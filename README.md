@@ -2,14 +2,14 @@
 
 AI image-to-SVG product generator. Upload an image, chat with GPT-4o to
 produce a manufacturing-ready SVG, approve, and save it as a priced product.
-Price is the OpenAI token cost of the generation plus a flat $10 markup.
+Price is the OpenAI API cost of the generation plus a flat $10 markup.
 
 ## Stack
 
-- Next.js 15 (App Router) + React 19, TypeScript
+- Next.js App Router + React 19, TypeScript
 - shadcn/ui on Tailwind CSS
 - Supabase (auth, Postgres with RLS, Storage)
-- Vercel AI SDK 4 + OpenAI GPT-4o (`streamObject` for structured streaming)
+- Vercel AI SDK + OpenAI models for structured generation
 - `isomorphic-dompurify` for SVG sanitization
 - Deploys to Vercel; pnpm package manager
 
@@ -68,14 +68,94 @@ Local Supabase ships demo JWT keys — they are stable across resets and safe to
 commit only if you're sure the project never reuses them in production. For
 prod, swap to your live project's URL + keys.
 
+### 3a. Promote a local admin
+
+After registering and verifying a local user, promote that account from
+Supabase Studio SQL editor. Replace the email lookup value first:
+
+```sql
+update public.profiles
+set role = 'admin'
+where user_id = (
+  select id
+  from auth.users
+  where email = 'admin@example.com'
+);
+
+insert into public.admin_permissions (user_id, permission)
+select profiles.user_id, permission
+from public.profiles
+cross join (
+  values
+    ('catalog_manage'),
+    ('seo_manage'),
+    ('orders_manage'),
+    ('generated_review'),
+    ('users_manage'),
+    ('transactions_manage'),
+    ('balances_adjust')
+) as permissions(permission)
+where profiles.role = 'admin'
+on conflict (user_id, permission) do nothing;
+```
+
 ### 4. Run
 
 ```bash
 pnpm dev
 ```
 
-Open <http://localhost:3000>. Register → check Mailpit (<http://127.0.0.1:54324>) for the
-verification email → click the link → land on `/dashboard`.
+Open <http://localhost:3000>. Register, check Mailpit (<http://127.0.0.1:54324>) for the
+verification email, click the link, then land on `/dashboard`.
+
+With the dev server running, run the local runtime smoke check when validating public routes
+and sitemap URLs:
+
+```bash
+pnpm smoke:runtime
+```
+
+With local Supabase running, run the disposable database workflow smoke when validating
+cart, order snapshot, admin audit, transaction, credit, and personalized order data behavior:
+
+```bash
+pnpm smoke:db-workflows
+```
+
+With a local app server running, run the headless Chrome UI workflow smoke when validating
+guest storefront/cart, language switching, banner, personalized night light, and auth-gate entry points:
+
+```bash
+pnpm smoke:ui-workflows
+```
+
+## Marketplace Setup Notes
+
+Run `supabase db reset` after pulling migration changes. The marketplace migrations seed:
+
+- Categories, subcategories, popular catalog items, banner size presets, and banner sample templates.
+- Storage buckets: `catalog-assets`, `banner-assets`, `user-uploads`, and `generated-assets`.
+- Admin permission rows used by catalog, SEO, user, transaction, balance, and generation review screens.
+
+Important local routes:
+
+| Flow | Route |
+|---|---|
+| Storefront | <http://localhost:3000/> |
+| Catalog | <http://localhost:3000/catalog> |
+| Cart | <http://localhost:3000/cart> |
+| Credit packs | <http://localhost:3000/credits> |
+| Generic generator | <http://localhost:3000/create> |
+| Night light generator | <http://localhost:3000/create/night-light> |
+| 2D laser-cut generator | <http://localhost:3000/create/laser-cut-2d> |
+| Admin hub | <http://localhost:3000/admin> |
+| Admin create hub | <http://localhost:3000/admin/create> |
+| Admin banner samples | <http://localhost:3000/admin/banner-samples> |
+| Admin personalized models | <http://localhost:3000/admin/personalization-models> |
+
+Credit packs and order payments use Stripe Checkout when Stripe environment variables are configured. Admins can still perform guarded manual credit adjustments from the admin user detail page with an audit reason.
+
+Uploaded user images require an explicit rights confirmation. Generated previews are approximate and require admin/production review before manufacturing.
 
 ### Stopping
 
@@ -138,7 +218,7 @@ app/
   api/generate/                   # streamObject endpoint
 lib/
   supabase/                       # client / server / middleware factories
-  pricing.ts                      # token-cost-to-price math
+  pricing.ts                      # Generation-cost-to-price math
   sanitize.ts                     # DOMPurify SVG sanitization
   generation-schema.ts            # Zod schema shared by API + client
   env.ts                          # Zod-validated env vars
@@ -157,8 +237,8 @@ Maps 1:1 to PRD §11:
 2. ~~Branded Resend email~~ — DEFERRED, Supabase default in v1
 3. Click verification link → land on `/dashboard` with empty state
 4. Click "Create new" → upload → describe → first SVG streams in
-5. ⩽5s first-token latency on GPT-4o
-6. Follow-up message replaces SVG; tokens accumulated server-side
+5. <=5s first generated-output latency on GPT-4o
+6. Follow-up message replaces SVG; usage is accumulated server-side
 7. Approve → atomic save
 8. Land on `/products/[id]` with SVG, title, price, disabled Buy + tooltip
 9. Return to dashboard → card visible

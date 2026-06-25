@@ -1,0 +1,117 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { z } from 'zod';
+import { getServerEnv } from '@/lib/env';
+import { createOrderFromCart } from '@/lib/orders';
+import { getStripe } from '@/lib/stripe';
+import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { createTransactionRecord } from '@/lib/transactions';
+
+const checkoutSchema = z.object({
+  contactEmail: z.string().email().optional().or(z.literal('')),
+  locale: z.enum(['en', 'ru', 'am']).optional().or(z.literal('')),
+});
+
+export async function createCheckoutOrderAction(formData: FormData) {
+  const parsed = checkoutSchema.safeParse({
+    contactEmail: formData.get('contactEmail') || '',
+    locale: formData.get('locale') || '',
+  });
+  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid checkout data.');
+
+  const supabase = await getServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect('/login?next=/checkout');
+
+  const order = await createOrderFromCart(supabase, user.id, {
+    contactEmail: parsed.data.contactEmail || user.email,
+    locale: parsed.data.locale || null,
+  });
+
+  const { data: orderTotals, error: totalError } = await supabase
+    .from('orders')
+    .select('subtotal_cents, currency, exchange_rate_context, payment_provider_route')
+    .eq('id', order.id)
+    .eq('user_id', user.id)
+    .single<{
+      subtotal_cents: number;
+      currency: string;
+      exchange_rate_context: Record<string, unknown>;
+      payment_provider_route: 'stripe' | 'bank_manual' | null;
+    }>();
+
+  if (totalError || !orderTotals) throw new Error(totalError?.message ?? 'Unable to read order total.');
+
+  const service = getServiceSupabase();
+  const transaction = await createTransactionRecord(service, {
+    userId: user.id,
+    orderId: order.id,
+    type: 'payment',
+    status: 'pending',
+    amountCents: orderTotals.subtotal_cents,
+    currency: orderTotals.currency,
+    provider: orderTotals.payment_provider_route ?? 'bank_manual',
+    paymentProviderRoute: orderTotals.payment_provider_route ?? 'bank_manual',
+    exchangeRateContext: orderTotals.exchange_rate_context,
+    metadata: {
+      source: 'checkout_review',
+      paymentProviderRoute: orderTotals.payment_provider_route ?? 'bank_manual',
+    },
+    createdBy: user.id,
+  });
+
+  const { error: transactionLinkError } = await service
+    .from('orders')
+    .update({ transaction_id: transaction.id })
+    .eq('id', order.id)
+    .eq('user_id', user.id);
+
+  if (transactionLinkError) throw new Error(transactionLinkError.message);
+
+  revalidatePath('/cart');
+  revalidatePath('/checkout');
+  revalidatePath('/orders');
+
+  if (orderTotals.payment_provider_route !== 'stripe') {
+    redirect(`/orders/${order.id}?checkout=bank_pending`);
+  }
+
+  const siteUrl = getServerEnv().NEXT_PUBLIC_SITE_URL;
+  const session = await getStripe().checkout.sessions.create({
+    mode: 'payment',
+    payment_method_types: ['card'],
+    customer_email: user.email ?? undefined,
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: orderTotals.currency.toLowerCase(),
+          unit_amount: orderTotals.subtotal_cents,
+          product_data: {
+            name: `Snip order ${order.id.slice(0, 8)}`,
+          },
+        },
+      },
+    ],
+    metadata: {
+      purchaseType: 'order',
+      transactionId: transaction.id,
+      orderId: order.id,
+      userId: user.id,
+    },
+    success_url: `${siteUrl}/orders/${order.id}?checkout=success`,
+    cancel_url: `${siteUrl}/checkout?checkout=cancelled`,
+  });
+
+  await service
+    .from('transactions')
+    .update({ provider_reference: session.id })
+    .eq('id', transaction.id);
+
+  if (!session.url) throw new Error('Stripe did not return a checkout URL.');
+  redirect(session.url);
+}

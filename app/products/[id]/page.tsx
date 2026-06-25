@@ -27,7 +27,7 @@ export default async function ProductDetailPage({
   const { data: product, error } = await supabase
     .from('products')
     .select(
-      'id, title, svg_content, input_tokens, output_tokens, token_cost_cents, markup_cents, price_cents, created_at',
+      'id, title, svg_content, input_units, output_units, api_cost_cents, markup_cents, price_cents, created_at',
     )
     .eq('id', id)
     .single();
@@ -76,11 +76,11 @@ export default async function ProductDetailPage({
             Price breakdown
           </summary>
           <div className="space-y-2 border-t px-4 py-3 text-sm">
-            <Row label="Input tokens" value={product.input_tokens.toLocaleString()} />
-            <Row label="Output tokens" value={product.output_tokens.toLocaleString()} />
+            <Row label="Input units" value={product.input_units.toLocaleString()} />
+            <Row label="Output units" value={product.output_units.toLocaleString()} />
             <Row
-              label={`Token cost (input × $${PRICING.INPUT_USD_PER_MILLION}/M + output × $${PRICING.OUTPUT_USD_PER_MILLION}/M)`}
-              value={formatPrice(product.token_cost_cents)}
+              label={`API usage cost (input × $${PRICING.INPUT_USD_PER_MILLION}/M + output × $${PRICING.OUTPUT_USD_PER_MILLION}/M)`}
+              value={formatPrice(product.api_cost_cents)}
             />
             <Row label="Markup" value={formatPrice(product.markup_cents)} />
             <div className="border-t pt-2">

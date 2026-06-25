@@ -4,6 +4,7 @@ import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { generationSchema } from '@/lib/generation-schema';
+import { getCreditBalance } from '@/lib/credits';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -42,10 +43,14 @@ export async function POST(req: NextRequest) {
   const supabase = await getServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const balance = await getCreditBalance(supabase, user.id).catch(() => 0);
+  if (balance < 1) {
+    return NextResponse.json({ error: 'Insufficient credit balance.' }, { status: 402 });
+  }
 
   const { data: session, error: sessionErr } = await supabase
     .from('generation_sessions')
-    .select('id, user_id, input_tokens, output_tokens')
+    .select('id, user_id, input_units, output_units')
     .eq('id', parsed.sessionId)
     .single();
   if (sessionErr || !session) return NextResponse.json({ error: 'Session not found.' }, { status: 404 });
@@ -74,8 +79,8 @@ export async function POST(req: NextRequest) {
       await supabase
         .from('generation_sessions')
         .update({
-          input_tokens: session.input_tokens + (usage?.inputTokens ?? 0),
-          output_tokens: session.output_tokens + (usage?.outputTokens ?? 0),
+          input_units: session.input_units + (usage?.inputTokens ?? 0),
+          output_units: session.output_units + (usage?.outputTokens ?? 0),
           last_title: object.title,
           last_svg: object.svg,
           updated_at: new Date().toISOString(),

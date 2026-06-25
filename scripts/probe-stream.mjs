@@ -9,7 +9,7 @@ const cookies = fs.readFileSync('/tmp/snip-app-cookies.txt', 'utf8')
   .map((l) => { const c = l.split('\t'); return `${c[5]}=${c[6]}`; })
   .join('; ');
 
-// Reset session tokens to 0 so the probe doesn't compound previous runs.
+// Reset session usage counters so the probe doesn't compound previous runs.
 const tinyPng = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
 
 const t0 = Date.now();

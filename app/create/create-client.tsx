@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SvgRender } from '@/components/svg-render';
 import { generationSchema } from '@/lib/generation-schema';
+import { PRODUCT_TYPES, type ProductType } from '@/lib/marketplace-constants';
 import { startSession, approveSession } from './actions';
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -36,12 +37,22 @@ async function fileToBase64(file: File): Promise<string> {
   return btoa(bin);
 }
 
-export function CreateClient() {
+export function CreateClient({
+  initialProductType = 'laser_cut_2d_decoration',
+  mode = 'laser-cut-2d',
+}: {
+  initialProductType?: ProductType;
+  mode?: 'generic' | 'night-light' | 'laser-cut-2d';
+}) {
   const [image, setImage] = useState<UploadedImage | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [editableTitle, setEditableTitle] = useState('');
+  const [productType, setProductType] = useState<ProductType>(initialProductType);
+  const [standText, setStandText] = useState('');
+  const [sizePreset, setSizePreset] = useState('medium');
+  const [rightsConfirmed, setRightsConfirmed] = useState(false);
   const [approving, startApproving] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -64,6 +75,11 @@ export function CreateClient() {
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!rightsConfirmed) {
+      toast.error('Confirm that you have rights to use the uploaded image.');
+      e.target.value = '';
+      return;
+    }
     if (!ACCEPTED_MIME.includes(file.type)) {
       toast.error('Only PNG, JPEG, or WebP are accepted.');
       e.target.value = '';
@@ -78,7 +94,11 @@ export function CreateClient() {
     const mimeType = file.type as UploadedImage['mimeType'];
     const previewUrl = URL.createObjectURL(file);
     try {
-      const { sessionId: newId } = await startSession({ imageBase64: base64, mimeType });
+      const { sessionId: newId } = await startSession({
+        imageBase64: base64,
+        mimeType,
+        rightsConfirmed,
+      });
       setSessionId(newId);
       setImage({ base64, mimeType, previewUrl });
       toast.success('Image uploaded. Now describe what you want.');
@@ -86,11 +106,17 @@ export function CreateClient() {
       toast.error(err instanceof Error ? err.message : 'Upload failed.');
       URL.revokeObjectURL(previewUrl);
     }
-  }, []);
+  }, [rightsConfirmed]);
 
   const handleSend = useCallback(() => {
     if (!sessionId || !image || !input.trim() || isLoading) return;
-    const message = input.trim();
+    const details = [
+      mode === 'night-light' ? 'Generate a night light design with acrylic engraving and a wood base.' : null,
+      mode === 'laser-cut-2d' ? `Generate a ${productType.replaceAll('_', ' ')} with cut and engrave layers.` : null,
+      standText.trim() ? `Wood base text: ${standText.trim().slice(0, 100)}.` : null,
+      sizePreset ? `Preferred size: ${sizePreset}.` : null,
+    ].filter(Boolean).join('\n');
+    const message = `${details ? `${details}\n\n` : ''}${input.trim()}`;
     setMessages((m) => [...m, { role: 'user', content: message }]);
     setInput('');
     submit({
@@ -99,13 +125,17 @@ export function CreateClient() {
       imageBase64: image.base64,
       mimeType: image.mimeType,
     });
-  }, [sessionId, image, input, isLoading, submit]);
+  }, [sessionId, image, input, isLoading, mode, productType, sizePreset, standText, submit]);
 
   const handleApprove = useCallback(() => {
     if (!sessionId || !livePreviewSvg) return;
     startApproving(async () => {
       try {
-        await approveSession(sessionId);
+        await approveSession({
+          sessionId,
+          title: editableTitle.trim() || liveTitle,
+          productType,
+        });
         // approveSession redirects on success; if it returns, something odd happened.
       } catch (err) {
         // Next.js redirect throws a NEXT_REDIRECT sentinel — not a real error.
@@ -113,7 +143,7 @@ export function CreateClient() {
         if (!msg.includes('NEXT_REDIRECT')) toast.error(msg);
       }
     });
-  }, [sessionId, livePreviewSvg]);
+  }, [editableTitle, livePreviewSvg, liveTitle, productType, sessionId]);
 
   const previewPane = (
     <Card className="flex h-[60vh] items-center justify-center md:h-[calc(100vh-12rem)]">
@@ -142,22 +172,34 @@ export function CreateClient() {
     <Card className="flex h-[60vh] flex-col md:h-[calc(100vh-12rem)]">
       <CardContent className="flex flex-1 flex-col gap-4 p-4">
         {!image && (
-          <label
-            htmlFor="image-upload"
-            className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed p-6 text-center hover:bg-accent"
-          >
-            <Upload className="h-8 w-8 text-muted-foreground" />
-            <p className="font-medium">Upload a reference image</p>
-            <p className="text-xs text-muted-foreground">PNG, JPEG, or WebP up to 5 MB.</p>
-            <input
-              ref={fileInputRef}
-              id="image-upload"
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </label>
+          <div className="flex flex-1 flex-col gap-3">
+            <label className="flex items-start gap-2 rounded-md border bg-muted/30 p-3 text-sm">
+              <input
+                type="checkbox"
+                checked={rightsConfirmed}
+                onChange={(event) => setRightsConfirmed(event.target.checked)}
+                className="mt-1"
+              />
+              <span>I have the rights to use the uploaded image.</span>
+            </label>
+            <label
+              htmlFor="image-upload"
+              className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed p-6 text-center hover:bg-accent"
+            >
+              <Upload className="h-8 w-8 text-muted-foreground" />
+              <p className="font-medium">Upload a reference image</p>
+              <p className="text-xs text-muted-foreground">PNG, JPEG, or WebP up to 5 MB.</p>
+              <input
+                ref={fileInputRef}
+                id="image-upload"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                disabled={!rightsConfirmed}
+                onChange={handleFileChange}
+              />
+            </label>
+          </div>
         )}
 
         {image && (
@@ -203,6 +245,49 @@ export function CreateClient() {
 
         {image && (
           <div className="space-y-2 border-t pt-3">
+            {mode === 'night-light' && (
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Input
+                  value={standText}
+                  onChange={(event) => setStandText(event.target.value.slice(0, 100))}
+                  placeholder="Wood base text"
+                />
+                <select
+                  value={sizePreset}
+                  onChange={(event) => setSizePreset(event.target.value)}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            )}
+            {mode === 'laser-cut-2d' && (
+              <div className="grid gap-2 sm:grid-cols-2">
+                <select
+                  value={productType}
+                  onChange={(event) => setProductType(event.target.value as ProductType)}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="laser_cut_2d_toy">Toy</option>
+                  <option value="laser_cut_2d_decoration">Decoration</option>
+                  <option value="laser_cut_2d_constructor">Constructor</option>
+                </select>
+                <select
+                  value={sizePreset}
+                  onChange={(event) => setSizePreset(event.target.value)}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="small">Small</option>
+                  <option value="medium">Medium</option>
+                  <option value="large">Large</option>
+                </select>
+              </div>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Estimated credit cost is based on model usage and shown before saving.
+            </p>
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -237,18 +322,42 @@ export function CreateClient() {
   const approveBar = livePreviewSvg && !isLoading && (
     <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex-1 space-y-1">
-        <label htmlFor="approve-title" className="text-sm font-medium">
-          Product title
-        </label>
-        <Input
-          id="approve-title"
-          value={editableTitle}
-          onChange={(e) => setEditableTitle(e.target.value)}
-          placeholder={liveTitle}
-          className="max-w-md"
-        />
+        <div className="grid gap-3 md:grid-cols-[1fr_260px]">
+          <div className="space-y-1">
+            <label htmlFor="approve-title" className="text-sm font-medium">
+              Product title
+            </label>
+            <Input
+              id="approve-title"
+              value={editableTitle}
+              onChange={(e) => setEditableTitle(e.target.value)}
+              placeholder={liveTitle}
+              className="max-w-md"
+            />
+          </div>
+          <div className="space-y-1">
+            <label htmlFor="product-type" className="text-sm font-medium">
+              Product type
+            </label>
+            <select
+              id="product-type"
+              value={productType}
+              onChange={(event) => setProductType(event.target.value as ProductType)}
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            >
+              {PRODUCT_TYPES.filter((type) => type !== 'personalized_night_light' && type !== 'banner').map((type) => (
+                <option key={type} value={type}>
+                  {type.replaceAll('_', ' ')}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Saving creates a generated item. Generated previews are approximations and require production review before manufacturing. Price starts with a $10.00 markup plus API usage cost.
+        </p>
       </div>
-      <Button onClick={handleApprove} disabled={approving || !editableTitle.trim()}>
+      <Button onClick={handleApprove} disabled={approving || !(editableTitle.trim() || liveTitle)}>
         {approving ? 'Approving…' : 'Approve and save'}
       </Button>
     </div>

@@ -9,18 +9,18 @@ export const PRICING = {
 } as const;
 
 export interface PriceBreakdown {
-  tokenCostCents: number;
+  apiCostCents: number;
   markupCents: number;
   priceCents: number;
 }
 
-export function computePriceCents(inputTokens: number, outputTokens: number): PriceBreakdown {
-  const inputCents = (inputTokens / 1_000_000) * PRICING.INPUT_USD_PER_MILLION * 100;
-  const outputCents = (outputTokens / 1_000_000) * PRICING.OUTPUT_USD_PER_MILLION * 100;
-  const tokenCostCents = Math.round(inputCents + outputCents);
+export function computePriceCents(inputUnits: number, outputUnits: number): PriceBreakdown {
+  const inputCents = (inputUnits / 1_000_000) * PRICING.INPUT_USD_PER_MILLION * 100;
+  const outputCents = (outputUnits / 1_000_000) * PRICING.OUTPUT_USD_PER_MILLION * 100;
+  const apiCostCents = Math.round(inputCents + outputCents);
   return {
-    tokenCostCents,
+    apiCostCents,
     markupCents: PRICING.MARKUP_CENTS,
-    priceCents: tokenCostCents + PRICING.MARKUP_CENTS,
+    priceCents: apiCostCents + PRICING.MARKUP_CENTS,
   };
 }

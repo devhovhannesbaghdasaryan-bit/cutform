@@ -1,7 +1,10 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { mergeSessionCartIntoUserCart } from '@/lib/cart';
+import { clearCartSessionId, getCartSessionId } from '@/lib/cart-session';
+import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { getServerEnv } from '@/lib/env';
 
 export type AuthFormState = { error: string | null };
@@ -38,12 +41,18 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
   if (error) return { error: error.message };
 
   if (!data.user?.email_confirmed_at) redirect('/auth/verify-email');
+  const sessionId = await getCartSessionId();
+  if (sessionId && data.user) {
+    await mergeSessionCartIntoUserCart(getServiceSupabase(), sessionId, data.user.id);
+    await clearCartSessionId();
+  }
   redirect(next.startsWith('/') ? next : '/dashboard');
 }
 
 export async function logoutAction() {
   const supabase = await getServerSupabase();
   await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
   redirect('/login');
 }
 
@@ -69,8 +78,13 @@ export async function verifyOtpAction(_prev: AuthFormState, formData: FormData):
   if (!/^\d{6}$/.test(token)) return { error: 'Enter the 6-digit code from the email.' };
 
   const supabase = await getServerSupabase();
-  const { error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' });
+  const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' });
   if (error) return { error: error.message };
 
+  const sessionId = await getCartSessionId();
+  if (sessionId && data.user) {
+    await mergeSessionCartIntoUserCart(getServiceSupabase(), sessionId, data.user.id);
+    await clearCartSessionId();
+  }
   redirect('/dashboard');
 }
