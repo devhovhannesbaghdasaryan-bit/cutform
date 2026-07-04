@@ -65,6 +65,7 @@ export function GeneratedPreviewSelector({
               src={activePreviewUrl}
               alt={copy.previewAlt.replace('{name}', activeOption?.label ?? itemTitle)}
               fill
+              unoptimized
               priority
               sizes="(min-width: 1024px) 720px, 100vw"
               className="object-contain"
@@ -108,6 +109,7 @@ export function GeneratedPreviewSelector({
                         src={option.previewUrl}
                         alt={copy.previewAlt.replace('{name}', option.label)}
                         fill
+                        unoptimized
                         sizes="(min-width: 640px) 30vw, 100vw"
                         className="object-contain"
                       />

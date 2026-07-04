@@ -8,7 +8,13 @@ grant execute on function private.is_admin(uuid) to anon, authenticated, service
 
 -- Trigger/event-trigger entrypoints must not be callable as RPC functions.
 revoke all on function public.handle_new_user() from public, anon, authenticated;
-revoke all on function public.rls_auto_enable() from public, anon, authenticated;
+do $$
+begin
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    execute 'revoke all on function public.rls_auto_enable() from public, anon, authenticated';
+  end if;
+end
+$$;
 
 -- Pin lookup paths so object resolution cannot be redirected by a caller.
 alter function public.set_updated_at() set search_path = '';

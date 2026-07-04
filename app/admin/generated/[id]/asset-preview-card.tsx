@@ -31,7 +31,7 @@ export function AssetPreviewCard({ title, path, url, downloadUrl, isSvg = false 
               // eslint-disable-next-line @next/next/no-img-element
               <img src={url} alt="" className="h-full w-full object-contain p-1" />
             ) : (
-              <Image src={url} alt="" fill sizes="80px" className="object-cover" />
+              <Image src={url} alt="" fill unoptimized sizes="80px" className="object-cover" />
             )
           ) : (
             <span className="grid h-full place-items-center px-2 text-xs text-muted-foreground">Unavailable</span>
@@ -93,7 +93,7 @@ export function AssetPreviewCard({ title, path, url, downloadUrl, isSvg = false 
               // eslint-disable-next-line @next/next/no-img-element
               <img src={url} alt={title} className="max-h-[70vh] max-w-full object-contain" />
             ) : (
-              <Image src={url} alt={title} width={1600} height={1600} className="max-h-[70vh] w-auto max-w-full object-contain" />
+              <Image src={url} alt={title} width={1600} height={1600} unoptimized className="max-h-[70vh] w-auto max-w-full object-contain" />
             )}
           </div>
           <div className="flex justify-stretch border-t p-3 sm:justify-end">
