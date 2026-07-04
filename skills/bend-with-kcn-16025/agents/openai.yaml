@@ -1,0 +1,4 @@
+interface:
+  display_name: "KCN-16025 Press Brake"
+  short_description: "Plan and validate KCN-16025 bending jobs"
+  default_prompt: "Use $bend-with-kcn-16025 to review this sheet-metal part and prepare a safe bend plan."

@@ -501,6 +501,52 @@ async function validateCategoryExists(
   return Boolean(data);
 }
 
+async function syncCatalogItemMarketRules(
+  supabase: Awaited<ReturnType<typeof requireAdmin>>['supabase'],
+  catalogItemId: string,
+  formData: FormData,
+) {
+  const rows: Array<{
+    catalog_item_id: string;
+    region_id: string | null;
+    country_code: string | null;
+    visibility_override: boolean | null;
+    shipping_rate_cents: number | null;
+  }> = [];
+  const targets = new Set<string>();
+  for (const key of formData.keys()) {
+    const match = /^market_(region|country)_([^_]+)_(visibility|shipping)$/.exec(key);
+    if (match) targets.add(`${match[1]}:${match[2]}`);
+  }
+  for (const target of targets) {
+    const [kind, id] = target.split(':') as ['region' | 'country', string];
+    const visibilityValue = String(formData.get(`market_${kind}_${id}_visibility`) ?? '');
+    const shippingValue = String(formData.get(`market_${kind}_${id}_shipping`) ?? '').trim();
+    const visibility = visibilityValue === 'show' ? true : visibilityValue === 'hide' ? false : null;
+    const shipping = shippingValue === '' ? null : Number(shippingValue);
+    if (shipping != null && (!Number.isInteger(shipping) || shipping < 0)) {
+      throw new Error('Shipping rates must be non-negative AMD minor-unit amounts.');
+    }
+    if (visibility == null && shipping == null) continue;
+    rows.push({
+      catalog_item_id: catalogItemId,
+      region_id: kind === 'region' ? id : null,
+      country_code: kind === 'country' ? id : null,
+      visibility_override: visibility,
+      shipping_rate_cents: shipping,
+    });
+  }
+  const { error: deleteError } = await supabase
+    .from('catalog_item_market_rules')
+    .delete()
+    .eq('catalog_item_id', catalogItemId);
+  if (deleteError) throw new Error(deleteError.message);
+  if (rows.length) {
+    const { error } = await supabase.from('catalog_item_market_rules').insert(rows);
+    if (error) throw new Error(error.message);
+  }
+}
+
 export async function createCatalogItemAction(
   _prev: AdminFormState,
   formData: FormData,
@@ -564,6 +610,7 @@ export async function createCatalogItemAction(
     uploadedAssets.thumbnailPath ?? item.thumbnailPath ?? null,
   );
   await upsertSeoMetadata(supabase, data.id, item, user.id);
+  await syncCatalogItemMarketRules(supabase, data.id, formData);
 
   revalidatePath('/');
   revalidatePath('/catalog');
@@ -711,6 +758,7 @@ export async function updateCatalogItemAction(
     uploadedAssets.thumbnailPath ?? item.thumbnailPath ?? null,
   );
   await upsertSeoMetadata(supabase, id, item, user.id);
+  await syncCatalogItemMarketRules(supabase, id, formData);
 
   revalidatePath('/');
   revalidatePath('/catalog');

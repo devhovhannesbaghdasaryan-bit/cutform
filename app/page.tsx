@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { ArrowRight, BadgeCheck, PackageCheck, Sparkles } from 'lucide-react';
 import { CategoryNavigation } from '@/components/category-navigation';
 import { Button } from '@/components/ui/button';
 import { CatalogItemCard } from '@/components/catalog-item-card';
 import { MarketplaceHeader } from '@/components/marketplace-header';
+import { SvgRender } from '@/components/svg-render';
 import { translate } from '@/lib/i18n';
 import { listCategories, listPopularCatalogItems, listSubcategories } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
@@ -32,23 +35,24 @@ export default async function LandingPage() {
     listCategories().catch(() => []),
     listSubcategories().catch(() => []),
   ]);
+  const heroProducts = await loadHeroProducts();
 
   return (
     <>
       <MarketplaceHeader />
       <main>
-        <section className="overflow-hidden border-b bg-white">
-          <div className="storefront-container grid min-h-[calc(100vh-5rem)] gap-10 py-12 lg:grid-cols-[1fr_560px] lg:items-center lg:py-16">
+        <section className="cyber-grid-surface overflow-hidden border-b">
+          <div className="storefront-container grid min-h-[calc(100vh-5rem)] gap-10 py-12 lg:grid-cols-[minmax(0,1fr)_560px] lg:items-center lg:py-14">
             <div className="min-w-0 space-y-7 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-1 text-sm text-muted-foreground">
-                <Sparkles className="h-4 w-4" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card/80 px-3 py-1 text-sm text-foreground shadow-sm">
+                <Sparkles className="h-4 w-4 text-cyber-magenta" />
                 {translate(locale, 'landing.eyebrow')}
               </div>
               <div className="space-y-4">
                 <h1 className="mx-auto max-w-3xl break-words text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:mx-0 lg:text-6xl">
                   {translate(locale, 'landing.title')}
                 </h1>
-                <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-lg lg:mx-0 md:text-xl">
+                <p className="mx-auto max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg lg:mx-0 md:text-xl">
                   {translate(locale, 'landing.subtitle')}
                 </p>
               </div>
@@ -60,37 +64,38 @@ export default async function LandingPage() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link href="/create">{translate(locale, 'landing.generate_custom')}</Link>
+                  <Link href="/personalize/portrait-personalized-night-light">
+                    {translate(locale, 'landing.generate_custom')}
+                  </Link>
                 </Button>
+              </div>
+              <div className="grid gap-3 text-left sm:grid-cols-2 lg:max-w-xl">
+                <div className="flex items-start gap-3 rounded-lg border bg-card/75 p-3 shadow-sm">
+                  <PackageCheck className="mt-0.5 h-5 w-5 shrink-0 text-cyber-yellow" />
+                  <p className="text-sm text-muted-foreground">{translate(locale, 'catalog.subtitle')}</p>
+                </div>
+                <div className="flex items-start gap-3 rounded-lg border bg-card/75 p-3 shadow-sm">
+                  <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+                  <p className="text-sm text-muted-foreground">{translate(locale, 'generation.preview_disclaimer')}</p>
+                </div>
               </div>
             </div>
             <div className="relative mx-auto w-full max-w-[560px]">
-              <div className="product-art-frame flex items-center justify-center p-4 shadow-sm sm:p-8">
-                <div className="grid h-full w-full grid-cols-2 gap-4">
-                  <div className="rounded-lg border bg-white p-5 shadow-sm">
-                    <p className="text-xs font-medium uppercase text-muted-foreground">
-                      {translate(locale, 'landing.hero_night_lights')}
-                    </p>
-                    <div className="mt-6 h-24 rounded-full border bg-secondary" />
-                  </div>
-                  <div className="rounded-lg border bg-white p-5 shadow-sm">
-                    <p className="text-xs font-medium uppercase text-muted-foreground">
-                      {translate(locale, 'landing.hero_banners')}
-                    </p>
-                    <div className="mt-6 h-20 rounded-md bg-primary" />
-                  </div>
-                  <div className="col-span-2 rounded-lg border bg-white p-5 shadow-sm">
-                    <p className="text-xs font-medium uppercase text-muted-foreground">
-                      {translate(locale, 'landing.hero_laser_gifts')}
-                    </p>
-                    <div className="mt-5 grid grid-cols-4 gap-3">
-                      <span className="h-12 rounded-md bg-muted" />
-                      <span className="h-12 rounded-md bg-muted" />
-                      <span className="h-12 rounded-md bg-muted" />
-                      <span className="h-12 rounded-md bg-muted" />
+              <div className="product-art-frame grid gap-3 p-3 shadow-xl shadow-cyber-cyan/10 sm:grid-cols-[1.15fr_0.85fr] sm:p-4">
+                {heroProducts.map((product, index) => (
+                  <article
+                    key={product.title}
+                    className={index === 0 ? 'hero-product-card sm:row-span-2' : 'hero-product-card'}
+                  >
+                    <div className={index === 0 ? 'h-full min-h-64' : 'h-36 sm:h-full'}>
+                      <SvgRender svg={product.svg} className="h-full w-full p-5" />
                     </div>
-                  </div>
-                </div>
+                    <div className="absolute inset-x-3 bottom-3 rounded-md border bg-card/90 px-3 py-2 shadow-sm backdrop-blur">
+                      <p className="text-xs font-medium uppercase text-muted-foreground">{product.category}</p>
+                      <p className="truncate text-sm font-semibold">{product.title}</p>
+                    </div>
+                  </article>
+                ))}
               </div>
             </div>
           </div>
@@ -125,4 +130,47 @@ export default async function LandingPage() {
       </main>
     </>
   );
+}
+
+async function loadHeroProducts() {
+  const productRoot = path.join(process.cwd(), 'products');
+  const loaded = await Promise.all([
+    readHeroProduct(
+      productRoot,
+      'Modular plywood shelving',
+      'CNC routed decor',
+      'cnc-routed-wood-furniture-decor-fixtures',
+      '01-modular-plywood-shelving',
+    ),
+    readHeroProduct(
+      productRoot,
+      'Personalized lithophane lamp',
+      'Night lights',
+      '3d-printed-products-parts-fixtures-custom-devices',
+      '07-personalized-lithophane-lamps',
+    ),
+    readHeroProduct(
+      productRoot,
+      'Flat-pack laptop stand',
+      'Desk gifts',
+      'cnc-routed-wood-furniture-decor-fixtures',
+      '04-flat-pack-laptop-stand',
+    ),
+  ]);
+
+  return loaded.filter((item) => item.svg);
+}
+
+async function readHeroProduct(
+  productRoot: string,
+  title: string,
+  category: string,
+  group: string,
+  slug: string,
+) {
+  return {
+    title,
+    category,
+    svg: await readFile(path.join(productRoot, group, slug, 'assets', 'hero.svg'), 'utf8').catch(() => ''),
+  };
 }

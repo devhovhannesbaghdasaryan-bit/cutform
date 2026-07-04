@@ -43,17 +43,17 @@ export function createFallbackSeoMetadataDraft(source: SeoMetadataSource): SeoMe
   const category = source.categoryName ?? 'custom product';
   const cleanTitle = source.title.trim();
   const baseDescription = source.description?.trim()
-    || `Shop ${cleanTitle}, a ${category.toLowerCase()} available from the Snip marketplace.`;
+    || `Shop ${cleanTitle}, a ${category.toLowerCase()} available from the Uniqraft marketplace.`;
   const seoDescription = baseDescription.length > 155
     ? `${baseDescription.slice(0, 152).trim()}...`
     : baseDescription;
 
   return {
-    seoTitle: `${cleanTitle} | Snip Marketplace`.slice(0, 70),
+    seoTitle: `${cleanTitle} | Uniqraft Marketplace`.slice(0, 70),
     seoDescription,
     keywords: Array.from(
       new Set(
-        [cleanTitle, category, 'laser cut', 'custom gift', 'Snip']
+        [cleanTitle, category, 'laser cut', 'custom gift', 'Uniqraft']
           .map((value) => value.toLowerCase())
           .filter(Boolean),
       ),

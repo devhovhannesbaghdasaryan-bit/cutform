@@ -15,6 +15,7 @@ import {
 import { getCartSessionId } from '@/lib/cart-session';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { resolveCatalogMarket, resolveMarket } from '@/lib/market';
 
 async function getCartActor() {
   const supabase = await getServerSupabase();
@@ -49,6 +50,14 @@ export async function addCatalogItemToCartAction(formData: FormData) {
 
   if (error || !item || item.status !== 'published') {
     throw new Error(error?.message ?? 'Item is not available.');
+  }
+
+  const market = await resolveMarket({ supabase: getServiceSupabase() });
+  if (market.countryCode) {
+    const marketResolution = await resolveCatalogMarket(item.id, market, getServiceSupabase());
+    if (!marketResolution.availability.available) {
+      throw new Error('This item is not available for shipping to your selected country.');
+    }
   }
 
   const sourceCurrency = normalizeCurrency(item.currency) ?? 'AMD';

@@ -17,7 +17,7 @@ if (!catalog.includes('grid-cols-1') || !catalog.includes('lg:grid-cols-4')) {
 }
 
 const banners = readFileSync('app/banners/page.tsx', 'utf8');
-for (const token of ['MarketplaceHeader', 'storefront-container', 'Customize a sample', 'Advanced AI banner']) {
+for (const token of ['MarketplaceHeader', 'storefront-container', 'banners.customize', 'banners.advanced']) {
   if (!banners.includes(token)) throw new Error(`Banner page is missing redesign signal: ${token}`);
 }
 

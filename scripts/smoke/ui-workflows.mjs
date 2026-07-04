@@ -428,8 +428,8 @@ async function runAdminFlow(adminUser) {
       ['/en/admin/items', 'Items'],
       ['/en/admin/orders', 'Orders'],
       ['/en/admin/generated', 'Generated items'],
-      ['/en/admin/banner-samples', 'Banner samples'],
-      ['/en/admin/personalization-models', 'Personalized models'],
+      ['/en/personalization', 'Personalization'],
+      ['/en/personalization/night-lights', 'Night light templates'],
     ];
 
     for (const [route, expected] of adminRoutes) {

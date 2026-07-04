@@ -99,7 +99,7 @@ export default async function CatalogItemDetailPage({
         </Button>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr]">
-          <div className="overflow-hidden rounded-lg border bg-[linear-gradient(135deg,hsl(38_45%_88%),hsl(31_36%_72%))] p-6">
+          <div className="product-art-frame p-6">
             <CatalogMediaSlider
               media={sliderMedia}
               fallbackTitle={item.title}
@@ -153,11 +153,6 @@ export default async function CatalogItemDetailPage({
                 </TooltipTrigger>
                 <TooltipContent>Checkout arrives with the orders milestone.</TooltipContent>
               </Tooltip>
-              {item.is_customizable && (
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/create">Generate similar</Link>
-                </Button>
-              )}
             </div>
 
             {item.manufacturing_notes && (

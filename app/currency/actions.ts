@@ -13,7 +13,7 @@ const currencySchema = z.object({
   next: z.string().optional(),
 });
 
-async function updateActiveCartCurrency({
+export async function updateActiveCartCurrency({
   service,
   userId,
   sessionId,

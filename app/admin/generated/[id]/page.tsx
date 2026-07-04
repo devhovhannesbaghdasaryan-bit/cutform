@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation';
 import { reviewGeneratedItemAction } from '@/app/admin/generated/actions';
+import { AssetPreviewCard } from './asset-preview-card';
+import { ManufacturingSvgForm } from './manufacturing-svg-form';
 import { requireAdmin } from '@/lib/admin';
 import { formatDate } from '@/lib/utils';
 
@@ -32,7 +34,7 @@ interface PreviewOption {
   id: string;
   option_index: number;
   preview_image_path: string;
-  hidden_svg_path: string;
+  hidden_svg_path: string | null;
   status: string;
   metadata: Record<string, unknown>;
 }
@@ -78,54 +80,110 @@ export default async function AdminGeneratedDetailPage({
 
   if (error || !item) notFound();
 
+  const sourcePaths = [...new Set([
+    ...(item.source_image_path ? [item.source_image_path] : []),
+    ...item.original_image_paths,
+  ])];
+  const sourceAssets = await Promise.all(sourcePaths.map(async (storagePath) => {
+    const [preview, download] = await Promise.all([
+      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60),
+      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60, { download: fileName(storagePath) }),
+    ]);
+    return { storagePath, url: preview.data?.signedUrl ?? null, downloadUrl: download.data?.signedUrl ?? null };
+  }));
+  const optionAssets = await Promise.all((options ?? []).map(async (option) => ({
+    ...option,
+    previewUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60)).data?.signedUrl ?? null,
+    previewDownloadUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60, { download: fileName(option.preview_image_path) })).data?.signedUrl ?? null,
+    hiddenSvgUrl: option.hidden_svg_path
+      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
+      : null,
+    hiddenSvgDownloadUrl: option.hidden_svg_path
+      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60, { download: fileName(option.hidden_svg_path) })).data?.signedUrl ?? null
+      : null,
+  })));
+  const parentPreviewPath = item.selected_preview_path ?? item.preview_path;
+  const parentPreviewUrl = parentPreviewPath
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60)).data?.signedUrl ?? null
+    : null;
+  const parentPreviewDownloadUrl = parentPreviewPath
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60, { download: fileName(parentPreviewPath) })).data?.signedUrl ?? null
+    : null;
+  const parentHiddenSvgUrl = item.hidden_svg_path
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
+    : null;
+  const parentHiddenSvgDownloadUrl = item.hidden_svg_path
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60, { download: fileName(item.hidden_svg_path) })).data?.signedUrl ?? null
+    : null;
+  const validationWarnings = extractValidationWarnings(item.manufacturing_metadata);
+
   return (
-    <main className="container max-w-6xl space-y-8 py-10">
-      <div>
+    <main className="container max-w-6xl space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-10">
+      <div className="min-w-0">
         <p className="text-sm text-muted-foreground">Generated {formatDate(item.created_at)}</p>
-        <h1 className="text-3xl font-bold tracking-tight">{item.title ?? item.id.slice(0, 8)}</h1>
-        <p className="text-muted-foreground">
+        <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">{item.title ?? item.id.slice(0, 8)}</h1>
+        <p className="break-words text-sm text-muted-foreground sm:text-base">
           {item.product_type} &middot; {item.review_status} &middot; user {item.user_id.slice(0, 8)}
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
-        <section className="space-y-6">
-          <div className="rounded-lg border p-5">
-            <h2 className="font-semibold">Preview and source assets</h2>
-            <div className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
-              <Info label="Source image" value={item.source_image_path ?? '-'} />
-              <Info label="Original images" value={item.original_image_paths.join(', ') || '-'} />
-              <Info label="Preview" value={item.preview_path ?? '-'} />
-              <Info label="Selected preview" value={item.selected_preview_path ?? '-'} />
-              <Info label="Hidden SVG" value={item.hidden_svg_path ?? '-'} />
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:gap-8">
+        <section className="min-w-0 space-y-6">
+          <div className="min-w-0 rounded-lg border p-4 sm:p-5">
+            <h2 className="font-semibold">Source assets</h2>
+            {sourceAssets.length ? (
+              <div className="mt-4 grid min-w-0 gap-4 md:grid-cols-2">
+                {sourceAssets.map((asset, index) => (
+                  <AssetPreviewCard key={asset.storagePath} title={`Source image ${index + 1}`} path={asset.storagePath} url={asset.url} downloadUrl={asset.downloadUrl} />
+                ))}
+              </div>
+            ) : <p className="mt-3 text-sm text-muted-foreground">No source image was stored.</p>}
+            <div className="mt-5 grid gap-3 border-t pt-5 text-sm sm:grid-cols-2">
               <Info label="LED" value={item.multi_color ? 'Multi color' : item.color ?? '-'} />
               <Info label="Text" value={item.custom_text ?? '-'} />
               <Info label="Prompt" value={item.prompt ?? '-'} />
             </div>
           </div>
 
-          {options?.length ? (
-            <section className="space-y-4">
-              <h2 className="text-xl font-semibold tracking-tight">Personalized preview options</h2>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {options.map((option) => (
-                  <div key={option.id} className="space-y-3 rounded-lg border p-4">
-                    <div className="flex aspect-[4/3] items-center justify-center rounded-md bg-muted text-xs text-muted-foreground">
-                      {option.preview_image_path}
+          {optionAssets.length ? (
+            <section className="min-w-0 space-y-4">
+              <h2 className="break-words text-lg font-semibold tracking-tight sm:text-xl">Personalized preview options</h2>
+              <div className="grid min-w-0 gap-5 xl:grid-cols-2">
+                {optionAssets.map((option) => (
+                  <article key={option.id} className="min-w-0 space-y-4 overflow-hidden rounded-lg border p-3 sm:p-4">
+                    <div>
+                      <p className="font-semibold">{getOptionName(option)}</p>
+                      <p className="text-sm text-muted-foreground">Option {option.option_index} · {option.status}</p>
                     </div>
-                    <Info label="Status" value={option.status} />
-                    <Info label="Hidden SVG" value={option.hidden_svg_path} />
+                    <AssetPreviewCard title="Generated preview" path={option.preview_image_path} url={option.previewUrl} downloadUrl={option.previewDownloadUrl} />
+                    {option.hidden_svg_path ? (
+                      <AssetPreviewCard title="Manufacturing PNG" path={option.hidden_svg_path} url={option.hiddenSvgUrl} downloadUrl={option.hiddenSvgDownloadUrl} />
+                    ) : (
+                      <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">No manufacturing PNG has been generated by an admin.</div>
+                    )}
+                    <ManufacturingSvgForm
+                      generatedItemId={item.id}
+                      optionId={option.id}
+                      optionName={getOptionName(option)}
+                      defaultPrompt={buildManufacturingPrompt(item, option)}
+                      hasExistingSvg={Boolean(option.hidden_svg_path)}
+                    />
                     <Snapshot title="Option metadata" value={option.metadata} />
-                  </div>
+                  </article>
                 ))}
               </div>
             </section>
+          ) : parentPreviewPath ? (
+            <section className="grid gap-4 sm:grid-cols-2">
+              <AssetPreviewCard title="Generated preview" path={parentPreviewPath} url={parentPreviewUrl} downloadUrl={parentPreviewDownloadUrl} />
+              {item.hidden_svg_path ? <AssetPreviewCard title="Manufacturing PNG" path={item.hidden_svg_path} url={parentHiddenSvgUrl} downloadUrl={parentHiddenSvgDownloadUrl} /> : null}
+            </section>
           ) : null}
 
-          <Snapshot title="Raw manufacturing SVG" value={item.svg_content || 'No SVG content stored.'} />
-          <Snapshot title="Manufacturing metadata" value={item.manufacturing_metadata} />
-          <Snapshot title="Generation options" value={item.generation_options} />
-          <Snapshot title="Validation warnings" value={extractValidationWarnings(item.manufacturing_metadata)} />
+          {item.svg_content.trim() ? <Snapshot title="Raw manufacturing SVG" value={item.svg_content} /> : null}
+          {hasContent(item.manufacturing_metadata) ? <Snapshot title="Manufacturing metadata" value={item.manufacturing_metadata} /> : null}
+          {hasContent(item.generation_options) ? <Snapshot title="Generation options" value={item.generation_options} /> : null}
+          {validationWarnings.length ? <Snapshot title="Validation warnings" value={validationWarnings} /> : null}
           {artifacts?.length ? (
             <section className="space-y-4">
               <h2 className="text-xl font-semibold tracking-tight">Artifacts</h2>
@@ -145,7 +203,7 @@ export default async function AdminGeneratedDetailPage({
           ) : null}
         </section>
 
-        <aside className="space-y-6">
+        <aside className="min-w-0 space-y-6">
           <div className="rounded-lg border p-5">
             <h2 className="font-semibold">Review</h2>
             <dl className="mt-4 space-y-3 text-sm">
@@ -201,7 +259,23 @@ export default async function AdminGeneratedDetailPage({
 
 function extractValidationWarnings(metadata: Record<string, unknown>) {
   const warnings = metadata.validationWarnings ?? metadata.warnings ?? [];
-  return Array.isArray(warnings) && warnings.length ? warnings : ['No validation warnings stored.'];
+  return Array.isArray(warnings) ? warnings : [];
+}
+
+function hasContent(value: Record<string, unknown>) {
+  return Object.keys(value).length > 0;
+}
+
+function getOptionName(option: PreviewOption) {
+  return typeof option.metadata.boilerplateName === 'string'
+    ? option.metadata.boilerplateName
+    : `Personalized option ${option.option_index}`;
+}
+
+function buildManufacturingPrompt(item: GeneratedAdminDetail, option: PreviewOption) {
+  void item;
+  void option;
+  return 'Transform the source photo into clean black-on-white pencil line art for laser engraving on a clear acrylic glass night light. Preserve the people’s recognizable likeness, pose, facial expressions, hairstyle, clothing outlines, hands, and important personal details. Draw elegant, realistic contour lines with a hand-sketched pencil or fine-ink appearance: crisp solid black strokes on a pure white background, with varied line weight and only sparse black hatching where essential for facial definition. Keep faces attractive and clearly readable while simplifying photographic detail into engravable outlines. Use continuous, well-separated lines with no tiny noisy marks, no filled dark areas, and no soft gray shading. Center and crop the subjects as one cohesive engraving composition with a clean outer silhouette suitable for display on an acrylic panel. Output only the flat engraving artwork. No color, gradients, skin tones, lighting effects, glow, shadows, grayscale wash, background scene, frame, acrylic panel, wooden base, lamp mockup, text, watermark, or extra elements.';
 }
 
 function Info({ label, value }: { label: string; value: string }) {
@@ -213,11 +287,15 @@ function Info({ label, value }: { label: string; value: string }) {
   );
 }
 
+function fileName(path: string) {
+  return path.split('/').at(-1) ?? 'asset';
+}
+
 function Snapshot({ title, value }: { title: string; value: unknown }) {
   return (
-    <div className="rounded-lg border p-4">
+    <div className="min-w-0 rounded-lg border p-3 sm:p-4">
       <p className="text-sm font-medium">{title}</p>
-      <pre className="mt-2 max-h-96 overflow-auto rounded-md bg-muted p-3 text-xs">
+      <pre className="mt-2 max-h-96 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md bg-muted p-3 text-xs sm:whitespace-pre">
         {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
       </pre>
     </div>

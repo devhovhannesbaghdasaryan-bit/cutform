@@ -4,6 +4,7 @@ import { SeoMetadataManager } from '@/app/admin/seo-metadata-manager';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import type { AppLocale } from '@/lib/i18n';
+import { getCountryDisplayName, listMarketGeography } from '@/lib/market';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,6 +63,8 @@ export default async function EditAdminItemPage({
     { data: subcategories },
     { data: seoRecords },
     { data: media },
+    geography,
+    { data: marketRules },
   ] = await Promise.all([
     supabase
       .from('catalog_items')
@@ -94,6 +97,18 @@ export default async function EditAdminItemPage({
       .eq('catalog_item_id', id)
       .order('sort_order', { ascending: true })
       .returns<CatalogMedia[]>(),
+    listMarketGeography(supabase),
+    supabase
+      .from('catalog_item_market_rules')
+      .select('id, region_id, country_code, visibility_override, shipping_rate_cents')
+      .eq('catalog_item_id', id)
+      .returns<{
+        id: string;
+        region_id: string | null;
+        country_code: string | null;
+        visibility_override: boolean | null;
+        shipping_rate_cents: number | null;
+      }[]>(),
   ]);
 
   if (error || !item) notFound();
@@ -119,6 +134,9 @@ export default async function EditAdminItemPage({
         item={item}
         media={media ?? []}
         seoRecords={seoRecords ?? []}
+        marketRegions={geography.regions}
+        marketCountries={geography.countries.map((country) => ({ ...country, label: getCountryDisplayName(country.code) }))}
+        marketRules={marketRules ?? []}
       />
       <SeoMetadataManager catalogItemId={item.id} />
     </main>

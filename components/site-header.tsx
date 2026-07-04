@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Coins, Plus, ShieldCheck, ShoppingCart, Store } from 'lucide-react';
+import { Coins, ShieldCheck, ShoppingCart, Store, UserCircle } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 import { CurrencySwitcher } from '@/components/currency-switcher';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LogoutMenuItem } from '@/components/logout-menu-item';
@@ -7,15 +8,17 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getCurrentUserRole } from '@/lib/admin';
+import { translate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
 
-export async function SiteHeader({ email, hideCreate }: { email: string; hideCreate?: boolean }) {
+export async function SiteHeader({ email }: { email: string }) {
   const supabase = await getServerSupabase();
   const locale = await getRequestLocale();
   const {
@@ -43,15 +46,15 @@ export async function SiteHeader({ email, hideCreate }: { email: string; hideCre
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between gap-4">
-        <Link href="/dashboard" className="text-lg font-semibold tracking-tight">
-          Snip
+        <Link href="/" aria-label={translate(locale, 'nav.home')} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <BrandLogo />
         </Link>
         <div className="flex items-center gap-2">
           <CurrencySwitcher />
           <LanguageSwitcher activeLocale={locale} />
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/catalog">
-              <Store className="mr-1 h-4 w-4" /> Catalog
+              <Store className="mr-1 h-4 w-4" /> {translate(locale, 'nav.catalog')}
             </Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
@@ -67,14 +70,7 @@ export async function SiteHeader({ email, hideCreate }: { email: string; hideCre
           {isAdmin && (
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/admin">
-                <ShieldCheck className="mr-1 h-4 w-4" /> Admin
-              </Link>
-            </Button>
-          )}
-          {!hideCreate && (
-            <Button asChild size="sm">
-              <Link href="/create">
-                <Plus className="mr-1 h-4 w-4" /> Create new
+                <ShieldCheck className="mr-1 h-4 w-4" /> {translate(locale, 'nav.admin')}
               </Link>
             </Button>
           )}
@@ -86,10 +82,17 @@ export async function SiteHeader({ email, hideCreate }: { email: string; hideCre
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel className="font-normal text-muted-foreground">
-                Signed in
+                {translate(locale, 'auth.signedIn')}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <LogoutMenuItem />
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  {translate(locale, 'nav.profile')}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <LogoutMenuItem label={translate(locale, 'auth.logout')} />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

@@ -28,7 +28,8 @@ export interface PersonalizedPreviewOptionInput {
   generatedItemId: string;
   optionIndex: number;
   previewImagePath: string;
-  hiddenSvgPath: string;
+  hiddenSvgPath?: string | null;
+  boilerplateId?: string | null;
   metadata?: Record<string, unknown>;
 }
 
@@ -78,6 +79,7 @@ export async function createPersonalizedPreviewOptions(
         option_index: option.optionIndex,
         preview_image_path: option.previewImagePath,
         hidden_svg_path: option.hiddenSvgPath,
+        boilerplate_id: option.boilerplateId ?? null,
         metadata: option.metadata ?? {},
       })),
     )

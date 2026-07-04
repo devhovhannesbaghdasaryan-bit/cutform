@@ -1,0 +1,4 @@
+interface:
+  display_name: "XT-3202 Eco-Solvent Printer"
+  short_description: "Prepare XT-3202 wide-format print jobs"
+  default_prompt: "Use $print-with-xt-3202 to validate this artwork and prepare the print workflow."

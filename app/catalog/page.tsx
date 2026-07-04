@@ -83,7 +83,9 @@ export default async function CatalogPage({
             </p>
           </div>
           <Button asChild className="w-full sm:w-auto">
-            <Link href="/create">{translate(locale, 'catalog.generate_custom')}</Link>
+            <Link href="/personalize/portrait-personalized-night-light">
+              {translate(locale, 'catalog.generate_custom')}
+            </Link>
           </Button>
         </div>
 

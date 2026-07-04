@@ -1,0 +1,4 @@
+interface:
+  display_name: "Flatbed UV Printer"
+  short_description: "Prepare 2500x1300 flatbed UV print jobs"
+  default_prompt: "Use $print-with-flatbed-uv to validate this substrate and artwork for direct UV printing."

@@ -57,6 +57,18 @@ for (const [path, expectedText] of routeChecks) {
   if (!path.endsWith('.txt') && !path.endsWith('.xml')) assertMetadata(path, body);
 }
 
+for (const removedPath of [
+  '/create',
+  '/create/night-light',
+  '/create/laser-cut-2d',
+  '/api/generate',
+  '/admin/banner-samples',
+  '/admin/personalization-models',
+]) {
+  const { response } = await fetchPage(removedPath);
+  assert(response.status === 404, `${removedPath} should return 404, received ${response.status}`);
+}
+
 for (const locale of ['en', 'ru', 'am']) {
   for (const path of ['/', '/catalog']) {
     const localizedPath = `/${locale}${path === '/' ? '' : path}`;

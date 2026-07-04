@@ -34,7 +34,7 @@ export function CategoryNavigation({
             {translate(locale, 'categories.subtitle')}
           </p>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {categories.map((category) => {
             const Icon = ICONS[category.slug] ?? Gift;
             const children = subcategories.filter((item) => item.category_id === category.id);
@@ -48,9 +48,9 @@ export function CategoryNavigation({
               <Link
                 key={category.id}
                 href={`/catalog?category=${category.slug}`}
-                className="group rounded-lg border bg-card p-5 text-center transition hover:-translate-y-0.5 hover:shadow-md"
+                className="group rounded-lg border bg-card p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyber-cyan/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition group-hover:bg-primary group-hover:text-primary-foreground">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-md bg-secondary text-secondary-foreground transition group-hover:bg-primary group-hover:text-primary-foreground">
                   <Icon className="h-7 w-7" />
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">{categoryName}</h3>

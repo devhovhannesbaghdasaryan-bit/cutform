@@ -39,9 +39,9 @@ export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogIt
     : null;
 
   return (
-    <Card className="min-w-0 overflow-hidden rounded-lg transition-shadow hover:shadow-md">
+    <Card className="min-w-0 overflow-hidden rounded-lg shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <CardContent className="p-0">
-        <div className="flex aspect-[4/3] items-center justify-center bg-[linear-gradient(135deg,hsl(38_45%_88%),hsl(31_36%_72%))] p-6">
+        <div className="product-art-frame flex aspect-[4/3] items-center justify-center rounded-none border-0 p-5">
           <CatalogMediaSlider
             media={sliderMedia}
             fallbackTitle={item.title}
@@ -72,7 +72,7 @@ export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogIt
           </p>
           <form action={addCatalogItemToCartAction}>
             <input type="hidden" name="itemId" value={item.id} />
-            <Button type="submit" size="sm" variant="outline" aria-label={`Add ${item.title} to cart`}>
+            <Button type="submit" size="sm" variant="outline" className="shadow-sm" aria-label={`Add ${item.title} to cart`}>
               <ShoppingCart className="h-4 w-4" />
             </Button>
           </form>

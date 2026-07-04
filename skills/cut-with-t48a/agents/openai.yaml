@@ -1,0 +1,4 @@
+interface:
+  display_name: "T48A Plotter Cutter"
+  short_description: "Prepare T48A vinyl cutting jobs"
+  default_prompt: "Use $cut-with-t48a to validate this artwork and prepare a weedable plotter-cut job."

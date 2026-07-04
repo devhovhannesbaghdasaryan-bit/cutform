@@ -10,7 +10,7 @@ import {
   normalizeLocale,
 } from '@/lib/i18n';
 
-const PROTECTED_PREFIXES = ['/dashboard', '/create', '/products'];
+const PROTECTED_PREFIXES = ['/dashboard', '/products'];
 const VERIFY_EMAIL_PATH = '/auth/verify-email';
 const LOCALE_API_PATH = '/api/locale';
 
@@ -51,7 +51,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),

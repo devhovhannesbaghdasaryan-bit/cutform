@@ -1,5 +1,5 @@
 {
-  "name": "snip",
+  "name": "uniqraft",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,12 +14,13 @@
     "smoke:generation": "node scripts/smoke/generation.mjs",
     "smoke:credits": "node scripts/smoke/credit-spending.mjs",
     "smoke:currency": "node scripts/smoke/currency.mjs",
+    "smoke:markets": "node scripts/smoke/geographic-commerce.mjs",
     "smoke:catalog-media": "node scripts/smoke/catalog-media.mjs",
     "smoke:admin": "node scripts/smoke/admin.mjs",
     "smoke:runtime": "node scripts/smoke/runtime-local.mjs",
     "smoke:db-workflows": "node scripts/smoke/db-workflows.mjs",
     "smoke:ui-workflows": "node scripts/smoke/ui-workflows.mjs",
-    "smoke": "pnpm smoke:i18n && pnpm smoke:seo && pnpm smoke:redesign && pnpm smoke:generation && pnpm smoke:credits && pnpm smoke:currency && pnpm smoke:catalog-media && pnpm smoke:admin"
+    "smoke": "pnpm smoke:i18n && pnpm smoke:seo && pnpm smoke:redesign && pnpm smoke:generation && pnpm smoke:credits && pnpm smoke:currency && pnpm smoke:markets && pnpm smoke:catalog-media && pnpm smoke:admin"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.64",
@@ -29,8 +30,8 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.4",
-    "@supabase/ssr": "^0.10.3",
-    "@supabase/supabase-js": "^2.46.1",
+    "@supabase/ssr": "0.10.3",
+    "@supabase/supabase-js": "2.106.0",
     "ai": "^6.0.185",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

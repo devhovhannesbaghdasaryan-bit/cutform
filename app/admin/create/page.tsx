@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Boxes, ImagePlus, Sparkles, Store } from 'lucide-react';
+import { Boxes, ImagePlus, Sparkles } from 'lucide-react';
 import { generateToyDecorationDraftAction } from '@/app/admin/actions';
 import { requireAdmin } from '@/lib/admin';
 
@@ -13,16 +13,10 @@ const actions = [
     icon: Boxes,
   },
   {
-    href: '/admin/personalization-models',
+    href: '/personalization/night-lights',
     title: 'Personalized model',
     description: 'Publish or replace Night lights > Personalized model templates.',
     icon: Sparkles,
-  },
-  {
-    href: '/admin/banner-samples',
-    title: 'Banner sample',
-    description: 'Generate drafts, upload banner artwork, and publish reusable samples.',
-    icon: Store,
   },
   {
     href: '/admin/generated',

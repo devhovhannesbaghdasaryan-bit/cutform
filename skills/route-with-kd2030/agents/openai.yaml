@@ -1,0 +1,4 @@
+interface:
+  display_name: "KD2030 CNC Router"
+  short_description: "Prepare KD2030 CNC routing jobs"
+  default_prompt: "Use $route-with-kd2030 to review this part and prepare a safe CNC routing plan."

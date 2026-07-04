@@ -908,7 +908,7 @@ This change request supersedes the earlier split token/credit model. Credits are
   - Acceptance: user cannot accidentally start a generation without enough credits.
 
 - [x] Preserve existing upload and SVG streaming where useful.
-  - Adapt existing `/create` and `/api/generate` code instead of rebuilding from scratch.
+  - Use the dedicated `/personalize/[slug]` flow for customer personalization.
   - Acceptance: old image-to-SVG capability is reused behind typed flows.
 
 - [x] Store outputs as `generated_items`.
@@ -937,15 +937,18 @@ This change request supersedes the earlier split token/credit model. Credits are
   - Acceptance: guest can navigate to Personalized and open the first model.
 
 - [x] Create personalized model detail/form route.
-  - Route can be `/personalize/night-lights/[slug]`, `/create/night-light/[model]`, or equivalent.
+  - Route uses `/personalize/[slug]`.
   - Show selected model image and personalization controls.
   - Acceptance: user can inspect the model and fill all required personalization fields.
 
+- [x] Route the storefront `Create personalized design` CTA directly to the initial personalized night-light model.
+  - Acceptance: the CTA opens the upload/generation form without an intermediate generic generator page.
+
 - [x] Build personalized night light form.
-  - Image selector accepts up to 3 images.
-  - LED color selector uses eye-comfortable colors.
-  - `Multi color` checkbox disables the single color selector when checked.
-  - Text editor/input enforces max 100 characters.
+  - Image selector requires exactly 1 image.
+  - LED color selector uses eye-comfortable colors and defaults to warm white.
+  - Rich-text editor supports basic emphasis/alignment and enforces max 80 visible characters.
+  - Show the current model price; initialize the model at 25,000 AMD.
   - Submit button starts generation for authenticated users.
   - Acceptance: invalid image count, missing required fields, and over-limit text are blocked before submit.
 
@@ -956,13 +959,15 @@ This change request supersedes the earlier split token/credit model. Credits are
   - Acceptance: unauthenticated user sees a prompt instead of an API error or silent redirect.
 
 - [x] Create personalized night light OpenAI request builder.
-  - Include up to 3 user images.
-  - Include user text.
-  - Include selected LED color or multi-color flag.
+  - Include exactly 1 user image.
+  - Include user text and supported formatting intent.
+  - Include the selected LED color or warm-white default.
   - Include selected model ID/slug.
-  - Include boilerplate/template image asset.
-  - Ask for 3 generated preview images.
+  - Include the matching tracked boilerplate image in each generation call.
+  - Ask for 3 generated preview images: rectangular UV print, round UV print, and contour CO2-laser engraving.
   - Ask for hidden manufacturing SVG output for each generated preview option.
+  - Use `gpt-image-2` with low image quality during the current cost-controlled preview phase.
+  - Require personalized text to be laser-engraved on the wooden base only, never printed or engraved on the acrylic panel.
   - Acceptance: request payload is deterministic and includes all production-relevant personalization inputs.
 
 - [x] Implement personalized night light generation endpoint/action.
@@ -978,13 +983,26 @@ This change request supersedes the earlier split token/credit model. Credits are
   - Save generated item/request metadata.
   - Acceptance: successful generation returns a persisted set of 3 preview choices and hidden production SVG assets.
 
+- [x] Add recoverable personalized-generation error states.
+  - Return friendly inline messages for AI provider billing limits, rate limits, and generation failures.
+  - Check the user's credit balance before uploads and AI calls.
+  - Show a not-enough-credits dialog with Cancel and Buy credits actions.
+  - Refund debited generation credits when downstream generation fails.
+  - Acceptance: expected failures never open a Next.js runtime overlay and insufficient-credit attempts never call the image provider.
+
 - [x] Build generated preview selection UI.
-  - Display 3 generated images.
+  - Display the 3 generated images using signed asset URLs.
   - Allow user to select exactly one image.
   - Show selected state clearly.
   - Do not display or link the hidden generated SVG to the user.
   - Provide buy/order action for the selected result.
   - Acceptance: user can select one generated image to proceed to purchase.
+
+- [x] Make personalized night-light price admin-editable.
+  - Store the default as 25,000 AMD using the platform minor-unit convention.
+  - Admin model forms edit a human-readable AMD amount.
+  - Snapshot the price when generation starts and use that snapshot when adding the selected result to cart.
+  - Acceptance: admin price changes affect future generations without changing existing generated items or cart/order snapshots.
 
 - [x] Add generated personalized night light detail page.
   - Show selected model.
@@ -995,7 +1013,7 @@ This change request supersedes the earlier split token/credit model. Credits are
   - Show review/order status.
   - Acceptance: user and admin can audit what was generated and selected.
 
-- [x] Create `/create/night-light` UI.
+- [x] Create the personalized night-light UI (legacy route retired).
   - Image upload.
   - Text field for wooden stand text.
   - Optional size selector.
@@ -1032,7 +1050,7 @@ This change request supersedes the earlier split token/credit model. Credits are
 
 ## Milestone 8: 2D Laser-Cut Generation
 
-- [x] Create `/create/laser-cut-2d` UI.
+- [x] Create the 2D laser-cut UI (legacy route retired).
   - Image upload.
   - Product type selector: toy, decoration, constructor.
   - Optional notes/prompt.
@@ -1516,7 +1534,7 @@ This milestone adds money-currency support for catalog prices, credit packs, car
   - Automated sitemap URL check passed for localized landing, catalog, category, and item detail URLs under `/en`, `/ru`, and `/am`.
   - `SNIP_SMOKE_BASE_URL=http://localhost:3320 pnpm smoke:runtime` passed against a production-mode local app server with 8 route checks and 45 sitemap URL checks.
   - `pnpm smoke:db-workflows` passed against local Supabase with disposable users, guest cart merge, credit ledger, admin audit, transaction, generated personalized item, order, and order item snapshot checks.
-  - `SNIP_SMOKE_BASE_URL=http://localhost:3320 pnpm smoke:ui-workflows` passed against a production-mode local app server after adding disposable confirmed customer/admin login coverage. Covered landing render, language switching, guest cart creation, password login, guest cart merge, credit balance visibility, authenticated cart editing/removal, banners entry, personalized model detail/form entry, and protected admin dashboard/users/transactions/items/orders/generated/banner-samples/personalized-model pages.
+  - `SNIP_SMOKE_BASE_URL=http://localhost:3320 pnpm smoke:ui-workflows` passed against a production-mode local app server after adding disposable confirmed customer/admin login coverage. Covered landing render, language switching, guest cart creation, password login, guest cart merge, credit balance visibility, authenticated cart editing/removal, banners entry, personalized model detail/form entry, and protected admin dashboard/users/transactions/items/orders/generated/personalization pages.
   - `scripts/smoke/ui-workflows.mjs` was expanded further for customized banner generation, generated-banner cart insertion, checkout review, and advanced banner credit spending. The expanded run is still unverified because the command escalation reviewer returned a usage-limit rejection when rerunning `SNIP_SMOKE_BASE_URL=http://localhost:3320 pnpm smoke:ui-workflows`.
   - Production-mode desktop/mobile screenshots were captured under `docs/qa/screenshots/` and summarized in `docs/qa/local-e2e-qa.md`.
   - Chrome DevTools Protocol mobile checks confirmed `scrollWidth === viewportWidth` for landing, catalog, and cart at `390x844`.

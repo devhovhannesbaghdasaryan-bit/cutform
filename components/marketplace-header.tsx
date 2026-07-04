@@ -1,17 +1,10 @@
 import Link from 'next/link';
-import { Coins, LayoutDashboard, Plus, ShieldCheck, ShoppingCart, UserCircle } from 'lucide-react';
+import { Coins, LayoutDashboard, ShieldCheck, ShoppingCart, UserCircle } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 import { CurrencySwitcher } from '@/components/currency-switcher';
 import { LanguageSwitcher } from '@/components/language-switcher';
-import { LogoutMenuItem } from '@/components/logout-menu-item';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { getCurrentUserRole } from '@/lib/admin';
 import { getCartSessionId } from '@/lib/cart-session';
 import { translate } from '@/lib/i18n';
@@ -54,22 +47,20 @@ export async function MarketplaceHeader() {
   const cartCount = cart?.cart_items?.length ?? 0;
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 border-b bg-background/90 shadow-[0_1px_0_hsl(var(--cyber-cyan)/0.16)] backdrop-blur supports-[backdrop-filter]:bg-background/75">
       <div className="container flex min-h-14 items-center justify-between gap-2 py-2">
         <nav className="flex min-w-0 items-center gap-3 sm:gap-5">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            Snip
+          <Link href="/" aria-label="Uniqraft home" className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+            <BrandLogo />
           </Link>
-          <Link href="/catalog" className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline">
+          <Link href="/catalog" className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline">
             {translate(locale, 'nav.catalog')}
-          </Link>
-          <Link href="/create" className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline">
-            {translate(locale, 'nav.create')}
           </Link>
         </nav>
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">
           <CurrencySwitcher />
           <LanguageSwitcher activeLocale={locale} />
+          <ThemeToggle />
           {user ? (
             <>
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
@@ -98,26 +89,11 @@ export async function MarketplaceHeader() {
                   </Link>
                 </Button>
               )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Account">
+              <Button asChild variant="ghost" size="icon">
+                <Link href="/profile" aria-label={translate(locale, 'nav.profile')}>
                     <UserCircle className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel className="max-w-56 truncate font-normal text-muted-foreground">
-                    {user.email ?? 'Signed in'}
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      {translate(locale, 'nav.dashboard')}
-                    </Link>
-                  </DropdownMenuItem>
-                  <LogoutMenuItem label={translate(locale, 'auth.logout')} />
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Link>
+              </Button>
             </>
           ) : (
             <>
@@ -135,12 +111,6 @@ export async function MarketplaceHeader() {
               </Button>
             </>
           )}
-          <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
-            <Link href="/create">
-              <Plus className="mr-1 h-4 w-4" />
-              {translate(locale, 'common.generate')}
-            </Link>
-          </Button>
         </div>
       </div>
     </header>

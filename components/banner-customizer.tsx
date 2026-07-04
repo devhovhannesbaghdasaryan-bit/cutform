@@ -22,12 +22,16 @@ interface BannerPreset {
   finish: string;
 }
 
+export type BannerCopy = { sample: string; size: string; text: string; textPlaceholder: string; previewText: string; custom: string; review: string; unavailable: string; advancedPrompt: string; promptPlaceholder: string; reference: string; rights: string; generate: string; disclaimer: string };
+
 export function BannerCustomizer({
   samples,
   presets,
+  copy,
 }: {
   samples: BannerSample[];
   presets: BannerPreset[];
+  copy: BannerCopy;
 }) {
   const [sampleId, setSampleId] = useState(samples[0]?.id ?? '');
   const [sizeKey, setSizeKey] = useState(presets[0]?.key ?? '');
@@ -50,19 +54,19 @@ export function BannerCustomizer({
           className="relative flex w-full items-center justify-center overflow-hidden rounded-md border bg-muted p-8"
           style={{ aspectRatio: ratio }}
         >
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(210_40%_98%),hsl(214_32%_91%))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),hsl(var(--cyber-cyan)/0.14))]" />
           <div className="relative max-w-[80%] text-center text-3xl font-extrabold tracking-normal text-foreground">
-            {text || 'Your banner text'}
+            {text || copy.previewText}
           </div>
           <div className="absolute bottom-3 left-3 rounded bg-background/80 px-2 py-1 text-xs text-muted-foreground">
-            {selectedSample?.title ?? 'Custom banner'}
+            {selectedSample?.title ?? copy.custom}
           </div>
         </div>
       </section>
 
       <form action={customizeBannerSampleAction} className="space-y-4 rounded-lg border p-5">
         <div className="space-y-2">
-          <Label htmlFor="sample">Sample</Label>
+          <Label htmlFor="sample">{copy.sample}</Label>
           <select
             id="sample"
             name="sampleId"
@@ -79,7 +83,7 @@ export function BannerCustomizer({
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="size">Size</Label>
+          <Label htmlFor="size">{copy.size}</Label>
           <select
             id="size"
             name="sizeKey"
@@ -101,22 +105,22 @@ export function BannerCustomizer({
           ) : null}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="bannerText">Banner text</Label>
+          <Label htmlFor="bannerText">{copy.text}</Label>
           <Textarea
             id="bannerText"
             name="bannerText"
             value={text}
             onChange={(event) => setText(event.target.value.slice(0, 120))}
-            placeholder="Text to place inside the banner"
+            placeholder={copy.textPlaceholder}
             required
           />
         </div>
         <Button type="submit" className="w-full" disabled={!canCustomize}>
-          Review customized banner
+          {copy.review}
         </Button>
         {!canCustomize ? (
           <p className="text-xs text-muted-foreground">
-            Publish an admin banner sample and size preset before ordering a customized sample.
+            {copy.unavailable}
           </p>
         ) : null}
       </form>
@@ -124,20 +128,20 @@ export function BannerCustomizer({
   );
 }
 
-export function AdvancedBannerGenerationPanel({ presets }: { presets: BannerPreset[] }) {
+export function AdvancedBannerGenerationPanel({ presets, copy }: { presets: BannerPreset[]; copy: BannerCopy }) {
   return (
     <form action={generateBannerAction} className="grid gap-4 rounded-lg border p-5 md:grid-cols-[1fr_260px_auto]">
       <div className="space-y-2 md:col-span-2">
-        <Label htmlFor="advancedPrompt">Advanced AI prompt</Label>
+        <Label htmlFor="advancedPrompt">{copy.advancedPrompt}</Label>
         <Textarea
           id="advancedPrompt"
           name="prompt"
-          placeholder="Describe the store, offer, brand colors, attached references, and desired banner style."
+          placeholder={copy.promptPlaceholder}
           required
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="advancedSize">Banner size</Label>
+        <Label htmlFor="advancedSize">{copy.size}</Label>
         <select
           id="advancedSize"
           name="sizeKey"
@@ -150,10 +154,10 @@ export function AdvancedBannerGenerationPanel({ presets }: { presets: BannerPres
             </option>
           ))}
         </select>
-        <Label htmlFor="advancedReference">Reference image</Label>
+        <Label htmlFor="advancedReference">{copy.reference}</Label>
         <label className="flex items-start gap-2 text-xs text-muted-foreground">
           <input type="checkbox" name="uploadRightsConfirmed" className="mt-0.5" required />
-          <span>I have the rights to use the uploaded reference image.</span>
+          <span>{copy.rights}</span>
         </label>
         <input
           id="advancedReference"
@@ -165,10 +169,10 @@ export function AdvancedBannerGenerationPanel({ presets }: { presets: BannerPres
       </div>
       <Button type="submit" className="self-end">
         <WandSparkles className="mr-2 h-4 w-4" />
-        Generate with credits
+        {copy.generate}
       </Button>
       <p className="text-xs text-muted-foreground md:col-span-3">
-        Generated banner previews are approximations and require admin production review before manufacturing.
+        {copy.disclaimer}
       </p>
     </form>
   );
