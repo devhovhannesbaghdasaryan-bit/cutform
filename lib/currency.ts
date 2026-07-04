@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { getServerEnv } from '@/lib/env';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { resolveMarket } from '@/lib/market';
 
 export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
@@ -110,6 +111,12 @@ export async function getActiveCurrency() {
     const profileCurrency = normalizeCurrency(profile?.preferred_currency);
     if (profileCurrency && enabledCodes.has(profileCurrency)) return profileCurrency;
   }
+
+  const market = await resolveMarket({ supabase: getServiceSupabase() });
+  const countryCurrency = normalizeCurrency(market.countryDefaultCurrency);
+  if (countryCurrency && enabledCodes.has(countryCurrency)) return countryCurrency;
+  const regionCurrency = normalizeCurrency(market.regionDefaultCurrency);
+  if (regionCurrency && enabledCodes.has(regionCurrency)) return regionCurrency;
 
   return enabled.find((currency) => currency.is_default)?.code ?? DEFAULT_CURRENCY;
 }

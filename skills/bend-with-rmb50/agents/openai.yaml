@@ -1,0 +1,4 @@
+interface:
+  display_name: "RMB50 Tube Bender"
+  short_description: "Plan RMB50 tube and profile bends"
+  default_prompt: "Use $bend-with-rmb50 to validate this tube part and prepare a testable bend schedule."

@@ -9,6 +9,13 @@ import { getServerEnv } from '@/lib/env';
 
 export type AuthFormState = { error: string | null };
 
+const socialProviders = {
+  facebook: 'facebook',
+  google: 'google',
+  x: 'x',
+  telegram: 'custom:telegram',
+} as const;
+
 function callbackUrl() {
   return `${getServerEnv().NEXT_PUBLIC_SITE_URL}/auth/callback`;
 }
@@ -46,7 +53,33 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
     await mergeSessionCartIntoUserCart(getServiceSupabase(), sessionId, data.user.id);
     await clearCartSessionId();
   }
-  redirect(next.startsWith('/') ? next : '/dashboard');
+  redirect(next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard');
+}
+
+export async function socialLoginAction(formData: FormData) {
+  const providerName = String(formData.get('provider') ?? '');
+  const next = String(formData.get('next') ?? '/dashboard');
+  const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
+  const provider = socialProviders[providerName as keyof typeof socialProviders];
+
+  if (!provider) {
+    redirect(`/login?error=${encodeURIComponent('Unsupported login provider.')}&next=${encodeURIComponent(safeNext)}`);
+  }
+
+  const supabase = await getServerSupabase();
+  const redirectTo = new URL(callbackUrl());
+  redirectTo.searchParams.set('next', safeNext);
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: redirectTo.toString() },
+  });
+
+  if (error || !data.url) {
+    const message = error?.message ?? 'The login provider could not be started.';
+    redirect(`/login?error=${encodeURIComponent(message)}&next=${encodeURIComponent(safeNext)}`);
+  }
+
+  redirect(data.url);
 }
 
 export async function logoutAction() {

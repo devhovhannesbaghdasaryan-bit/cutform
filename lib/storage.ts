@@ -13,3 +13,8 @@ export function resolvePublicStorageUrl(
   const encodedPath = path.split('/').map(encodeURIComponent).join('/');
   return `${baseUrl}/storage/v1/object/public/${bucket}/${encodedPath}`;
 }
+
+export function normalizePersonalizationMockPath(path: string | null | undefined) {
+  if (!path || path.startsWith('/mock/night-lights/')) return null;
+  return path;
+}

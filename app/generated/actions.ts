@@ -50,8 +50,12 @@ export async function selectGeneratedPreviewAction(formData: FormData) {
 }
 
 export async function addGeneratedItemToCartAction(formData: FormData) {
-  const parsed = z.object({ generatedItemId: z.string().uuid() }).safeParse({
+  const parsed = z.object({
+    generatedItemId: z.string().uuid(),
+    optionIds: z.array(z.string().uuid()).optional(),
+  }).safeParse({
     generatedItemId: formData.get('generatedItemId'),
+    optionIds: formData.getAll('optionIds'),
   });
 
   if (!parsed.success) throw new Error('Invalid generated item.');
@@ -77,32 +81,57 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
 
   if (error || !item) throw new Error(error?.message ?? 'Generated item was not found.');
   if (item.review_status === 'rejected') throw new Error('Rejected generated items cannot be ordered.');
-  if (
-    item.product_type === 'personalized_night_light'
-    && (!item.selected_preview_path || !item.hidden_svg_path)
-  ) {
-    throw new Error('Select a generated preview before adding this item to cart.');
-  }
-
   const sourcePriceCents = getGeneratedSalePriceCents(item.generation_options);
   const sourceCurrency = getGeneratedSaleCurrency(item.generation_options);
   const activeCurrency = await getActiveCurrency();
   const converted = await convertMoney(sourcePriceCents, sourceCurrency, activeCurrency, getServiceSupabase());
 
-  await addItemToUserCart(supabase, user.id, {
-    generatedItemId: item.id,
-    title: item.title ?? `${item.product_type} ${item.id.slice(0, 8)}`,
-    quantity: 1,
-    unitPriceCents: converted.amountCents,
-    currency: converted.currency,
-    configuration: {
-      productType: item.product_type,
-      creditCost: item.credit_cost,
-      sourcePriceCents,
-      sourceCurrency,
-      exchangeRateContext: converted.exchangeRateContext,
-    },
-  });
+  if (item.product_type === 'personalized_night_light') {
+    const optionIds = [...new Set(parsed.data.optionIds ?? [])];
+    if (!optionIds.length) throw new Error('Select at least one generated option.');
+    const { data: options, error: optionsError } = await supabase
+      .from('personalized_preview_options')
+      .select('id, preview_image_path, hidden_svg_path, metadata')
+      .eq('generated_item_id', item.id)
+      .in('id', optionIds)
+      .returns<{ id: string; preview_image_path: string; hidden_svg_path: string | null; metadata: Record<string, unknown> }[]>();
+    if (optionsError || !options || options.length !== optionIds.length) throw new Error('One or more generated options are unavailable.');
+    for (const option of options) {
+      await addItemToUserCart(supabase, user.id, {
+        generatedItemId: item.id,
+        title: typeof option.metadata.boilerplateName === 'string' ? option.metadata.boilerplateName : item.title ?? 'Personalized night light',
+        quantity: 1,
+        unitPriceCents: converted.amountCents,
+        currency: converted.currency,
+        configuration: {
+          productType: item.product_type,
+          personalizedPreviewOptionId: option.id,
+          selectedPreviewPath: option.preview_image_path,
+          hiddenSvgPath: option.hidden_svg_path,
+          boilerplateSnapshot: option.metadata,
+          creditCost: 1,
+          sourcePriceCents,
+          sourceCurrency,
+          exchangeRateContext: converted.exchangeRateContext,
+        },
+      });
+    }
+  } else {
+    await addItemToUserCart(supabase, user.id, {
+      generatedItemId: item.id,
+      title: item.title ?? `${item.product_type} ${item.id.slice(0, 8)}`,
+      quantity: 1,
+      unitPriceCents: converted.amountCents,
+      currency: converted.currency,
+      configuration: {
+        productType: item.product_type,
+        creditCost: item.credit_cost,
+        sourcePriceCents,
+        sourceCurrency,
+        exchangeRateContext: converted.exchangeRateContext,
+      },
+    });
+  }
 
   revalidatePath('/cart');
   redirect('/cart');

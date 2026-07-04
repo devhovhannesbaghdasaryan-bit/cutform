@@ -49,20 +49,18 @@ Reads from:
 - `catalog_items`
 - catalog image storage bucket
 
-### Generation
+### Personalization Generation
 
 Routes:
 
-- `/create`: generation type selector and upload flow.
-- `/create/night-light`: night light generation flow.
-- `/create/laser-cut-2d`: 2D laser-cut generation flow.
+- `/catalog/night-lights/personalized`: published model selector.
+- `/personalize/[slug]`: customer night-light personalization flow.
 - `/generated/[id]`: generated item preview/detail.
 
 Reads/writes:
 
 - `credit_accounts`
 - `credit_ledger`
-- `generation_sessions`
 - `generated_items`
 - uploads and generated asset storage
 
@@ -85,6 +83,8 @@ Routes:
 - `/admin/generated`: review generated items.
 - `/admin/orders`: manage orders.
 - `/admin/create`: admin generation tools.
+- `/personalization`: personalization category selector.
+- `/personalization/night-lights`: manage night-light models and template images.
 
 Admin access must be enforced by server-side role checks on every admin route and mutation.
 

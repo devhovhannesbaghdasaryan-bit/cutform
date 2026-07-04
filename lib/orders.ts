@@ -1,6 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { validateCartBeforeCheckout } from '@/lib/cart';
 import { getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
+import { resolveMarket } from '@/lib/market';
+import { calculateOrderTotals, type ShippingAddress } from '@/lib/shipping';
 
 interface CartItemForOrder {
   id: string;
@@ -68,19 +70,21 @@ function getRecordValue(record: Record<string, unknown> | undefined, key: string
 export async function createOrderFromCart(
   supabase: SupabaseClient,
   userId: string,
-  options: { contactEmail?: string | null; locale?: string | null } = {},
+  options: { contactEmail?: string | null; locale?: string | null; shippingAddress?: ShippingAddress } = {},
 ) {
-  const issues = await validateCartBeforeCheckout(supabase, userId);
+  const address = options.shippingAddress;
+  if (!address) throw new Error('Shipping address is required.');
+  const issues = await validateCartBeforeCheckout(supabase, userId, address.countryCode);
   if (issues.length > 0) {
     throw new Error(issues[0]?.message ?? 'Cart has validation issues.');
   }
 
   const { data: cart, error: cartError } = await supabase
     .from('carts')
-    .select('id, currency')
+    .select('id, currency, destination_country_code')
     .eq('user_id', userId)
     .eq('status', 'active')
-    .maybeSingle<{ id: string; currency: string }>();
+    .maybeSingle<{ id: string; currency: string; destination_country_code: string | null }>();
 
   if (cartError || !cart) throw new Error(cartError?.message ?? 'Active cart was not found.');
 
@@ -98,12 +102,16 @@ export async function createOrderFromCart(
     throw new Error('Cart contains multiple currencies. Switch currency or re-add items before checkout.');
   }
 
-  const subtotalCents = cartItems.reduce(
-    (sum, item) => sum + item.unit_price_cents * item.quantity,
-    0,
-  );
   const orderCurrency = normalizeCurrency(cartItems[0]?.currency) ?? normalizeCurrency(cart.currency) ?? 'AMD';
   const paymentProviderRoute = getPaymentRouteForCurrency(orderCurrency);
+  const market = await resolveMarket({ checkoutCountryCode: address.countryCode, supabase });
+  const totals = await calculateOrderTotals({
+    items: cartItems,
+    market,
+    currency: orderCurrency,
+    supabase,
+  });
+  const shippingByCartItem = new Map(totals.shippingLines.map((line) => [line.cartItemId, line]));
   const exchangeRateContexts = cartItems.map((item) => ({
     cartItemId: item.id,
     source: item.configuration?.exchangeRateContext ?? {},
@@ -115,13 +123,18 @@ export async function createOrderFromCart(
       user_id: userId,
       status: 'pending_payment',
       payment_status: 'unpaid',
-      subtotal_cents: subtotalCents,
+      subtotal_cents: totals.subtotalCents,
+      shipping_cents: totals.shippingCents,
+      total_cents: totals.totalCents,
       currency: orderCurrency,
       exchange_rate_context: { items: exchangeRateContexts },
       payment_provider_route: paymentProviderRoute,
       contact_email: options.contactEmail ?? null,
       locale: options.locale ?? null,
       cart_id: cart.id,
+      destination_country_code: address.countryCode,
+      shipping_address: address,
+      shipping_rate_context: { lines: totals.shippingLines },
     })
     .select('id')
     .single<{ id: string }>();
@@ -146,6 +159,7 @@ export async function createOrderFromCart(
   const { error: orderItemsError } = await supabase.from('order_items').insert(
     cartItems.map((item) => {
       const source = item.generated_item_id ? generatedById.get(item.generated_item_id) : null;
+      const shipping = shippingByCartItem.get(item.id);
       const snapshot = buildOrderItemSnapshot(item, source);
       const productionSnapshot = source
         ? {
@@ -165,6 +179,9 @@ export async function createOrderFromCart(
         total_price_cents: item.unit_price_cents * item.quantity,
         currency: item.currency,
         exchange_rate_context: getRecordValue(item.configuration, 'exchangeRateContext'),
+        shipping_unit_cents: shipping?.unitShippingCents ?? 0,
+        shipping_total_cents: shipping?.shippingTotalCents ?? 0,
+        shipping_rate_context: shipping ?? {},
         item_snapshot: snapshot.itemSnapshot,
         personalization_snapshot: snapshot.personalizationSnapshot,
         production_snapshot: productionSnapshot,
@@ -186,7 +203,7 @@ export async function createOrderFromCart(
 
   const { error: cartUpdateError } = await supabase
     .from('carts')
-    .update({ status: 'converted' })
+    .update({ status: 'converted', destination_country_code: address.countryCode })
     .eq('id', cart.id);
 
   if (cartUpdateError) throw new Error(cartUpdateError.message);

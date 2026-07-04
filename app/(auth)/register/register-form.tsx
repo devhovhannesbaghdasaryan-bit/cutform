@@ -8,19 +8,19 @@ import { registerAction, type AuthFormState } from '@/app/(auth)/actions';
 
 const initial: AuthFormState = { error: null };
 
-export function RegisterForm() {
+export function RegisterForm({ copy }: { copy: { email: string; password: string; minPassword: string; create: string; creating: string } }) {
   const [state, action, pending] = useActionState(registerAction, initial);
 
   return (
     <form action={action} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{copy.email}</Label>
         <Input id="email" name="email" type="email" autoComplete="email" required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{copy.password}</Label>
         <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
-        <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+        <p className="text-xs text-muted-foreground">{copy.minPassword}</p>
       </div>
       {state.error && (
         <p role="alert" className="text-sm text-destructive">
@@ -28,7 +28,7 @@ export function RegisterForm() {
         </p>
       )}
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? 'Creating account…' : 'Create account'}
+        {pending ? copy.creating : copy.create}
       </Button>
     </form>
   );

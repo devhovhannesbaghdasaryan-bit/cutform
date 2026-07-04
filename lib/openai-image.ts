@@ -8,6 +8,7 @@ export interface OpenAiImageInput {
   prompt: string;
   images?: File[];
   size?: '1024x1024' | '1536x1024' | '1024x1536' | 'auto';
+  quality?: 'low' | 'medium' | 'high' | 'auto';
   purpose?: OpenAiImagePurpose;
 }
 
@@ -22,7 +23,7 @@ interface OpenAiImageResponse {
 }
 
 function getImageModel() {
-  return getServerEnv().OPENAI_IMAGE_MODEL ?? 'gpt-image-1';
+  return getServerEnv().OPENAI_IMAGE_MODEL ?? 'gpt-image-2';
 }
 
 function getApiKey() {
@@ -52,6 +53,7 @@ export async function generateOpenAiImage(input: OpenAiImageInput) {
   formData.set('model', getImageModel());
   formData.set('prompt', input.prompt);
   formData.set('size', input.size ?? '1024x1024');
+  formData.set('quality', input.quality ?? 'low');
   if (hasImages) {
     input.images?.forEach((image) => {
       formData.append('image[]', image, image.name || 'reference.png');

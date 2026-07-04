@@ -608,16 +608,17 @@ Generated SVGs must be sanitized and stored with structured metadata:
 - Credit cost.
 - Review status.
 
-Personalized night light generations must store generated raster preview images and hidden manufacturing SVGs. The selected generated option must be linked to the original uploaded images, entered text, LED color choice, selected model, selected preview image, selected hidden SVG, boilerplate/template image version, credit cost, and review status.
+Personalized night light generations must accept exactly one user image and store three generated raster preview images plus hidden manufacturing SVGs. The selected generated option must be linked to the original uploaded image, entered rich-text content and formatting intent, LED color choice, selected model, selected preview image, selected hidden SVG, boilerplate/template image version, credit cost, sale-price snapshot, and review status.
 
 ## Preview Requirements
 
-Night light preview should show:
+Personalized night light generation must return one option for each approved boilerplate:
 
-- Acrylic panel outline.
-- Pencil-like engraved image on the panel.
-- Wooden stand/base.
-- User-entered text positioned on the base.
+- Rectangular clear acrylic with a full-color UV-print design.
+- Round clear acrylic with a full-color UV-print design.
+- Contour-cut clear acrylic with monochrome CO2-laser-engraved line art.
+- The matching wooden LED stand/base and selected comfortable light color.
+- User-entered text and supported rich-text styling laser-engraved only on the front face of the wooden base within safe production margins; personalized text must not appear on the acrylic panel.
 
 2D laser-cut preview should show:
 
@@ -636,6 +637,7 @@ Admin pages must support:
 - Create/edit marketplace item.
 - Upload/manage item images.
 - Set title, description, category, price, inventory/availability, and popularity flag.
+- Set the personalized night-light model price in AMD; the initial/default price is 25,000 AMD and changes apply to future generations while generated/cart/order records retain their price snapshots.
 - Manage product SEO metadata.
 - Generate, regenerate, review, and manually edit product SEO metadata.
 - Create toys and decorations by uploading images or generating images/samples.
@@ -763,9 +765,9 @@ For personalized night light orders, order details must also store a snapshot of
 
 - User-selected generated preview image.
 - Hidden generated SVG for the selected option.
-- Original uploaded user image or images.
-- Selected LED color or multi-color mode.
-- User-entered personalization text.
+- Original uploaded user image.
+- Selected LED color, defaulting to warm white when the user makes no change.
+- User-entered personalization text and supported formatting intent.
 - Selected personalization model and template image version.
 
 These personalized order assets and inputs should be visible to admins in order details, but the hidden SVG should not be exposed in the user-facing order UI.
@@ -829,10 +831,14 @@ Suggested production statuses:
 - User can preview the night light result before ordering.
 - Guest can navigate to `Night lights > Personalized` and view the initial personalizable model.
 - Guest is prompted to log in or register when attempting to generate a personalized night light.
-- Authenticated user can personalize the first night light model with up to 3 images, text up to 100 characters, and either a comfortable LED color or multi-color mode.
-- Personalized night light generation returns 3 preview images.
+- The `Create personalized design` CTA opens the first personalized night-light creation page directly.
+- Authenticated user can personalize the night light with exactly one image, up to 80 characters in a rich-text editor, and an optional comfortable LED color that defaults to warm white.
+- Personalized night light generation returns exactly 3 preview images, one for each approved rectangular-print, round-print, and contour-engraved boilerplate.
 - Personalized night light generation creates hidden SVG files for the generated options.
+- Expected generation failures stay on the personalization page with a friendly message instead of exposing provider errors or a framework error overlay.
+- If the user lacks generation credits, the UI opens a dialog showing the shortage and offers a direct Buy credits action; no upload or AI call starts before this check passes.
 - User can select one generated personalized night light preview to buy.
+- The initial personalized night-light price is 25,000 AMD, admins can change it, and the selected generated item is added to cart using the price captured when it was generated.
 - When a user places a personalized night light order, the chosen preview image, hidden SVG, original uploaded images, color selection, and text are stored with the order.
 - Admin can view personalized night light order assets and inputs from order details.
 - Guest can add published catalog items to cart and continue browsing.

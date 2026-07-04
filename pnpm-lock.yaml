@@ -30,10 +30,10 @@ importers:
         specifier: ^1.1.4
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@supabase/ssr':
-        specifier: ^0.10.3
+        specifier: 0.10.3
         version: 0.10.3(@supabase/supabase-js@2.106.0)
       '@supabase/supabase-js':
-        specifier: ^2.46.1
+        specifier: 2.106.0
         version: 2.106.0
       ai:
         specifier: ^6.0.185

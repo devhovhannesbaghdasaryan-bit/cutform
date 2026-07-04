@@ -16,6 +16,7 @@ Build a marketplace where users can buy ready-made crafted items and generate su
 ## Key MVP Documents
 
 - `requirements/mvp-marketplace-requirements.md`: marketplace MVP scope, roles, flows, and acceptance criteria.
+- `requirements/geographic-commerce-requirements.md`: country/region availability, currency defaults, shipping, and checkout decisions.
 - `design/mvp-marketplace-system-design.md`: proposed architecture, data model, generation pipelines, admin review, and implementation phases.
 - `manufacturing/tools.json`: first-pass structured capability database for available and quoted machines.
 - `manufacturing/ai-skills.md`: AI workflows for tool selection, manufacturability, file preparation, quoting, and operator checklists.

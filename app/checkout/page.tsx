@@ -5,10 +5,15 @@ import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { CountrySwitcherClient } from '@/components/country-switcher-client';
 import { listUserCartItems, validateCartBeforeCheckout } from '@/lib/cart';
+import { normalizeCurrency } from '@/lib/currency';
 import { getRequestLocale } from '@/lib/i18n-server';
+import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
+import { calculateOrderTotals } from '@/lib/shipping';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
+import { translate } from '@/lib/i18n';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,16 +26,31 @@ export default async function CheckoutPage() {
   if (!user) redirect('/login?next=/checkout');
 
   const locale = await getRequestLocale();
-  const [{ items }, issues] = await Promise.all([
+  const [{ items }, market, geography] = await Promise.all([
     listUserCartItems(supabase, user.id),
-    validateCartBeforeCheckout(supabase, user.id).catch(() => []),
+    resolveMarket(),
+    listMarketGeography(supabase),
   ]);
 
   if (!items.length) redirect('/cart');
 
+  const issues = await validateCartBeforeCheckout(supabase, user.id, market.countryCode).catch(() => []);
+
   const issueByItem = new Map(issues.map((issue) => [issue.cartItemId, issue]));
   const subtotal = items.reduce((sum, item) => sum + item.unit_price_cents * item.quantity, 0);
   const subtotalCurrency = items[0]?.currency ?? 'AMD';
+  const totals = market.countryCode
+    ? await calculateOrderTotals({
+        items,
+        market,
+        currency: normalizeCurrency(subtotalCurrency) ?? 'AMD',
+        supabase,
+      }).catch(() => null)
+    : null;
+  const countries = geography.countries
+    .filter((country) => country.is_active)
+    .map((country) => ({ code: country.code, label: getCountryDisplayName(country.code, locale) }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale));
 
   return (
     <>
@@ -76,8 +96,18 @@ export default async function CheckoutPage() {
           </section>
 
           <aside className="space-y-4">
+            <div className="space-y-2 rounded-lg border p-5">
+              <Label>{translate(locale, 'checkout.destination')}</Label>
+              <p className="text-xs text-muted-foreground">{translate(locale, 'checkout.destination_help')}</p>
+              {market.countryCode ? (
+                <CountrySwitcherClient activeCountry={market.countryCode} countries={countries} />
+              ) : (
+                <p className="text-sm text-destructive">{translate(locale, 'checkout.select_country')}</p>
+              )}
+            </div>
             <form action={createCheckoutOrderAction} className="space-y-4 rounded-lg border p-5">
               <input type="hidden" name="locale" value={locale} />
+              <input type="hidden" name="countryCode" value={market.countryCode ?? ''} />
               <div>
                 <h2 className="font-semibold">Summary</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -94,16 +124,54 @@ export default async function CheckoutPage() {
                   required
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="recipientName">{translate(locale, 'checkout.recipient')}</Label>
+                <Input id="recipientName" name="recipientName" autoComplete="name" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">{translate(locale, 'checkout.phone')}</Label>
+                <Input id="phone" name="phone" type="tel" autoComplete="tel" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="addressLine1">{translate(locale, 'checkout.address1')}</Label>
+                <Input id="addressLine1" name="addressLine1" autoComplete="address-line1" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="addressLine2">{translate(locale, 'checkout.address2')}</Label>
+                <Input id="addressLine2" name="addressLine2" autoComplete="address-line2" />
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="city">{translate(locale, 'checkout.city')}</Label>
+                  <Input id="city" name="city" autoComplete="address-level2" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="administrativeArea">{translate(locale, 'checkout.region')}</Label>
+                  <Input id="administrativeArea" name="administrativeArea" autoComplete="address-level1" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">{translate(locale, 'checkout.postal')}</Label>
+                <Input id="postalCode" name="postalCode" autoComplete="postal-code" />
+              </div>
               <div className="flex justify-between border-t pt-4">
                 <span className="text-muted-foreground">Subtotal</span>
                 <span className="font-semibold">{formatPrice(subtotal, subtotalCurrency)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{translate(locale, 'cart.shipping')}</span>
+                <span className="font-semibold">{totals ? formatPrice(totals.shippingCents, totals.currency) : 'Select destination'}</span>
+              </div>
+              <div className="flex justify-between border-t pt-4 text-lg">
+                <span>{translate(locale, 'cart.total')}</span>
+                <span className="font-bold">{totals ? formatPrice(totals.totalCents, totals.currency) : formatPrice(subtotal, subtotalCurrency)}</span>
               </div>
               {issues.length ? (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                   Resolve cart issues before creating an order.
                 </div>
               ) : null}
-              <Button type="submit" className="w-full" disabled={issues.length > 0}>
+              <Button type="submit" className="w-full" disabled={issues.length > 0 || !market.countryCode || !totals}>
                 Create order
               </Button>
             </form>

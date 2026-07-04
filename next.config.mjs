@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    // Local Supabase Storage resolves to a loopback IP. Keep this exception
+    // development-only so production image optimization retains SSRF protection.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV === 'development',
     remotePatterns: [
       {
         protocol: 'http',
@@ -27,7 +30,7 @@ const nextConfig = {
   serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
   experimental: {
     serverActions: {
-      bodySizeLimit: '6mb',
+      bodySizeLimit: '22mb',
     },
   },
 };

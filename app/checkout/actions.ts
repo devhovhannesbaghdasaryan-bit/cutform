@@ -12,12 +12,28 @@ import { createTransactionRecord } from '@/lib/transactions';
 const checkoutSchema = z.object({
   contactEmail: z.string().email().optional().or(z.literal('')),
   locale: z.enum(['en', 'ru', 'am']).optional().or(z.literal('')),
+  recipientName: z.string().trim().min(2).max(120),
+  phone: z.string().trim().min(5).max(40),
+  addressLine1: z.string().trim().min(3).max(160),
+  addressLine2: z.string().trim().max(160).optional().or(z.literal('')),
+  city: z.string().trim().min(2).max(100),
+  administrativeArea: z.string().trim().max(100).optional().or(z.literal('')),
+  postalCode: z.string().trim().max(30).optional().or(z.literal('')),
+  countryCode: z.string().trim().regex(/^[A-Z]{2}$/),
 });
 
 export async function createCheckoutOrderAction(formData: FormData) {
   const parsed = checkoutSchema.safeParse({
     contactEmail: formData.get('contactEmail') || '',
     locale: formData.get('locale') || '',
+    recipientName: formData.get('recipientName'),
+    phone: formData.get('phone'),
+    addressLine1: formData.get('addressLine1'),
+    addressLine2: formData.get('addressLine2') || '',
+    city: formData.get('city'),
+    administrativeArea: formData.get('administrativeArea') || '',
+    postalCode: formData.get('postalCode') || '',
+    countryCode: formData.get('countryCode'),
   });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid checkout data.');
 
@@ -30,15 +46,27 @@ export async function createCheckoutOrderAction(formData: FormData) {
   const order = await createOrderFromCart(supabase, user.id, {
     contactEmail: parsed.data.contactEmail || user.email,
     locale: parsed.data.locale || null,
+    shippingAddress: {
+      recipientName: parsed.data.recipientName,
+      phone: parsed.data.phone,
+      addressLine1: parsed.data.addressLine1,
+      addressLine2: parsed.data.addressLine2 || null,
+      city: parsed.data.city,
+      administrativeArea: parsed.data.administrativeArea || null,
+      postalCode: parsed.data.postalCode || null,
+      countryCode: parsed.data.countryCode,
+    },
   });
 
   const { data: orderTotals, error: totalError } = await supabase
     .from('orders')
-    .select('subtotal_cents, currency, exchange_rate_context, payment_provider_route')
+    .select('subtotal_cents, shipping_cents, total_cents, currency, exchange_rate_context, payment_provider_route')
     .eq('id', order.id)
     .eq('user_id', user.id)
     .single<{
       subtotal_cents: number;
+      shipping_cents: number;
+      total_cents: number;
       currency: string;
       exchange_rate_context: Record<string, unknown>;
       payment_provider_route: 'stripe' | 'bank_manual' | null;
@@ -52,7 +80,7 @@ export async function createCheckoutOrderAction(formData: FormData) {
     orderId: order.id,
     type: 'payment',
     status: 'pending',
-    amountCents: orderTotals.subtotal_cents,
+    amountCents: orderTotals.total_cents,
     currency: orderTotals.currency,
     provider: orderTotals.payment_provider_route ?? 'bank_manual',
     paymentProviderRoute: orderTotals.payment_provider_route ?? 'bank_manual',
@@ -60,6 +88,8 @@ export async function createCheckoutOrderAction(formData: FormData) {
     metadata: {
       source: 'checkout_review',
       paymentProviderRoute: orderTotals.payment_provider_route ?? 'bank_manual',
+      subtotalCents: orderTotals.subtotal_cents,
+      shippingCents: orderTotals.shipping_cents,
     },
     createdBy: user.id,
   });
@@ -90,9 +120,9 @@ export async function createCheckoutOrderAction(formData: FormData) {
         quantity: 1,
         price_data: {
           currency: orderTotals.currency.toLowerCase(),
-          unit_amount: orderTotals.subtotal_cents,
+          unit_amount: orderTotals.total_cents,
           product_data: {
-            name: `Snip order ${order.id.slice(0, 8)}`,
+            name: `Uniqraft order ${order.id.slice(0, 8)}`,
           },
         },
       },

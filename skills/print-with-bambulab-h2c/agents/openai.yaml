@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bambu Lab H2C Printer"
+  short_description: "Plan Bambu Lab H2C print jobs"
+  default_prompt: "Use $print-with-bambulab-h2c to prepare this part for a reliable multi-material print."

@@ -12,6 +12,9 @@ interface AdminOrderDetail {
   status: string;
   payment_status: string;
   subtotal_cents: number;
+  shipping_cents: number;
+  total_cents: number;
+  shipping_rate_context: Record<string, unknown>;
   currency: string;
   exchange_rate_context: Record<string, unknown>;
   payment_provider_route: string | null;
@@ -79,7 +82,7 @@ export default async function AdminOrderDetailPage({
     supabase
       .from('orders')
       .select(
-        'id, user_id, status, payment_status, subtotal_cents, currency, exchange_rate_context, payment_provider_route, shipping_address, contact_email, created_at, updated_at',
+        'id, user_id, status, payment_status, subtotal_cents, shipping_cents, total_cents, shipping_rate_context, currency, exchange_rate_context, payment_provider_route, shipping_address, contact_email, created_at, updated_at',
       )
       .eq('id', id)
       .maybeSingle<AdminOrderDetail>(),
@@ -196,8 +199,16 @@ export default async function AdminOrderDetailPage({
         <aside className="space-y-6">
           <div className="rounded-lg border p-5">
             <p className="text-sm text-muted-foreground">Total</p>
-            <p className="text-4xl font-bold">{formatPrice(order.subtotal_cents, order.currency)}</p>
+            <p className="text-4xl font-bold">{formatPrice(order.total_cents, order.currency)}</p>
             <dl className="mt-4 space-y-2 text-sm">
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Merchandise</dt>
+                <dd>{formatPrice(order.subtotal_cents, order.currency)}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Shipping</dt>
+                <dd>{formatPrice(order.shipping_cents, order.currency)}</dd>
+              </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">Currency</dt>
                 <dd>{order.currency}</dd>
@@ -230,6 +241,12 @@ export default async function AdminOrderDetailPage({
             <h2 className="font-semibold">Exchange-rate context</h2>
             <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">
               {JSON.stringify(order.exchange_rate_context ?? {}, null, 2)}
+            </pre>
+          </div>
+          <div className="rounded-lg border p-5">
+            <h2 className="font-semibold">Shipping-rate context</h2>
+            <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">
+              {JSON.stringify(order.shipping_rate_context ?? {}, null, 2)}
             </pre>
           </div>
         </aside>

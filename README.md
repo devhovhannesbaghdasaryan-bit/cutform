@@ -1,4 +1,4 @@
-# Snip
+# Uniqraft
 
 AI image-to-SVG product generator. Upload an image, chat with GPT-4o to
 produce a manufacturing-ready SVG, approve, and save it as a priced product.
@@ -58,8 +58,8 @@ Copy the keys from `supabase status --output env` into `.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<ANON_KEY from supabase status>
-SUPABASE_SERVICE_ROLE_KEY=<SERVICE_ROLE_KEY from supabase status>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<PUBLISHABLE_KEY from supabase status>
+SUPABASE_SECRET_KEY=<SECRET_KEY from supabase status>
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 OPENAI_API_KEY=sk-...
 ```
@@ -145,13 +145,11 @@ Important local routes:
 | Catalog | <http://localhost:3000/catalog> |
 | Cart | <http://localhost:3000/cart> |
 | Credit packs | <http://localhost:3000/credits> |
-| Generic generator | <http://localhost:3000/create> |
-| Night light generator | <http://localhost:3000/create/night-light> |
-| 2D laser-cut generator | <http://localhost:3000/create/laser-cut-2d> |
+| Personalized night lights | <http://localhost:3000/catalog/night-lights/personalized> |
 | Admin hub | <http://localhost:3000/admin> |
 | Admin create hub | <http://localhost:3000/admin/create> |
-| Admin banner samples | <http://localhost:3000/admin/banner-samples> |
-| Admin personalized models | <http://localhost:3000/admin/personalization-models> |
+| Personalization categories | <http://localhost:3000/personalization> |
+| Night light templates | <http://localhost:3000/personalization/night-lights> |
 
 Credit packs and order payments use Stripe Checkout when Stripe environment variables are configured. Admins can still perform guarded manual credit adjustments from the admin user detail page with an audit reason.
 
@@ -166,9 +164,9 @@ supabase stop --no-backup --no-save   # nukes data too
 
 ## Production deployment
 
-Same env var contract; instead of `supabase start`, provision a cloud Supabase
-project, run the same migration in its SQL Editor, and set the same env vars
-in Vercel.
+Use the cloud project's URL, `sb_publishable_...` key, and server-only
+`sb_secret_...` key in the same variables. Deploy migrations with the Supabase
+CLI or the connected Supabase integration before starting the app.
 
 ## Email delivery
 

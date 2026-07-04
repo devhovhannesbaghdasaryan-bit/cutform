@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { resolveCatalogMarket, resolveMarket } from '@/lib/market';
 
 export interface CartItemInput {
   catalogItemId?: string;
@@ -31,7 +32,9 @@ export interface CartValidationIssue {
     | 'item_unavailable'
     | 'generated_item_not_orderable'
     | 'missing_production_asset'
-    | 'currency_disabled';
+    | 'currency_disabled'
+    | 'market_unavailable'
+    | 'shipping_unavailable';
   message: string;
 }
 
@@ -338,7 +341,11 @@ export async function mergeSessionCartIntoUserCart(
   return userCart;
 }
 
-export async function validateCartBeforeCheckout(supabase: SupabaseClient, userId: string) {
+export async function validateCartBeforeCheckout(
+  supabase: SupabaseClient,
+  userId: string,
+  destinationCountryCode?: string | null,
+) {
   const { items } = await listUserCartItems(supabase, userId);
   const issues: CartValidationIssue[] = [];
   const { data: enabledCurrencies, error: currencyError } = await supabase
@@ -348,6 +355,10 @@ export async function validateCartBeforeCheckout(supabase: SupabaseClient, userI
     .returns<{ code: string }[]>();
   if (currencyError) throw new Error(currencyError.message);
   const enabledCurrencyCodes = new Set((enabledCurrencies ?? []).map((currency) => currency.code));
+  const market = await resolveMarket({
+    checkoutCountryCode: destinationCountryCode,
+    supabase,
+  });
 
   for (const item of items) {
     if (!enabledCurrencyCodes.has(item.currency)) {
@@ -381,6 +392,22 @@ export async function validateCartBeforeCheckout(supabase: SupabaseClient, userI
           message: 'The item price changed. Please review before checkout.',
         });
       }
+      if (catalogItem && market.countryCode) {
+        const resolution = await resolveCatalogMarket(item.catalog_item_id, market, supabase);
+        if (!resolution.availability.visible) {
+          issues.push({
+            cartItemId: item.id,
+            code: 'market_unavailable',
+            message: 'This item is not sold in your destination country.',
+          });
+        } else if (resolution.shipping.baseAmountCents == null) {
+          issues.push({
+            cartItemId: item.id,
+            code: 'shipping_unavailable',
+            message: 'Shipping is not available for this item and destination.',
+          });
+        }
+      }
     }
 
     if (item.generated_item_id) {
@@ -405,13 +432,28 @@ export async function validateCartBeforeCheckout(supabase: SupabaseClient, userI
 
       if (
         generatedItem?.product_type === 'personalized_night_light'
-        && (!generatedItem.selected_preview_path || !generatedItem.hidden_svg_path)
+        && !getStringConfigurationValue(item.configuration, 'personalizedPreviewOptionId')
       ) {
         issues.push({
           cartItemId: item.id,
           code: 'missing_production_asset',
-          message: 'This personalized item is missing a selected preview or production file.',
+          message: 'This personalized item is missing its generated option.',
         });
+      } else if (generatedItem?.product_type === 'personalized_night_light') {
+        const optionId = getStringConfigurationValue(item.configuration, 'personalizedPreviewOptionId');
+        const { data: option, error: optionError } = await supabase
+          .from('personalized_preview_options')
+          .select('id')
+          .eq('id', optionId!)
+          .eq('generated_item_id', item.generated_item_id)
+          .maybeSingle<{ id: string }>();
+        if (optionError || !option) {
+          issues.push({
+            cartItemId: item.id,
+            code: 'missing_production_asset',
+            message: 'This personalized option is no longer available.',
+          });
+        }
       }
     }
   }

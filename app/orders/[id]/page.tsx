@@ -12,7 +12,10 @@ interface OrderDetail {
   status: string;
   payment_status: string;
   subtotal_cents: number;
+  shipping_cents: number;
+  total_cents: number;
   currency: string;
+  shipping_address: Record<string, unknown> | null;
   contact_email: string | null;
   created_at: string;
 }
@@ -48,7 +51,7 @@ export default async function OrderDetailPage({
   const [{ data: order, error }, { data: items, error: itemsError }] = await Promise.all([
     supabase
       .from('orders')
-      .select('id, status, payment_status, subtotal_cents, currency, contact_email, created_at')
+      .select('id, status, payment_status, subtotal_cents, shipping_cents, total_cents, currency, shipping_address, contact_email, created_at')
       .eq('id', id)
       .eq('user_id', user.id)
       .maybeSingle<OrderDetail>(),
@@ -130,14 +133,39 @@ export default async function OrderDetailPage({
                 <dt className="text-muted-foreground">Subtotal</dt>
                 <dd className="font-medium">{formatPrice(order.subtotal_cents, order.currency)}</dd>
               </div>
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Shipping</dt>
+                <dd className="font-medium">{formatPrice(order.shipping_cents, order.currency)}</dd>
+              </div>
+              <div className="flex justify-between gap-4 border-t pt-3 text-base">
+                <dt className="font-medium">Total</dt>
+                <dd className="font-bold">{formatPrice(order.total_cents, order.currency)}</dd>
+              </div>
               <div>
                 <dt className="text-muted-foreground">Contact</dt>
                 <dd>{order.contact_email ?? user.email ?? '-'}</dd>
               </div>
+              {order.shipping_address ? (
+                <div>
+                  <dt className="text-muted-foreground">Shipping address</dt>
+                  <dd className="whitespace-pre-line">{formatShippingAddress(order.shipping_address)}</dd>
+                </div>
+              ) : null}
             </dl>
           </aside>
         </div>
       </main>
     </>
   );
+}
+
+function formatShippingAddress(address: Record<string, unknown>) {
+  return [
+    address.recipientName,
+    address.addressLine1,
+    address.addressLine2,
+    [address.city, address.administrativeArea, address.postalCode].filter(Boolean).join(', '),
+    address.countryCode,
+    address.phone,
+  ].filter((value): value is string => typeof value === 'string' && value.length > 0).join('\n');
 }

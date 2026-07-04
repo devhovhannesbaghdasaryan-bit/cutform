@@ -1,0 +1,4 @@
+interface:
+  display_name: "HX-260G Band Saw"
+  short_description: "Prepare HX-260G stock cutting jobs"
+  default_prompt: "Use $cut-with-hx-260g to turn this fabrication plan into a safe, accurate cut list."

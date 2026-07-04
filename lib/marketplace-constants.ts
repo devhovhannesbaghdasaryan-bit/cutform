@@ -41,8 +41,11 @@ export const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded', 'failed'] as cons
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 export const PERSONALIZED_NIGHT_LIGHT = {
-  maxImages: 3,
-  maxTextLength: 100,
+  maxImages: 1,
+  maxTextLength: 80,
+  defaultPriceCents: 2_500_000,
+  defaultLedColor: 'warm_white',
+  modelSlug: 'portrait-personalized-night-light',
   multiColorValue: 'multi_color',
   comfortableLedColors: [
     { value: 'warm_white', label: 'Warm white', hex: '#f7d7a1' },

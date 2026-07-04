@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getServerSupabase } from '@/lib/supabase/server';
+import { translate, translateTemplate } from '@/lib/i18n';
+import { getRequestLocale } from '@/lib/i18n-server';
 import { VerifyEmailClient } from './verify-email-client';
 
 export default async function VerifyEmailPage({
@@ -8,7 +10,7 @@ export default async function VerifyEmailPage({
   searchParams: Promise<{ email?: string }>;
 }) {
   const { email: emailFromQuery } = await searchParams;
-  const supabase = await getServerSupabase();
+  const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
   const { data: { user } } = await supabase.auth.getUser();
 
   // Already confirmed → straight to the dashboard.
@@ -27,15 +29,14 @@ export default async function VerifyEmailPage({
     <main className="container flex min-h-screen items-center justify-center py-16">
       <div className="w-full max-w-md space-y-6 text-center">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Check your email</h1>
+          <h1 className="text-3xl font-bold">{translate(locale, 'auth.checkEmail')}</h1>
           <p className="text-muted-foreground">
-            We sent a verification link to <span className="font-medium text-foreground">{email}</span>.
-            Click the link to activate your account.
+            {translateTemplate(locale, 'auth.verificationSentTo', { email })}
           </p>
         </div>
-        <VerifyEmailClient email={email} signedIn={!!user} />
+        <VerifyEmailClient email={email} signedIn={!!user} copy={{ enterCode: translate(locale, 'auth.enterCode'), verifying: translate(locale, 'auth.verifying'), verify: translate(locale, 'auth.verify'), orClickLink: translate(locale, 'auth.orClickLink'), sending: translate(locale, 'auth.sending'), resend: translate(locale, 'auth.resend'), sent: translate(locale, 'auth.sent'), logout: translate(locale, 'auth.logout'), backLogin: translate(locale, 'auth.backLogin') }} />
         <p className="text-xs text-muted-foreground">
-          Not seeing it? Check your spam folder. Links expire after 24 hours.
+          {translate(locale, 'auth.spamNotice')}
         </p>
       </div>
     </main>

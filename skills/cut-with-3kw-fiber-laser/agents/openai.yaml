@@ -1,0 +1,4 @@
+interface:
+  display_name: "3 kW Fiber Laser Cutter"
+  short_description: "Plan sheet and tube fiber-laser jobs"
+  default_prompt: "Use $cut-with-3kw-fiber-laser to assess this metal part and prepare a safe cutting plan."

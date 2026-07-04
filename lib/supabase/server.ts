@@ -13,7 +13,7 @@ export async function getServerSupabase() {
 
   return createServerClient(
     env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll: () => cookieStore.getAll(),
@@ -33,15 +33,15 @@ export async function getServerSupabase() {
 }
 
 /**
- * Service-role client for privileged operations (e.g., deleting storage objects
- * during approval cleanup). Never expose to the browser.
+ * Secret-key client for privileged operations. Never expose to the browser.
+ * Legacy service-role keys remain supported for local Supabase compatibility.
  */
 export function getServiceSupabase() {
   const env = getServerEnv();
-  if (!env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for this operation');
+  if (!env.SUPABASE_SECRET_KEY) {
+    throw new Error('SUPABASE_SECRET_KEY is required for this operation');
   }
-  return createSupabaseClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+  return createSupabaseClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

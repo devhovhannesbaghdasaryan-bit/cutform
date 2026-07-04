@@ -1,0 +1,4 @@
+interface:
+  display_name: "XC-7500 Dust Collector"
+  short_description: "Validate XC-7500 dust collection setups"
+  default_prompt: "Use $collect-dust-with-xc-7500 to assess dust extraction for this woodworking operation."

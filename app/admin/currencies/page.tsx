@@ -118,11 +118,11 @@ export default async function AdminCurrenciesPage() {
                       </td>
                       <td className="px-4 py-3">
                         {rate?.is_stale ? (
-                          <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800">
+                          <span className="bg-warning text-warning-foreground rounded-full px-2 py-1 text-xs font-medium">
                             Stale fallback
                           </span>
                         ) : rate ? (
-                          <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800">
+                          <span className="bg-success/15 text-success rounded-full px-2 py-1 text-xs font-medium">
                             Cached
                           </span>
                         ) : (

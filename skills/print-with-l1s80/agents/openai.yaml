@@ -1,0 +1,4 @@
+interface:
+  display_name: "L1S80 FFF Printer"
+  short_description: "Plan large-format L1S80 print jobs"
+  default_prompt: "Use $print-with-l1s80 to assess this model and prepare a large-format print plan."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "HLW-3000 Laser Welder"
+  short_description: "Plan and validate HLW-3000 welding jobs"
+  default_prompt: "Use $weld-with-hlw-3000 to assess this assembly and prepare a safe welding procedure."

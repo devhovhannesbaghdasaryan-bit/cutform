@@ -1,0 +1,4 @@
+interface:
+  display_name: "100 W CO2 Laser Cutter"
+  short_description: "Prepare 1300x900 CO2 laser jobs"
+  default_prompt: "Use $cut-with-co2-laser to validate this material and artwork for safe laser cutting."

@@ -1,24 +1,77 @@
-'use server';
+"use server";
 
-import { redirect } from 'next/navigation';
-import { createGeneratedItem, createPersonalizedPreviewOptions } from '@/lib/generated-items';
-import { PERSONALIZED_NIGHT_LIGHT } from '@/lib/marketplace-constants';
-import { generateOpenAiImage } from '@/lib/openai-image';
-import { buildPersonalizedNightLightOpenAiPayload } from '@/lib/personalized-night-light-ai';
-import { preflightSvg } from '@/lib/sanitize';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
-import { debitCredits, refundCredits } from '@/lib/credits';
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { redirect } from "next/navigation";
+import {
+  createGeneratedItem,
+  createPersonalizedPreviewOptions,
+} from "@/lib/generated-items";
+import { PERSONALIZED_NIGHT_LIGHT } from "@/lib/marketplace-constants";
+import { generateOpenAiImage } from "@/lib/openai-image";
+import {
+  buildPersonalizedNightLightOpenAiPayload,
+} from "@/lib/personalized-night-light-ai";
+import { getServerSupabase, getServiceSupabase } from "@/lib/supabase/server";
+import { debitCredits, getCreditBalance, refundCredits } from "@/lib/credits";
+import type { PersonalizationBoilerplate } from "@/lib/personalization-boilerplates";
+import { translate } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/i18n-server";
+
+export type PersonalizedGenerationState = {
+  code: "idle" | "error" | "insufficient_credits";
+  message: string | null;
+  requiredCredits?: number;
+  availableCredits?: number;
+};
+
+function errorState(message: string): PersonalizedGenerationState {
+  return { code: "error", message };
+}
+
+function friendlyGenerationError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (
+    message.includes("billing hard limit") ||
+    message.includes("billing limit")
+  ) {
+    return "Image generation is temporarily unavailable because the AI service billing limit was reached. Please try again later or contact support. Any generation credits were refunded.";
+  }
+  if (message.includes("rate limit") || message.includes("too many requests")) {
+    return "The image service is busy right now. Please wait a moment and try again. Any generation credits were refunded.";
+  }
+  return "We could not generate your night-light previews. Please try again. Any generation credits were refunded.";
+}
 
 const imageExtByMime: Record<string, string> = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/webp': 'webp',
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
 };
 
 function getImageFiles(formData: FormData) {
   return formData
-    .getAll('images')
+    .getAll("images")
     .filter((value): value is File => value instanceof File && value.size > 0);
+}
+
+function summarizeTextFormatting(value: FormDataEntryValue | null) {
+  const html = typeof value === "string" ? value.slice(0, 2_000) : "";
+  const styles = [
+    /<(b|strong)(\s|>)/i.test(html) ? "bold emphasis" : null,
+    /<(i|em)(\s|>)/i.test(html) ? "italic emphasis" : null,
+    /text-align\s*:\s*center|align=["']?center/i.test(html)
+      ? "center aligned"
+      : "left aligned",
+  ].filter(Boolean);
+  return styles.join(", ");
+}
+
+function resolveModelPriceCents(formSchema: Record<string, unknown>) {
+  const configured = Number(formSchema.basePriceCents);
+  return Number.isFinite(configured) && configured >= 0
+    ? Math.round(configured)
+    : PERSONALIZED_NIGHT_LIGHT.defaultPriceCents;
 }
 
 async function uploadUserImage(
@@ -27,29 +80,18 @@ async function uploadUserImage(
   file: File,
 ) {
   const ext = imageExtByMime[file.type];
-  if (!ext) throw new Error('Upload PNG, JPG, or WEBP images only.');
-  if (file.size > 20 * 1024 * 1024) throw new Error('Images must be 20 MB or smaller.');
+  if (!ext) throw new Error("Upload PNG, JPG, or WEBP images only.");
+  if (file.size > 20 * 1024 * 1024)
+    throw new Error("Images must be 20 MB or smaller.");
   const path = `${userId}/personalized-night-lights/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage
-    .from('user-uploads')
-    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false });
+    .from("user-uploads")
+    .upload(path, await file.arrayBuffer(), {
+      contentType: file.type,
+      upsert: false,
+    });
   if (error) throw new Error(error.message);
   return path;
-}
-
-async function uploadGeneratedSvg(
-  supabase: Awaited<ReturnType<typeof getServerSupabase>>,
-  userId: string,
-  folder: string,
-  svg: string,
-) {
-  const { cleanSvg, warnings } = preflightSvg(svg);
-  const path = `${userId}/personalized-night-lights/${folder}/${crypto.randomUUID()}.svg`;
-  const { error } = await supabase.storage
-    .from('generated-assets')
-    .upload(path, new TextEncoder().encode(cleanSvg), { contentType: 'image/svg+xml', upsert: false });
-  if (error) throw new Error(error.message);
-  return { path, warnings };
 }
 
 async function uploadGeneratedPng(
@@ -60,42 +102,74 @@ async function uploadGeneratedPng(
 ) {
   const path = `${userId}/personalized-night-lights/${folder}/${crypto.randomUUID()}.png`;
   const { error } = await supabase.storage
-    .from('generated-assets')
-    .upload(path, bytes, { contentType: 'image/png', upsert: false });
+    .from("generated-assets")
+    .upload(path, bytes, { contentType: "image/png", upsert: false });
   if (error) throw new Error(error.message);
   return path;
 }
 
-function createPreviewSvg(index: number, text: string, color: string | null, multiColor: boolean) {
-  const glow = multiColor ? '#a78bfa' : color === 'sky_blue' ? '#7dd3fc' : color === 'mint' ? '#86efac' : '#fbbf24';
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650"><rect width="900" height="650" fill="#111827"/><path id="cut-acrylic-panel" d="M230 80h440a70 70 0 0 1 70 70v300H160V150a70 70 0 0 1 70-70z" fill="none" stroke="${glow}" stroke-width="8"/><path id="engrave-portrait" d="M315 220c45-80 225-80 270 0 20 40 5 110-50 145-55 35-115 35-170 0-55-35-70-105-50-145z" fill="none" stroke="#e0f2fe" stroke-width="6"/><rect id="cut-wood-base" x="240" y="470" width="420" height="90" rx="16" fill="#9a5a22"/><text id="engrave-base-text" x="450" y="525" text-anchor="middle" font-family="Arial" font-size="34" fill="#fff7ed">${text.replace(/[<>&]/g, '').slice(0, 100) || `Option ${index}`}</text></svg>`;
+async function loadBoilerplate(
+  supabase: Awaited<ReturnType<typeof getServerSupabase>>,
+  reference: PersonalizationBoilerplate,
+) {
+  let bytes: Uint8Array;
+  if (reference.image_path.startsWith("/")) {
+    bytes = new Uint8Array(await readFile(path.join(process.cwd(), "public", ...reference.image_path.split("/").filter(Boolean))));
+  } else {
+    const { data, error } = await supabase.storage.from("catalog-assets").download(reference.image_path);
+    if (error || !data) throw new Error(error?.message ?? "Unable to load boilerplate image.");
+    bytes = new Uint8Array(await data.arrayBuffer());
+  }
+  const extension = reference.image_path.split(".").pop()?.toLowerCase();
+  const mime = extension === "png" ? "image/png" : extension === "webp" ? "image/webp" : extension === "svg" ? "image/svg+xml" : "image/jpeg";
+  return new File([Uint8Array.from(bytes).buffer], `boilerplate.${extension || "jpg"}`, { type: mime });
 }
 
-export async function generatePersonalizedNightLightAction(formData: FormData) {
+export async function generatePersonalizedNightLightAction(
+  _previousState: PersonalizedGenerationState,
+  formData: FormData,
+): Promise<PersonalizedGenerationState> {
   const supabase = await getServerSupabase();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const modelId = String(formData.get('modelId') ?? '');
-  if (!user) redirect(`/login?next=/personalize/${encodeURIComponent(modelId)}`);
+  const modelId = String(formData.get("modelId") ?? "");
+  if (!user)
+    redirect(`/login?next=/personalize/${encodeURIComponent(modelId)}`);
+  const locale = await getRequestLocale();
+  const t = (key: string) => translate(locale, `nightLight.${key}`);
 
   const files = getImageFiles(formData);
-  if (!files.length || files.length > PERSONALIZED_NIGHT_LIGHT.maxImages) {
-    throw new Error(`Upload 1 to ${PERSONALIZED_NIGHT_LIGHT.maxImages} images.`);
+  if (files.length !== PERSONALIZED_NIGHT_LIGHT.maxImages) {
+    return errorState(t("errorUpload"));
   }
-  if (formData.get('uploadRightsConfirmed') !== 'on') {
-    throw new Error('Confirm that you have rights to use the uploaded images.');
+  const customText = String(formData.get("customText") ?? "").trim();
+  if (customText.length > PERSONALIZED_NIGHT_LIGHT.maxTextLength) {
+    return errorState(
+      t("errorText"),
+    );
   }
-
-  const customText = String(formData.get('customText') ?? '').slice(0, PERSONALIZED_NIGHT_LIGHT.maxTextLength);
-  const multiColor = formData.get('multiColor') === 'on';
-  const ledColor = multiColor ? null : String(formData.get('ledColor') ?? 'warm_white');
+  const customTextFormatting = summarizeTextFormatting(
+    formData.get("customTextHtml"),
+  );
+  const allowedColors = new Set(
+    PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map((color) => color.value),
+  );
+  const requestedColor = String(
+    formData.get("ledColor") ?? PERSONALIZED_NIGHT_LIGHT.defaultLedColor,
+  );
+  const ledColor = allowedColors.has(
+    requestedColor as (typeof PERSONALIZED_NIGHT_LIGHT.comfortableLedColors)[number]["value"],
+  )
+    ? requestedColor
+    : PERSONALIZED_NIGHT_LIGHT.defaultLedColor;
+  const multiColor = false;
 
   const { data: model, error: modelError } = await supabase
-    .from('personalization_models')
-    .select('id, slug, title, boilerplate_image_path, status, form_schema')
-    .eq('id', modelId)
-    .eq('status', 'published')
+    .from("personalization_models")
+    .select("id, slug, title, boilerplate_image_path, status, form_schema")
+    .eq("id", modelId)
+    .eq("status", "published")
     .maybeSingle<{
       id: string;
       slug: string;
@@ -105,28 +179,73 @@ export async function generatePersonalizedNightLightAction(formData: FormData) {
       form_schema: Record<string, unknown>;
     }>();
 
-  if (modelError || !model) throw new Error(modelError?.message ?? 'Personalization model is not available.');
+  if (modelError || !model)
+    return errorState(t("errorModel"));
 
-  const creditCost = Number(model.form_schema.creditCost ?? 0);
+  const requestedBoilerplateIds = [...new Set(
+    formData.getAll("boilerplateIds").filter((value): value is string => typeof value === "string"),
+  )];
+  if (!requestedBoilerplateIds.length) return errorState(t("selectAtLeastOne"));
+  const { data: selectedBoilerplates, error: boilerplateError } = await supabase
+    .from("personalization_boilerplates")
+    .select("id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order")
+    .eq("model_id", model.id)
+    .eq("is_active", true)
+    .in("id", requestedBoilerplateIds)
+    .order("sort_order")
+    .returns<PersonalizationBoilerplate[]>();
+  if (boilerplateError || !selectedBoilerplates || selectedBoilerplates.length !== requestedBoilerplateIds.length) {
+    return errorState(t("errorStyle"));
+  }
+
+  const creditCost = selectedBoilerplates.length;
   let debited = false;
   let generatedId: string | null = null;
-  const creditSupabase = creditCost > 0 ? getServiceSupabase() : null;
+  let creditSupabase: ReturnType<typeof getServiceSupabase> | null = null;
   if (creditCost > 0) {
-    await debitCredits(creditSupabase!, {
-      userId: user.id,
-      amount: creditCost,
-      referenceType: 'personalized_night_light',
-      metadata: {
-        modelId: model.id,
-        modelSlug: model.slug,
-      },
-    });
-    debited = true;
+    try {
+      creditSupabase = getServiceSupabase();
+      const availableCredits = await getCreditBalance(creditSupabase!, user.id);
+      if (availableCredits < creditCost) {
+        return {
+          code: "insufficient_credits",
+          message: `You need ${creditCost} credits to generate these previews, but you have ${availableCredits}.`,
+          requiredCredits: creditCost,
+          availableCredits,
+        };
+      }
+      await debitCredits(creditSupabase!, {
+        userId: user.id,
+        amount: creditCost,
+        referenceType: "personalized_night_light",
+        metadata: {
+          modelId: model.id,
+          modelSlug: model.slug,
+          boilerplateIds: requestedBoilerplateIds,
+        },
+      });
+      debited = true;
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.toLowerCase().includes("insufficient credit")
+      ) {
+        return {
+          code: "insufficient_credits",
+          message: "You do not have enough credits to generate these previews.",
+          requiredCredits: creditCost,
+        };
+      }
+      return errorState(
+        t("errorBalance"),
+      );
+    }
   }
 
   try {
     const originalImagePaths = [];
-    for (const file of files) originalImagePaths.push(await uploadUserImage(supabase, user.id, file));
+    for (const file of files)
+      originalImagePaths.push(await uploadUserImage(supabase, user.id, file));
 
     const requestPayload = buildPersonalizedNightLightOpenAiPayload({
       modelId: model.id,
@@ -135,15 +254,20 @@ export async function generatePersonalizedNightLightAction(formData: FormData) {
       boilerplateImagePath: model.boilerplate_image_path,
       userImagePaths: originalImagePaths,
       customText,
+      customTextFormatting,
       ledColor,
       multiColor,
-      comfortableColors: PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map((color) => ({ ...color })),
+      comfortableColors: PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map(
+        (color) => ({ ...color }),
+      ),
     });
+
+    console.log("[personalized-night-light] request payload", requestPayload);
 
     const generated = await createGeneratedItem(supabase, {
       userId: user.id,
       generatedBy: user.id,
-      productType: 'personalized_night_light',
+      productType: "personalized_night_light",
       title: `${model.title} preview`,
       prompt: requestPayload.prompt,
       customText,
@@ -154,65 +278,86 @@ export async function generatePersonalizedNightLightAction(formData: FormData) {
         modelId: model.id,
         modelSlug: model.slug,
         boilerplateImagePath: model.boilerplate_image_path,
+        boilerplateIds: selectedBoilerplates.map((item) => item.id),
         openAiRequest: requestPayload,
-        uploadRightsConfirmed: true,
         previewDisclaimerAccepted: true,
-        salePriceCents: Number(model.form_schema.basePriceCents ?? 0),
+        customTextFormatting,
+        salePriceCents: resolveModelPriceCents(model.form_schema),
+        saleCurrency: "AMD",
       },
       creditCost,
-      reviewStatus: 'preview_ready',
+      reviewStatus: "preview_ready",
     });
     generatedId = generated.id;
 
     const options = [];
-    const allWarnings: string[] = [];
-    for (let index = 1; index <= 3; index += 1) {
-      const svg = createPreviewSvg(index, customText, ledColor, multiColor);
+    for (let offset = 0; offset < selectedBoilerplates.length; offset += 1) {
+      const index = offset + 1;
+      const reference = selectedBoilerplates[offset];
+      const boilerplate = await loadBoilerplate(supabase, reference);
       const image = await generateOpenAiImage({
-        prompt: `${requestPayload.prompt}\n\nCreate preview option ${index} of 3. Keep the same product form but vary composition subtly.`,
-        images: files,
-        size: '1024x1024',
-        purpose: 'edit',
+        prompt: `${requestPayload.prompt}\n\nCreate the selected ${reference.admin_name} preview using manufacturing process ${reference.manufacturing_process}. ${reference.generation_instruction} The final preview must show this boilerplate product customized with the user-submitted subject; do not return the blank boilerplate.`,
+        images: [...files, boilerplate],
+        size: "1024x1024",
+        quality: "low",
+        purpose: "edit",
       });
-      const previewPath = await uploadGeneratedPng(supabase, user.id, 'previews', image.bytes);
-      const hidden = await uploadGeneratedSvg(supabase, user.id, 'hidden-svg', svg);
-      allWarnings.push(...hidden.warnings);
+      const previewPath = await uploadGeneratedPng(
+        supabase,
+        user.id,
+        "previews",
+        image.bytes,
+      );
       options.push({
         generatedItemId: generated.id,
         optionIndex: index,
         previewImagePath: previewPath,
-        hiddenSvgPath: hidden.path,
+        hiddenSvgPath: null,
+        boilerplateId: reference.id,
         metadata: {
           modelId: model.id,
           optionIndex: index,
+          boilerplateId: reference.id,
+          boilerplateName: reference.admin_name,
+          manufacturingProcess: reference.manufacturing_process,
+          boilerplatePath: reference.image_path,
+          requiresManufacturingSvg: reference.generate_hidden_svg,
+          manufacturingSvgStatus: "pending_admin_generation",
           revisedPrompt: image.revisedPrompt,
-          validationWarnings: hidden.warnings,
+          validationWarnings: [],
         },
       });
     }
     await createPersonalizedPreviewOptions(supabase, options);
-    if (allWarnings.length) {
-      await supabase
-        .from('generated_items')
-        .update({ manufacturing_metadata: { validationWarnings: allWarnings } })
-        .eq('id', generated.id);
-    }
   } catch (error) {
     if (debited) {
-      await refundCredits(creditSupabase!, {
-        userId: user.id,
-        amount: creditCost,
-        referenceType: 'personalized_night_light',
-        referenceId: generatedId,
-        metadata: {
-          modelId: model.id,
-          reason: error instanceof Error ? error.message : 'personalized_generation_failed',
-        },
-      });
+      try {
+        await refundCredits(creditSupabase!, {
+          userId: user.id,
+          amount: creditCost,
+          referenceType: "personalized_night_light",
+          referenceId: generatedId,
+          metadata: {
+            modelId: model.id,
+            reason:
+              error instanceof Error
+                ? error.message
+                : "personalized_generation_failed",
+          },
+        });
+      } catch (refundError) {
+        console.error(
+          "[personalized-night-light] credit refund failed",
+          refundError,
+        );
+      }
     }
-    throw error;
+    return errorState(error instanceof Error ? friendlyGenerationError(error) : t("errorGeneration"));
   }
 
-  if (!generatedId) throw new Error('Personalized generation did not create an item.');
+  if (!generatedId)
+    return errorState(
+      "We could not save the generated previews. Please try again.",
+    );
   redirect(`/generated/${generatedId}`);
 }
