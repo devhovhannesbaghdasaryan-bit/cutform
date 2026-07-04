@@ -170,20 +170,53 @@ CLI or the connected Supabase integration before starting the app.
 
 ## Email delivery
 
-v1 ships with **Supabase's default SMTP sender**. The verification email comes
-from a generic Supabase address — not from your domain. This is a deliberate
-deferral; see [the plan file](/Users/harut/.claude/plans/we-need-to-generate-spicy-mccarthy.md)
-for full context.
+Auth emails (sign-up confirmation, resend) are sent through **Resend's SMTP
+relay** instead of Supabase's built-in sender, configured in
+[`supabase/config.toml`](./supabase/config.toml) under `[auth.email.smtp]`.
+The confirmation email content lives in
+[`supabase/templates/confirmation.html`](./supabase/templates/confirmation.html)
+and includes both the confirmation link and the 6-digit code shown on
+`/auth/verify-email`.
 
-**To enable branded emails via Resend (post-v1, no code change):**
+Local dev picks this up automatically via `supabase start`, as long as
+`RESEND_API_KEY` is set in a plain `.env` file at the repo root (Supabase
+CLI's `env()` substitution reads `.env`, not `.env.local` — see
+`.env.local.example`).
 
-1. Verify your sender domain in Resend.
-2. In Supabase Dashboard: **Authentication → SMTP Settings**.
-3. Enter Resend SMTP credentials and sender (e.g. `noreply@yourdomain.com`).
-4. Add SPF + DKIM DNS records as instructed by Resend.
-5. Send a test from Supabase to confirm.
+**Current limitation:** no custom sending domain is verified in Resend yet,
+so both local and production are configured with Resend's sandbox sender
+(`onboarding@resend.dev`), which only delivers to the Resend account's own
+email address. To send to real users:
 
-Auth email templates can be customized in **Authentication → Email Templates**.
+1. Point a domain you control at Vercel (or elsewhere) and verify it in Resend
+   (`resend.com/domains`) — this adds SPF/DKIM DNS records.
+2. Update `admin_email`/`sender_name` in `supabase/config.toml` (local) and
+   the hosted project's SMTP settings (below) to use an address on that
+   domain.
+
+**Production (hosted project):** apply the same SMTP settings via
+**Authentication → SMTP Settings** in the Supabase Dashboard, or the
+Management API:
+
+```bash
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "external_email_enabled": true,
+    "smtp_admin_email": "onboarding@resend.dev",
+    "smtp_host": "smtp.resend.com",
+    "smtp_port": 465,
+    "smtp_user": "resend",
+    "smtp_pass": "your-resend-api-key",
+    "smtp_sender_name": "Snip"
+  }'
+```
+
+The confirmation email template itself is hosted-project-specific and must
+be set separately in **Authentication → Email Templates → Confirm signup**
+(paste the same subject/HTML as `supabase/templates/confirmation.html`) —
+local `config.toml` template paths don't apply to hosted projects.
 
 ## Deploy to Vercel
 
