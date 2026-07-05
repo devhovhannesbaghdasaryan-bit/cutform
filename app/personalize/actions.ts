@@ -24,8 +24,7 @@ import {
   loadBoilerplate,
   type PersonalizationBoilerplate,
 } from "@/lib/personalization-boilerplates";
-import { translate } from "@/lib/i18n";
-import { getRequestLocale } from "@/lib/i18n-server";
+import { getTranslations } from "next-intl/server";
 
 // Sanctioned exception to the ActionState convention (lib/action-state.ts):
 // the credits dialog in components/personalized-night-light-form.tsx needs the
@@ -83,8 +82,7 @@ export async function generatePersonalizedNightLightAction(
   const rawModelId = String(formData.get("modelId") ?? "");
   if (!user)
     redirect(`/login?next=/personalize/${encodeURIComponent(rawModelId)}`);
-  const locale = await getRequestLocale();
-  const t = (key: string) => translate(locale, `nightLight.${key}`);
+  const t = await getTranslations("nightLight");
 
   const parsed = generationFormSchema.safeParse({
     modelId: rawModelId,

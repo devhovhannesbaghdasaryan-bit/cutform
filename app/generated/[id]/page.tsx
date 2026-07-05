@@ -5,7 +5,9 @@ import { GeneratedPreviewSelector } from '@/components/generated-preview-selecto
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { getServerSupabase } from '@/lib/supabase/server';
-import { formatLocalizedCurrency, formatLocalizedDate, translate, translateTemplate, translateWithFallback } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import type { GeneratedItemRow, PersonalizedPreviewOptionRow } from '@/lib/generated-items';
 import { getBoilerplateName, type PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
@@ -67,6 +69,7 @@ export default async function GeneratedItemPage({
       .returns<PreviewOption[]>(),
     getRequestLocale(),
   ]);
+  const t = await getTranslations();
 
   if (error || !item) notFound();
 
@@ -83,22 +86,22 @@ export default async function GeneratedItemPage({
   const bannerDetails = item.product_type === 'banner' ? extractBannerDetails(item.generation_options) : null;
   const canOrder = item.review_status !== 'rejected' && (item.product_type !== 'personalized_night_light' || previewOptions.length > 0);
   const salePriceCents = Number(item.generation_options.salePriceCents ?? 0);
-  const localizedProductType = translateWithFallback(
-    locale,
+  const localizedProductType = tDynamic(
+    t,
     `generated.productType.${item.product_type}`,
     item.product_type.replaceAll('_', ' '),
   );
   const itemTitle = item.product_type === 'personalized_night_light'
     ? localizedProductType
     : item.title ?? localizedProductType;
-  const reviewStatus = translateWithFallback(
-    locale,
+  const reviewStatus = tDynamic(
+    t,
     `status.${item.review_status}`,
     item.review_status.replaceAll('_', ' '),
   );
   const lightColor = item.multi_color
-    ? translate(locale, 'generated.multiColor')
-    : translateWithFallback(locale, `generated.color.${item.color}`, item.color?.replaceAll('_', ' ') ?? '-');
+    ? t('generated.multiColor')
+    : tDynamic(t, `generated.color.${item.color}`, item.color?.replaceAll('_', ' ') ?? '-');
 
   return (
     <>
@@ -107,15 +110,15 @@ export default async function GeneratedItemPage({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm text-muted-foreground">
-              {translateTemplate(locale, 'generated.created', { date: formatLocalizedDate(locale, item.created_at) })}
+              {t('generated.created', { date: formatLocalizedDate(locale, item.created_at) })}
             </p>
             <h1 className="text-3xl font-bold tracking-tight">{itemTitle}</h1>
             <p className="text-muted-foreground">
-              {reviewStatus} &middot; {translateTemplate(locale, 'generated.creditsUsed', { count: String(item.credit_cost) })}
+              {reviewStatus} &middot; {t('generated.creditsUsed', { count: String(item.credit_cost) })}
             </p>
           </div>
           <Button asChild variant="outline">
-            <Link href="/dashboard">{translate(locale, 'generated.backDashboard')}</Link>
+            <Link href="/dashboard">{t('generated.backDashboard')}</Link>
           </Button>
         </div>
 
@@ -131,26 +134,27 @@ export default async function GeneratedItemPage({
                   ? getBoilerplateName(option.boilerplate, locale)
                   : typeof option.metadata.boilerplateName === 'string'
                     ? option.metadata.boilerplateName
-                    : translateTemplate(locale, 'generated.option', { number: String(option.option_index) }),
+                    : t('generated.option', { number: String(option.option_index) }),
               }))}
               fallbackPreviewUrl={fallbackPreviewUrl}
               priceLabel={salePriceCents > 0
-                ? translateTemplate(locale, 'generated.priceEach', {
+                ? t('generated.priceEach', {
                     price: formatLocalizedCurrency(locale, salePriceCents, 'AMD'),
                   })
                 : null}
               copy={{
-                resultsTitle: translate(locale, 'nightLight.results'),
-                resultsHelp: translate(locale, 'nightLight.resultsHelp'),
-                addSelected: translate(locale, 'nightLight.addSelected'),
-                previewUnavailable: translate(locale, 'generated.previewUnavailable'),
-                noPreview: translate(locale, 'generated.noPreview'),
-                previewAlt: translate(locale, 'generated.previewAlt'),
+                resultsTitle: t('nightLight.results'),
+                resultsHelp: t('nightLight.resultsHelp'),
+                addSelected: t('nightLight.addSelected'),
+                previewUnavailable: t('generated.previewUnavailable'),
+                noPreview: t('generated.noPreview'),
+                // Raw template ({name}) — the client component interpolates it.
+                previewAlt: t.raw('generated.previewAlt'),
               }}
             />
             {item.product_type !== 'personalized_night_light' && item.svg_content ? (
               <section className="space-y-3">
-                <h2 className="text-xl font-semibold tracking-tight">{translate(locale, 'generated.rawSvg')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">{t('generated.rawSvg')}</h2>
                 <pre className="max-h-96 overflow-auto rounded-lg border bg-muted p-4 text-xs">
                   {item.svg_content}
                 </pre>
@@ -158,7 +162,7 @@ export default async function GeneratedItemPage({
             ) : null}
             {warnings.length ? (
               <section className="warning-panel space-y-3 rounded-lg border p-4">
-                <h2 className="text-lg font-semibold">{translate(locale, 'generated.warnings')}</h2>
+                <h2 className="text-lg font-semibold">{t('generated.warnings')}</h2>
                 <ul className="list-disc space-y-1 pl-5 text-sm">
                   {warnings.map((warning) => (
                     <li key={warning}>{warning}</li>
@@ -170,14 +174,14 @@ export default async function GeneratedItemPage({
 
           <aside className="space-y-6">
             <div className="rounded-lg border bg-card p-5 shadow-sm">
-              <h2 className="font-semibold">{translate(locale, 'generated.customization')}</h2>
+              <h2 className="font-semibold">{t('generated.customization')}</h2>
               <dl className="mt-4 space-y-3 text-sm">
                 {item.custom_text ? <div>
-                  <dt className="text-muted-foreground">{translate(locale, 'generated.personalizedText')}</dt>
+                  <dt className="text-muted-foreground">{t('generated.personalizedText')}</dt>
                   <dd>{item.custom_text}</dd>
                 </div> : null}
                 <div>
-                  <dt className="text-muted-foreground">{translate(locale, 'generated.lightColor')}</dt>
+                  <dt className="text-muted-foreground">{t('generated.lightColor')}</dt>
                   <dd className="capitalize">{lightColor}</dd>
                 </div>
               </dl>
@@ -185,14 +189,14 @@ export default async function GeneratedItemPage({
 
             {bannerDetails ? (
               <div className="rounded-lg border p-5">
-                <h2 className="font-semibold">{translate(locale, 'generated.bannerReview')}</h2>
+                <h2 className="font-semibold">{t('generated.bannerReview')}</h2>
                 <dl className="mt-4 space-y-3 text-sm">
                   <div>
-                    <dt className="text-muted-foreground">{translate(locale, 'generated.size')}</dt>
+                    <dt className="text-muted-foreground">{t('generated.size')}</dt>
                     <dd>{bannerDetails.sizeLabel}</dd>
                   </div>
                   <div>
-                    <dt className="text-muted-foreground">{translate(locale, 'generated.textPlacement')}</dt>
+                    <dt className="text-muted-foreground">{t('generated.textPlacement')}</dt>
                     <dd>{bannerDetails.textPlacement}</dd>
                   </div>
                 </dl>
@@ -205,11 +209,11 @@ export default async function GeneratedItemPage({
                 <p className="mb-3 text-center text-lg font-semibold">{formatLocalizedCurrency(locale, salePriceCents, 'AMD')}</p>
               )}
               <Button type="submit" className="w-full" disabled={!canOrder}>
-                {translate(locale, 'generated.addToCart')}
+                {t('generated.addToCart')}
               </Button>
               {!canOrder && (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {translate(locale, 'generated.selectPreview')}
+                  {t('generated.selectPreview')}
                 </p>
               )}
             </form> : null}

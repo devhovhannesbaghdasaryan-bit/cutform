@@ -45,7 +45,7 @@ for (const warning of ['missing a viewBox', 'missing obvious cut/engrave layer m
 }
 
 const generatedDetail = readFileSync('app/generated/[id]/page.tsx', 'utf8');
-for (const contract of ['extractValidationWarnings', "translate(locale, 'generated.warnings')"]) {
+for (const contract of ['extractValidationWarnings', "t('generated.warnings')", 'getTranslations']) {
   if (!generatedDetail.includes(contract)) throw new Error(`Generated detail is missing warning rendering: ${contract}`);
 }
 

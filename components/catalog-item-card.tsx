@@ -6,11 +6,14 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { sortCatalogMedia } from '@/lib/catalog-media';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
+import { getTranslations } from 'next-intl/server';
 import type { AppLocale } from '@/lib/i18n';
-import { formatLocalizedCurrency, translate, translateWithFallback } from '@/lib/i18n';
+import { formatLocalizedCurrency } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import type { CatalogItem } from '@/lib/marketplace';
 
 export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogItem; locale?: AppLocale }) {
+  const t = await getTranslations();
   const media = sortCatalogMedia(item.media ?? []);
   const sliderMedia = media.length
     ? media
@@ -32,10 +35,10 @@ export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogIt
     activeCurrency,
   );
   const categoryName = item.category
-    ? translateWithFallback(locale, `category.${item.category.slug}.name`, item.category.name)
-    : translate(locale, 'product.uncategorized');
+    ? tDynamic(t, `category.${item.category.slug}.name`, item.category.name)
+    : t('product.uncategorized');
   const subcategoryName = item.subcategory
-    ? translateWithFallback(locale, `subcategory.${item.subcategory.slug}.name`, item.subcategory.name)
+    ? tDynamic(t, `subcategory.${item.subcategory.slug}.name`, item.subcategory.name)
     : null;
 
   return (
@@ -61,7 +64,7 @@ export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogIt
             {item.is_customizable && (
               <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-secondary-foreground">
                 <Sparkles className="h-3 w-3" />
-                {translate(locale, 'common.custom')}
+                {t('common.custom')}
               </span>
             )}
           </div>

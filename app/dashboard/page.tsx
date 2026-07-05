@@ -3,7 +3,9 @@ import Link from 'next/link';
 import { SiteHeader } from '@/components/site-header';
 import { ProductCard } from '@/components/product-card';
 import { EmptyState } from '@/components/empty-state';
-import { formatLocalizedDate, translate, translateWithFallback } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { formatLocalizedDate } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
@@ -11,7 +13,7 @@ import { formatPrice } from '@/lib/utils';
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
+  const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
@@ -55,37 +57,37 @@ export default async function DashboardPage() {
       <SiteHeader email={user.email ?? ''} />
       <main className="container space-y-6 py-10">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{translate(locale, 'dashboard.title')}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
           <p className="text-sm text-muted-foreground">
-            {translate(locale, 'dashboard.subtitle')}
+            {t('dashboard.subtitle')}
           </p>
         </div>
         <section className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground">{translate(locale, 'dashboard.credits')}</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.credits')}</p>
             <p className="text-3xl font-bold">{creditAccount?.balance ?? 0}</p>
           </div>
           <div className="rounded-lg border p-4">
-            <p className="text-sm text-muted-foreground">{translate(locale, 'dashboard.orders')}</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.orders')}</p>
             <p className="text-3xl font-bold">{orders?.length ?? 0}</p>
           </div>
         </section>
         {items.length === 0 && !generatedItems?.length && !orders?.length ? (
-          <EmptyState copy={{ title: translate(locale, 'empty.title'), description: translate(locale, 'empty.description'), browse: translate(locale, 'empty.browse') }} />
+          <EmptyState copy={{ title: t('empty.title'), description: t('empty.description'), browse: t('empty.browse') }} />
         ) : (
           <>
             {(orders?.length ?? 0) > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold tracking-tight">{translate(locale, 'dashboard.recentOrders')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">{t('dashboard.recentOrders')}</h2>
                 <div className="overflow-hidden rounded-lg border">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50 text-left">
                       <tr>
-                        <th className="px-4 py-3 font-medium">{translate(locale, 'dashboard.order')}</th>
-                        <th className="px-4 py-3 font-medium">{translate(locale, 'dashboard.total')}</th>
-                        <th className="px-4 py-3 font-medium">{translate(locale, 'dashboard.payment')}</th>
-                        <th className="px-4 py-3 font-medium">{translate(locale, 'dashboard.production')}</th>
-                        <th className="px-4 py-3 font-medium">{translate(locale, 'dashboard.created')}</th>
+                        <th className="px-4 py-3 font-medium">{t('dashboard.order')}</th>
+                        <th className="px-4 py-3 font-medium">{t('dashboard.total')}</th>
+                        <th className="px-4 py-3 font-medium">{t('dashboard.payment')}</th>
+                        <th className="px-4 py-3 font-medium">{t('dashboard.production')}</th>
+                        <th className="px-4 py-3 font-medium">{t('dashboard.created')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -99,8 +101,8 @@ export default async function DashboardPage() {
                           <td className="px-4 py-3">
                             {formatPrice(order.subtotal_cents, order.currency)}
                           </td>
-                          <td className="px-4 py-3">{translateWithFallback(locale, `status.${order.payment_status}`, order.payment_status)}</td>
-                          <td className="px-4 py-3">{translateWithFallback(locale, `status.${order.status}`, order.status)}</td>
+                          <td className="px-4 py-3">{tDynamic(t, `status.${order.payment_status}`, order.payment_status)}</td>
+                          <td className="px-4 py-3">{tDynamic(t, `status.${order.status}`, order.status)}</td>
                           <td className="px-4 py-3">{formatLocalizedDate(locale, order.created_at)}</td>
                         </tr>
                       ))}
@@ -111,7 +113,7 @@ export default async function DashboardPage() {
             )}
             {(generatedItems?.length ?? 0) > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold tracking-tight">{translate(locale, 'dashboard.generatedItems')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">{t('dashboard.generatedItems')}</h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {generatedItems?.map((item) => (
                     <Link
@@ -120,13 +122,13 @@ export default async function DashboardPage() {
                       className="rounded-lg border p-4 transition-colors hover:bg-accent"
                     >
                       <div className="flex aspect-[4/3] items-center justify-center rounded-md border bg-muted text-sm text-muted-foreground">
-                        {item.selected_preview_path || item.preview_path ? translate(locale, 'dashboard.previewSaved') : translate(locale, 'dashboard.noPreview')}
+                        {item.selected_preview_path || item.preview_path ? t('dashboard.previewSaved') : t('dashboard.noPreview')}
                       </div>
                       <div className="mt-4 space-y-1">
                         <p className="font-medium">{item.title ?? item.id.slice(0, 8)}</p>
                         <p className="text-sm text-muted-foreground">{item.product_type}</p>
                         <p className="text-xs text-muted-foreground">
-                          {translateWithFallback(locale, `status.${item.review_status}`, item.review_status)} · {item.credit_cost} {translate(locale, 'dashboard.credits').toLowerCase()} · {formatLocalizedDate(locale, item.created_at)}
+                          {tDynamic(t, `status.${item.review_status}`, item.review_status)} · {item.credit_cost} {t('dashboard.credits').toLowerCase()} · {formatLocalizedDate(locale, item.created_at)}
                         </p>
                       </div>
                     </Link>
@@ -136,7 +138,7 @@ export default async function DashboardPage() {
             )}
             {items.length > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold tracking-tight">{translate(locale, 'dashboard.approvedProducts')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">{t('dashboard.approvedProducts')}</h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((p) => (
                     <ProductCard key={p.id} product={p} />

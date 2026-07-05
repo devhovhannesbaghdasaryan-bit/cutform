@@ -9,13 +9,14 @@ import { getCurrentUserRole } from '@/lib/admin';
 import { getActiveCartItemCount } from '@/lib/cart';
 import { getCartSessionId } from '@/lib/cart-session';
 import { getCreditBalanceForDisplay } from '@/lib/credits';
-import { translate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 export async function MarketplaceHeader() {
   const supabase = await getServerSupabase();
   const locale = await getRequestLocale();
+  const t = await getTranslations();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -36,7 +37,7 @@ export async function MarketplaceHeader() {
             <BrandLogo />
           </Link>
           <Link href="/catalog" className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline">
-            {translate(locale, 'nav.catalog')}
+            {t('nav.catalog')}
           </Link>
         </nav>
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">
@@ -60,19 +61,19 @@ export async function MarketplaceHeader() {
               <Button asChild size="sm" className="hidden sm:inline-flex">
                 <Link href="/dashboard">
                   <LayoutDashboard className="mr-1 h-4 w-4" />
-                  {translate(locale, 'nav.dashboard')}
+                  {t('nav.dashboard')}
                 </Link>
               </Button>
               {role === 'admin' && (
                 <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
                   <Link href="/admin">
                     <ShieldCheck className="mr-1 h-4 w-4" />
-                    {translate(locale, 'nav.admin')}
+                    {t('nav.admin')}
                   </Link>
                 </Button>
               )}
               <Button asChild variant="ghost" size="icon">
-                <Link href="/profile" aria-label={translate(locale, 'nav.profile')}>
+                <Link href="/profile" aria-label={t('nav.profile')}>
                     <UserCircle className="h-4 w-4" />
                 </Link>
               </Button>
@@ -86,10 +87,10 @@ export async function MarketplaceHeader() {
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="sm">
-                <Link href="/login">{translate(locale, 'auth.login')}</Link>
+                <Link href="/login">{t('auth.login')}</Link>
               </Button>
               <Button asChild size="sm" className="hidden sm:inline-flex">
-                <Link href="/register">{translate(locale, 'auth.signup')}</Link>
+                <Link href="/register">{t('auth.signup')}</Link>
               </Button>
             </>
           )}

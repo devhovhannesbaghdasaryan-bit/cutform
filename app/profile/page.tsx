@@ -3,14 +3,16 @@ import { CalendarDays, Coins, Languages, LayoutDashboard, Mail, ShieldCheck, Use
 import { redirect } from 'next/navigation';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
-import { formatLocalizedDate, translate, translateWithFallback } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { formatLocalizedDate } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
-  const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
+  const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -26,10 +28,10 @@ export default async function ProfilePage() {
   const displayName = profile?.display_name
     ?? user.user_metadata?.display_name
     ?? user.email?.split('@')[0]
-    ?? translate(locale, 'profile.memberFallback');
+    ?? t('profile.memberFallback');
   const preferredLanguage = profile?.preferred_locale
-    ? translateWithFallback(locale, `profile.language.${profile.preferred_locale}`, profile.preferred_locale.toUpperCase())
-    : translate(locale, 'profile.notSelected');
+    ? tDynamic(t, `profile.language.${profile.preferred_locale}`, profile.preferred_locale.toUpperCase())
+    : t('profile.notSelected');
   const memberSince = formatLocalizedDate(locale, profile?.created_at ?? user.created_at);
   const accountStatus = profile?.status ?? 'active';
   const accountRole = profile?.role ?? 'user';
@@ -44,7 +46,7 @@ export default async function ProfilePage() {
               <UserCircle className="h-9 w-9" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-muted-foreground">{translate(locale, 'profile.yourAccount')}</p>
+              <p className="text-sm text-muted-foreground">{t('profile.yourAccount')}</p>
               <h1 className="truncate text-3xl font-bold tracking-tight">{displayName}</h1>
               <p className="truncate text-sm text-muted-foreground">{user.email}</p>
             </div>
@@ -52,38 +54,38 @@ export default async function ProfilePage() {
           <Button asChild variant="outline">
             <Link href="/dashboard">
               <LayoutDashboard className="mr-2 h-4 w-4" />
-              {translate(locale, 'profile.yourProducts')}
+              {t('profile.yourProducts')}
             </Link>
           </Button>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={translate(locale, 'profile.details')}>
-          <ProfileDetail icon={Mail} label={translate(locale, 'profile.email')} value={user.email ?? translate(locale, 'profile.notAvailable')} />
+        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t('profile.details')}>
+          <ProfileDetail icon={Mail} label={t('profile.email')} value={user.email ?? t('profile.notAvailable')} />
           <ProfileDetail
             icon={ShieldCheck}
-            label={translate(locale, 'profile.accountStatus')}
-            value={translateWithFallback(locale, `profile.status.${accountStatus}`, accountStatus)}
+            label={t('profile.accountStatus')}
+            value={tDynamic(t, `profile.status.${accountStatus}`, accountStatus)}
           />
           <ProfileDetail
             icon={CalendarDays}
-            label={translate(locale, 'profile.memberSince')}
+            label={t('profile.memberSince')}
             value={memberSince}
           />
-          <ProfileDetail icon={Languages} label={translate(locale, 'profile.preferredLanguage')} value={preferredLanguage} />
-          <ProfileDetail icon={Coins} label={translate(locale, 'profile.preferredCurrency')} value={profile?.preferred_currency ?? translate(locale, 'profile.notSelected')} />
-          <ProfileDetail icon={ShieldCheck} label={translate(locale, 'profile.accountType')} value={translateWithFallback(locale, `profile.role.${accountRole}`, accountRole)} />
+          <ProfileDetail icon={Languages} label={t('profile.preferredLanguage')} value={preferredLanguage} />
+          <ProfileDetail icon={Coins} label={t('profile.preferredCurrency')} value={profile?.preferred_currency ?? t('profile.notSelected')} />
+          <ProfileDetail icon={ShieldCheck} label={t('profile.accountType')} value={tDynamic(t, `profile.role.${accountRole}`, accountRole)} />
         </section>
 
         <section className="rounded-xl border bg-card p-6 shadow-sm">
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold tracking-tight">{translate(locale, 'profile.shortcuts')}</h2>
-            <p className="text-sm text-muted-foreground">{translate(locale, 'profile.shortcutsHelp')}</p>
+            <h2 className="text-xl font-semibold tracking-tight">{t('profile.shortcuts')}</h2>
+            <p className="text-sm text-muted-foreground">{t('profile.shortcutsHelp')}</p>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button asChild><Link href="/dashboard">{translate(locale, 'profile.yourProducts')}</Link></Button>
-            <Button asChild variant="outline"><Link href="/credits">{translate(locale, 'profile.credits')}</Link></Button>
-            <Button asChild variant="outline"><Link href="/cart">{translate(locale, 'profile.cart')}</Link></Button>
-            <Button asChild variant="outline"><Link href="/catalog">{translate(locale, 'profile.browseCatalog')}</Link></Button>
+            <Button asChild><Link href="/dashboard">{t('profile.yourProducts')}</Link></Button>
+            <Button asChild variant="outline"><Link href="/credits">{t('profile.credits')}</Link></Button>
+            <Button asChild variant="outline"><Link href="/cart">{t('profile.cart')}</Link></Button>
+            <Button asChild variant="outline"><Link href="/catalog">{t('profile.browseCatalog')}</Link></Button>
           </div>
         </section>
       </main>

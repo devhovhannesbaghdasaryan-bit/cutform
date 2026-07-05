@@ -16,13 +16,14 @@ import {
 import { getCurrentUserRole } from '@/lib/admin';
 import { getActiveCartItemCount } from '@/lib/cart';
 import { getCreditBalanceForDisplay } from '@/lib/credits';
-import { translate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
 
 export async function SiteHeader({ email }: { email: string }) {
   const supabase = await getServerSupabase();
   const locale = await getRequestLocale();
+  const t = await getTranslations();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -38,7 +39,7 @@ export async function SiteHeader({ email }: { email: string }) {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between gap-4">
-        <Link href="/" aria-label={translate(locale, 'nav.home')} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+        <Link href="/" aria-label={t('nav.home')} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
           <BrandLogo />
         </Link>
         <div className="flex items-center gap-2">
@@ -46,7 +47,7 @@ export async function SiteHeader({ email }: { email: string }) {
           <LanguageSwitcher activeLocale={locale} />
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/catalog">
-              <Store className="mr-1 h-4 w-4" /> {translate(locale, 'nav.catalog')}
+              <Store className="mr-1 h-4 w-4" /> {t('nav.catalog')}
             </Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
@@ -62,7 +63,7 @@ export async function SiteHeader({ email }: { email: string }) {
           {isAdmin && (
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link href="/admin">
-                <ShieldCheck className="mr-1 h-4 w-4" /> {translate(locale, 'nav.admin')}
+                <ShieldCheck className="mr-1 h-4 w-4" /> {t('nav.admin')}
               </Link>
             </Button>
           )}
@@ -74,17 +75,17 @@ export async function SiteHeader({ email }: { email: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel className="font-normal text-muted-foreground">
-                {translate(locale, 'auth.signedIn')}
+                {t('auth.signedIn')}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/profile">
                   <UserCircle className="mr-2 h-4 w-4" />
-                  {translate(locale, 'nav.profile')}
+                  {t('nav.profile')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <LogoutMenuItem label={translate(locale, 'auth.logout')} />
+              <LogoutMenuItem label={t('auth.logout')} />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

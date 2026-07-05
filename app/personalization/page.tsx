@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Blocks, Gift, Lamp, Megaphone, Puzzle } from 'lucide-react';
-import { getRequestLocale } from '@/lib/i18n-server';
-import { translate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { tDynamic } from '@/lib/i18n-dynamic';
 
 const categories = [
   { slug: 'toys', icon: Gift },
@@ -12,12 +12,12 @@ const categories = [
 ];
 
 export default async function PersonalizationPage() {
-  const locale = await getRequestLocale();
+  const t = await getTranslations();
   return (
     <main className="container max-w-5xl space-y-8 py-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">{translate(locale, 'personalization.title')}</h1>
-        <p className="mt-2 text-muted-foreground">{translate(locale, 'personalization.subtitle')}</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('personalization.title')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('personalization.subtitle')}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -30,12 +30,12 @@ export default async function PersonalizationPage() {
                   <Icon className="h-5 w-5" />
                 </span>
                 <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                  {translate(locale, category.href ? 'personalization.available' : 'personalization.comingSoon')}
+                  {t(category.href ? 'personalization.available' : 'personalization.comingSoon')}
                 </span>
               </div>
-              <h2 className="mt-5 text-lg font-semibold">{translate(locale, `personalization.${category.slug}`)}</h2>
+              <h2 className="mt-5 text-lg font-semibold">{tDynamic(t, `personalization.${category.slug}`)}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {translate(locale, category.href ? 'personalization.manage' : 'personalization.unavailable')}
+                {t(category.href ? 'personalization.manage' : 'personalization.unavailable')}
               </p>
             </>
           );

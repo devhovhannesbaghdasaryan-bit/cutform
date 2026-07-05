@@ -10,7 +10,9 @@ import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { type CartItem, listCartItems, validateCartBeforeCheckout } from '@/lib/cart';
 import { getCartSessionId } from '@/lib/cart-session';
-import { formatLocalizedCurrency, translate, translateTemplate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { formatLocalizedCurrency } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { normalizeCurrency } from '@/lib/currency';
 import { resolveMarket } from '@/lib/market';
@@ -80,6 +82,7 @@ export default async function CartPage() {
   } = await supabase.auth.getUser();
 
   const locale = await getRequestLocale();
+  const t = await getTranslations();
   const sessionId = user ? null : await getCartSessionId();
   const cartSupabase = user ? supabase : getServiceSupabase();
   const cartData = user
@@ -111,17 +114,17 @@ export default async function CartPage() {
       <main className="container max-w-6xl space-y-8 py-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
-            <h1 className="text-3xl font-bold tracking-tight">{translate(locale, 'cart.title')}</h1>
-            <p className="max-w-2xl text-muted-foreground">{translate(locale, 'cart.description')}</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t('cart.title')}</h1>
+            <p className="max-w-2xl text-muted-foreground">{t('cart.description')}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {!user && (
               <Button asChild>
-                <Link href="/login?next=/cart">{translate(locale, 'cart.login_checkout')}</Link>
+                <Link href="/login?next=/cart">{t('cart.login_checkout')}</Link>
               </Button>
             )}
             <Button asChild variant="outline">
-              <Link href="/catalog">{translate(locale, 'cart.continue_shopping')}</Link>
+              <Link href="/catalog">{t('cart.continue_shopping')}</Link>
             </Button>
           </div>
         </div>
@@ -129,10 +132,10 @@ export default async function CartPage() {
         {items.length === 0 ? (
           <div className="rounded-lg border border-dashed p-10 text-center">
             <ShoppingCart className="mx-auto h-10 w-10 text-muted-foreground" />
-            <h2 className="mt-4 text-lg font-semibold">{translate(locale, 'cart.empty')}</h2>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{translate(locale, 'cart.empty_description')}</p>
+            <h2 className="mt-4 text-lg font-semibold">{t('cart.empty')}</h2>
+            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t('cart.empty_description')}</p>
             <Button asChild className="mt-5">
-              <Link href="/catalog">{translate(locale, 'cart.browse_catalog')}</Link>
+              <Link href="/catalog">{t('cart.browse_catalog')}</Link>
             </Button>
           </div>
         ) : (
@@ -144,10 +147,10 @@ export default async function CartPage() {
                   const isGenerated = Boolean(item.generated_item_id);
                   const previewUrl = previewUrls.get(item.id);
                   const itemType = item.generated_item_id
-                    ? translate(locale, 'cart.generated_item')
+                    ? t('cart.generated_item')
                     : item.banner_sample_id
-                      ? translate(locale, 'cart.banner_item')
-                      : translate(locale, 'cart.catalog_item');
+                      ? t('cart.banner_item')
+                      : t('cart.catalog_item');
                   return (
                     <div key={item.id} className="grid gap-4 p-4 sm:grid-cols-[96px_1fr_auto]">
                       <div className="flex aspect-square items-center justify-center overflow-hidden rounded-md border bg-muted text-xs text-muted-foreground">
@@ -155,13 +158,13 @@ export default async function CartPage() {
                           // eslint-disable-next-line @next/next/no-img-element -- Signed generated-asset URLs are dynamic and expire.
                           <img
                             src={previewUrl}
-                            alt={translateTemplate(locale, 'cart.preview_alt', { name: item.title })}
+                            alt={t('cart.preview_alt', { name: item.title })}
                             className="h-full w-full object-cover"
                           />
                         ) : (
                           <span className="flex flex-col items-center gap-1 px-2 text-center">
                             <ImageOff className="h-5 w-5" aria-hidden="true" />
-                            {translate(locale, 'cart.preview_unavailable')}
+                            {t('cart.preview_unavailable')}
                           </span>
                         )}
                       </div>
@@ -172,7 +175,7 @@ export default async function CartPage() {
                         </p>
                         {issue && (
                           <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                            {translate(locale, `cart.issue.${issue.code}`)}
+                            {tDynamic(t, `cart.issue.${issue.code}`)}
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-2">
@@ -185,18 +188,18 @@ export default async function CartPage() {
                               max={isGenerated ? 1 : 99}
                               defaultValue={item.quantity}
                               disabled={isGenerated}
-                              aria-label={translateTemplate(locale, 'cart.quantity_label', { name: item.title })}
+                              aria-label={t('cart.quantity_label', { name: item.title })}
                               className="h-9 w-20 rounded-md border border-input bg-background px-3 text-sm disabled:opacity-60"
                             />
                             <Button type="submit" variant="outline" size="sm" disabled={isGenerated}>
-                              {translate(locale, 'cart.update_quantity')}
+                              {t('cart.update_quantity')}
                             </Button>
                           </form>
                           <form action={removeCartItemAction}>
                             <input type="hidden" name="cartItemId" value={item.id} />
                             <Button type="submit" variant="ghost" size="sm">
                               <Trash2 className="mr-1 h-4 w-4" />
-                              {translate(locale, 'cart.remove')}
+                              {t('cart.remove')}
                             </Button>
                           </form>
                         </div>
@@ -206,7 +209,7 @@ export default async function CartPage() {
                           {formatLocalizedCurrency(locale, item.unit_price_cents * item.quantity, item.currency)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatLocalizedCurrency(locale, item.unit_price_cents, item.currency)} {translate(locale, 'common.each')}
+                          {formatLocalizedCurrency(locale, item.unit_price_cents, item.currency)} {t('common.each')}
                         </p>
                       </div>
                     </div>
@@ -217,47 +220,47 @@ export default async function CartPage() {
 
             <aside className="space-y-4">
               <div className="rounded-lg border p-5">
-                <h2 className="font-semibold">{translate(locale, 'cart.summary')}</h2>
+                <h2 className="font-semibold">{t('cart.summary')}</h2>
                 <dl className="mt-4 space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">{translate(locale, 'cart.subtotal')}</dt>
+                    <dt className="text-muted-foreground">{t('cart.subtotal')}</dt>
                     <dd className="font-medium">{formatLocalizedCurrency(locale, subtotal, subtotalCurrency)}</dd>
                   </div>
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">{translate(locale, 'cart.shipping')}</dt>
+                    <dt className="text-muted-foreground">{t('cart.shipping')}</dt>
                     <dd>{totals
                       ? formatLocalizedCurrency(locale, totals.shippingCents, totals.currency)
                       : market.countryCode
-                        ? translate(locale, 'cart.shipping_unavailable')
-                        : translate(locale, 'cart.select_country')}</dd>
+                        ? t('cart.shipping_unavailable')
+                        : t('cart.select_country')}</dd>
                   </div>
                   {totals ? (
                     <div className="flex justify-between border-t pt-3 text-base">
-                      <dt className="font-medium">{translate(locale, 'cart.total')}</dt>
+                      <dt className="font-medium">{t('cart.total')}</dt>
                       <dd className="font-bold">{formatLocalizedCurrency(locale, totals.totalCents, totals.currency)}</dd>
                     </div>
                   ) : null}
                   <div className="flex justify-between">
-                    <dt className="text-muted-foreground">{translate(locale, 'cart.tax')}</dt>
-                    <dd>{translate(locale, 'cart.calculated_later')}</dd>
+                    <dt className="text-muted-foreground">{t('cart.tax')}</dt>
+                    <dd>{t('cart.calculated_later')}</dd>
                   </div>
                 </dl>
                 {!user ? (
                   <Button asChild className="mt-5 w-full">
-                    <Link href="/login?next=/checkout">{translate(locale, 'cart.login_checkout')}</Link>
+                    <Link href="/login?next=/checkout">{t('cart.login_checkout')}</Link>
                   </Button>
                 ) : issues.length > 0 ? (
                   <Button className="mt-5 w-full" disabled>
-                    {translate(locale, 'cart.checkout_review')}
+                    {t('cart.checkout_review')}
                   </Button>
                 ) : (
                   <Button asChild className="mt-5 w-full">
-                    <Link href="/checkout">{translate(locale, 'cart.checkout_review')}</Link>
+                    <Link href="/checkout">{t('cart.checkout_review')}</Link>
                   </Button>
                 )}
                 {issues.length > 0 && (
                   <p className="mt-2 text-sm text-destructive">
-                    {translate(locale, 'cart.resolve_issues')}
+                    {t('cart.resolve_issues')}
                   </p>
                 )}
               </div>
@@ -265,7 +268,7 @@ export default async function CartPage() {
               <form action={clearCartAction}>
                 <Button type="submit" variant="outline" className="w-full">
                   <Minus className="mr-2 h-4 w-4" />
-                  {translate(locale, 'cart.clear')}
+                  {t('cart.clear')}
                 </Button>
               </form>
             </aside>

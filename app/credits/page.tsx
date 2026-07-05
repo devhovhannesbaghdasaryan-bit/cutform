@@ -5,14 +5,15 @@ import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
 import { CREDIT_PACKS } from '@/lib/credit-packs';
 import { convertMoney, getActiveCurrency, getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
-import { formatLocalizedCurrency, formatLocalizedDate, translate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CreditsPage() {
-  const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
+  const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -78,9 +79,9 @@ export default async function CreditsPage() {
       <SiteHeader email={user.email ?? ''} />
       <main className="container max-w-3xl space-y-6 py-10">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">{translate(locale, 'credits.title')}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('credits.title')}</h1>
           <p className="text-muted-foreground">
-            {translate(locale, 'credits.subtitle')}
+            {t('credits.subtitle')}
           </p>
         </div>
 
@@ -90,25 +91,25 @@ export default async function CreditsPage() {
               <Coins className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">{translate(locale, 'credits.balance')}</p>
-              <p className="text-3xl font-bold">{account?.balance ?? 0} {translate(locale, 'credits.unit')}</p>
+              <p className="text-sm text-muted-foreground">{t('credits.balance')}</p>
+              <p className="text-3xl font-bold">{account?.balance ?? 0} {t('credits.unit')}</p>
             </div>
           </div>
         </section>
 
         <section className="rounded-lg border">
           <div className="border-b p-4">
-            <h2 className="font-semibold">{translate(locale, 'credits.activity')}</h2>
+            <h2 className="font-semibold">{t('credits.activity')}</h2>
           </div>
           {!ledger?.length ? (
-            <p className="p-4 text-sm text-muted-foreground">{translate(locale, 'credits.noActivity')}</p>
+            <p className="p-4 text-sm text-muted-foreground">{t('credits.noActivity')}</p>
           ) : (
             <div className="divide-y">
               {ledger.map((entry) => (
                 <div key={entry.id} className="flex items-start justify-between gap-4 p-4 text-sm">
                   <div>
                     <p className="font-medium">{entry.reason}</p>
-                    <p className="text-xs text-muted-foreground">{entry.reference_type ?? translate(locale, 'credits.noReference')}</p>
+                    <p className="text-xs text-muted-foreground">{entry.reference_type ?? t('credits.noReference')}</p>
                   </div>
                   <div className="text-right">
                     <p className={entry.delta >= 0 ? 'font-semibold text-success' : 'font-semibold text-destructive'}>
@@ -124,9 +125,9 @@ export default async function CreditsPage() {
 
         <section className="space-y-4 rounded-lg border p-6">
           <div>
-            <h2 className="font-semibold">{translate(locale, 'credits.packs')}</h2>
+            <h2 className="font-semibold">{t('credits.packs')}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {translate(locale, 'credits.packsHelp')}
+              {t('credits.packsHelp')}
             </p>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
@@ -135,27 +136,27 @@ export default async function CreditsPage() {
                 <input type="hidden" name="packKey" value={pack.key} />
                 <div>
                   <h3 className="font-medium">{pack.name}</h3>
-                  <p className="text-2xl font-bold">{pack.creditAmount} {translate(locale, 'credits.unit')}</p>
+                  <p className="text-2xl font-bold">{pack.creditAmount} {t('credits.unit')}</p>
                   <p className="text-sm text-muted-foreground">{formatLocalizedCurrency(locale, pack.displayPriceCents, pack.displayCurrency)}</p>
                   <p className="text-xs text-muted-foreground">
-                    {pack.paymentRoute === 'stripe' ? translate(locale, 'credits.stripe') : translate(locale, 'credits.manual')}
+                    {pack.paymentRoute === 'stripe' ? t('credits.stripe') : t('credits.manual')}
                   </p>
                 </div>
                 <p className="min-h-10 text-xs text-muted-foreground">{pack.description}</p>
                 <Button type="submit" className="w-full">
-                  {translate(locale, 'credits.buy')}
+                  {t('credits.buy')}
                 </Button>
               </form>
             ))}
           </div>
           {pendingRequests?.length ? (
             <div className="rounded-md border bg-muted/30 p-4">
-              <h3 className="text-sm font-medium">{translate(locale, 'credits.pending')}</h3>
+              <h3 className="text-sm font-medium">{t('credits.pending')}</h3>
               <div className="mt-3 space-y-2">
                 {pendingRequests.map((request) => (
                   <div key={request.id} className="flex justify-between gap-4 text-sm">
                     <span>
-                      {String(request.metadata.packName ?? translate(locale, 'credits.packFallback'))} - {String(request.metadata.creditAmount ?? '?')} {translate(locale, 'credits.unit')}
+                      {String(request.metadata.packName ?? t('credits.packFallback'))} - {String(request.metadata.creditAmount ?? '?')} {t('credits.unit')}
                     </span>
                     <span className="text-muted-foreground">{formatLocalizedDate(locale, request.created_at)}</span>
                   </div>

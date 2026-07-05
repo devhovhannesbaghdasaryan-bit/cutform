@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import type { ComponentType } from 'react';
 import { Blocks, Gift, Lamp, Megaphone, Puzzle } from 'lucide-react';
-import type { AppLocale } from '@/lib/i18n';
-import { translate, translateWithFallback } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import type { MarketplaceCategory, MarketplaceSubcategory } from '@/lib/marketplace';
 import { cn } from '@/lib/utils';
 
@@ -14,33 +14,32 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   banners: Megaphone,
 };
 
-export function CategoryNavigation({
+export async function CategoryNavigation({
   categories,
   subcategories = [],
-  locale = 'en',
   className,
 }: {
   categories: MarketplaceCategory[];
   subcategories?: MarketplaceSubcategory[];
-  locale?: AppLocale;
   className?: string;
 }) {
+  const t = await getTranslations();
   return (
     <section className={cn('storefront-section bg-background', className)} id="categories">
       <div className="storefront-container space-y-10">
         <div className="text-center">
-          <h2 className="storefront-heading">{translate(locale, 'categories.title')}</h2>
+          <h2 className="storefront-heading">{t('categories.title')}</h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground md:text-base">
-            {translate(locale, 'categories.subtitle')}
+            {t('categories.subtitle')}
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {categories.map((category) => {
             const Icon = ICONS[category.slug] ?? Gift;
             const children = subcategories.filter((item) => item.category_id === category.id);
-            const categoryName = translateWithFallback(locale, `category.${category.slug}.name`, category.name);
-            const categoryDescription = translateWithFallback(
-              locale,
+            const categoryName = tDynamic(t, `category.${category.slug}.name`, category.name);
+            const categoryDescription = tDynamic(
+              t,
               `category.${category.slug}.description`,
               category.description ?? '',
             );
@@ -61,7 +60,7 @@ export function CategoryNavigation({
                   <div className="mt-4 flex flex-wrap justify-center gap-2">
                     {children.map((child) => (
                       <span key={child.id} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                        {translateWithFallback(locale, `subcategory.${child.slug}.name`, child.name)}
+                        {tDynamic(t, `subcategory.${child.slug}.name`, child.name)}
                       </span>
                     ))}
                   </div>

@@ -13,7 +13,7 @@ import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib
 import { calculateOrderTotals } from '@/lib/shipping';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
-import { translate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,10 +26,11 @@ export default async function CheckoutPage() {
   if (!user) redirect('/login?next=/checkout');
 
   const locale = await getRequestLocale();
-  const [{ items }, market, geography] = await Promise.all([
+  const [{ items }, market, geography, t] = await Promise.all([
     listCartItems(supabase, { userId: user.id }),
     resolveMarket(),
     listMarketGeography(supabase),
+    getTranslations(),
   ]);
 
   if (!items.length) redirect('/cart');
@@ -97,12 +98,12 @@ export default async function CheckoutPage() {
 
           <aside className="space-y-4">
             <div className="space-y-2 rounded-lg border p-5">
-              <Label>{translate(locale, 'checkout.destination')}</Label>
-              <p className="text-xs text-muted-foreground">{translate(locale, 'checkout.destination_help')}</p>
+              <Label>{t('checkout.destination')}</Label>
+              <p className="text-xs text-muted-foreground">{t('checkout.destination_help')}</p>
               {market.countryCode ? (
                 <CountrySwitcherClient activeCountry={market.countryCode} countries={countries} />
               ) : (
-                <p className="text-sm text-destructive">{translate(locale, 'checkout.select_country')}</p>
+                <p className="text-sm text-destructive">{t('checkout.select_country')}</p>
               )}
             </div>
             <form action={createCheckoutOrderAction} className="space-y-4 rounded-lg border p-5">
@@ -125,33 +126,33 @@ export default async function CheckoutPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="recipientName">{translate(locale, 'checkout.recipient')}</Label>
+                <Label htmlFor="recipientName">{t('checkout.recipient')}</Label>
                 <Input id="recipientName" name="recipientName" autoComplete="name" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">{translate(locale, 'checkout.phone')}</Label>
+                <Label htmlFor="phone">{t('checkout.phone')}</Label>
                 <Input id="phone" name="phone" type="tel" autoComplete="tel" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="addressLine1">{translate(locale, 'checkout.address1')}</Label>
+                <Label htmlFor="addressLine1">{t('checkout.address1')}</Label>
                 <Input id="addressLine1" name="addressLine1" autoComplete="address-line1" required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="addressLine2">{translate(locale, 'checkout.address2')}</Label>
+                <Label htmlFor="addressLine2">{t('checkout.address2')}</Label>
                 <Input id="addressLine2" name="addressLine2" autoComplete="address-line2" />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="city">{translate(locale, 'checkout.city')}</Label>
+                  <Label htmlFor="city">{t('checkout.city')}</Label>
                   <Input id="city" name="city" autoComplete="address-level2" required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="administrativeArea">{translate(locale, 'checkout.region')}</Label>
+                  <Label htmlFor="administrativeArea">{t('checkout.region')}</Label>
                   <Input id="administrativeArea" name="administrativeArea" autoComplete="address-level1" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="postalCode">{translate(locale, 'checkout.postal')}</Label>
+                <Label htmlFor="postalCode">{t('checkout.postal')}</Label>
                 <Input id="postalCode" name="postalCode" autoComplete="postal-code" />
               </div>
               <div className="flex justify-between border-t pt-4">
@@ -159,11 +160,11 @@ export default async function CheckoutPage() {
                 <span className="font-semibold">{formatPrice(subtotal, subtotalCurrency)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">{translate(locale, 'cart.shipping')}</span>
+                <span className="text-muted-foreground">{t('cart.shipping')}</span>
                 <span className="font-semibold">{totals ? formatPrice(totals.shippingCents, totals.currency) : 'Select destination'}</span>
               </div>
               <div className="flex justify-between border-t pt-4 text-lg">
-                <span>{translate(locale, 'cart.total')}</span>
+                <span>{t('cart.total')}</span>
                 <span className="font-bold">{totals ? formatPrice(totals.totalCents, totals.currency) : formatPrice(subtotal, subtotalCurrency)}</span>
               </div>
               {issues.length ? (

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { getPrimaryCatalogMedia } from '@/lib/catalog-media';
 import { getPublishedPersonalizationModel, listPublishedCatalogItems } from '@/lib/marketplace';
 import { getServerSupabase } from '@/lib/supabase/server';
-import { translate } from '@/lib/i18n';
+import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getBoilerplateName, type PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
 import { resolvePublicStorageUrl } from '@/lib/storage';
@@ -33,10 +33,11 @@ export default async function PersonalizedModelPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [model, supabase, locale] = await Promise.all([
+  const [model, supabase, locale, t] = await Promise.all([
     getPublishedPersonalizationModel(slug).catch(() => null),
     getServerSupabase(),
     getRequestLocale(),
+    getTranslations(),
   ]);
   if (!model) notFound();
   const popularNightLights = await listPublishedCatalogItems('night-lights')
@@ -59,39 +60,41 @@ export default async function PersonalizedModelPage({
     name: getBoilerplateName(boilerplate, locale),
     imageUrl: resolvePublicStorageUrl('catalog-assets', boilerplate.image_path) ?? '',
   }));
-  const copy = Object.fromEntries([
+  const tNight = await getTranslations('nightLight');
+  // .raw: some entries are ICU templates ({count}) interpolated client-side.
+  const copy: Record<string, string> = Object.fromEntries(([
     'chooseTemplates', 'chooseTemplatesHelp', 'image', 'upload', 'color', 'text',
     'textOptional', 'textPlaceholder', 'charactersRemaining', 'creditPerStyle', 'creditTotal',
     'generate', 'generatingTitle', 'generatingBody', 'selectAtLeastOne', 'notEnoughCredits',
     'buyCredits', 'noTemplates', 'requiredCredits', 'availableCredits',
-  ].map((key) => [key, translate(locale, `nightLight.${key}`)]));
-  copy.cancel = translate(locale, 'common.cancel');
+  ] as const).map((key) => [key, tNight.raw(key)]));
+  copy.cancel = t('common.cancel');
 
   return (
     <>
       <MarketplaceHeader />
       <main className="storefront-container space-y-8 py-10">
         <Button asChild variant="ghost" className="px-0">
-          <Link href="/catalog/night-lights/personalized">{translate(locale, 'nightLight.back')}</Link>
+          <Link href="/catalog/night-lights/personalized">{t('nightLight.back')}</Link>
         </Button>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
           <section className="space-y-6">
             <div>
-              <p className="text-sm text-muted-foreground">{translate(locale, 'nightLight.modelEyebrow')}</p>
-              <h1 className="text-3xl font-bold tracking-tight">{translate(locale, 'nightLight.title')}</h1>
+              <p className="text-sm text-muted-foreground">{t('nightLight.modelEyebrow')}</p>
+              <h1 className="text-3xl font-bold tracking-tight">{t('nightLight.title')}</h1>
               <p className="mt-2 max-w-2xl text-muted-foreground">
-                {translate(locale, 'nightLight.sectionIntro')}
+                {t('nightLight.sectionIntro')}
               </p>
             </div>
             <div className="space-y-3" data-testid="popular-night-lights">
               <div className="flex items-end justify-between gap-4">
                 <div>
-                  <h2 className="text-lg font-semibold">{translate(locale, 'nightLight.popularTitle')}</h2>
-                  <p className="text-sm text-muted-foreground">{translate(locale, 'nightLight.popularHelp')}</p>
+                  <h2 className="text-lg font-semibold">{t('nightLight.popularTitle')}</h2>
+                  <p className="text-sm text-muted-foreground">{t('nightLight.popularHelp')}</p>
                 </div>
                 <Button asChild variant="link" size="sm" className="h-auto shrink-0 px-0">
-                  <Link href="/catalog?category=night-lights">{translate(locale, 'common.view_all')}</Link>
+                  <Link href="/catalog?category=night-lights">{t('common.view_all')}</Link>
                 </Button>
               </div>
 
@@ -159,7 +162,7 @@ export default async function PersonalizedModelPage({
               ) : (
                 <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-xl border bg-muted p-8 text-center text-sm text-muted-foreground shadow-sm">
                   <ImageOff className="h-8 w-8" />
-                  <span>{translate(locale, 'nightLight.popularEmpty')}</span>
+                  <span>{t('nightLight.popularEmpty')}</span>
                 </div>
               )}
             </div>
@@ -170,16 +173,16 @@ export default async function PersonalizedModelPage({
               <PersonalizedNightLightForm modelId={model.id} boilerplates={boilerplates} copy={copy} />
             ) : (
               <div className="space-y-4 rounded-lg border p-5">
-                <h2 className="text-xl font-semibold">{translate(locale, 'nightLight.signInTitle')}</h2>
+                <h2 className="text-xl font-semibold">{t('nightLight.signInTitle')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  {translate(locale, 'nightLight.signInBody')}
+                  {t('nightLight.signInBody')}
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Button asChild>
-                    <Link href={`/login?next=/personalize/${model.slug}`}>{translate(locale, 'auth.login')}</Link>
+                    <Link href={`/login?next=/personalize/${model.slug}`}>{t('auth.login')}</Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link href={`/register?next=/personalize/${model.slug}`}>{translate(locale, 'auth.signup')}</Link>
+                    <Link href={`/register?next=/personalize/${model.slug}`}>{t('auth.signup')}</Link>
                   </Button>
                 </div>
               </div>
