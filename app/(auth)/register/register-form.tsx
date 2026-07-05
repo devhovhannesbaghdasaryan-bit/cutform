@@ -4,12 +4,12 @@ import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { registerAction, type AuthFormState } from '@/app/(auth)/actions';
-
-const initial: AuthFormState = { error: null };
+import { registerAction } from '@/app/(auth)/actions';
+import { errorOf, idleState } from '@/lib/action-state';
 
 export function RegisterForm({ copy }: { copy: { email: string; password: string; minPassword: string; create: string; creating: string } }) {
-  const [state, action, pending] = useActionState(registerAction, initial);
+  const [state, action, pending] = useActionState(registerAction, idleState);
+  const error = errorOf(state);
 
   return (
     <form action={action} className="space-y-4">
@@ -22,9 +22,9 @@ export function RegisterForm({ copy }: { copy: { email: string; password: string
         <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
         <p className="text-xs text-muted-foreground">{copy.minPassword}</p>
       </div>
-      {state.error && (
+      {error && (
         <p role="alert" className="text-sm text-destructive">
-          {state.error}
+          {error}
         </p>
       )}
       <Button type="submit" className="w-full" disabled={pending}>

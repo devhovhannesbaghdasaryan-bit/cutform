@@ -10,24 +10,22 @@ import {
   resendVerificationAction,
   verifyOtpAction,
   logoutAction,
-  type AuthFormState,
 } from '@/app/(auth)/actions';
-
-const initial: AuthFormState = { error: null };
+import { idleState } from '@/lib/action-state';
 
 type VerifyCopy = { enterCode: string; verifying: string; verify: string; orClickLink: string; sending: string; resend: string; sent: string; logout: string; backLogin: string };
 
 export function VerifyEmailClient({ email, signedIn, copy }: { email: string; signedIn: boolean; copy: VerifyCopy }) {
-  const [verifyState, verifyAction, verifying] = useActionState(verifyOtpAction, initial);
-  const [resendState, resendAction, resending] = useActionState(resendVerificationAction, initial);
+  const [verifyState, verifyAction, verifying] = useActionState(verifyOtpAction, idleState);
+  const [resendState, resendAction, resending] = useActionState(resendVerificationAction, idleState);
 
   useEffect(() => {
-    if (verifyState.error) toast.error(verifyState.error);
+    if (verifyState.status === 'error') toast.error(verifyState.error);
   }, [verifyState]);
 
   useEffect(() => {
-    if (resendState.error) toast.error(resendState.error);
-    else if (resendState !== initial && !resending) toast.success(copy.sent);
+    if (resendState.status === 'error') toast.error(resendState.error);
+    else if (resendState.status === 'success' && !resending) toast.success(copy.sent);
   }, [resendState, resending, copy.sent]);
 
   return (

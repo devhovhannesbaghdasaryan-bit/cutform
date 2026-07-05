@@ -4,9 +4,8 @@ import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { loginAction, socialLoginAction, type AuthFormState } from '@/app/(auth)/actions';
-
-const initial: AuthFormState = { error: null };
+import { loginAction, socialLoginAction } from '@/app/(auth)/actions';
+import { errorOf, idleState } from '@/lib/action-state';
 const providers = [
   { id: 'facebook', copyKey: 'facebook', mark: 'f' },
   { id: 'google', copyKey: 'google', mark: 'G' },
@@ -17,7 +16,8 @@ const providers = [
 type LoginCopy = { socialOptions: string; facebook: string; google: string; x: string; telegram: string; useEmail: string; email: string; password: string; login: string; loggingIn: string };
 
 export function LoginForm({ next, oauthError, copy }: { next: string; oauthError?: string; copy: LoginCopy }) {
-  const [state, action, pending] = useActionState(loginAction, initial);
+  const [state, action, pending] = useActionState(loginAction, idleState);
+  const error = errorOf(state);
 
   return (
     <div className="space-y-5">
@@ -42,9 +42,9 @@ export function LoginForm({ next, oauthError, copy }: { next: string; oauthError
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      {(oauthError || state.error) && (
+      {(oauthError || error) && (
         <p role="alert" className="text-sm text-destructive">
-          {oauthError || state.error}
+          {oauthError || error}
         </p>
       )}
 
