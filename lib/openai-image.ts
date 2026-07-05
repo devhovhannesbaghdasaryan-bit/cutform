@@ -1,72 +1,57 @@
 import 'server-only';
 
+import { generateImage } from 'ai';
+import {
+  openai,
+  type OpenAIImageModelEditOptions,
+  type OpenAIImageModelGenerationOptions,
+} from '@ai-sdk/openai';
 import { getServerEnv } from '@/lib/env';
-
-type OpenAiImagePurpose = 'generation' | 'edit';
 
 export interface OpenAiImageInput {
   prompt: string;
   images?: File[];
   size?: '1024x1024' | '1536x1024' | '1024x1536' | 'auto';
   quality?: 'low' | 'medium' | 'high' | 'auto';
-  purpose?: OpenAiImagePurpose;
-}
-
-interface OpenAiImageResponse {
-  data?: Array<{
-    b64_json?: string;
-    revised_prompt?: string;
-  }>;
-  error?: {
-    message?: string;
-  };
 }
 
 function getImageModel() {
   return getServerEnv().OPENAI_IMAGE_MODEL ?? 'gpt-image-2';
 }
 
-function getApiKey() {
-  const apiKey = getServerEnv().OPENAI_API_KEY;
-  if (!apiKey) throw new Error('OPENAI_API_KEY is required for AI image generation.');
-  return apiKey;
-}
-
-async function parseImageResponse(response: Response) {
-  const json = await response.json().catch(() => null) as OpenAiImageResponse | null;
-  if (!response.ok) {
-    throw new Error(json?.error?.message ?? `OpenAI image request failed with ${response.status}.`);
+function assertApiKey() {
+  if (!getServerEnv().OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY is required for AI image generation.');
   }
-
-  const first = json?.data?.[0];
-  if (!first?.b64_json) throw new Error('OpenAI image response did not include image data.');
-  return {
-    bytes: Uint8Array.from(Buffer.from(first.b64_json, 'base64')),
-    revisedPrompt: first.revised_prompt ?? null,
-  };
 }
 
 export async function generateOpenAiImage(input: OpenAiImageInput) {
-  const hasImages = Boolean(input.images?.length);
-  const endpoint = hasImages ? 'https://api.openai.com/v1/images/edits' : 'https://api.openai.com/v1/images/generations';
-  const formData = new FormData();
-  formData.set('model', getImageModel());
-  formData.set('prompt', input.prompt);
-  formData.set('size', input.size ?? '1024x1024');
-  formData.set('quality', input.quality ?? 'low');
-  if (hasImages) {
-    input.images?.forEach((image) => {
-      formData.append('image[]', image, image.name || 'reference.png');
-    });
-  }
+  assertApiKey();
+  const quality = input.quality ?? 'low';
+  const size = input.size ?? '1024x1024';
+  const referenceImages = await Promise.all(
+    (input.images ?? []).map(async (image) => new Uint8Array(await image.arrayBuffer())),
+  );
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${getApiKey()}`,
+  const { image, providerMetadata } = await generateImage({
+    model: openai.image(getImageModel()),
+    prompt: referenceImages.length
+      ? { text: input.prompt, images: referenceImages }
+      : input.prompt,
+    size: size === 'auto' ? undefined : size,
+    providerOptions: {
+      openai: referenceImages.length
+        ? ({ quality } satisfies OpenAIImageModelEditOptions)
+        : ({ quality } satisfies OpenAIImageModelGenerationOptions),
     },
-    body: formData,
   });
 
-  return parseImageResponse(response);
+  const [firstImageMetadata] = (providerMetadata.openai?.images ?? []) as Array<
+    { revisedPrompt?: string } | undefined
+  >;
+
+  return {
+    bytes: image.uint8Array,
+    revisedPrompt: firstImageMetadata?.revisedPrompt ?? null,
+  };
 }

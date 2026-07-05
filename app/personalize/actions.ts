@@ -262,8 +262,6 @@ export async function generatePersonalizedNightLightAction(
       ),
     });
 
-    console.log("[personalized-night-light] request payload", requestPayload);
-
     const generated = await createGeneratedItem(supabase, {
       userId: user.id,
       generatedBy: user.id,
@@ -300,7 +298,6 @@ export async function generatePersonalizedNightLightAction(
         images: [...files, boilerplate],
         size: "1024x1024",
         quality: "low",
-        purpose: "edit",
       });
       const previewPath = await uploadGeneratedPng(
         supabase,
