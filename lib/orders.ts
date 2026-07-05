@@ -11,6 +11,161 @@ export type OrderRow = Omit<Tables<'orders'>, 'shipping_address'> & {
 
 export type OrderItemRow = Tables<'order_items'>;
 
+export type OrderDetailRow = Pick<
+  OrderRow,
+  | 'id'
+  | 'status'
+  | 'payment_status'
+  | 'subtotal_cents'
+  | 'shipping_cents'
+  | 'total_cents'
+  | 'currency'
+  | 'shipping_address'
+  | 'contact_email'
+  | 'created_at'
+>;
+
+export type OrderDetailItem = Pick<
+  OrderItemRow,
+  | 'id'
+  | 'title'
+  | 'quantity'
+  | 'unit_price_cents'
+  | 'total_price_cents'
+  | 'currency'
+  | 'image_path'
+  | 'selected_preview_path'
+  | 'custom_text'
+  | 'led_color'
+  | 'multi_color'
+  | 'banner_size_key'
+>;
+
+export type AdminOrderDetailRow = Pick<
+  OrderRow,
+  | 'id'
+  | 'user_id'
+  | 'status'
+  | 'payment_status'
+  | 'subtotal_cents'
+  | 'shipping_cents'
+  | 'total_cents'
+  | 'shipping_rate_context'
+  | 'currency'
+  | 'exchange_rate_context'
+  | 'payment_provider_route'
+  | 'shipping_address'
+  | 'contact_email'
+  | 'created_at'
+  | 'updated_at'
+>;
+
+export type AdminOrderItem = Omit<
+  OrderItemRow,
+  'order_id' | 'shipping_unit_cents' | 'shipping_total_cents' | 'shipping_rate_context'
+>;
+
+export type CatalogProductionInfo = Pick<
+  Tables<'catalog_items'>,
+  'id' | 'item_type' | 'characteristics' | 'sizes' | 'manufacturing_notes'
+>;
+
+export type GeneratedOrderInfo = Pick<Tables<'generated_items'>, 'id' | 'product_type'>;
+
+export type BannerManufacturingInstruction = Pick<
+  Tables<'banner_manufacturing_instructions'>,
+  'id' | 'order_item_id' | 'source_image_path' | 'instructions' | 'drawing_paths' | 'status' | 'created_at'
+>;
+
+export async function getOrderDetail(
+  supabase: SupabaseClient,
+  orderId: string,
+  opts: { userId: string },
+) {
+  const [{ data: order, error }, { data: items, error: itemsError }] = await Promise.all([
+    supabase
+      .from('orders')
+      .select('id, status, payment_status, subtotal_cents, shipping_cents, total_cents, currency, shipping_address, contact_email, created_at')
+      .eq('id', orderId)
+      .eq('user_id', opts.userId)
+      .maybeSingle<OrderDetailRow>(),
+    supabase
+      .from('order_items')
+      .select(
+        'id, title, quantity, unit_price_cents, total_price_cents, currency, image_path, selected_preview_path, custom_text, led_color, multi_color, banner_size_key',
+      )
+      .eq('order_id', orderId)
+      .returns<OrderDetailItem[]>(),
+  ]);
+
+  if (error || !order) return null;
+
+  return { order, items, itemsError };
+}
+
+export async function getOrderDetailForAdmin(supabase: SupabaseClient, orderId: string) {
+  const [{ data: order, error }, { data: items, error: itemsError }] = await Promise.all([
+    supabase
+      .from('orders')
+      .select(
+        'id, user_id, status, payment_status, subtotal_cents, shipping_cents, total_cents, shipping_rate_context, currency, exchange_rate_context, payment_provider_route, shipping_address, contact_email, created_at, updated_at',
+      )
+      .eq('id', orderId)
+      .maybeSingle<AdminOrderDetailRow>(),
+    supabase
+      .from('order_items')
+      .select(
+        'id, title, quantity, unit_price_cents, total_price_cents, currency, exchange_rate_context, catalog_item_id, generated_item_id, item_snapshot, personalization_snapshot, production_snapshot, image_path, selected_preview_path, hidden_svg_path, original_image_paths, custom_text, led_color, multi_color, banner_size_key',
+      )
+      .eq('order_id', orderId)
+      .returns<AdminOrderItem[]>(),
+  ]);
+
+  if (error || !order) return null;
+
+  const catalogIds = (items ?? [])
+    .map((item) => item.catalog_item_id)
+    .filter((value): value is string => Boolean(value));
+  const generatedIds = (items ?? [])
+    .map((item) => item.generated_item_id)
+    .filter((value): value is string => Boolean(value));
+
+  const [{ data: catalogInfo }, { data: generatedInfo }, { data: bannerInstructions }] =
+    await Promise.all([
+      catalogIds.length
+        ? supabase
+            .from('catalog_items')
+            .select('id, item_type, characteristics, sizes, manufacturing_notes')
+            .in('id', catalogIds)
+            .returns<CatalogProductionInfo[]>()
+        : Promise.resolve({ data: [] as CatalogProductionInfo[] }),
+      generatedIds.length
+        ? supabase
+            .from('generated_items')
+            .select('id, product_type')
+            .in('id', generatedIds)
+            .returns<GeneratedOrderInfo[]>()
+        : Promise.resolve({ data: [] as GeneratedOrderInfo[] }),
+      supabase
+        .from('banner_manufacturing_instructions')
+        .select('id, order_item_id, source_image_path, instructions, drawing_paths, status, created_at')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: false })
+        .returns<BannerManufacturingInstruction[]>(),
+    ]);
+
+  const catalogInfoById = new Map((catalogInfo ?? []).map((item) => [item.id, item]));
+  const generatedInfoById = new Map((generatedInfo ?? []).map((item) => [item.id, item]));
+  const latestInstructionByItemId = new Map<string | null, BannerManufacturingInstruction>();
+  for (const instruction of bannerInstructions ?? []) {
+    if (!latestInstructionByItemId.has(instruction.order_item_id)) {
+      latestInstructionByItemId.set(instruction.order_item_id, instruction);
+    }
+  }
+
+  return { order, items, itemsError, catalogInfoById, generatedInfoById, latestInstructionByItemId };
+}
+
 interface CartItemForOrder {
   id: string;
   catalog_item_id: string | null;

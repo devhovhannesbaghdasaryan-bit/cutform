@@ -1,29 +1,17 @@
 import { notFound } from 'next/navigation';
 import { OrderStatusForm } from '@/app/admin/order-status-form';
 import { requireAdmin } from '@/lib/admin';
-import type { OrderItemRow } from '@/lib/orders';
-import type { Tables } from '@/lib/supabase/types';
+import {
+  getOrderDetailForAdmin,
+  type AdminOrderItem,
+  type BannerManufacturingInstruction,
+  type CatalogProductionInfo,
+  type GeneratedOrderInfo,
+} from '@/lib/orders';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { generateBannerManufacturingInstructionAction } from './actions';
 
 export const dynamic = 'force-dynamic';
-
-type AdminOrderItem = Omit<
-  OrderItemRow,
-  'order_id' | 'shipping_unit_cents' | 'shipping_total_cents' | 'shipping_rate_context'
->;
-
-type CatalogProductionInfo = Pick<
-  Tables<'catalog_items'>,
-  'id' | 'item_type' | 'characteristics' | 'sizes' | 'manufacturing_notes'
->;
-
-type GeneratedOrderInfo = Pick<Tables<'generated_items'>, 'id' | 'product_type'>;
-
-type BannerManufacturingInstruction = Pick<
-  Tables<'banner_manufacturing_instructions'>,
-  'id' | 'order_item_id' | 'source_image_path' | 'instructions' | 'drawing_paths' | 'status' | 'created_at'
->;
 
 export default async function AdminOrderDetailPage({
   params,
@@ -33,60 +21,12 @@ export default async function AdminOrderDetailPage({
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
-  const [{ data: order, error }, { data: items, error: itemsError }] = await Promise.all([
-    supabase
-      .from('orders')
-      .select(
-        'id, user_id, status, payment_status, subtotal_cents, shipping_cents, total_cents, shipping_rate_context, currency, exchange_rate_context, payment_provider_route, shipping_address, contact_email, created_at, updated_at',
-      )
-      .eq('id', id)
-      .maybeSingle(),
-    supabase
-      .from('order_items')
-      .select(
-        'id, title, quantity, unit_price_cents, total_price_cents, currency, exchange_rate_context, catalog_item_id, generated_item_id, item_snapshot, personalization_snapshot, production_snapshot, image_path, selected_preview_path, hidden_svg_path, original_image_paths, custom_text, led_color, multi_color, banner_size_key',
-      )
-      .eq('order_id', id),
-  ]);
+  const detail = await getOrderDetailForAdmin(supabase, id);
 
-  if (error || !order) notFound();
+  if (!detail) notFound();
 
-  const catalogIds = (items ?? [])
-    .map((item) => item.catalog_item_id)
-    .filter((value): value is string => Boolean(value));
-  const generatedIds = (items ?? [])
-    .map((item) => item.generated_item_id)
-    .filter((value): value is string => Boolean(value));
-
-  const [{ data: catalogInfo }, { data: generatedInfo }, { data: bannerInstructions }] =
-    await Promise.all([
-      catalogIds.length
-        ? supabase
-            .from('catalog_items')
-            .select('id, item_type, characteristics, sizes, manufacturing_notes')
-            .in('id', catalogIds)
-        : Promise.resolve({ data: [] as CatalogProductionInfo[] }),
-      generatedIds.length
-        ? supabase
-            .from('generated_items')
-            .select('id, product_type')
-            .in('id', generatedIds)
-        : Promise.resolve({ data: [] as GeneratedOrderInfo[] }),
-      supabase
-        .from('banner_manufacturing_instructions')
-        .select('id, order_item_id, source_image_path, instructions, drawing_paths, status, created_at')
-        .eq('order_id', id)
-        .order('created_at', { ascending: false }),
-    ]);
-
-  const catalogInfoById = new Map((catalogInfo ?? []).map((item) => [item.id, item]));
-  const generatedInfoById = new Map((generatedInfo ?? []).map((item) => [item.id, item]));
-  const latestInstructionByItemId = new Map<string | null, BannerManufacturingInstruction>();
-  for (const instruction of bannerInstructions ?? []) {
-    if (!latestInstructionByItemId.has(instruction.order_item_id)) {
-      latestInstructionByItemId.set(instruction.order_item_id, instruction);
-    }
-  }
+  const { order, items, itemsError, catalogInfoById, generatedInfoById, latestInstructionByItemId } =
+    detail;
 
   return (
     <main className="container max-w-5xl space-y-8 py-10">

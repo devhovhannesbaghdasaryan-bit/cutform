@@ -50,13 +50,20 @@ for (const contract of ['ImageUploadField', 'mockImagePath', 'boilerplateImagePa
 
 const generatedDetail = readFileSync('app/admin/generated/[id]/page.tsx', 'utf8');
 for (const contract of [
-  "from('user-uploads').createSignedUrl",
-  "from('generated-assets').createSignedUrl",
+  'getGeneratedItemAdminDetail',
   'Generated preview',
   'Manufacturing PNG',
   'ManufacturingSvgForm',
 ]) {
   if (!generatedDetail.includes(contract)) throw new Error(`Admin generated detail is missing asset rendering: ${contract}`);
+}
+
+const generatedItemsLib = readFileSync('lib/generated-items.ts', 'utf8');
+for (const contract of [
+  "from('user-uploads').createSignedUrl",
+  "from('generated-assets').createSignedUrl",
+]) {
+  if (!generatedItemsLib.includes(contract)) throw new Error(`Generated item admin detail is missing signed asset URLs: ${contract}`);
 }
 
 const generatedActions = readFileSync('app/admin/generated/actions.ts', 'utf8');

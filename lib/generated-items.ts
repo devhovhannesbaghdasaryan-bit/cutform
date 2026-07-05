@@ -14,6 +14,31 @@ export type PersonalizedPreviewOptionRow = Omit<Tables<'personalized_preview_opt
   metadata: Record<string, Json | undefined>;
 };
 
+export type GeneratedItemAdminDetail = Omit<
+  GeneratedItemRow,
+  'category_id' | 'subcategory_id' | 'generated_by'
+>;
+
+export type AdminGeneratedPreviewOption = Pick<
+  PersonalizedPreviewOptionRow,
+  'id' | 'option_index' | 'preview_image_path' | 'hidden_svg_path' | 'status' | 'metadata'
+>;
+
+export type GeneratedItemArtifactRow = Pick<
+  Tables<'generated_item_artifacts'>,
+  'id' | 'artifact_type' | 'storage_path' | 'content_text' | 'metadata' | 'created_at'
+>;
+
+export type GeneratedItemAdminListRow = Pick<
+  GeneratedItemRow,
+  'id' | 'user_id' | 'title' | 'product_type' | 'review_status' | 'credit_cost' | 'created_at'
+>;
+
+export interface GeneratedItemAdminListFilters {
+  status?: string;
+  type?: string;
+}
+
 export interface GeneratedItemInput {
   userId: string;
   generatedBy?: string | null;
@@ -143,6 +168,99 @@ export async function selectPersonalizedPreviewOption(
     .eq('id', generatedItemId);
 
   if (generatedError) throw new Error(generatedError.message);
+}
+
+export async function listGeneratedItemsForAdminReview(
+  supabase: SupabaseClient,
+  filters: GeneratedItemAdminListFilters = {},
+) {
+  let query = supabase
+    .from('generated_items')
+    .select('id, user_id, title, product_type, review_status, credit_cost, created_at')
+    .order('created_at', { ascending: false });
+
+  if (filters.status) query = query.eq('review_status', filters.status);
+  if (filters.type) query = query.eq('product_type', filters.type);
+
+  return query.returns<GeneratedItemAdminListRow[]>();
+}
+
+export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: string) {
+  const [{ data: item, error }, { data: options }, { data: artifacts }] = await Promise.all([
+    supabase
+      .from('generated_items')
+      .select(
+        'id, user_id, title, product_type, review_status, credit_cost, source_image_path, original_image_paths, preview_path, selected_preview_path, hidden_svg_path, custom_text, color, multi_color, prompt, svg_content, manufacturing_metadata, generation_options, created_at, updated_at',
+      )
+      .eq('id', id)
+      .maybeSingle<GeneratedItemAdminDetail>(),
+    supabase
+      .from('personalized_preview_options')
+      .select('id, option_index, preview_image_path, hidden_svg_path, status, metadata')
+      .eq('generated_item_id', id)
+      .order('option_index', { ascending: true })
+      .returns<AdminGeneratedPreviewOption[]>(),
+    supabase
+      .from('generated_item_artifacts')
+      .select('id, artifact_type, storage_path, content_text, metadata, created_at')
+      .eq('generated_item_id', id)
+      .order('created_at', { ascending: false })
+      .returns<GeneratedItemArtifactRow[]>(),
+  ]);
+
+  if (error || !item) return null;
+
+  const sourcePaths = [...new Set([
+    ...(item.source_image_path ? [item.source_image_path] : []),
+    ...item.original_image_paths,
+  ])];
+  const sourceAssets = await Promise.all(sourcePaths.map(async (storagePath) => {
+    const [preview, download] = await Promise.all([
+      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60),
+      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60, { download: fileName(storagePath) }),
+    ]);
+    return { storagePath, url: preview.data?.signedUrl ?? null, downloadUrl: download.data?.signedUrl ?? null };
+  }));
+  const optionAssets = await Promise.all((options ?? []).map(async (option) => ({
+    ...option,
+    previewUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60)).data?.signedUrl ?? null,
+    previewDownloadUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60, { download: fileName(option.preview_image_path) })).data?.signedUrl ?? null,
+    hiddenSvgUrl: option.hidden_svg_path
+      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
+      : null,
+    hiddenSvgDownloadUrl: option.hidden_svg_path
+      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60, { download: fileName(option.hidden_svg_path) })).data?.signedUrl ?? null
+      : null,
+  })));
+  const parentPreviewPath = item.selected_preview_path ?? item.preview_path;
+  const parentPreviewUrl = parentPreviewPath
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60)).data?.signedUrl ?? null
+    : null;
+  const parentPreviewDownloadUrl = parentPreviewPath
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60, { download: fileName(parentPreviewPath) })).data?.signedUrl ?? null
+    : null;
+  const parentHiddenSvgUrl = item.hidden_svg_path
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
+    : null;
+  const parentHiddenSvgDownloadUrl = item.hidden_svg_path
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60, { download: fileName(item.hidden_svg_path) })).data?.signedUrl ?? null
+    : null;
+
+  return {
+    item,
+    artifacts,
+    sourceAssets,
+    optionAssets,
+    parentPreviewPath,
+    parentPreviewUrl,
+    parentPreviewDownloadUrl,
+    parentHiddenSvgUrl,
+    parentHiddenSvgDownloadUrl,
+  };
+}
+
+function fileName(path: string) {
+  return path.split('/').at(-1) ?? 'asset';
 }
 
 export async function updateGeneratedReviewStatus(

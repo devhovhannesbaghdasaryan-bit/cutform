@@ -2,25 +2,11 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
-import type { OrderRow } from '@/lib/orders';
+import { getOrderDetail } from '@/lib/orders';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
-
-type OrderDetail = Pick<
-  OrderRow,
-  | 'id'
-  | 'status'
-  | 'payment_status'
-  | 'subtotal_cents'
-  | 'shipping_cents'
-  | 'total_cents'
-  | 'currency'
-  | 'shipping_address'
-  | 'contact_email'
-  | 'created_at'
->;
 
 export default async function OrderDetailPage({
   params,
@@ -35,22 +21,11 @@ export default async function OrderDetailPage({
 
   if (!user) redirect(`/login?next=/orders/${id}`);
 
-  const [{ data: order, error }, { data: items, error: itemsError }] = await Promise.all([
-    supabase
-      .from('orders')
-      .select('id, status, payment_status, subtotal_cents, shipping_cents, total_cents, currency, shipping_address, contact_email, created_at')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .maybeSingle<OrderDetail>(),
-    supabase
-      .from('order_items')
-      .select(
-        'id, title, quantity, unit_price_cents, total_price_cents, currency, image_path, selected_preview_path, custom_text, led_color, multi_color, banner_size_key',
-      )
-      .eq('order_id', id),
-  ]);
+  const detail = await getOrderDetail(supabase, id, { userId: user.id });
 
-  if (error || !order) notFound();
+  if (!detail) notFound();
+
+  const { order, items, itemsError } = detail;
 
   return (
     <>

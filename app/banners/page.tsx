@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { AdvancedBannerGenerationPanel, BannerCustomizer } from '@/components/banner-customizer';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
-import type { BannerSample } from '@/lib/banners';
+import { listBannerSamples, listBannerSizePresets, type BannerSample } from '@/lib/banners';
 import { translate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
@@ -12,16 +12,8 @@ export const dynamic = 'force-dynamic';
 export default async function BannersPage() {
   const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
   const [{ data: samples }, { data: presets }] = await Promise.all([
-    supabase
-      .from('banner_samples')
-      .select('id, title, image_path')
-      .eq('status', 'published')
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('banner_size_presets')
-      .select('key, name, width_mm, height_mm, material, finish')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true }),
+    listBannerSamples(supabase),
+    listBannerSizePresets(supabase),
   ]);
 
   const fallbackSamples: BannerSample[] = samples?.length

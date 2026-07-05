@@ -1,26 +1,9 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/admin';
+import { listAdminUsers } from '@/lib/admin-users';
 import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
-
-interface AdminUserRow {
-  user_id: string;
-  role: string;
-  status: string;
-  display_name: string | null;
-  preferred_locale: string | null;
-  created_at: string;
-}
-
-interface BalanceRow {
-  user_id: string;
-  balance: number;
-}
-
-interface OrderOwnerRow {
-  user_id: string;
-}
 
 export default async function AdminUsersPage({
   searchParams,
@@ -30,42 +13,7 @@ export default async function AdminUsersPage({
   const params = await searchParams;
   const { supabase } = await requireAdmin();
 
-  let query = supabase
-    .from('profiles')
-    .select('user_id, role, status, display_name, preferred_locale, created_at')
-    .order('created_at', { ascending: false })
-    .limit(100);
-
-  if (params.role) query = query.eq('role', params.role);
-  if (params.status) query = query.eq('status', params.status);
-
-  const { data: users, error } = await query.returns<AdminUserRow[]>();
-  const search = params.q?.trim().toLowerCase();
-  const filteredUsers = (users ?? []).filter((user) => {
-    if (!search) return true;
-    return (
-      user.user_id.toLowerCase().includes(search)
-      || user.display_name?.toLowerCase().includes(search)
-    );
-  });
-
-  const userIds = filteredUsers.map((user) => user.user_id);
-  const { data: balances } = userIds.length
-    ? await supabase
-        .from('credit_accounts')
-        .select('user_id, balance')
-        .in('user_id', userIds)
-        .returns<BalanceRow[]>()
-    : { data: [] as BalanceRow[] };
-  const { data: orderOwners } = userIds.length
-    ? await supabase.from('orders').select('user_id').in('user_id', userIds).returns<OrderOwnerRow[]>()
-    : { data: [] as OrderOwnerRow[] };
-
-  const balanceByUser = new Map((balances ?? []).map((row) => [row.user_id, row]));
-  const orderCountByUser = new Map<string, number>();
-  for (const row of orderOwners ?? []) {
-    orderCountByUser.set(row.user_id, (orderCountByUser.get(row.user_id) ?? 0) + 1);
-  }
+  const { users, error, balanceByUser, orderCountByUser } = await listAdminUsers(supabase, params);
 
   return (
     <main className="container space-y-6 py-10">
@@ -107,7 +55,7 @@ export default async function AdminUsersPage({
 
       {error ? (
         <p className="text-sm text-destructive">{error.message}</p>
-      ) : filteredUsers.length === 0 ? (
+      ) : users.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-sm text-muted-foreground">
           No users found.
         </div>
@@ -126,7 +74,7 @@ export default async function AdminUsersPage({
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.map((user) => {
+              {users.map((user) => {
                 const balance = balanceByUser.get(user.user_id);
                 return (
                   <tr key={user.user_id} className="border-t">

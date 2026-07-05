@@ -3,17 +3,14 @@ import { reviewGeneratedItemAction } from '@/app/admin/generated/actions';
 import { AssetPreviewCard } from './asset-preview-card';
 import { ManufacturingSvgForm } from './manufacturing-svg-form';
 import { requireAdmin } from '@/lib/admin';
-import type { GeneratedItemRow, PersonalizedPreviewOptionRow } from '@/lib/generated-items';
+import {
+  getGeneratedItemAdminDetail,
+  type AdminGeneratedPreviewOption,
+  type GeneratedItemAdminDetail,
+} from '@/lib/generated-items';
 import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
-
-type GeneratedAdminDetail = Omit<GeneratedItemRow, 'category_id' | 'subcategory_id' | 'generated_by'>;
-
-type PreviewOption = Pick<
-  PersonalizedPreviewOptionRow,
-  'id' | 'option_index' | 'preview_image_path' | 'hidden_svg_path' | 'status' | 'metadata'
->;
 
 export default async function AdminGeneratedDetailPage({
   params,
@@ -23,64 +20,21 @@ export default async function AdminGeneratedDetailPage({
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
-  const [{ data: item, error }, { data: options }, { data: artifacts }] = await Promise.all([
-    supabase
-      .from('generated_items')
-      .select(
-        'id, user_id, title, product_type, review_status, credit_cost, source_image_path, original_image_paths, preview_path, selected_preview_path, hidden_svg_path, custom_text, color, multi_color, prompt, svg_content, manufacturing_metadata, generation_options, created_at, updated_at',
-      )
-      .eq('id', id)
-      .maybeSingle<GeneratedAdminDetail>(),
-    supabase
-      .from('personalized_preview_options')
-      .select('id, option_index, preview_image_path, hidden_svg_path, status, metadata')
-      .eq('generated_item_id', id)
-      .order('option_index', { ascending: true })
-      .returns<PreviewOption[]>(),
-    supabase
-      .from('generated_item_artifacts')
-      .select('id, artifact_type, storage_path, content_text, metadata, created_at')
-      .eq('generated_item_id', id)
-      .order('created_at', { ascending: false }),
-  ]);
+  const detail = await getGeneratedItemAdminDetail(supabase, id);
 
-  if (error || !item) notFound();
+  if (!detail) notFound();
 
-  const sourcePaths = [...new Set([
-    ...(item.source_image_path ? [item.source_image_path] : []),
-    ...item.original_image_paths,
-  ])];
-  const sourceAssets = await Promise.all(sourcePaths.map(async (storagePath) => {
-    const [preview, download] = await Promise.all([
-      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60),
-      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60, { download: fileName(storagePath) }),
-    ]);
-    return { storagePath, url: preview.data?.signedUrl ?? null, downloadUrl: download.data?.signedUrl ?? null };
-  }));
-  const optionAssets = await Promise.all((options ?? []).map(async (option) => ({
-    ...option,
-    previewUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60)).data?.signedUrl ?? null,
-    previewDownloadUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60, { download: fileName(option.preview_image_path) })).data?.signedUrl ?? null,
-    hiddenSvgUrl: option.hidden_svg_path
-      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
-      : null,
-    hiddenSvgDownloadUrl: option.hidden_svg_path
-      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60, { download: fileName(option.hidden_svg_path) })).data?.signedUrl ?? null
-      : null,
-  })));
-  const parentPreviewPath = item.selected_preview_path ?? item.preview_path;
-  const parentPreviewUrl = parentPreviewPath
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60)).data?.signedUrl ?? null
-    : null;
-  const parentPreviewDownloadUrl = parentPreviewPath
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60, { download: fileName(parentPreviewPath) })).data?.signedUrl ?? null
-    : null;
-  const parentHiddenSvgUrl = item.hidden_svg_path
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
-    : null;
-  const parentHiddenSvgDownloadUrl = item.hidden_svg_path
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60, { download: fileName(item.hidden_svg_path) })).data?.signedUrl ?? null
-    : null;
+  const {
+    item,
+    artifacts,
+    sourceAssets,
+    optionAssets,
+    parentPreviewPath,
+    parentPreviewUrl,
+    parentPreviewDownloadUrl,
+    parentHiddenSvgUrl,
+    parentHiddenSvgDownloadUrl,
+  } = detail;
   const validationWarnings = extractValidationWarnings(item.manufacturing_metadata);
 
   return (
@@ -232,13 +186,13 @@ function hasContent(value: Record<string, unknown>) {
   return Object.keys(value).length > 0;
 }
 
-function getOptionName(option: PreviewOption) {
+function getOptionName(option: AdminGeneratedPreviewOption) {
   return typeof option.metadata.boilerplateName === 'string'
     ? option.metadata.boilerplateName
     : `Personalized option ${option.option_index}`;
 }
 
-function buildManufacturingPrompt(item: GeneratedAdminDetail, option: PreviewOption) {
+function buildManufacturingPrompt(item: GeneratedItemAdminDetail, option: AdminGeneratedPreviewOption) {
   void item;
   void option;
   return 'Transform the source photo into clean black-on-white pencil line art for laser engraving on a clear acrylic glass night light. Preserve the people’s recognizable likeness, pose, facial expressions, hairstyle, clothing outlines, hands, and important personal details. Draw elegant, realistic contour lines with a hand-sketched pencil or fine-ink appearance: crisp solid black strokes on a pure white background, with varied line weight and only sparse black hatching where essential for facial definition. Keep faces attractive and clearly readable while simplifying photographic detail into engravable outlines. Use continuous, well-separated lines with no tiny noisy marks, no filled dark areas, and no soft gray shading. Center and crop the subjects as one cohesive engraving composition with a clean outer silhouette suitable for display on an acrylic panel. Output only the flat engraving artwork. No color, gradients, skin tones, lighting effects, glow, shadows, grayscale wash, background scene, frame, acrylic panel, wooden base, lamp mockup, text, watermark, or extra elements.';
@@ -251,10 +205,6 @@ function Info({ label, value }: { label: string; value: string }) {
       <p className="break-all font-medium">{value}</p>
     </div>
   );
-}
-
-function fileName(path: string) {
-  return path.split('/').at(-1) ?? 'asset';
 }
 
 function Snapshot({ title, value }: { title: string; value: unknown }) {

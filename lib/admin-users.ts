@@ -1,12 +1,11 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AppLocale } from '@/lib/i18n';
+import type { TypedSupabaseClient } from '@/lib/supabase/types';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 export interface AdminUserFilters {
-  search?: string;
-  role?: 'user' | 'admin' | '';
-  status?: 'active' | 'suspended' | 'disabled' | '';
-  limit?: number;
+  q?: string;
+  role?: string;
+  status?: string;
 }
 
 export interface AdminUserUpdateInput {
@@ -19,28 +18,49 @@ export interface AdminUserUpdateInput {
 }
 
 export async function listAdminUsers(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   filters: AdminUserFilters = {},
 ) {
   let query = supabase
     .from('profiles')
-    .select('user_id, role, status, display_name, preferred_locale, internal_notes, created_at, updated_at')
+    .select('user_id, role, status, display_name, preferred_locale, created_at')
     .order('created_at', { ascending: false })
-    .limit(filters.limit ?? 50);
+    .limit(100);
 
   if (filters.role) query = query.eq('role', filters.role);
   if (filters.status) query = query.eq('status', filters.status);
-  if (filters.search) {
-    const search = filters.search.trim();
-    query = query.or(`display_name.ilike.%${search}%,user_id.eq.${search}`);
+
+  const { data: users, error } = await query;
+  const search = filters.q?.trim().toLowerCase();
+  const filteredUsers = (users ?? []).filter((user) => {
+    if (!search) return true;
+    return (
+      user.user_id.toLowerCase().includes(search)
+      || user.display_name?.toLowerCase().includes(search)
+    );
+  });
+
+  const userIds = filteredUsers.map((user) => user.user_id);
+  const { data: balances } = userIds.length
+    ? await supabase
+        .from('credit_accounts')
+        .select('user_id, balance')
+        .in('user_id', userIds)
+    : { data: [] };
+  const { data: orderOwners } = userIds.length
+    ? await supabase.from('orders').select('user_id').in('user_id', userIds)
+    : { data: [] };
+
+  const balanceByUser = new Map((balances ?? []).map((row) => [row.user_id, row]));
+  const orderCountByUser = new Map<string, number>();
+  for (const row of orderOwners ?? []) {
+    orderCountByUser.set(row.user_id, (orderCountByUser.get(row.user_id) ?? 0) + 1);
   }
 
-  const { data, error } = await query;
-  if (error) throw new Error(error.message);
-  return data ?? [];
+  return { users: filteredUsers, error, balanceByUser, orderCountByUser };
 }
 
-export async function getAdminUserDetail(supabase: SupabaseClient, userId: string) {
+export async function getAdminUserDetail(supabase: TypedSupabaseClient, userId: string) {
   const [
     { data: profile, error },
     { data: balance },
@@ -85,7 +105,8 @@ export async function getAdminUserDetail(supabase: SupabaseClient, userId: strin
       .limit(8),
   ]);
 
-  if (error) throw new Error(error.message);
+  if (error || !profile) return null;
+
   return {
     profile,
     balance,
@@ -97,7 +118,7 @@ export async function getAdminUserDetail(supabase: SupabaseClient, userId: strin
 }
 
 export async function updateAdminUserProfile(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   input: AdminUserUpdateInput,
 ) {
   const { data: before } = await supabase

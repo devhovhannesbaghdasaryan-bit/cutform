@@ -6,6 +6,7 @@ import {
 } from '@/app/admin/users/actions';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
+import { getAdminUserDetail } from '@/lib/admin-users';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -18,51 +19,11 @@ export default async function AdminUserDetailPage({
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
-  const [
-    { data: profile, error },
-    { data: balance },
-    { data: orders },
-    { data: generatedItems },
-    { data: transactions },
-    { data: auditRows },
-  ] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('user_id, role, status, display_name, preferred_locale, internal_notes, created_at, updated_at')
-      .eq('user_id', id)
-      .maybeSingle(),
-    supabase
-      .from('credit_accounts')
-      .select('balance, updated_at')
-      .eq('user_id', id)
-      .maybeSingle(),
-    supabase
-      .from('orders')
-      .select('id, status, payment_status, subtotal_cents, created_at')
-      .eq('user_id', id)
-      .order('created_at', { ascending: false })
-      .limit(8),
-    supabase
-      .from('generated_items')
-      .select('id, title, product_type, review_status, created_at')
-      .eq('user_id', id)
-      .order('created_at', { ascending: false })
-      .limit(8),
-    supabase
-      .from('transactions')
-      .select('id, type, status, amount_cents, currency, provider, created_at')
-      .eq('user_id', id)
-      .order('created_at', { ascending: false })
-      .limit(8),
-    supabase
-      .from('admin_audit_log')
-      .select('id, action, reason, created_at')
-      .eq('target_user_id', id)
-      .order('created_at', { ascending: false })
-      .limit(8),
-  ]);
+  const detail = await getAdminUserDetail(supabase, id);
 
-  if (error || !profile) notFound();
+  if (!detail) notFound();
+
+  const { profile, balance, orders, generatedItems, transactions, auditRows } = detail;
 
   return (
     <main className="container max-w-6xl space-y-8 py-10">
@@ -135,7 +96,7 @@ export default async function AdminUserDetailPage({
           <AdminTable
             title="Recent orders"
             empty="No orders found."
-            rows={(orders ?? []).map((order) => ({
+            rows={orders.map((order) => ({
               id: order.id,
               href: `/admin/orders/${order.id}`,
               primary: `${order.id.slice(0, 8)} - ${formatPrice(order.subtotal_cents)}`,
@@ -147,7 +108,7 @@ export default async function AdminUserDetailPage({
           <AdminTable
             title="Generated items"
             empty="No generated items found."
-            rows={(generatedItems ?? []).map((item) => ({
+            rows={generatedItems.map((item) => ({
               id: item.id,
               primary: item.title ?? item.id.slice(0, 8),
               secondary: `${item.product_type} / ${item.review_status}`,
@@ -201,7 +162,7 @@ export default async function AdminUserDetailPage({
           <AdminTable
             title="Transactions"
             empty="No transactions found."
-            rows={(transactions ?? []).map((transaction) => ({
+            rows={transactions.map((transaction) => ({
               id: transaction.id,
               href: `/admin/transactions/${transaction.id}`,
               primary: `${transaction.type} - ${transaction.status}`,
@@ -213,7 +174,7 @@ export default async function AdminUserDetailPage({
           <AdminTable
             title="Audit history"
             empty="No audit history found."
-            rows={(auditRows ?? []).map((row) => ({
+            rows={auditRows.map((row) => ({
               id: row.id,
               primary: row.action,
               secondary: row.reason ?? 'No reason',

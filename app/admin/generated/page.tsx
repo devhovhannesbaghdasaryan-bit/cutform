@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { requireAdmin } from '@/lib/admin';
+import { listGeneratedItemsForAdminReview } from '@/lib/generated-items';
 import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -11,15 +12,8 @@ export default async function AdminGeneratedPage({
 }) {
   const params = await searchParams;
   const { supabase } = await requireAdmin();
-  let query = supabase
-    .from('generated_items')
-    .select('id, user_id, title, product_type, review_status, credit_cost, created_at')
-    .order('created_at', { ascending: false });
 
-  if (params.status) query = query.eq('review_status', params.status);
-  if (params.type) query = query.eq('product_type', params.type);
-
-  const { data: items, error } = await query;
+  const { data: items, error } = await listGeneratedItemsForAdminReview(supabase, params);
 
   return (
     <main className="container space-y-6 py-10">
