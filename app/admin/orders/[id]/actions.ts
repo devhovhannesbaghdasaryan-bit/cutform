@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { buildBannerManufacturingInstructions } from '@/lib/banner-manufacturing';
+import { uploadToBucket } from '@/lib/storage';
 import type { Json } from '@/lib/supabase/types';
 
 const generateSchema = z.object({
@@ -104,13 +105,12 @@ export async function generateBannerManufacturingInstructionAction(formData: For
   });
 
   const drawingPath = `${user.id}/banner-manufacturing/${orderItemId}/${crypto.randomUUID()}.svg`;
-  const { error: uploadError } = await supabase.storage
-    .from('generated-assets')
-    .upload(drawingPath, new TextEncoder().encode(result.drawingSvg), {
-      contentType: 'image/svg+xml',
-      upsert: false,
-    });
-  if (uploadError) throw new Error(uploadError.message);
+  await uploadToBucket(supabase, {
+    bucket: 'generated-assets',
+    path: drawingPath,
+    body: new TextEncoder().encode(result.drawingSvg),
+    contentType: 'image/svg+xml',
+  });
 
   const { error: insertError } = await supabase.from('banner_manufacturing_instructions').insert({
     order_id: orderId,

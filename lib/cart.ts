@@ -48,6 +48,23 @@ function getStringConfigurationValue(record: Record<string, unknown>, key: strin
   return typeof value === 'string' ? value : null;
 }
 
+export type CartOwner = { userId: string } | { sessionId: string };
+
+/**
+ * Error-tolerant item count for the owner's active cart, for display surfaces
+ * such as headers. Never creates a cart; returns 0 when no active cart exists
+ * or the query fails.
+ */
+export async function getActiveCartItemCount(supabase: SupabaseClient, owner: CartOwner) {
+  const query = supabase.from('carts').select('id, cart_items(id)');
+  const { data } = await ('userId' in owner
+    ? query.eq('user_id', owner.userId)
+    : query.eq('session_id', owner.sessionId))
+    .eq('status', 'active')
+    .maybeSingle<{ id: string; cart_items: { id: string }[] }>();
+  return data?.cart_items?.length ?? 0;
+}
+
 export async function getOrCreateUserCart(supabase: SupabaseClient, userId: string) {
   const { data: existing, error: existingError } = await supabase
     .from('carts')

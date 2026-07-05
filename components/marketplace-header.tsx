@@ -6,7 +6,9 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { getCurrentUserRole } from '@/lib/admin';
+import { getActiveCartItemCount } from '@/lib/cart';
 import { getCartSessionId } from '@/lib/cart-session';
+import { getCreditBalanceForDisplay } from '@/lib/credits';
 import { translate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
@@ -19,32 +21,12 @@ export async function MarketplaceHeader() {
   } = await supabase.auth.getUser();
   const role = user ? await getCurrentUserRole() : null;
   const sessionId = user ? null : await getCartSessionId();
-  const [{ data: creditAccount }, { data: cart }] = user
+  const [creditBalance, cartCount] = user
     ? await Promise.all([
-        supabase
-          .from('credit_accounts')
-          .select('balance')
-          .eq('user_id', user.id)
-          .maybeSingle<{ balance: number }>(),
-        supabase
-          .from('carts')
-          .select('id, cart_items(id)')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .maybeSingle<{ id: string; cart_items: { id: string }[] }>(),
+        getCreditBalanceForDisplay(supabase, user.id),
+        getActiveCartItemCount(supabase, { userId: user.id }),
       ])
-    : [
-        { data: null },
-        sessionId
-          ? await getServiceSupabase()
-              .from('carts')
-              .select('id, cart_items(id)')
-              .eq('session_id', sessionId)
-              .eq('status', 'active')
-              .maybeSingle<{ id: string; cart_items: { id: string }[] }>()
-          : { data: null },
-      ];
-  const cartCount = cart?.cart_items?.length ?? 0;
+    : [0, sessionId ? await getActiveCartItemCount(getServiceSupabase(), { sessionId }) : 0];
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 shadow-[0_1px_0_hsl(var(--cyber-cyan)/0.16)] backdrop-blur supports-[backdrop-filter]:bg-background/75">
@@ -66,7 +48,7 @@ export async function MarketplaceHeader() {
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
                 <Link href="/credits">
                   <Coins className="mr-1 h-4 w-4" />
-                  {creditAccount?.balance ?? 0}
+                  {creditBalance}
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="sm">

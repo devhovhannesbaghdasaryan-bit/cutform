@@ -6,6 +6,7 @@ import { openai, type OpenAIImageModelEditOptions } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { requireAdmin } from '@/lib/admin';
 import { updateGeneratedReviewStatus } from '@/lib/generated-items';
+import { downloadFromBucket, uploadToBucket } from '@/lib/storage';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 const reviewSchema = z.object({
@@ -39,8 +40,7 @@ async function downloadAsDataUrl(
   bucket: string,
   storagePath: string,
 ) {
-  const { data, error } = await supabase.storage.from(bucket).download(storagePath);
-  if (error || !data) throw new Error(error?.message ?? `Unable to load ${storagePath}.`);
+  const data = await downloadFromBucket(supabase, bucket, storagePath, `Unable to load ${storagePath}.`);
   return `data:${mediaTypeForPath(storagePath)};base64,${Buffer.from(await data.arrayBuffer()).toString('base64')}`;
 }
 
@@ -114,13 +114,12 @@ export async function generateManufacturingSvgAction(
       },
     });
     const storagePath = `${item.user_id}/personalized-night-lights/manufacturing-png/${crypto.randomUUID()}.png`;
-    const { error: uploadError } = await supabase.storage
-      .from('generated-assets')
-      .upload(storagePath, imageEdit.image.uint8Array, {
-        contentType: 'image/png',
-        upsert: false,
-      });
-    if (uploadError) throw new Error(uploadError.message);
+    await uploadToBucket(supabase, {
+      bucket: 'generated-assets',
+      path: storagePath,
+      body: imageEdit.image.uint8Array,
+      contentType: 'image/png',
+    });
 
     const generationMetadata = {
       model: settings.model,

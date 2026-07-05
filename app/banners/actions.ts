@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { debitBannerCredits, refundBannerCredits } from '@/lib/banner-credits';
 import { createGeneratedItem } from '@/lib/generated-items';
 import { BANNER_CREDIT_COSTS } from '@/lib/marketplace-constants';
+import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 const bannerGenerationSchema = z.object({
@@ -21,12 +22,6 @@ const bannerCustomizationSchema = z.object({
   bannerText: z.string().trim().min(1, 'Banner text is required.').max(120),
 });
 
-const imageExtByMime: Record<string, string> = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/webp': 'webp',
-};
-
 function getFile(formData: FormData, name: string) {
   const value = formData.get(name);
   return value instanceof File && value.size > 0 ? value : null;
@@ -38,15 +33,15 @@ async function uploadReferenceImage(
   file: File | null,
 ) {
   if (!file) return null;
-  const ext = imageExtByMime[file.type];
+  const ext = IMAGE_EXTENSION_BY_MIME[file.type];
   if (!ext) throw new Error('Upload PNG, JPG, or WEBP reference images only.');
   if (file.size > 20 * 1024 * 1024) throw new Error('Reference image must be 20 MB or smaller.');
-  const path = `${userId}/banners/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('user-uploads')
-    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: 'user-uploads',
+    path: `${userId}/banners/${crypto.randomUUID()}.${ext}`,
+    body: await file.arrayBuffer(),
+    contentType: file.type,
+  });
 }
 
 async function uploadGeneratedBannerPreview(
@@ -56,12 +51,12 @@ async function uploadGeneratedBannerPreview(
 ) {
   const safePrompt = prompt.replace(/[<>&]/g, '').slice(0, 120);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect width="1200" height="500" fill="#f8fafc"/><rect x="50" y="50" width="1100" height="400" rx="28" fill="#0f766e"/><text x="600" y="270" text-anchor="middle" font-family="Arial, sans-serif" font-size="58" font-weight="700" fill="#ffffff">${safePrompt}</text></svg>`;
-  const path = `${userId}/banners/generated/${crypto.randomUUID()}.svg`;
-  const { error } = await supabase.storage
-    .from('generated-assets')
-    .upload(path, new TextEncoder().encode(svg), { contentType: 'image/svg+xml', upsert: false });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: 'generated-assets',
+    path: `${userId}/banners/generated/${crypto.randomUUID()}.svg`,
+    body: new TextEncoder().encode(svg),
+    contentType: 'image/svg+xml',
+  });
 }
 
 async function uploadCustomizedBannerPreview(
@@ -73,12 +68,12 @@ async function uploadCustomizedBannerPreview(
   const safeText = text.replace(/[<>&]/g, '').slice(0, 120);
   const safeSample = sampleTitle.replace(/[<>&]/g, '').slice(0, 80);
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 500"><rect width="1200" height="500" fill="#f8fafc"/><rect x="50" y="50" width="1100" height="400" rx="24" fill="#1d4ed8"/><text x="600" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff">${safeText}</text><text x="600" y="315" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#dbeafe">${safeSample}</text></svg>`;
-  const path = `${userId}/banners/customized/${crypto.randomUUID()}.svg`;
-  const { error } = await supabase.storage
-    .from('generated-assets')
-    .upload(path, new TextEncoder().encode(svg), { contentType: 'image/svg+xml', upsert: false });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: 'generated-assets',
+    path: `${userId}/banners/customized/${crypto.randomUUID()}.svg`,
+    body: new TextEncoder().encode(svg),
+    contentType: 'image/svg+xml',
+  });
 }
 
 export async function customizeBannerSampleAction(formData: FormData) {

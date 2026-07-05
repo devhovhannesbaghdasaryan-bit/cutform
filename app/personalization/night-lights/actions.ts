@@ -3,11 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
+import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 
 const imageExtByMime: Record<string, string> = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/webp': 'webp',
+  ...IMAGE_EXTENSION_BY_MIME,
   'image/svg+xml': 'svg',
 };
 
@@ -55,12 +54,12 @@ async function uploadModelImage(
   if (!ext) throw new Error('Upload PNG, JPG, WEBP, or SVG images only.');
   if (file.size > 10 * 1024 * 1024) throw new Error('Template images must be 10 MB or smaller.');
 
-  const path = `${userId}/personalization-models/${kind}-${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from('catalog-assets')
-    .upload(path, await file.arrayBuffer(), { contentType: file.type, upsert: false });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: 'catalog-assets',
+    path: `${userId}/personalization-models/${kind}-${crypto.randomUUID()}.${ext}`,
+    body: await file.arrayBuffer(),
+    contentType: file.type,
+  });
 }
 
 function revalidatePersonalization(slug?: string | null) {

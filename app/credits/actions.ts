@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { getCreditPack } from '@/lib/credit-packs';
 import { convertMoney, getActiveCurrency, getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
 import { getServerEnv } from '@/lib/env';
-import { getStripe } from '@/lib/stripe';
+import { createCheckoutSessionForTransaction } from '@/lib/stripe';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createCreditPurchaseTransaction } from '@/lib/transactions';
 
@@ -110,23 +110,13 @@ export async function createCreditPackCheckoutAction(formData: FormData) {
   }
 
   const siteUrl = getServerEnv().NEXT_PUBLIC_SITE_URL;
-  const session = await getStripe().checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    customer_email: user.email ?? undefined,
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: converted.currency.toLowerCase(),
-          unit_amount: converted.amountCents,
-          product_data: {
-            name: pack.name,
-            description: pack.description,
-          },
-        },
-      },
-    ],
+  const checkoutUrl = await createCheckoutSessionForTransaction(service, {
+    transactionId: transaction.id,
+    customerEmail: user.email ?? undefined,
+    currency: converted.currency,
+    amountCents: converted.amountCents,
+    productName: pack.name,
+    productDescription: pack.description,
     metadata: {
       purchaseType: 'credit_pack',
       transactionId: transaction.id,
@@ -135,15 +125,9 @@ export async function createCreditPackCheckoutAction(formData: FormData) {
       creditAmount: String(pack.creditAmount),
       currency: converted.currency,
     },
-    success_url: `${siteUrl}/credits?checkout=success`,
-    cancel_url: `${siteUrl}/credits?checkout=cancelled`,
+    successUrl: `${siteUrl}/credits?checkout=success`,
+    cancelUrl: `${siteUrl}/credits?checkout=cancelled`,
   });
 
-  await service
-    .from('transactions')
-    .update({ provider_reference: session.id })
-    .eq('id', transaction.id);
-
-  if (!session.url) throw new Error('Stripe did not return a checkout URL.');
-  redirect(session.url);
+  redirect(checkoutUrl);
 }

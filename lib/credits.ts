@@ -30,6 +30,18 @@ export async function getCreditBalance(supabase: SupabaseClient, userId: string)
   return data?.balance ?? 0;
 }
 
+/**
+ * Error-tolerant balance lookup for display surfaces such as headers.
+ * Returns 0 instead of throwing when the account is missing or unreadable.
+ */
+export async function getCreditBalanceForDisplay(supabase: SupabaseClient, userId: string) {
+  try {
+    return await getCreditBalance(supabase, userId);
+  } catch {
+    return 0;
+  }
+}
+
 export async function adjustCredits(supabase: SupabaseClient, input: CreditAdjustmentInput) {
   if (!Number.isInteger(input.delta) || input.delta === 0) {
     throw new Error('Credit adjustment delta must be a non-zero integer.');

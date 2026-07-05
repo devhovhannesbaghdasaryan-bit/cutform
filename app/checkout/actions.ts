@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getServerEnv } from '@/lib/env';
 import { createOrderFromCart } from '@/lib/orders';
-import { getStripe } from '@/lib/stripe';
+import { createCheckoutSessionForTransaction } from '@/lib/stripe';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
 
@@ -111,37 +111,21 @@ export async function createCheckoutOrderAction(formData: FormData) {
   }
 
   const siteUrl = getServerEnv().NEXT_PUBLIC_SITE_URL;
-  const session = await getStripe().checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    customer_email: user.email ?? undefined,
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: orderTotals.currency.toLowerCase(),
-          unit_amount: orderTotals.total_cents,
-          product_data: {
-            name: `Uniqraft order ${order.id.slice(0, 8)}`,
-          },
-        },
-      },
-    ],
+  const checkoutUrl = await createCheckoutSessionForTransaction(service, {
+    transactionId: transaction.id,
+    customerEmail: user.email ?? undefined,
+    currency: orderTotals.currency,
+    amountCents: orderTotals.total_cents,
+    productName: `Uniqraft order ${order.id.slice(0, 8)}`,
     metadata: {
       purchaseType: 'order',
       transactionId: transaction.id,
       orderId: order.id,
       userId: user.id,
     },
-    success_url: `${siteUrl}/orders/${order.id}?checkout=success`,
-    cancel_url: `${siteUrl}/checkout?checkout=cancelled`,
+    successUrl: `${siteUrl}/orders/${order.id}?checkout=success`,
+    cancelUrl: `${siteUrl}/checkout?checkout=cancelled`,
   });
 
-  await service
-    .from('transactions')
-    .update({ provider_reference: session.id })
-    .eq('id', transaction.id);
-
-  if (!session.url) throw new Error('Stripe did not return a checkout URL.');
-  redirect(session.url);
+  redirect(checkoutUrl);
 }

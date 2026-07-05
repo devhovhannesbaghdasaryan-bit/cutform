@@ -9,6 +9,7 @@ import { APP_LOCALES, type AppLocale } from '@/lib/i18n';
 import { TOY_DECORATION_SIZE_PRESETS } from '@/lib/marketplace-constants';
 import { generateSeoMetadataDraft, type SeoMetadataDraft } from '@/lib/seo-ai';
 import { adjustCredits } from '@/lib/credits';
+import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 import { writeAdminAuditLog } from '@/lib/transactions';
 import type { Json } from '@/lib/supabase/types';
 
@@ -22,9 +23,7 @@ export type SeoGenerationState = {
 const localeSchema = z.enum(APP_LOCALES);
 const CATALOG_ASSET_MAX_BYTES = 50 * 1024 * 1024;
 const CATALOG_ASSET_EXTENSIONS: Record<string, string> = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/webp': 'webp',
+  ...IMAGE_EXTENSION_BY_MIME,
   'image/svg+xml': 'svg',
   'video/mp4': 'mp4',
   'video/webm': 'webm',
@@ -250,12 +249,12 @@ async function uploadGeneratedCatalogSvg(
   const safeTitle = title.replace(/[<>&]/g, '').slice(0, 90);
   const accent = categorySlug === 'toys' ? '#2563eb' : '#be123c';
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900"><rect width="1200" height="900" fill="#f8fafc"/><rect x="120" y="120" width="960" height="660" rx="36" fill="${accent}"/><circle cx="420" cy="410" r="120" fill="#ffffff" opacity="0.9"/><rect x="560" y="300" width="260" height="220" rx="28" fill="#ffffff" opacity="0.9"/><text x="600" y="690" text-anchor="middle" font-family="Arial, sans-serif" font-size="54" font-weight="700" fill="#ffffff">${safeTitle}</text></svg>`;
-  const path = `${userId}/generated-catalog/${crypto.randomUUID()}.svg`;
-  const { error } = await supabase.storage
-    .from('catalog-assets')
-    .upload(path, new TextEncoder().encode(svg), { contentType: 'image/svg+xml', upsert: false });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: 'catalog-assets',
+    path: `${userId}/generated-catalog/${crypto.randomUUID()}.svg`,
+    body: new TextEncoder().encode(svg),
+    contentType: 'image/svg+xml',
+  });
 }
 
 async function uploadAdminCatalogAsset(
@@ -269,16 +268,12 @@ async function uploadAdminCatalogAsset(
   if (!extension) throw new Error('Upload PNG, JPG, WEBP, SVG, MP4, or WEBM files only.');
   if (file.size > CATALOG_ASSET_MAX_BYTES) throw new Error('Catalog media must be 50 MB or smaller.');
 
-  const path = `${userId}/${folder}/${crypto.randomUUID()}.${extension}`;
-  const { error } = await supabase.storage
-    .from('catalog-assets')
-    .upload(path, await file.arrayBuffer(), {
-      contentType: file.type,
-      upsert: false,
-    });
-
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: 'catalog-assets',
+    path: `${userId}/${folder}/${crypto.randomUUID()}.${extension}`,
+    body: await file.arrayBuffer(),
+    contentType: file.type,
+  });
 }
 
 async function syncCatalogItemMedia(

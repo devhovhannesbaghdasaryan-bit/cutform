@@ -54,7 +54,7 @@ for (const contract of [
 }
 
 const generatedActions = readFileSync('app/admin/generated/actions.ts', 'utf8');
-for (const contract of ['generateManufacturingSvgAction', 'openai.image(settings.model)', "from('generated-assets')", 'manufacturing-png']) {
+for (const contract of ['generateManufacturingSvgAction', 'openai.image(settings.model)', "'generated-assets'", 'manufacturing-png']) {
   if (!generatedActions.includes(contract)) throw new Error(`Admin manufacturing PNG generation is missing: ${contract}`);
 }
 

@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getCurrentUserRole } from '@/lib/admin';
+import { getActiveCartItemCount } from '@/lib/cart';
+import { getCreditBalanceForDisplay } from '@/lib/credits';
 import { translate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
@@ -26,22 +28,12 @@ export async function SiteHeader({ email }: { email: string }) {
   } = await supabase.auth.getUser();
   const role = await getCurrentUserRole();
   const isAdmin = role === 'admin';
-  const [{ data: creditAccount }, { data: cart }] = user
+  const [creditBalance, cartCount] = user
     ? await Promise.all([
-        supabase
-          .from('credit_accounts')
-          .select('balance')
-          .eq('user_id', user.id)
-          .maybeSingle<{ balance: number }>(),
-        supabase
-          .from('carts')
-          .select('id, cart_items(id)')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .maybeSingle<{ id: string; cart_items: { id: string }[] }>(),
+        getCreditBalanceForDisplay(supabase, user.id),
+        getActiveCartItemCount(supabase, { userId: user.id }),
       ])
-    : [{ data: null }, { data: null }];
-  const cartCount = cart?.cart_items?.length ?? 0;
+    : [0, 0];
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,7 +51,7 @@ export async function SiteHeader({ email }: { email: string }) {
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/credits">
-              <Coins className="mr-1 h-4 w-4" /> {creditAccount?.balance ?? 0}
+              <Coins className="mr-1 h-4 w-4" /> {creditBalance}
             </Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">

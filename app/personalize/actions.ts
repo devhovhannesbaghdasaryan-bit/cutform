@@ -12,6 +12,11 @@ import { generateOpenAiImage } from "@/lib/openai-image";
 import {
   buildPersonalizedNightLightOpenAiPayload,
 } from "@/lib/personalized-night-light-ai";
+import {
+  IMAGE_EXTENSION_BY_MIME,
+  downloadFromBucket,
+  uploadToBucket,
+} from "@/lib/storage";
 import { getServerSupabase, getServiceSupabase } from "@/lib/supabase/server";
 import { debitCredits, getCreditBalance, refundCredits } from "@/lib/credits";
 import type { PersonalizationBoilerplate } from "@/lib/personalization-boilerplates";
@@ -43,12 +48,6 @@ function friendlyGenerationError(error: unknown) {
   return "We could not generate your night-light previews. Please try again. Any generation credits were refunded.";
 }
 
-const imageExtByMime: Record<string, string> = {
-  "image/png": "png",
-  "image/jpeg": "jpg",
-  "image/webp": "webp",
-};
-
 function getImageFiles(formData: FormData) {
   return formData
     .getAll("images")
@@ -79,19 +78,16 @@ async function uploadUserImage(
   userId: string,
   file: File,
 ) {
-  const ext = imageExtByMime[file.type];
+  const ext = IMAGE_EXTENSION_BY_MIME[file.type];
   if (!ext) throw new Error("Upload PNG, JPG, or WEBP images only.");
   if (file.size > 20 * 1024 * 1024)
     throw new Error("Images must be 20 MB or smaller.");
-  const path = `${userId}/personalized-night-lights/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from("user-uploads")
-    .upload(path, await file.arrayBuffer(), {
-      contentType: file.type,
-      upsert: false,
-    });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: "user-uploads",
+    path: `${userId}/personalized-night-lights/${crypto.randomUUID()}.${ext}`,
+    body: await file.arrayBuffer(),
+    contentType: file.type,
+  });
 }
 
 async function uploadGeneratedPng(
@@ -100,12 +96,12 @@ async function uploadGeneratedPng(
   folder: string,
   bytes: Uint8Array,
 ) {
-  const path = `${userId}/personalized-night-lights/${folder}/${crypto.randomUUID()}.png`;
-  const { error } = await supabase.storage
-    .from("generated-assets")
-    .upload(path, bytes, { contentType: "image/png", upsert: false });
-  if (error) throw new Error(error.message);
-  return path;
+  return uploadToBucket(supabase, {
+    bucket: "generated-assets",
+    path: `${userId}/personalized-night-lights/${folder}/${crypto.randomUUID()}.png`,
+    body: bytes,
+    contentType: "image/png",
+  });
 }
 
 async function loadBoilerplate(
@@ -116,8 +112,12 @@ async function loadBoilerplate(
   if (reference.image_path.startsWith("/")) {
     bytes = new Uint8Array(await readFile(path.join(process.cwd(), "public", ...reference.image_path.split("/").filter(Boolean))));
   } else {
-    const { data, error } = await supabase.storage.from("catalog-assets").download(reference.image_path);
-    if (error || !data) throw new Error(error?.message ?? "Unable to load boilerplate image.");
+    const data = await downloadFromBucket(
+      supabase,
+      "catalog-assets",
+      reference.image_path,
+      "Unable to load boilerplate image.",
+    );
     bytes = new Uint8Array(await data.arrayBuffer());
   }
   const extension = reference.image_path.split(".").pop()?.toLowerCase();
