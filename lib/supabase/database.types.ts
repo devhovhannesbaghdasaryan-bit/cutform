@@ -913,8 +913,8 @@ export type Database = {
           custom_text: string | null
           generated_by: string | null
           generation_options: Json
-          hidden_svg_path: string | null
           id: string
+          manufacturing_file_path: string | null
           manufacturing_metadata: Json
           multi_color: boolean
           original_image_paths: string[]
@@ -938,8 +938,8 @@ export type Database = {
           custom_text?: string | null
           generated_by?: string | null
           generation_options?: Json
-          hidden_svg_path?: string | null
           id?: string
+          manufacturing_file_path?: string | null
           manufacturing_metadata?: Json
           multi_color?: boolean
           original_image_paths?: string[]
@@ -963,8 +963,8 @@ export type Database = {
           custom_text?: string | null
           generated_by?: string | null
           generation_options?: Json
-          hidden_svg_path?: string | null
           id?: string
+          manufacturing_file_path?: string | null
           manufacturing_metadata?: Json
           multi_color?: boolean
           original_image_paths?: string[]
@@ -1082,11 +1082,11 @@ export type Database = {
           custom_text: string | null
           exchange_rate_context: Json
           generated_item_id: string | null
-          hidden_svg_path: string | null
           id: string
           image_path: string | null
           item_snapshot: Json
           led_color: string | null
+          manufacturing_file_path: string | null
           multi_color: boolean
           order_id: string
           original_image_paths: string[]
@@ -1108,11 +1108,11 @@ export type Database = {
           custom_text?: string | null
           exchange_rate_context?: Json
           generated_item_id?: string | null
-          hidden_svg_path?: string | null
           id?: string
           image_path?: string | null
           item_snapshot?: Json
           led_color?: string | null
+          manufacturing_file_path?: string | null
           multi_color?: boolean
           order_id: string
           original_image_paths?: string[]
@@ -1134,11 +1134,11 @@ export type Database = {
           custom_text?: string | null
           exchange_rate_context?: Json
           generated_item_id?: string | null
-          hidden_svg_path?: string | null
           id?: string
           image_path?: string | null
           item_snapshot?: Json
           led_color?: string | null
+          manufacturing_file_path?: string | null
           multi_color?: boolean
           order_id?: string
           original_image_paths?: string[]
@@ -1396,8 +1396,8 @@ export type Database = {
           boilerplate_id: string | null
           created_at: string
           generated_item_id: string
-          hidden_svg_path: string | null
           id: string
+          manufacturing_file_path: string | null
           metadata: Json
           option_index: number
           preview_image_path: string
@@ -1408,8 +1408,8 @@ export type Database = {
           boilerplate_id?: string | null
           created_at?: string
           generated_item_id: string
-          hidden_svg_path?: string | null
           id?: string
+          manufacturing_file_path?: string | null
           metadata?: Json
           option_index: number
           preview_image_path: string
@@ -1420,8 +1420,8 @@ export type Database = {
           boilerplate_id?: string | null
           created_at?: string
           generated_item_id?: string
-          hidden_svg_path?: string | null
           id?: string
+          manufacturing_file_path?: string | null
           metadata?: Json
           option_index?: number
           preview_image_path?: string

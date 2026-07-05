@@ -26,7 +26,7 @@ for (const contract of [
   'formData.getAll("boilerplateIds")',
   'const creditCost = selectedBoilerplates.length',
   'reference.generate_hidden_svg',
-  'hiddenSvgPath: null',
+  'manufacturingFilePath: null',
   'manufacturingSvgStatus: "pending_admin_generation"',
 ]) {
   if (!personalizedAction.includes(contract)) throw new Error(`Missing personalized generation contract: ${contract}`);

@@ -466,7 +466,7 @@
     "manufacturingProcess": "Արտադրական գործընթաց",
     "generationInstruction": "AI գեներացման հրահանգ",
     "displayOrder": "Ցուցադրման հերթականություն",
-    "requiresSvg": "Պահանջվում է արտադրական SVG",
+    "requiresSvg": "Պահանջվում է արտադրական ֆայլ",
     "updateBoilerplate": "Թարմացնել ձևանմուշը",
     "addBoilerplate": "Ավելացնել ձևանմուշ",
     "modelTitle": "Վերնագիր",

@@ -466,7 +466,7 @@
     "manufacturingProcess": "Manufacturing process",
     "generationInstruction": "AI generation instruction",
     "displayOrder": "Display order",
-    "requiresSvg": "Requires manufacturing SVG",
+    "requiresSvg": "Requires manufacturing file",
     "updateBoilerplate": "Update boilerplate",
     "addBoilerplate": "Add boilerplate",
     "modelTitle": "Title",

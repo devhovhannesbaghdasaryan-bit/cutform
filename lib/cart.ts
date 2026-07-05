@@ -379,7 +379,7 @@ export async function validateCartBeforeCheckout(
     if (item.generated_item_id) {
       const { data: generatedItem, error } = await supabase
         .from('generated_items')
-        .select('review_status, selected_preview_path, hidden_svg_path, product_type')
+        .select('review_status, selected_preview_path, manufacturing_file_path, product_type')
         .eq('id', item.generated_item_id)
         .maybeSingle();
 

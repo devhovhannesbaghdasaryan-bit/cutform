@@ -3,29 +3,29 @@
 import { Loader2, Sparkles } from 'lucide-react';
 import { useActionState } from 'react';
 import {
-  generateManufacturingSvgAction,
-  type ManufacturingSvgGenerationState,
+  generateManufacturingFileAction,
+  type ManufacturingFileGenerationState,
 } from '@/app/admin/generated/actions';
 
-interface ManufacturingSvgFormProps {
+interface ManufacturingFileFormProps {
   generatedItemId: string;
   optionId: string;
   optionName: string;
   defaultPrompt: string;
-  hasExistingSvg: boolean;
+  hasExistingFile: boolean;
 }
 
-const initialState: ManufacturingSvgGenerationState = { status: 'idle', message: null };
+const initialState: ManufacturingFileGenerationState = { status: 'idle', message: null };
 
-export function ManufacturingSvgForm({
+export function ManufacturingFileForm({
   generatedItemId,
   optionId,
   optionName,
   defaultPrompt,
-  hasExistingSvg,
-}: ManufacturingSvgFormProps) {
-  const [state, action, pending] = useActionState(generateManufacturingSvgAction, initialState);
-  const fieldPrefix = `svg-${optionId}`;
+  hasExistingFile,
+}: ManufacturingFileFormProps) {
+  const [state, action, pending] = useActionState(generateManufacturingFileAction, initialState);
+  const fieldPrefix = `manufacturing-file-${optionId}`;
 
   return (
     <form action={action} className="min-w-0 space-y-4 rounded-lg border border-dashed bg-muted/20 p-3 sm:p-4">
@@ -75,7 +75,7 @@ export function ManufacturingSvgForm({
         className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground disabled:opacity-60 sm:w-auto"
       >
         {pending ? <Loader2 className="size-4 animate-spin" aria-hidden="true" /> : <Sparkles className="size-4" aria-hidden="true" />}
-        {pending ? 'Generating production PNG…' : hasExistingSvg ? 'Regenerate manufacturing PNG' : 'Generate manufacturing PNG'}
+        {pending ? 'Generating production PNG…' : hasExistingFile ? 'Regenerate manufacturing PNG' : 'Generate manufacturing PNG'}
       </button>
     </form>
   );

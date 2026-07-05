@@ -64,7 +64,7 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
   const { data: item, error } = await supabase
     .from('generated_items')
     .select(
-      'id, title, product_type, review_status, selected_preview_path, hidden_svg_path, generation_options, credit_cost',
+      'id, title, product_type, review_status, selected_preview_path, manufacturing_file_path, generation_options, credit_cost',
     )
     .eq('id', parsed.data.generatedItemId)
     .eq('user_id', user.id)
@@ -74,7 +74,7 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
       product_type: string;
       review_status: string;
       selected_preview_path: string | null;
-      hidden_svg_path: string | null;
+      manufacturing_file_path: string | null;
       generation_options: Record<string, unknown> | null;
       credit_cost: number;
     }>();
@@ -91,10 +91,10 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
     if (!optionIds.length) throw new Error('Select at least one generated option.');
     const { data: options, error: optionsError } = await supabase
       .from('personalized_preview_options')
-      .select('id, preview_image_path, hidden_svg_path, metadata')
+      .select('id, preview_image_path, manufacturing_file_path, metadata')
       .eq('generated_item_id', item.id)
       .in('id', optionIds)
-      .returns<{ id: string; preview_image_path: string; hidden_svg_path: string | null; metadata: Record<string, unknown> }[]>();
+      .returns<{ id: string; preview_image_path: string; manufacturing_file_path: string | null; metadata: Record<string, unknown> }[]>();
     if (optionsError || !options || options.length !== optionIds.length) throw new Error('One or more generated options are unavailable.');
     for (const option of options) {
       await addItemToCart(supabase, { userId: user.id }, {
@@ -107,7 +107,10 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
           productType: item.product_type,
           personalizedPreviewOptionId: option.id,
           selectedPreviewPath: option.preview_image_path,
-          hiddenSvgPath: option.hidden_svg_path,
+          // NOTE: 'hiddenSvgPath' is a stored jsonb key inside cart_items.configuration
+          // (snapshotted into order_items.item_snapshot). Existing rows carry it, so the
+          // key is intentionally NOT renamed; it holds the manufacturing file path.
+          hiddenSvgPath: option.manufacturing_file_path,
           boilerplateSnapshot: option.metadata,
           creditCost: 1,
           sourcePriceCents,

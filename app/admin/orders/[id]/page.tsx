@@ -179,7 +179,7 @@ function OrderItemDetail({
         <div className="grid gap-3 rounded-md bg-muted/40 p-3 text-xs sm:grid-cols-2">
           <Info label="Image" value={item.image_path ?? '-'} />
           <Info label="Selected preview" value={item.selected_preview_path ?? '-'} />
-          <Info label="Hidden SVG" value={item.hidden_svg_path ?? '-'} />
+          <Info label="Manufacturing file" value={item.manufacturing_file_path ?? '-'} />
           <Info label="Original images" value={item.original_image_paths.join(', ') || '-'} />
           <Info label="Text" value={item.custom_text ?? '-'} />
           <Info label="LED" value={item.multi_color ? 'Multi color' : item.led_color ?? '-'} />

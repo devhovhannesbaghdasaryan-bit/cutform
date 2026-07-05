@@ -15,14 +15,14 @@ const reviewSchema = z.object({
   note: z.string().trim().optional(),
 });
 
-const generateManufacturingSvgSchema = z.object({
+const generateManufacturingFileSchema = z.object({
   generatedItemId: z.string().uuid(),
   optionId: z.string().uuid(),
   prompt: z.string().trim().min(40).max(20_000),
   model: z.enum(['gpt-image-2', 'gpt-image-1.5', 'gpt-image-1', 'gpt-image-1-mini']),
 });
 
-export type ManufacturingSvgGenerationState = {
+export type ManufacturingFileGenerationState = {
   status: 'idle' | 'success' | 'error';
   message: string | null;
 };
@@ -44,11 +44,11 @@ async function downloadAsDataUrl(
   return `data:${mediaTypeForPath(storagePath)};base64,${Buffer.from(await data.arrayBuffer()).toString('base64')}`;
 }
 
-export async function generateManufacturingSvgAction(
-  _previousState: ManufacturingSvgGenerationState,
+export async function generateManufacturingFileAction(
+  _previousState: ManufacturingFileGenerationState,
   formData: FormData,
-): Promise<ManufacturingSvgGenerationState> {
-  const parsed = generateManufacturingSvgSchema.safeParse({
+): Promise<ManufacturingFileGenerationState> {
+  const parsed = generateManufacturingFileSchema.safeParse({
     generatedItemId: formData.get('generatedItemId'),
     optionId: formData.get('optionId'),
     prompt: formData.get('prompt'),
@@ -77,14 +77,14 @@ export async function generateManufacturingSvgAction(
         }>(),
       supabase
         .from('personalized_preview_options')
-        .select('id, generated_item_id, preview_image_path, hidden_svg_path, status, metadata')
+        .select('id, generated_item_id, preview_image_path, manufacturing_file_path, status, metadata')
         .eq('id', settings.optionId)
         .eq('generated_item_id', settings.generatedItemId)
         .maybeSingle<{
           id: string;
           generated_item_id: string;
           preview_image_path: string;
-          hidden_svg_path: string | null;
+          manufacturing_file_path: string | null;
           status: string;
           metadata: Record<string, unknown>;
         }>(),
@@ -132,7 +132,7 @@ export async function generateManufacturingSvgAction(
     const { error: updateOptionError } = await supabase
       .from('personalized_preview_options')
       .update({
-        hidden_svg_path: storagePath,
+        manufacturing_file_path: storagePath,
         metadata: {
           ...option.metadata,
           manufacturingPngStatus: 'generated',
@@ -147,7 +147,7 @@ export async function generateManufacturingSvgAction(
       const { error: updateItemError } = await supabase
         .from('generated_items')
         .update({
-          hidden_svg_path: storagePath,
+          manufacturing_file_path: storagePath,
           manufacturing_metadata: {
             ...item.manufacturing_metadata,
             manufacturingPngGeneration: generationMetadata,
@@ -160,7 +160,7 @@ export async function generateManufacturingSvgAction(
     await writeAdminAuditLog(supabase, {
       actorUserId: user.id,
       targetUserId: item.user_id,
-      action: option.hidden_svg_path ? 'manufacturing_png_regenerated' : 'manufacturing_png_generated',
+      action: option.manufacturing_file_path ? 'manufacturing_png_regenerated' : 'manufacturing_png_generated',
       entityType: 'personalized_preview_option',
       entityId: option.id,
       metadata: { storagePath, model: settings.model, format: 'png' },

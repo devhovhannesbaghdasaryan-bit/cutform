@@ -242,7 +242,7 @@ export async function generatePersonalizedNightLightAction(
         generatedItemId: generated.id,
         optionIndex: index,
         previewImagePath: previewPath,
-        hiddenSvgPath: null,
+        manufacturingFilePath: null,
         boilerplateId: reference.id,
         metadata: {
           modelId: model.id,
@@ -251,6 +251,9 @@ export async function generatePersonalizedNightLightAction(
           boilerplateName: reference.admin_name,
           manufacturingProcess: reference.manufacturing_process,
           boilerplatePath: reference.image_path,
+          // NOTE: 'requiresManufacturingSvg' and 'manufacturingSvgStatus' are stored jsonb
+          // keys inside personalized_preview_options.metadata. Existing rows carry them, so
+          // the keys are intentionally NOT renamed; the asset they track is a PNG.
           requiresManufacturingSvg: reference.generate_hidden_svg,
           manufacturingSvgStatus: "pending_admin_generation",
           revisedPrompt: image.revisedPrompt,

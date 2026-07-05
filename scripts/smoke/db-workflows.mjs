@@ -189,7 +189,7 @@ try {
     svg_content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10h80v80H10z"/></svg>',
     preview_path: `generated/${runId}/preview.png`,
     selected_preview_path: `generated/${runId}/selected.png`,
-    hidden_svg_path: `generated/${runId}/hidden.svg`,
+    manufacturing_file_path: `generated/${runId}/manufacturing.png`,
     original_image_paths: [`uploads/${runId}/original-1.png`, `uploads/${runId}/original-2.png`],
     color: 'warm_white',
     multi_color: false,
@@ -203,7 +203,7 @@ try {
     generated_item_id: generatedItem.id,
     option_index: 1,
     preview_image_path: `generated/${runId}/selected.png`,
-    hidden_svg_path: `generated/${runId}/hidden.svg`,
+    manufacturing_file_path: `generated/${runId}/manufacturing.png`,
     status: 'selected',
     metadata: { runId },
   });
@@ -289,7 +289,7 @@ try {
         : {},
       image_path: isGenerated ? `generated/${runId}/selected.png` : null,
       selected_preview_path: isGenerated ? `generated/${runId}/selected.png` : null,
-      hidden_svg_path: isGenerated ? `generated/${runId}/hidden.svg` : null,
+      manufacturing_file_path: isGenerated ? `generated/${runId}/manufacturing.png` : null,
       original_image_paths: isGenerated
         ? [`uploads/${runId}/original-1.png`, `uploads/${runId}/original-2.png`]
         : [],
@@ -304,12 +304,12 @@ try {
 
   const orderItems = await supabase
     .from('order_items')
-    .select('id, title, selected_preview_path, hidden_svg_path, original_image_paths, custom_text, led_color, personalization_snapshot, production_snapshot')
+    .select('id, title, selected_preview_path, manufacturing_file_path, original_image_paths, custom_text, led_color, personalization_snapshot, production_snapshot')
     .eq('order_id', order.id);
   if (orderItems.error) throw new Error(orderItems.error.message);
   const personalizedOrderItem = orderItems.data.find((item) => item.selected_preview_path);
   assert(personalizedOrderItem, 'Expected personalized order item snapshot');
-  assert(personalizedOrderItem.hidden_svg_path?.endsWith('/hidden.svg'), 'Expected hidden SVG path on order item');
+  assert(personalizedOrderItem.manufacturing_file_path?.endsWith('/manufacturing.png'), 'Expected manufacturing file path on order item');
   assert(personalizedOrderItem.original_image_paths?.length === 2, 'Expected original image paths on order item');
   assert(personalizedOrderItem.custom_text === 'QA smoke', 'Expected custom text on order item');
   assert(personalizedOrderItem.led_color === 'warm_white', 'Expected LED color on order item');

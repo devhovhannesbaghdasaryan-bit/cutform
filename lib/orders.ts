@@ -115,7 +115,7 @@ export async function getOrderDetailForAdmin(supabase: SupabaseClient, orderId: 
     supabase
       .from('order_items')
       .select(
-        'id, title, quantity, unit_price_cents, total_price_cents, currency, exchange_rate_context, catalog_item_id, generated_item_id, item_snapshot, personalization_snapshot, production_snapshot, image_path, selected_preview_path, hidden_svg_path, original_image_paths, custom_text, led_color, multi_color, banner_size_key',
+        'id, title, quantity, unit_price_cents, total_price_cents, currency, exchange_rate_context, catalog_item_id, generated_item_id, item_snapshot, personalization_snapshot, production_snapshot, image_path, selected_preview_path, manufacturing_file_path, original_image_paths, custom_text, led_color, multi_color, banner_size_key',
       )
       .eq('order_id', orderId)
       .returns<AdminOrderItem[]>(),
@@ -183,7 +183,7 @@ interface GeneratedOrderSource {
   product_type: string;
   preview_path: string | null;
   selected_preview_path: string | null;
-  hidden_svg_path: string | null;
+  manufacturing_file_path: string | null;
   original_image_paths: string[];
   custom_text: string | null;
   color: string | null;
@@ -310,7 +310,7 @@ export async function createOrderFromCart(
     ? await supabase
         .from('generated_items')
         .select(
-          'id, title, product_type, preview_path, selected_preview_path, hidden_svg_path, original_image_paths, custom_text, color, multi_color, manufacturing_metadata, generation_options, prompt, credit_cost',
+          'id, title, product_type, preview_path, selected_preview_path, manufacturing_file_path, original_image_paths, custom_text, color, multi_color, manufacturing_metadata, generation_options, prompt, credit_cost',
         )
         .in('id', generatedIds)
         .returns<GeneratedOrderSource[]>()
@@ -349,7 +349,7 @@ export async function createOrderFromCart(
         production_snapshot: productionSnapshot,
         image_path: source?.selected_preview_path ?? source?.preview_path ?? null,
         selected_preview_path: source?.selected_preview_path ?? null,
-        hidden_svg_path: source?.hidden_svg_path ?? null,
+        manufacturing_file_path: source?.manufacturing_file_path ?? null,
         original_image_paths: source?.original_image_paths ?? [],
         custom_text: source?.custom_text ?? null,
         led_color: source?.color ?? null,

@@ -466,7 +466,7 @@
     "manufacturingProcess": "Производственный процесс",
     "generationInstruction": "Инструкция для AI-генерации",
     "displayOrder": "Порядок отображения",
-    "requiresSvg": "Требуется производственный SVG",
+    "requiresSvg": "Требуется производственный файл",
     "updateBoilerplate": "Обновить шаблон",
     "addBoilerplate": "Добавить шаблон",
     "modelTitle": "Название",

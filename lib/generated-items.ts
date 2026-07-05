@@ -21,7 +21,7 @@ export type GeneratedItemAdminDetail = Omit<
 
 export type AdminGeneratedPreviewOption = Pick<
   PersonalizedPreviewOptionRow,
-  'id' | 'option_index' | 'preview_image_path' | 'hidden_svg_path' | 'status' | 'metadata'
+  'id' | 'option_index' | 'preview_image_path' | 'manufacturing_file_path' | 'status' | 'metadata'
 >;
 
 export type GeneratedItemArtifactRow = Pick<
@@ -52,7 +52,7 @@ export interface GeneratedItemInput {
   svgContent?: string;
   previewPath?: string | null;
   selectedPreviewPath?: string | null;
-  hiddenSvgPath?: string | null;
+  manufacturingFilePath?: string | null;
   originalImagePaths?: string[];
   color?: string | null;
   multiColor?: boolean;
@@ -66,7 +66,7 @@ export interface PersonalizedPreviewOptionInput {
   generatedItemId: string;
   optionIndex: number;
   previewImagePath: string;
-  hiddenSvgPath?: string | null;
+  manufacturingFilePath?: string | null;
   boilerplateId?: string | null;
   metadata?: Record<string, unknown>;
 }
@@ -87,7 +87,7 @@ export async function createGeneratedItem(supabase: SupabaseClient, input: Gener
       svg_content: input.svgContent ?? '',
       preview_path: input.previewPath ?? null,
       selected_preview_path: input.selectedPreviewPath ?? null,
-      hidden_svg_path: input.hiddenSvgPath ?? null,
+      manufacturing_file_path: input.manufacturingFilePath ?? null,
       original_image_paths: input.originalImagePaths ?? [],
       color: input.color ?? null,
       multi_color: input.multiColor ?? false,
@@ -116,7 +116,7 @@ export async function createPersonalizedPreviewOptions(
         generated_item_id: option.generatedItemId,
         option_index: option.optionIndex,
         preview_image_path: option.previewImagePath,
-        hidden_svg_path: option.hiddenSvgPath,
+        manufacturing_file_path: option.manufacturingFilePath,
         boilerplate_id: option.boilerplateId ?? null,
         metadata: option.metadata ?? {},
       })),
@@ -135,10 +135,10 @@ export async function selectPersonalizedPreviewOption(
 ) {
   const { data: option, error: optionError } = await supabase
     .from('personalized_preview_options')
-    .select('preview_image_path, hidden_svg_path')
+    .select('preview_image_path, manufacturing_file_path')
     .eq('id', optionId)
     .eq('generated_item_id', generatedItemId)
-    .maybeSingle<{ preview_image_path: string; hidden_svg_path: string }>();
+    .maybeSingle<{ preview_image_path: string; manufacturing_file_path: string }>();
 
   if (optionError || !option) {
     throw new Error(optionError?.message ?? 'Preview option was not found.');
@@ -162,7 +162,7 @@ export async function selectPersonalizedPreviewOption(
     .from('generated_items')
     .update({
       selected_preview_path: option.preview_image_path,
-      hidden_svg_path: option.hidden_svg_path,
+      manufacturing_file_path: option.manufacturing_file_path,
       review_status: 'review_required',
     })
     .eq('id', generatedItemId);
@@ -190,13 +190,13 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
     supabase
       .from('generated_items')
       .select(
-        'id, user_id, title, product_type, review_status, credit_cost, source_image_path, original_image_paths, preview_path, selected_preview_path, hidden_svg_path, custom_text, color, multi_color, prompt, svg_content, manufacturing_metadata, generation_options, created_at, updated_at',
+        'id, user_id, title, product_type, review_status, credit_cost, source_image_path, original_image_paths, preview_path, selected_preview_path, manufacturing_file_path, custom_text, color, multi_color, prompt, svg_content, manufacturing_metadata, generation_options, created_at, updated_at',
       )
       .eq('id', id)
       .maybeSingle<GeneratedItemAdminDetail>(),
     supabase
       .from('personalized_preview_options')
-      .select('id, option_index, preview_image_path, hidden_svg_path, status, metadata')
+      .select('id, option_index, preview_image_path, manufacturing_file_path, status, metadata')
       .eq('generated_item_id', id)
       .order('option_index', { ascending: true })
       .returns<AdminGeneratedPreviewOption[]>(),
@@ -225,11 +225,11 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
     ...option,
     previewUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60)).data?.signedUrl ?? null,
     previewDownloadUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60, { download: fileName(option.preview_image_path) })).data?.signedUrl ?? null,
-    hiddenSvgUrl: option.hidden_svg_path
-      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
+    manufacturingFileUrl: option.manufacturing_file_path
+      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.manufacturing_file_path, 60 * 60)).data?.signedUrl ?? null
       : null,
-    hiddenSvgDownloadUrl: option.hidden_svg_path
-      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.hidden_svg_path, 60 * 60, { download: fileName(option.hidden_svg_path) })).data?.signedUrl ?? null
+    manufacturingFileDownloadUrl: option.manufacturing_file_path
+      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.manufacturing_file_path, 60 * 60, { download: fileName(option.manufacturing_file_path) })).data?.signedUrl ?? null
       : null,
   })));
   const parentPreviewPath = item.selected_preview_path ?? item.preview_path;
@@ -239,11 +239,11 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
   const parentPreviewDownloadUrl = parentPreviewPath
     ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60, { download: fileName(parentPreviewPath) })).data?.signedUrl ?? null
     : null;
-  const parentHiddenSvgUrl = item.hidden_svg_path
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60)).data?.signedUrl ?? null
+  const parentManufacturingFileUrl = item.manufacturing_file_path
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.manufacturing_file_path, 60 * 60)).data?.signedUrl ?? null
     : null;
-  const parentHiddenSvgDownloadUrl = item.hidden_svg_path
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.hidden_svg_path, 60 * 60, { download: fileName(item.hidden_svg_path) })).data?.signedUrl ?? null
+  const parentManufacturingFileDownloadUrl = item.manufacturing_file_path
+    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.manufacturing_file_path, 60 * 60, { download: fileName(item.manufacturing_file_path) })).data?.signedUrl ?? null
     : null;
 
   return {
@@ -254,8 +254,8 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
     parentPreviewPath,
     parentPreviewUrl,
     parentPreviewDownloadUrl,
-    parentHiddenSvgUrl,
-    parentHiddenSvgDownloadUrl,
+    parentManufacturingFileUrl,
+    parentManufacturingFileDownloadUrl,
   };
 }
 
