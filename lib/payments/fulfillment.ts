@@ -50,6 +50,24 @@ export async function fulfillCreditPurchase(service: SupabaseClient, transaction
     throw new Error('Credit purchase transaction is missing fulfillment metadata.');
   }
 
+  // A ledger row for this transaction means credits were already granted on a
+  // previous attempt that failed before linking the ledger id — backfill only.
+  const { data: existingLedger, error: ledgerLookupError } = await service
+    .from('credit_ledger')
+    .select('id')
+    .eq('reference_type', 'payment_transaction')
+    .eq('reference_id', transaction.id)
+    .maybeSingle<{ id: string }>();
+  if (ledgerLookupError) throw new Error(ledgerLookupError.message);
+  if (existingLedger) {
+    const { error: backfillError } = await service
+      .from('transactions')
+      .update({ credit_ledger_id: existingLedger.id })
+      .eq('id', transaction.id);
+    if (backfillError) throw new Error(backfillError.message);
+    return;
+  }
+
   const ledger = await adjustCredits(service, {
     userId: transaction.user_id,
     delta: creditAmount,
@@ -123,11 +141,14 @@ export async function settleAmeriaPayment(
     } catch (error) {
       // Give a later retry (callback replay or admin check) another chance
       // instead of leaving a succeeded transaction with no fulfillment.
-      await service
+      const { error: rollbackError } = await service
         .from('transactions')
         .update({ status: 'pending' })
         .eq('id', transaction.id)
         .eq('status', 'succeeded');
+      if (rollbackError) {
+        console.error('[ameria-settle] failed to roll back claim', transaction.id, rollbackError.message);
+      }
       throw error;
     }
     return { outcome, redirectPath: `${base}?checkout=success` };
