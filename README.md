@@ -2,7 +2,9 @@
 
 AI image-to-SVG product generator. Upload an image, chat with GPT-4o to
 produce a manufacturing-ready SVG, approve, and save it as a priced product.
-Price is the OpenAI API cost of the generation plus a flat $10 markup.
+AI generation is paid with prepaid credits: users buy one of the credit packs
+defined in `lib/credit-packs.ts` and each generation attempt debits its credit
+cost from their balance.
 
 ## Stack
 
@@ -196,8 +198,11 @@ Auth email templates can be customized in **Authentication → Email Templates**
 
 ## Pricing
 
-Adjust the constants in [`lib/pricing.ts`](./lib/pricing.ts) when OpenAI
-re-prices GPT-4o or you want to change the markup.
+AI generation runs on a prepaid credit-pack model. The packs (credit amount,
+price, currency) are defined in [`lib/credit-packs.ts`](./lib/credit-packs.ts)
+and surfaced on `/credits`; buying a pack tops up the user's credit account,
+and each generation attempt spends credits from that balance. Adjust the pack
+definitions there to change pricing.
 
 ## Acceptance criteria — known deferral
 
@@ -212,18 +217,17 @@ app/
   auth/{callback,verify-email}/   # verification flow
   dashboard/                      # product grid
   create/                         # upload + chat + live SVG preview
-  products/[id]/                  # product detail with price breakdown
   api/generate/                   # streamObject endpoint
 lib/
   supabase/                       # client / server / middleware factories
-  pricing.ts                      # Generation-cost-to-price math
+  credit-packs.ts                 # prepaid credit-pack definitions
   sanitize.ts                     # DOMPurify SVG sanitization
   generation-schema.ts            # Zod schema shared by API + client
   env.ts                          # Zod-validated env vars
 components/
   ui/                             # shadcn primitives
   site-header.tsx product-card.tsx empty-state.tsx svg-render.tsx
-middleware.ts                     # auth + verified-email gate
+proxy.ts                          # middleware entrypoint delegating to lib/supabase/middleware.ts (auth + verified-email gate)
 supabase/migrations/0001_init.sql # schema, RLS, storage bucket
 ```
 

@@ -2,7 +2,7 @@
 // Re-uses session cookies prepared by smoke-login-and-fetch.mjs.
 import fs from 'node:fs';
 
-const cookies = fs.readFileSync('/tmp/snip-app-cookies.txt', 'utf8')
+const cookies = fs.readFileSync('/tmp/uq-app-cookies.txt', 'utf8')
   .split('\n')
   .filter((l) => l && !l.startsWith('#'))
   .map((l) => {

@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { updateActiveCartCurrency } from '@/app/currency/actions';
 import { getCartSessionId } from '@/lib/cart-session';
-import { CURRENCY_COOKIE, listEnabledCurrencies, normalizeCurrency } from '@/lib/currency';
+import { CURRENCY_COOKIE, LEGACY_CURRENCY_COOKIE, listEnabledCurrencies, normalizeCurrency } from '@/lib/currency';
 import { COUNTRY_COOKIE, normalizeCountryCode, resolveMarket } from '@/lib/market';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
@@ -57,7 +57,9 @@ export async function setCountryPreferenceAction(formData: FormData) {
   if (cartError) throw new Error(cartError.message);
 
   // A geographic default changes the cart only when the user has not made an explicit choice.
-  const explicitCookieCurrency = normalizeCurrency(cookieStore.get(CURRENCY_COOKIE)?.value);
+  const explicitCookieCurrency = normalizeCurrency(
+    cookieStore.get(CURRENCY_COOKIE)?.value ?? cookieStore.get(LEGACY_CURRENCY_COOKIE)?.value,
+  );
   const { data: profile } = user
     ? await service.from('profiles').select('preferred_currency').eq('user_id', user.id).maybeSingle<{ preferred_currency: string | null }>()
     : { data: null };

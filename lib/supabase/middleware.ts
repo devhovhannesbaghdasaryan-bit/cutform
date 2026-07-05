@@ -4,6 +4,7 @@ import { getServerEnv } from '@/lib/env';
 import type { Database } from '@/lib/supabase/types';
 import {
   DEFAULT_LOCALE,
+  LEGACY_LOCALE_COOKIE,
   LOCALE_COOKIE,
   type AppLocale,
   getDefaultLocaleForRegion,
@@ -11,7 +12,7 @@ import {
   normalizeLocale,
 } from '@/lib/i18n-config';
 
-const PROTECTED_PREFIXES = ['/dashboard', '/products'];
+const PROTECTED_PREFIXES = ['/dashboard'];
 const VERIFY_EMAIL_PATH = '/auth/verify-email';
 const LOCALE_API_PATH = '/api/locale';
 
@@ -86,7 +87,13 @@ export async function updateSession(request: NextRequest) {
 
   const routePath = localePrefixedPath?.routePath ?? path;
   const isProtected = PROTECTED_PREFIXES.some((p) => routePath.startsWith(p));
-  const explicitLocale = normalizeLocale(request.cookies.get(LOCALE_COOKIE)?.value);
+  // Dual-read: prefer the new uq_ cookie, fall back to the legacy snip_ one.
+  // Resolution below feeds the write of LOCALE_COOKIE (the new name), so a
+  // visitor arriving with only the legacy cookie keeps their locale losslessly.
+  const explicitLocale = normalizeLocale(
+    request.cookies.get(LOCALE_COOKIE)?.value
+      ?? request.cookies.get(LEGACY_LOCALE_COOKIE)?.value,
+  );
   let activeLocale = localePrefixedPath?.locale ?? explicitLocale;
 
   if (!activeLocale && user) {

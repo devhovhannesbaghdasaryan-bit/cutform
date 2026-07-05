@@ -30,6 +30,18 @@ const nextConfig = {
   // jsdom (pulled in by isomorphic-dompurify) ships its own asset files;
   // bundling breaks it. Load these as Node externals at runtime.
   serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
+  // The legacy token-priced /products/[id] route is gone (Phase 17); send any
+  // inbound links to the live catalog. Single-segment :id only, so static
+  // assets under /products/night-lights/... are unaffected.
+  async redirects() {
+    return [
+      {
+        source: '/products/:id',
+        destination: '/catalog',
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '22mb',

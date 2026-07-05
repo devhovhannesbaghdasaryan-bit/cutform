@@ -1,4 +1,4 @@
-const baseUrl = process.env.SNIP_SMOKE_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const baseUrl = process.env.UQ_SMOKE_BASE_URL ?? process.env.SNIP_SMOKE_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 const rootUrl = baseUrl.replace(/\/$/, '');
 
 async function fetchPage(pathOrUrl) {

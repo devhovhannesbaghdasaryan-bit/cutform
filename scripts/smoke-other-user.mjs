@@ -17,5 +17,5 @@ const { data, error } = await supabase.auth.signInWithPassword({
 if (error) { console.error(error.message); process.exit(1); }
 const lines = ['# Netscape HTTP Cookie File'];
 for (const [name, value] of cookies) lines.push(`localhost\tFALSE\t/\tFALSE\t0\t${name}\t${value}`);
-fs.writeFileSync('/tmp/snip-other-cookies.txt', lines.join('\n') + '\n');
+fs.writeFileSync('/tmp/uq-other-cookies.txt', lines.join('\n') + '\n');
 console.log('signed in as', data.user.email);

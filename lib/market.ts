@@ -4,7 +4,10 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies, headers } from 'next/headers';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
-export const COUNTRY_COOKIE = 'snip_country';
+// Writes always target COUNTRY_COOKIE; LEGACY_COUNTRY_COOKIE exists only as a
+// read fallback for pre-rename visitors (Phase 17 rename).
+export const COUNTRY_COOKIE = 'uq_country';
+export const LEGACY_COUNTRY_COOKIE = 'snip_country';
 
 export interface MarketRegion {
   id: string;
@@ -112,7 +115,9 @@ export async function resolveMarket(options: {
   }
 
   const cookieStore = await cookies();
-  const cookieCode = normalizeCountryCode(cookieStore.get(COUNTRY_COOKIE)?.value);
+  const cookieCode = normalizeCountryCode(
+    cookieStore.get(COUNTRY_COOKIE)?.value ?? cookieStore.get(LEGACY_COUNTRY_COOKIE)?.value,
+  );
   if (cookieCode) {
     const country = await findCountry(service, cookieCode);
     if (country) return {

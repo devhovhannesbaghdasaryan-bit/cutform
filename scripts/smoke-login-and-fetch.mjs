@@ -29,5 +29,5 @@ for (const [name, value] of cookies) {
   // domain, flag, path, secure, expiration, name, value
   lines.push(`localhost\tFALSE\t/\tFALSE\t0\t${name}\t${value}`);
 }
-fs.writeFileSync('/tmp/snip-app-cookies.txt', lines.join('\n') + '\n');
+fs.writeFileSync('/tmp/uq-app-cookies.txt', lines.join('\n') + '\n');
 console.log('cookies written: ', [...cookies.keys()].join(', '));

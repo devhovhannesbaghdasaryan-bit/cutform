@@ -1,7 +1,7 @@
 // Simulate what useObject does: accumulate chunks, attempt to parse as
 // partial JSON, log the progression of object.svg over time.
 import fs from 'node:fs';
-const cookies = fs.readFileSync('/tmp/snip-app-cookies.txt', 'utf8')
+const cookies = fs.readFileSync('/tmp/uq-app-cookies.txt', 'utf8')
   .split('\n').filter((l) => l && !l.startsWith('#'))
   .map((l) => { const c = l.split('\t'); return `${c[5]}=${c[6]}`; }).join('; ');
 

@@ -3,7 +3,7 @@
 // complete object at the end (which useObject cannot show progressively).
 import fs from 'node:fs';
 
-const cookies = fs.readFileSync('/tmp/snip-app-cookies.txt', 'utf8')
+const cookies = fs.readFileSync('/tmp/uq-app-cookies.txt', 'utf8')
   .split('\n')
   .filter((l) => l && !l.startsWith('#'))
   .map((l) => { const c = l.split('\t'); return `${c[5]}=${c[6]}`; })

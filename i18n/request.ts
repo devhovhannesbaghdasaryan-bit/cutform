@@ -1,7 +1,7 @@
 // next-intl request config ("without i18n routing" cookie mode). The active
-// locale comes from getRequestLocale() — the snip_locale cookie that the
-// middleware resolves and injects into the request — so this stays the single
-// source of truth for locale resolution.
+// locale comes from getRequestLocale() — the uq_locale cookie (with a legacy
+// snip_locale read fallback) that the middleware resolves and injects into the
+// request — so this stays the single source of truth for locale resolution.
 import { getRequestConfig } from 'next-intl/server';
 import { IntlErrorCode } from 'next-intl';
 import { DEFAULT_LOCALE, type AppLocale } from '@/lib/i18n-config';

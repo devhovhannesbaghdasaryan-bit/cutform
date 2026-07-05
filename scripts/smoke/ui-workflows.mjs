@@ -4,11 +4,11 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
 
-const baseUrl = (process.env.SNIP_SMOKE_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const baseUrl = (process.env.UQ_SMOKE_BASE_URL ?? process.env.SNIP_SMOKE_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 const chromePath =
   process.env.CHROME_PATH
   ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const port = Number(process.env.SNIP_CHROME_DEBUG_PORT ?? 9333);
+const port = Number(process.env.UQ_CHROME_DEBUG_PORT ?? process.env.SNIP_CHROME_DEBUG_PORT ?? 9333);
 const runId = `ui-${Date.now()}`;
 const createdUserIds = [];
 
@@ -61,7 +61,7 @@ async function waitFor(condition, label, timeoutMs = 10000) {
 }
 
 async function connectBrowser() {
-  const userDataDir = mkdtempSync(join(tmpdir(), 'snip-ui-smoke-'));
+  const userDataDir = mkdtempSync(join(tmpdir(), 'uq-ui-smoke-'));
   const chrome = spawn(chromePath, [
     '--headless=new',
     '--disable-gpu',
@@ -306,7 +306,7 @@ async function runGuestAndCustomerFlow(customerUser) {
 
     await clickByText(browser, 'RU');
     await waitFor(
-      () => evaluate(browser, 'return document.cookie.includes("snip_locale=ru");'),
+      () => evaluate(browser, 'return document.cookie.includes("uq_locale=ru");'),
       'ru locale cookie',
     );
 

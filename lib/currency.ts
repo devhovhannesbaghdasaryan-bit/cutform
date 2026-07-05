@@ -11,7 +11,10 @@ export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
 
 export const DEFAULT_CURRENCY: AppCurrency = 'AMD';
-export const CURRENCY_COOKIE = 'snip_currency';
+// Writes always target CURRENCY_COOKIE; LEGACY_CURRENCY_COOKIE exists only as
+// a read fallback for pre-rename visitors (Phase 17 rename).
+export const CURRENCY_COOKIE = 'uq_currency';
+export const LEGACY_CURRENCY_COOKIE = 'snip_currency';
 
 export type PaymentRoute = 'stripe' | 'bank_manual';
 
@@ -97,7 +100,9 @@ export async function getActiveCurrency() {
   } = await supabase.auth.getUser();
 
   const cookieStore = await cookies();
-  const cookieCurrency = normalizeCurrency(cookieStore.get(CURRENCY_COOKIE)?.value);
+  const cookieCurrency = normalizeCurrency(
+    cookieStore.get(CURRENCY_COOKIE)?.value ?? cookieStore.get(LEGACY_CURRENCY_COOKIE)?.value,
+  );
   const enabled = await listEnabledCurrencies(supabase);
   const enabledCodes = new Set(enabled.map((currency) => currency.code));
 

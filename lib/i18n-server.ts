@@ -3,6 +3,7 @@ import 'server-only';
 import { cookies, headers } from 'next/headers';
 import {
   DEFAULT_LOCALE,
+  LEGACY_LOCALE_COOKIE,
   LOCALE_COOKIE,
   type AppLocale,
   getDefaultLocaleForRegion,
@@ -11,7 +12,9 @@ import {
 
 export async function getRequestLocale(): Promise<AppLocale> {
   const cookieStore = await cookies();
-  const selectedLocale = normalizeLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+  const selectedLocale = normalizeLocale(
+    cookieStore.get(LOCALE_COOKIE)?.value ?? cookieStore.get(LEGACY_LOCALE_COOKIE)?.value,
+  );
   if (selectedLocale) return selectedLocale;
 
   const headerStore = await headers();

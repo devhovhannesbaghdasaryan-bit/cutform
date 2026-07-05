@@ -6,7 +6,10 @@ export const APP_LOCALES = ['en', 'ru', 'am'] as const;
 export type AppLocale = (typeof APP_LOCALES)[number];
 
 export const DEFAULT_LOCALE: AppLocale = 'en';
-export const LOCALE_COOKIE = 'snip_locale';
+// Writes always target LOCALE_COOKIE; LEGACY_LOCALE_COOKIE exists only as a
+// read fallback so pre-rename visitors keep their language (Phase 17 rename).
+export const LOCALE_COOKIE = 'uq_locale';
+export const LEGACY_LOCALE_COOKIE = 'snip_locale';
 
 const REGION_LOCALE_DEFAULTS: Record<string, AppLocale> = {
   AM: 'am',
