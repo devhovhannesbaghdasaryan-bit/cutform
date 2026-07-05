@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { APP_LOCALES, type AppLocale } from '@/lib/i18n';
+import { APP_LOCALES, type AppLocale } from '@/lib/i18n-config';
 
 const LABELS: Record<AppLocale, string> = {
   en: 'EN',

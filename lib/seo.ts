@@ -74,6 +74,7 @@ export function resolveCatalogMetadata({
 }
 
 export function createProductStructuredData({
+  locale,
   name,
   description,
   image,
@@ -81,6 +82,7 @@ export function createProductStructuredData({
   priceCents,
   currency = 'USD',
 }: {
+  locale: AppLocale;
   name: string;
   description?: string | null;
   image?: string | null;
@@ -94,7 +96,9 @@ export function createProductStructuredData({
     name,
     description: description ?? undefined,
     image: image ? [image] : undefined,
-    url: `${PUBLIC_BASE_URL}/items/${slug}`,
+    // Locale-prefixed to match the page canonical (was an unprefixed
+    // /items/{slug} URL that never matched any canonical).
+    url: getCanonicalUrl(locale, `/items/${slug}`),
     offers: {
       '@type': 'Offer',
       priceCurrency: currency,

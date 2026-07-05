@@ -54,6 +54,7 @@ export default async function CatalogItemDetailPage({
   const { slug } = await params;
   const item = await getCatalogItem(slug).catch(() => null);
   if (!item) notFound();
+  const locale = await getRequestLocale();
   const activeCurrency = await getActiveCurrency();
   const convertedPrice = await convertMoney(
     item.price_cents,
@@ -61,6 +62,7 @@ export default async function CatalogItemDetailPage({
     activeCurrency,
   );
   const structuredData = createProductStructuredData({
+    locale,
     name: item.title,
     description: item.description,
     image: resolvePublicStorageUrl('catalog-assets', item.thumbnail_path),

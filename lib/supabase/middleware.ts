@@ -9,12 +9,15 @@ import {
   getDefaultLocaleForRegion,
   isAppLocale,
   normalizeLocale,
-} from '@/lib/i18n';
+} from '@/lib/i18n-config';
 
 const PROTECTED_PREFIXES = ['/dashboard', '/products'];
 const VERIFY_EMAIL_PATH = '/auth/verify-email';
 const LOCALE_API_PATH = '/api/locale';
 
+// INTENTIONAL: /en /ru /am URL prefixes are crawler-facing SEO URLs. They are
+// rewritten (not redirected) to the unprefixed routes so each locale has a
+// stable canonical URL (see lib/seo.ts and app/sitemap.ts). Keep this scheme.
 function getLocalePrefixedPath(path: string): { locale: AppLocale; routePath: string } | null {
   const [, maybeLocale, ...rest] = path.split('/');
   if (!isAppLocale(maybeLocale)) return null;
@@ -48,7 +51,17 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.rewrite(rewriteUrl, { request });
   };
 
-  let response = createBaseResponse();
+  // Response cookies queued so far. Rebuilding the response (required after
+  // mutating the forwarded request) replays them, so Supabase auth cookies
+  // and the locale cookie survive each rebuild.
+  const pendingCookies: { name: string; value: string; options?: CookieOptions }[] = [];
+  const buildResponse = () => {
+    const r = createBaseResponse();
+    for (const c of pendingCookies) r.cookies.set(c.name, c.value, c.options);
+    return r;
+  };
+
+  let response = buildResponse();
 
   const supabase = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
@@ -57,13 +70,11 @@ export async function updateSession(request: NextRequest) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet: { name: string; value: string; options: CookieOptions }[]) => {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
-          response = createBaseResponse();
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
-          );
+          for (const { name, value, options } of cookiesToSet) {
+            request.cookies.set(name, value);
+            pendingCookies.push({ name, value, options });
+          }
+          response = buildResponse();
         },
       },
     },
@@ -95,12 +106,16 @@ export async function updateSession(request: NextRequest) {
       : normalizeLocale(request.headers.get('accept-language')?.split(',')[0]) || DEFAULT_LOCALE;
   }
 
-  response.cookies.set(LOCALE_COOKIE, activeLocale, {
-    path: '/',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 365,
+  // Set the resolved locale on the forwarded request so getRequestLocale()
+  // sees it on the FIRST render (previously only the response cookie was set,
+  // which ignored a logged-in user's saved language until the next request).
+  request.cookies.set(LOCALE_COOKIE, activeLocale);
+  pendingCookies.push({
+    name: LOCALE_COOKIE,
+    value: activeLocale,
+    options: { path: '/', sameSite: 'lax', maxAge: 60 * 60 * 24 * 365 },
   });
-  response.headers.set('x-snip-locale', activeLocale);
+  response = buildResponse();
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
