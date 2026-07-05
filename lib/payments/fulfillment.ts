@@ -42,12 +42,6 @@ export async function fulfillOrderPayment(service: SupabaseClient, transaction: 
     })
     .eq('id', transaction.order_id);
   if (orderError) throw new Error(orderError.message);
-
-  const { error } = await service
-    .from('transactions')
-    .update({ status: 'succeeded' })
-    .eq('id', transaction.id);
-  if (error) throw new Error(error.message);
 }
 
 export async function fulfillCreditPurchase(service: SupabaseClient, transaction: SettleTransaction) {
@@ -70,9 +64,20 @@ export async function fulfillCreditPurchase(service: SupabaseClient, transaction
 
   const { error } = await service
     .from('transactions')
-    .update({ status: 'succeeded', credit_ledger_id: ledger.ledgerId })
+    .update({ credit_ledger_id: ledger.ledgerId })
     .eq('id', transaction.id);
   if (error) throw new Error(error.message);
+}
+
+async function claimTransactionSuccess(service: SupabaseClient, transactionId: string): Promise<boolean> {
+  const { data, error } = await service
+    .from('transactions')
+    .update({ status: 'succeeded' })
+    .eq('id', transactionId)
+    .eq('status', 'pending')
+    .select('id');
+  if (error) throw new Error(error.message);
+  return (data ?? []).length > 0;
 }
 
 export async function settleAmeriaPayment(
@@ -105,10 +110,25 @@ export async function settleAmeriaPayment(
   });
 
   if (outcome === 'succeeded') {
-    if (transaction.type === 'credit_purchase') {
-      await fulfillCreditPurchase(service, transaction);
-    } else {
-      await fulfillOrderPayment(service, transaction);
+    const claimed = await claimTransactionSuccess(service, transaction.id);
+    if (!claimed) {
+      return { outcome: 'already_succeeded', redirectPath: `${base}?checkout=success` };
+    }
+    try {
+      if (transaction.type === 'credit_purchase') {
+        await fulfillCreditPurchase(service, transaction);
+      } else {
+        await fulfillOrderPayment(service, transaction);
+      }
+    } catch (error) {
+      // Give a later retry (callback replay or admin check) another chance
+      // instead of leaving a succeeded transaction with no fulfillment.
+      await service
+        .from('transactions')
+        .update({ status: 'pending' })
+        .eq('id', transaction.id)
+        .eq('status', 'succeeded');
+      throw error;
     }
     return { outcome, redirectPath: `${base}?checkout=success` };
   }
