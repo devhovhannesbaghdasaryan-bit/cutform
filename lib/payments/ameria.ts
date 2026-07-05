@@ -33,7 +33,11 @@ export async function nextAmeriaOrderId(service: SupabaseClient): Promise<number
   if (error || data == null) {
     throw new Error(error?.message ?? 'Unable to allocate an Ameriabank order id.');
   }
-  const base = Number(getServerEnv().AMERIA_ORDER_ID_BASE ?? '0');
+  const rawBase = getServerEnv().AMERIA_ORDER_ID_BASE;
+  const base = rawBase == null ? 0 : Number(rawBase);
+  if (!Number.isSafeInteger(base) || base < 0) {
+    throw new Error('AMERIA_ORDER_ID_BASE must be a non-negative integer.');
+  }
   return base + Number(data);
 }
 
