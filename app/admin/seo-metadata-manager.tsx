@@ -10,7 +10,7 @@ import {
   generateCatalogItemSeoDraftAction,
   saveGeneratedCatalogItemSeoDraftAction,
   type SeoGenerationState,
-} from '@/app/admin/actions';
+} from '@/app/admin/items/seo-actions';
 
 const initialState: SeoGenerationState = {
   error: null,

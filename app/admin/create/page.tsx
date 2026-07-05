@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Boxes, ImagePlus, Sparkles } from 'lucide-react';
-import { generateToyDecorationDraftAction } from '@/app/admin/actions';
+import { generateToyDecorationDraftAction } from '@/app/admin/items/ai-draft-actions';
 import { requireAdmin } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';

@@ -13,3 +13,12 @@ export function formatPrice(cents: number, currency = 'AMD', locale: AppLocale =
 export function formatDate(d: string | Date, locale: AppLocale = DEFAULT_LOCALE) {
   return formatLocalizedDate(locale, d);
 }
+
+export function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 70)
+    || `draft-${crypto.randomUUID().slice(0, 8)}`;
+}

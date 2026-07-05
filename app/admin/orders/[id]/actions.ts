@@ -2,15 +2,58 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { requireAdminPermission } from '@/lib/admin';
+import { actionError, actionSuccess, type ActionState } from '@/lib/action-state';
+import { requireAdmin, requireAdminPermission } from '@/lib/admin';
 import { buildBannerManufacturingInstructions } from '@/lib/banner-manufacturing';
 import { uploadToBucket } from '@/lib/storage';
 import type { Json } from '@/lib/supabase/types';
 
 const generateSchema = z.object({
-  orderId: z.string().uuid(),
-  orderItemId: z.string().uuid(),
+  orderId: z.uuid(),
+  orderItemId: z.uuid(),
 });
+
+const orderStatusSchema = z.object({
+  orderId: z.uuid(),
+  status: z.enum([
+    'draft',
+    'pending_payment',
+    'paid',
+    'review_required',
+    'approved_for_production',
+    'in_production',
+    'ready_to_ship',
+    'shipped',
+    'cancelled',
+    'refunded',
+  ]),
+  paymentStatus: z.enum(['unpaid', 'paid', 'refunded', 'failed']),
+});
+
+export async function updateOrderStatusAction(
+  _prev: ActionState<null>,
+  formData: FormData,
+): Promise<ActionState<null>> {
+  const parsed = orderStatusSchema.safeParse({
+    orderId: formData.get('orderId'),
+    status: formData.get('status'),
+    paymentStatus: formData.get('paymentStatus'),
+  });
+  if (!parsed.success) return actionError(parsed.error.issues[0]?.message ?? 'Invalid order status.');
+
+  const { supabase } = await requireAdmin();
+  const { orderId, status, paymentStatus } = parsed.data;
+  const { error } = await supabase
+    .from('orders')
+    .update({ status, payment_status: paymentStatus })
+    .eq('id', orderId);
+
+  if (error) return actionError(error.message);
+
+  revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/${orderId}`);
+  return actionSuccess(null);
+}
 
 interface AdminBannerOrderItem {
   id: string;

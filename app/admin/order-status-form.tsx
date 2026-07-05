@@ -3,9 +3,8 @@
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { updateOrderStatusAction, type AdminFormState } from '@/app/admin/actions';
-
-const initial: AdminFormState = { error: null };
+import { updateOrderStatusAction } from '@/app/admin/orders/[id]/actions';
+import { errorOf, idleState } from '@/lib/action-state';
 
 export function OrderStatusForm({
   orderId,
@@ -16,7 +15,8 @@ export function OrderStatusForm({
   status: string;
   paymentStatus: string;
 }) {
-  const [state, action, pending] = useActionState(updateOrderStatusAction, initial);
+  const [state, action, pending] = useActionState(updateOrderStatusAction, idleState);
+  const error = errorOf(state);
 
   return (
     <form action={action} className="space-y-4 rounded-lg border p-5">
@@ -57,9 +57,9 @@ export function OrderStatusForm({
           </select>
         </div>
       </div>
-      {state.error && (
+      {error && (
         <p role="alert" className="text-sm text-destructive">
-          {state.error}
+          {error}
         </p>
       )}
       <Button type="submit" disabled={pending}>

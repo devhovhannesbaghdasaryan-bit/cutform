@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import {
   adjustAdminUserCreditsAction,
   updateAdminUserProfileAction,
-} from '@/app/admin/actions';
+} from '@/app/admin/users/actions';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import { formatDate, formatPrice } from '@/lib/utils';

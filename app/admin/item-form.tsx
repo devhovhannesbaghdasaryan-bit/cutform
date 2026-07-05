@@ -7,11 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { APP_LOCALES, type AppLocale } from '@/lib/i18n';
 import { validateSeoMetadata } from '@/lib/seo-validation';
-import {
-  createCatalogItemAction,
-  updateCatalogItemAction,
-  type AdminFormState,
-} from '@/app/admin/actions';
+import { createCatalogItemAction, updateCatalogItemAction } from '@/app/admin/items/actions';
+import { errorOf, idleState } from '@/lib/action-state';
 
 interface CategoryOption {
   id: string;
@@ -75,8 +72,6 @@ interface MarketRuleFormValue {
   shipping_rate_cents: number | null;
 }
 
-const initial: AdminFormState = { error: null };
-
 export function ItemForm({
   categories,
   subcategories,
@@ -99,7 +94,8 @@ export function ItemForm({
   marketRules?: MarketRuleFormValue[];
 }) {
   const actionFn = item?.id ? updateCatalogItemAction : createCatalogItemAction;
-  const [state, action, pending] = useActionState(actionFn, initial);
+  const [state, action, pending] = useActionState(actionFn, idleState);
+  const error = errorOf(state);
   const seoByLocale = new Map<AppLocale, SeoFormValue>();
   if (seo) seoByLocale.set('en', seo);
   seoRecords?.forEach((record) => {
@@ -500,9 +496,9 @@ export function ItemForm({
         </label>
       </div>
 
-      {state.error && (
+      {error && (
         <p role="alert" className="text-sm text-destructive">
-          {state.error}
+          {error}
         </p>
       )}
 

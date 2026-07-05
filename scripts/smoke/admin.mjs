@@ -18,14 +18,20 @@ for (const route of requiredRoutes) {
   if (!existsSync(route)) throw new Error(`Missing admin route: ${route}`);
 }
 
-const adminActions = readFileSync('app/admin/actions.ts', 'utf8');
-for (const action of ['createCatalogItemAction', 'updateCatalogItemAction', 'generateCatalogItemSeoDraftAction']) {
-  if (!adminActions.includes(action)) throw new Error(`Missing admin action: ${action}`);
+const catalogActions = readFileSync('app/admin/items/actions.ts', 'utf8');
+for (const action of ['createCatalogItemAction', 'updateCatalogItemAction']) {
+  if (!catalogActions.includes(action)) throw new Error(`Missing admin action: ${action}`);
+}
+
+const seoActions = readFileSync('app/admin/items/seo-actions.ts', 'utf8');
+if (!seoActions.includes('generateCatalogItemSeoDraftAction')) {
+  throw new Error('Missing admin action: generateCatalogItemSeoDraftAction');
 }
 
 for (const removedRoute of [
   'app/admin/banner-samples/page.tsx',
   'app/admin/personalization-models/page.tsx',
+  'app/admin/actions.ts',
   'app/create/page.tsx',
   'app/api/generate/route.ts',
 ]) {
