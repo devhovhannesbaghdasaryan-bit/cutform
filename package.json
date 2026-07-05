@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "db:types": "supabase gen types typescript --local --schema public > lib/supabase/database.types.ts",
     "smoke:i18n": "node scripts/smoke/i18n.mjs",
     "smoke:seo": "node scripts/smoke/seo.mjs",
@@ -62,7 +63,8 @@
     "supabase": "^2.104.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.4"
+    "typescript-eslint": "^8.59.4",
+    "vitest": "^4.1.9"
   },
   "packageManager": "pnpm@9.12.3"
 }
