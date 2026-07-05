@@ -15,6 +15,7 @@ import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/curren
 import { sortCatalogMedia } from '@/lib/catalog-media';
 import { getCatalogItem, getCatalogItemSeoMetadata } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
+import { getTranslations } from 'next-intl/server';
 import { createProductStructuredData, resolveCatalogMetadata } from '@/lib/seo';
 import { resolvePublicStorageUrl } from '@/lib/storage';
 import { formatPrice } from '@/lib/utils';
@@ -55,6 +56,7 @@ export default async function CatalogItemDetailPage({
   const item = await getCatalogItem(slug).catch(() => null);
   if (!item) notFound();
   const locale = await getRequestLocale();
+  const t = await getTranslations();
   const activeCurrency = await getActiveCurrency();
   const convertedPrice = await convertMoney(
     item.price_cents,
@@ -96,7 +98,7 @@ export default async function CatalogItemDetailPage({
         <Button asChild variant="ghost" className="px-0">
           <Link href="/catalog">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to catalog
+            {t('product.back_to_catalog')}
           </Link>
         </Button>
 
@@ -120,7 +122,7 @@ export default async function CatalogItemDetailPage({
                 {item.is_customizable && (
                   <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm text-secondary-foreground">
                     <Sparkles className="h-4 w-4" />
-                    Customizable
+                    {t('product.customizable')}
                   </span>
                 )}
               </div>
@@ -131,10 +133,10 @@ export default async function CatalogItemDetailPage({
             </div>
 
             <div className="rounded-lg border p-5">
-              <p className="text-sm text-muted-foreground">Price</p>
+              <p className="text-sm text-muted-foreground">{t('common.price')}</p>
               <p className="text-4xl font-bold">{formatPrice(convertedPrice.amountCents, convertedPrice.currency)}</p>
               {convertedPrice.exchangeRateContext.isStale ? (
-                <p className="mt-1 text-xs text-muted-foreground">Using latest cached exchange rate.</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t('product.exchange_rate_note')}</p>
               ) : null}
             </div>
 
@@ -143,23 +145,23 @@ export default async function CatalogItemDetailPage({
                 <input type="hidden" name="itemId" value={item.id} />
                 <Button size="lg" type="submit">
                   <ShoppingCart className="mr-2 h-4 w-4" />
-                  Add to cart
+                  {t('product.add_to_cart')}
                 </Button>
               </form>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button size="lg" variant="outline" aria-disabled="true" className="cursor-not-allowed opacity-50">
                     <ShoppingCart className="mr-2 h-4 w-4" />
-                    Buy
+                    {t('product.buy')}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Checkout arrives with the orders milestone.</TooltipContent>
+                <TooltipContent>{t('product.buy_tooltip')}</TooltipContent>
               </Tooltip>
             </div>
 
             {item.manufacturing_notes && (
               <div className="rounded-lg border bg-muted/30 p-4">
-                <p className="text-sm font-medium">Production notes</p>
+                <p className="text-sm font-medium">{t('product.production_notes')}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{item.manufacturing_notes}</p>
               </div>
             )}

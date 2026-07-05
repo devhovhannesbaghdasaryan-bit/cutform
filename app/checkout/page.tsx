@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { CountrySwitcherClient } from '@/components/country-switcher-client';
 import { listCartItems, validateCartBeforeCheckout } from '@/lib/cart';
 import { normalizeCurrency } from '@/lib/currency';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
 import { calculateOrderTotals } from '@/lib/shipping';
@@ -59,40 +60,43 @@ export default async function CheckoutPage() {
       <main className="container max-w-5xl space-y-8 py-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Checkout review</h1>
+            <h1 className="text-3xl font-bold tracking-tight">{t('checkout.review')}</h1>
             <p className="text-muted-foreground">
-              Confirm the saved cart snapshot before creating an order.
+              {t('checkout.review_help')}
             </p>
           </div>
           <Button asChild variant="outline">
-            <Link href="/cart">Back to cart</Link>
+            <Link href="/cart">{t('checkout.back_to_cart')}</Link>
           </Button>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
           <section className="rounded-lg border">
             <div className="border-b p-4">
-              <h2 className="font-semibold">Order items</h2>
+              <h2 className="font-semibold">{t('order.items')}</h2>
             </div>
             <div className="divide-y">
-              {items.map((item) => (
-                <div key={item.id} className="flex items-start justify-between gap-4 p-4">
-                  <div>
-                    <p className="font-medium">{item.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Qty {item.quantity} &middot; {item.generated_item_id ? 'Generated item' : 'Catalog item'}
-                    </p>
-                    {issueByItem.get(item.id) ? (
-                      <p className="mt-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                        {issueByItem.get(item.id)?.message}
+              {items.map((item) => {
+                const issue = issueByItem.get(item.id);
+                return (
+                  <div key={item.id} className="flex items-start justify-between gap-4 p-4">
+                    <div>
+                      <p className="font-medium">{item.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('order.qty', { count: item.quantity })} &middot; {item.generated_item_id ? t('cart.generated_item') : t('cart.catalog_item')}
                       </p>
-                    ) : null}
+                      {issue ? (
+                        <p className="mt-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                          {tDynamic(t, `cart.issue.${issue.code}`, issue.message)}
+                        </p>
+                      ) : null}
+                    </div>
+                    <p className="font-medium">
+                      {formatPrice(item.unit_price_cents * item.quantity, item.currency)}
+                    </p>
                   </div>
-                  <p className="font-medium">
-                    {formatPrice(item.unit_price_cents * item.quantity, item.currency)}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 
@@ -101,7 +105,7 @@ export default async function CheckoutPage() {
               <Label>{t('checkout.destination')}</Label>
               <p className="text-xs text-muted-foreground">{t('checkout.destination_help')}</p>
               {market.countryCode ? (
-                <CountrySwitcherClient activeCountry={market.countryCode} countries={countries} />
+                <CountrySwitcherClient activeCountry={market.countryCode} countries={countries} placeholder={t('checkout.country')} />
               ) : (
                 <p className="text-sm text-destructive">{t('checkout.select_country')}</p>
               )}
@@ -110,13 +114,13 @@ export default async function CheckoutPage() {
               <input type="hidden" name="locale" value={locale} />
               <input type="hidden" name="countryCode" value={market.countryCode ?? ''} />
               <div>
-                <h2 className="font-semibold">Summary</h2>
+                <h2 className="font-semibold">{t('order.summary')}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Payment provider checkout will attach to this order in the payment slice.
+                  {t('checkout.payment_note')}
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact email</Label>
+                <Label htmlFor="contactEmail">{t('checkout.contact_email')}</Label>
                 <Input
                   id="contactEmail"
                   name="contactEmail"
@@ -156,12 +160,12 @@ export default async function CheckoutPage() {
                 <Input id="postalCode" name="postalCode" autoComplete="postal-code" />
               </div>
               <div className="flex justify-between border-t pt-4">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">{t('cart.subtotal')}</span>
                 <span className="font-semibold">{formatPrice(subtotal, subtotalCurrency)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t('cart.shipping')}</span>
-                <span className="font-semibold">{totals ? formatPrice(totals.shippingCents, totals.currency) : 'Select destination'}</span>
+                <span className="font-semibold">{totals ? formatPrice(totals.shippingCents, totals.currency) : t('checkout.select_destination')}</span>
               </div>
               <div className="flex justify-between border-t pt-4 text-lg">
                 <span>{t('cart.total')}</span>
@@ -169,11 +173,11 @@ export default async function CheckoutPage() {
               </div>
               {issues.length ? (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                  Resolve cart issues before creating an order.
+                  {t('checkout.resolve_issues')}
                 </div>
               ) : null}
               <Button type="submit" className="w-full" disabled={issues.length > 0 || !market.countryCode || !totals}>
-                Create order
+                {t('checkout.create_order')}
               </Button>
             </form>
           </aside>

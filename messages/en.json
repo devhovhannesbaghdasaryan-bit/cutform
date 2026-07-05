@@ -313,7 +313,13 @@
     "customize": "Customize",
     "popular": "Popular",
     "details": "Product details",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "back_to_catalog": "Back to catalog",
+    "customizable": "Customizable",
+    "buy": "Buy",
+    "buy_tooltip": "Checkout arrives with the orders milestone.",
+    "production_notes": "Production notes",
+    "exchange_rate_note": "Using latest cached exchange rate."
   },
   "cart": {
     "title": "Shopping cart",
@@ -348,7 +354,9 @@
       "item_unavailable": "This item is no longer available.",
       "generated_item_not_orderable": "This generated item cannot be ordered.",
       "missing_production_asset": "This item is missing a required production file.",
-      "currency_disabled": "This currency is unavailable. Switch currency or add the item again."
+      "currency_disabled": "This currency is unavailable. Switch currency or add the item again.",
+      "market_unavailable": "This item is not sold in your destination country.",
+      "shipping_unavailable": "Shipping is not available for this item and destination."
     }
   },
   "checkout": {
@@ -364,12 +372,33 @@
     "postal": "Postal code (optional)",
     "title": "Checkout",
     "contact_email": "Contact email",
-    "place_order": "Place order"
+    "place_order": "Place order",
+    "review": "Checkout review",
+    "review_help": "Confirm the saved cart snapshot before creating an order.",
+    "back_to_cart": "Back to cart",
+    "payment_note": "Payment provider checkout will attach to this order in the payment slice.",
+    "select_destination": "Select destination",
+    "resolve_issues": "Resolve cart issues before creating an order.",
+    "create_order": "Create order",
+    "country": "Country"
   },
   "order": {
     "title": "Order",
     "items": "Order items",
-    "payment_status": "Payment status"
+    "payment_status": "Payment status",
+    "created": "Created {date}",
+    "status_line": "{status} · Payment: {payment}",
+    "items_title": "Items",
+    "no_items": "No order items found.",
+    "no_image": "No image",
+    "qty": "Qty {count}",
+    "custom_text": "Text: {text}.",
+    "led_multi": "LED: multi color.",
+    "led_color": "LED: {color}.",
+    "banner_size": "Banner size: {size}",
+    "summary": "Summary",
+    "contact": "Contact",
+    "shipping_address": "Shipping address"
   },
   "generation": {
     "title": "Create with AI",
@@ -421,6 +450,38 @@
     "available": "Available",
     "comingSoon": "Coming soon",
     "manage": "Manage models, template images, and production options.",
-    "unavailable": "Template customization is not available yet."
+    "unavailable": "Template customization is not available yet.",
+    "back": "Back to categories",
+    "nightLightsTitle": "Night light templates",
+    "nightLightsSubtitle": "Manage customer-facing models, preview images, and production boilerplates.",
+    "createModel": "Create model",
+    "saveModel": "Save model",
+    "boilerplateOptions": "Boilerplate options",
+    "boilerplateHelp": "Customers can choose any active option. Mark whether production requires an admin-generated manufacturing SVG.",
+    "adminName": "Admin name",
+    "nameEn": "English name",
+    "nameHy": "Armenian name",
+    "nameRu": "Russian name",
+    "templateImage": "Template image",
+    "manufacturingProcess": "Manufacturing process",
+    "generationInstruction": "AI generation instruction",
+    "displayOrder": "Display order",
+    "requiresSvg": "Requires manufacturing SVG",
+    "updateBoilerplate": "Update boilerplate",
+    "addBoilerplate": "Add boilerplate",
+    "modelTitle": "Title",
+    "slug": "Slug",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "none": "None",
+    "mockImage": "Customer mock image",
+    "baseBoilerplateImage": "Base boilerplate image",
+    "priceAmd": "Price (AMD)",
+    "creditCost": "Credit cost",
+    "status": "Status",
+    "noImage": "No image uploaded",
+    "currentImageAlt": "Current {label}",
+    "replaceImageHelp": "Choose a file to replace the current image.",
+    "uploadHelp": "Upload PNG, JPG, WEBP, or SVG up to 10 MB."
   }
 }

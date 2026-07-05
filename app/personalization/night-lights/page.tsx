@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { getServerSupabase } from '@/lib/supabase/server';
+import { getTranslations } from 'next-intl/server';
 import { PERSONALIZED_NIGHT_LIGHT } from '@/lib/marketplace-constants';
 import type { PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
 import { normalizePersonalizationMockPath, resolvePublicStorageUrl } from '@/lib/storage';
@@ -29,6 +30,7 @@ interface ModelRow {
 }
 
 export default async function NightLightPersonalizationPage() {
+  const t = await getTranslations();
   const supabase = await getServerSupabase();
   const { data: category } = await supabase
     .from('categories')
@@ -62,14 +64,14 @@ export default async function NightLightPersonalizationPage() {
     <main className="container max-w-5xl space-y-8 py-10">
       <div>
         <Button asChild variant="ghost" className="mb-3 px-0">
-          <Link href="/personalization">Back to categories</Link>
+          <Link href="/personalization">{t('personalization.back')}</Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">Night light templates</h1>
-        <p className="mt-2 text-muted-foreground">Manage customer-facing models, preview images, and production boilerplates.</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('personalization.nightLightsTitle')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('personalization.nightLightsSubtitle')}</p>
       </div>
 
       <section className="rounded-lg border p-5">
-        <h2 className="font-semibold">Create model</h2>
+        <h2 className="font-semibold">{t('personalization.createModel')}</h2>
         <ModelForm subcategories={subcategories ?? []} />
       </section>
 
@@ -80,9 +82,9 @@ export default async function NightLightPersonalizationPage() {
             <ModelForm model={model} subcategories={subcategories ?? []} />
             <div className="mt-6 border-t pt-6">
               <div className="mb-4">
-                <h3 className="font-semibold">Boilerplate options</h3>
+                <h3 className="font-semibold">{t('personalization.boilerplateOptions')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Customers can choose any active option. Mark whether production requires an admin-generated manufacturing SVG.
+                  {t('personalization.boilerplateHelp')}
                 </p>
               </div>
               <div className="space-y-4">
@@ -99,7 +101,7 @@ export default async function NightLightPersonalizationPage() {
   );
 }
 
-function ImageUploadField({
+async function ImageUploadField({
   id,
   label,
   pathName,
@@ -114,6 +116,7 @@ function ImageUploadField({
   currentPath?: string | null;
   required?: boolean;
 }) {
+  const t = await getTranslations();
   const currentUrl = resolvePublicStorageUrl('catalog-assets', currentPath);
 
   return (
@@ -123,11 +126,11 @@ function ImageUploadField({
       <div className="flex aspect-[4/3] max-w-sm items-center justify-center overflow-hidden rounded-md border bg-muted/30">
         {currentUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- Admin uploads can include SVG files.
-          <img src={currentUrl} alt={`Current ${label.toLowerCase()}`} className="h-full w-full object-contain" />
+          <img src={currentUrl} alt={t('personalization.currentImageAlt', { label: label.toLowerCase() })} className="h-full w-full object-contain" />
         ) : (
           <div className="flex flex-col items-center gap-2 p-6 text-center text-sm text-muted-foreground">
             <ImageOff className="h-6 w-6" />
-            <span>No image uploaded</span>
+            <span>{t('personalization.noImage')}</span>
           </div>
         )}
       </div>
@@ -139,13 +142,14 @@ function ImageUploadField({
         required={required && !currentPath}
       />
       <p className="text-xs text-muted-foreground">
-        {currentPath ? 'Choose a file to replace the current image.' : 'Upload PNG, JPG, WEBP, or SVG up to 10 MB.'}
+        {currentPath ? t('personalization.replaceImageHelp') : t('personalization.uploadHelp')}
       </p>
     </div>
   );
 }
 
-function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boilerplate?: PersonalizationBoilerplate }) {
+async function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boilerplate?: PersonalizationBoilerplate }) {
+  const t = await getTranslations();
   const fieldId = `boilerplate-image-${boilerplate?.id ?? `${modelId}-new`}`;
 
   return (
@@ -153,25 +157,25 @@ function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boilerplat
       <input type="hidden" name="modelId" value={modelId} />
       {boilerplate ? <input type="hidden" name="id" value={boilerplate.id} /> : null}
       <div className="space-y-1.5">
-        <Label>Admin name</Label>
+        <Label>{t('personalization.adminName')}</Label>
         <Input name="adminName" defaultValue={boilerplate?.admin_name ?? ''} required />
       </div>
       <div className="space-y-1.5">
-        <Label>English name</Label>
+        <Label>{t('personalization.nameEn')}</Label>
         <Input name="nameEn" defaultValue={boilerplate?.name_en ?? ''} />
       </div>
       <div className="space-y-1.5">
-        <Label>Armenian name</Label>
+        <Label>{t('personalization.nameHy')}</Label>
         <Input name="nameHy" defaultValue={boilerplate?.name_hy ?? ''} />
       </div>
       <div className="space-y-1.5">
-        <Label>Russian name</Label>
+        <Label>{t('personalization.nameRu')}</Label>
         <Input name="nameRu" defaultValue={boilerplate?.name_ru ?? ''} />
       </div>
       <div className="md:col-span-2">
         <ImageUploadField
           id={fieldId}
-          label="Template image"
+          label={t('personalization.templateImage')}
           pathName="imagePath"
           fileName="imageFile"
           currentPath={boilerplate?.image_path}
@@ -179,26 +183,26 @@ function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boilerplat
         />
       </div>
       <div className="space-y-1.5">
-        <Label>Manufacturing process</Label>
+        <Label>{t('personalization.manufacturingProcess')}</Label>
         <Input name="manufacturingProcess" defaultValue={boilerplate?.manufacturing_process ?? ''} required />
       </div>
       <div className="space-y-1.5 md:col-span-2">
-        <Label>AI generation instruction</Label>
+        <Label>{t('personalization.generationInstruction')}</Label>
         <Textarea name="generationInstruction" defaultValue={boilerplate?.generation_instruction ?? ''} required />
       </div>
       <div className="space-y-1.5">
-        <Label>Display order</Label>
+        <Label>{t('personalization.displayOrder')}</Label>
         <Input name="sortOrder" type="number" defaultValue={boilerplate?.sort_order ?? 0} />
       </div>
       <div className="flex flex-wrap items-center gap-5 md:col-span-2">
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" defaultChecked={boilerplate?.is_active ?? true} /> Active</label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="generateHiddenSvg" defaultChecked={boilerplate?.generate_hidden_svg ?? false} /> Requires manufacturing SVG</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" defaultChecked={boilerplate?.is_active ?? true} /> {t('profile.status.active')}</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="generateHiddenSvg" defaultChecked={boilerplate?.generate_hidden_svg ?? false} /> {t('personalization.requiresSvg')}</label>
       </div>
       <div className="flex items-center gap-2 md:col-span-3">
-        <Button type="submit" size="sm">{boilerplate ? 'Update boilerplate' : 'Add boilerplate'}</Button>
+        <Button type="submit" size="sm">{boilerplate ? t('personalization.updateBoilerplate') : t('personalization.addBoilerplate')}</Button>
         {boilerplate ? (
           <Button type="submit" size="sm" variant="destructive" formAction={removePersonalizationBoilerplateAction} formNoValidate>
-            Remove
+            {t('cart.remove')}
           </Button>
         ) : null}
       </div>
@@ -206,13 +210,14 @@ function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boilerplat
   );
 }
 
-function ModelForm({
+async function ModelForm({
   model,
   subcategories,
 }: {
   model?: ModelRow;
   subcategories: { id: string; name: string; category_id: string }[];
 }) {
+  const t = await getTranslations();
   const schema = model?.form_schema ?? {};
   const suffix = model?.id ?? 'new';
 
@@ -220,21 +225,21 @@ function ModelForm({
     <form action={savePersonalizationModelAction} className="mt-4 grid gap-4 md:grid-cols-2">
       {model?.id && <input type="hidden" name="id" value={model.id} />}
       <div className="space-y-2">
-        <Label htmlFor={`title-${suffix}`}>Title</Label>
+        <Label htmlFor={`title-${suffix}`}>{t('personalization.modelTitle')}</Label>
         <Input id={`title-${suffix}`} name="title" defaultValue={model?.title ?? ''} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor={`slug-${suffix}`}>Slug</Label>
+        <Label htmlFor={`slug-${suffix}`}>{t('personalization.slug')}</Label>
         <Input id={`slug-${suffix}`} name="slug" defaultValue={model?.slug ?? ''} required />
       </div>
       <div className="space-y-2">
-        <Label>Category</Label>
-        <Input value="Night lights" disabled />
+        <Label>{t('personalization.category')}</Label>
+        <Input value={t('personalization.nightLights')} disabled />
       </div>
       <div className="space-y-2">
-        <Label>Subcategory</Label>
+        <Label>{t('personalization.subcategory')}</Label>
         <select name="subcategoryId" defaultValue={model?.subcategory_id ?? ''} className="h-10 w-full rounded-md border bg-background px-3 text-sm">
-          <option value="">None</option>
+          <option value="">{t('personalization.none')}</option>
           {subcategories.map((subcategory) => (
             <option key={subcategory.id} value={subcategory.id}>{subcategory.name}</option>
           ))}
@@ -242,20 +247,20 @@ function ModelForm({
       </div>
       <ImageUploadField
         id={`mock-image-${suffix}`}
-        label="Customer mock image"
+        label={t('personalization.mockImage')}
         pathName="mockImagePath"
         fileName="mockImageFile"
         currentPath={normalizePersonalizationMockPath(model?.mock_image_path)}
       />
       <ImageUploadField
         id={`boilerplate-image-${suffix}`}
-        label="Base boilerplate image"
+        label={t('personalization.baseBoilerplateImage')}
         pathName="boilerplateImagePath"
         fileName="boilerplateImageFile"
         currentPath={model?.boilerplate_image_path}
       />
       <div className="space-y-2">
-        <Label>Price (AMD)</Label>
+        <Label>{t('personalization.priceAmd')}</Label>
         <Input
           name="basePriceAmd"
           type="number"
@@ -265,23 +270,23 @@ function ModelForm({
         />
       </div>
       <div className="space-y-2">
-        <Label>Credit cost</Label>
+        <Label>{t('personalization.creditCost')}</Label>
         <Input name="creditCost" type="number" min="0" defaultValue={Number(schema.creditCost ?? 0)} />
       </div>
       <div className="space-y-2">
-        <Label>Status</Label>
+        <Label>{t('personalization.status')}</Label>
         <select name="status" defaultValue={model?.status ?? 'draft'} className="h-10 w-full rounded-md border bg-background px-3 text-sm">
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="archived">Archived</option>
+          <option value="draft">{t('status.draft')}</option>
+          <option value="published">{t('status.published')}</option>
+          <option value="archived">{t('status.archived')}</option>
         </select>
       </div>
       <div className="space-y-2 md:col-span-2">
-        <Label>Production notes</Label>
+        <Label>{t('product.production_notes')}</Label>
         <Textarea name="productionNotes" defaultValue={String(schema.productionNotes ?? '')} />
       </div>
       <div className="md:col-span-2">
-        <Button type="submit">{model?.id ? 'Save model' : 'Create model'}</Button>
+        <Button type="submit">{model?.id ? t('personalization.saveModel') : t('personalization.createModel')}</Button>
       </div>
     </form>
   );
