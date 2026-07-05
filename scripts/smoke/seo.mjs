@@ -50,7 +50,7 @@ if (!itemPage.includes('getCatalogItemSeoMetadata') || !itemPage.includes('image
   throw new Error('Item page does not resolve reviewed SEO/social image metadata');
 }
 
-const adminItemForm = readFileSync('app/admin/item-form.tsx', 'utf8');
+const adminItemForm = readFileSync('app/admin/items/item-form/seo-section.tsx', 'utf8');
 if (!adminItemForm.includes('validateSeoMetadata')) {
   throw new Error('Admin item form does not surface SEO launch warnings');
 }

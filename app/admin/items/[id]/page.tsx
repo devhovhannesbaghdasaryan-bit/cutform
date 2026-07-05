@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { ItemForm } from '@/app/admin/item-form';
+import { ItemForm } from '@/app/admin/items/item-form';
 import { SeoMetadataManager } from '@/app/admin/seo-metadata-manager';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';

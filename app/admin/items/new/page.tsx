@@ -1,4 +1,4 @@
-import { ItemForm } from '@/app/admin/item-form';
+import { ItemForm } from '@/app/admin/items/item-form';
 import { requireAdmin } from '@/lib/admin';
 import { getCountryDisplayName, listMarketGeography } from '@/lib/market';
 
