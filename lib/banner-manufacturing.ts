@@ -8,6 +8,7 @@ import {
   type ManufacturingKnowledgeBase,
   type ManufacturingTool,
 } from '@/lib/manufacturing-schema';
+import type { Json } from '@/lib/supabase/types';
 
 export interface BannerManufacturingInput {
   orderId: string;
@@ -20,15 +21,15 @@ export interface BannerManufacturingInput {
   selectedPreviewPath: string | null;
   prompt: string | null;
   customText: string | null;
-  itemSnapshot: Record<string, unknown>;
-  personalizationSnapshot: Record<string, unknown>;
-  productionSnapshot: Record<string, unknown>;
-  generatedOptions: Record<string, unknown>;
+  itemSnapshot: Record<string, Json | undefined>;
+  personalizationSnapshot: Record<string, Json | undefined>;
+  productionSnapshot: Record<string, Json | undefined>;
+  generatedOptions: Record<string, Json | undefined>;
 }
 
 export interface BannerManufacturingResult {
   status: 'ready' | 'review_required';
-  instructions: Record<string, unknown>;
+  instructions: Json;
   drawingSvg: string;
 }
 

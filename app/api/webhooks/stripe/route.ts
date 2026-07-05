@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { getServiceSupabase } from '@/lib/supabase/server';
+import type { TablesUpdate } from '@/lib/supabase/types';
 import { getStripe, getStripeWebhookSecret } from '@/lib/stripe';
 import { adjustCredits } from '@/lib/credits';
 
@@ -12,7 +13,7 @@ async function markTransactionStatus(
   providerReference?: string | null,
 ) {
   if (!transactionId) return;
-  const update: Record<string, unknown> = { status };
+  const update: TablesUpdate<'transactions'> = { status };
   if (providerReference) update.provider_reference = providerReference;
   await getServiceSupabase().from('transactions').update(update).eq('id', transactionId);
 }

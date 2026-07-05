@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { getServerEnv } from '@/lib/env';
+import type { Database } from '@/lib/supabase/types';
 import {
   DEFAULT_LOCALE,
   LOCALE_COOKIE,
@@ -49,7 +50,7 @@ export async function updateSession(request: NextRequest) {
 
   let response = createBaseResponse();
 
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {

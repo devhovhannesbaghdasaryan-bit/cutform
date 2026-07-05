@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { buildBannerManufacturingInstructions } from '@/lib/banner-manufacturing';
+import type { Json } from '@/lib/supabase/types';
 
 const generateSchema = z.object({
   orderId: z.string().uuid(),
@@ -16,9 +17,9 @@ interface AdminBannerOrderItem {
   title: string;
   quantity: number;
   generated_item_id: string | null;
-  item_snapshot: Record<string, unknown>;
-  personalization_snapshot: Record<string, unknown>;
-  production_snapshot: Record<string, unknown>;
+  item_snapshot: Record<string, Json | undefined>;
+  personalization_snapshot: Record<string, Json | undefined>;
+  production_snapshot: Record<string, Json | undefined>;
   image_path: string | null;
   selected_preview_path: string | null;
   banner_size_key: string | null;
@@ -33,7 +34,7 @@ interface GeneratedBannerSource {
   prompt: string | null;
   preview_path: string | null;
   selected_preview_path: string | null;
-  generation_options: Record<string, unknown>;
+  generation_options: Record<string, Json | undefined>;
 }
 
 function requireStringPath(...values: Array<string | null | undefined>) {

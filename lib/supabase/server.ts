@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { getServerEnv } from '@/lib/env';
+import type { Database } from '@/lib/supabase/types';
 
 /**
  * Server-side Supabase client wired to the current request's cookies.
@@ -11,7 +12,7 @@ export async function getServerSupabase() {
   const env = getServerEnv();
   const cookieStore = await cookies();
 
-  return createServerClient(
+  return createServerClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
     env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
@@ -41,7 +42,7 @@ export function getServiceSupabase() {
   if (!env.SUPABASE_SECRET_KEY) {
     throw new Error('SUPABASE_SECRET_KEY is required for this operation');
   }
-  return createSupabaseClient(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
+  return createSupabaseClient<Database>(env.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SECRET_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 }

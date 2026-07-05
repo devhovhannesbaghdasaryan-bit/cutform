@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { getServerEnv } from '@/lib/env';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { resolveMarket } from '@/lib/market';
+import type { Json } from '@/lib/supabase/types';
 
 export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
@@ -24,7 +25,7 @@ export interface CurrencySettings {
   sort_order: number;
 }
 
-export interface ExchangeRateContext extends Record<string, unknown> {
+export interface ExchangeRateContext extends Record<string, Json | undefined> {
   baseCurrency: AppCurrency;
   targetCurrency: AppCurrency;
   rate: number;

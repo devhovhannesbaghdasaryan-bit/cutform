@@ -10,6 +10,7 @@ import { TOY_DECORATION_SIZE_PRESETS } from '@/lib/marketplace-constants';
 import { generateSeoMetadataDraft, type SeoMetadataDraft } from '@/lib/seo-ai';
 import { adjustCredits } from '@/lib/credits';
 import { writeAdminAuditLog } from '@/lib/transactions';
+import type { Json } from '@/lib/supabase/types';
 
 export type AdminFormState = { error: string | null };
 export type SeoGenerationState = {
@@ -160,7 +161,7 @@ function parseItemForm(formData: FormData) {
   });
 }
 
-function parseSizesJson(value: string | undefined) {
+function parseSizesJson(value: string | undefined): Json[] {
   if (!value) return [];
   try {
     const parsed = JSON.parse(value);
@@ -566,7 +567,7 @@ export async function createCatalogItemAction(
     item.categoryId,
   );
   if (!validSubcategory) return { error: 'Selected subcategory does not belong to category.' };
-  let sizes: unknown[];
+  let sizes: Json[];
   try {
     sizes = parseSizesJson(item.sizesJson);
   } catch (error) {
@@ -716,7 +717,7 @@ export async function updateCatalogItemAction(
     item.categoryId,
   );
   if (!validSubcategory) return { error: 'Selected subcategory does not belong to category.' };
-  let sizes: unknown[];
+  let sizes: Json[];
   try {
     sizes = parseSizesJson(item.sizesJson);
   } catch (error) {
