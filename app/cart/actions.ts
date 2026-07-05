@@ -3,13 +3,10 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import {
-  addItemToSessionCart,
-  addItemToUserCart,
-  clearSessionCart,
-  clearUserCart,
-  removeSessionCartItem,
+  addItemToCart,
+  type CartOwner,
+  clearCart,
   removeCartItem,
-  updateSessionCartItemQuantity,
   updateCartItemQuantity,
 } from '@/lib/cart';
 import { getCartSessionId } from '@/lib/cart-session';
@@ -23,9 +20,13 @@ async function getCartActor() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) return { supabase, user, sessionId: null, cartSupabase: supabase };
+  if (user) {
+    const owner: CartOwner = { userId: user.id };
+    return { supabase, owner, cartSupabase: supabase };
+  }
   const sessionId = await getCartSessionId({ create: true });
-  return { supabase, user: null, sessionId, cartSupabase: getServiceSupabase() };
+  const owner: CartOwner | null = sessionId ? { sessionId } : null;
+  return { supabase, owner, cartSupabase: getServiceSupabase() };
 }
 
 export async function addCatalogItemToCartAction(formData: FormData) {
@@ -35,7 +36,7 @@ export async function addCatalogItemToCartAction(formData: FormData) {
 
   if (!parsed.success) throw new Error('Invalid item.');
 
-  const { supabase, user, sessionId, cartSupabase } = await getCartActor();
+  const { supabase, owner, cartSupabase } = await getCartActor();
   const { data: item, error } = await supabase
     .from('catalog_items')
     .select('id, title, price_cents, currency, status')
@@ -81,10 +82,8 @@ export async function addCatalogItemToCartAction(formData: FormData) {
     },
   };
 
-  if (user) {
-    await addItemToUserCart(cartSupabase, user.id, input);
-  } else if (sessionId) {
-    await addItemToSessionCart(cartSupabase, sessionId, input);
+  if (owner) {
+    await addItemToCart(cartSupabase, owner, input);
   }
 
   revalidatePath('/cart');
@@ -103,11 +102,9 @@ export async function updateCartQuantityAction(formData: FormData) {
 
   if (!parsed.success) throw new Error('Invalid cart quantity.');
 
-  const { user, sessionId, cartSupabase } = await getCartActor();
-  if (user) {
-    await updateCartItemQuantity(cartSupabase, user.id, parsed.data.cartItemId, parsed.data.quantity);
-  } else if (sessionId) {
-    await updateSessionCartItemQuantity(cartSupabase, sessionId, parsed.data.cartItemId, parsed.data.quantity);
+  const { owner, cartSupabase } = await getCartActor();
+  if (owner) {
+    await updateCartItemQuantity(cartSupabase, owner, parsed.data.cartItemId, parsed.data.quantity);
   }
   revalidatePath('/cart');
 }
@@ -119,21 +116,17 @@ export async function removeCartItemAction(formData: FormData) {
 
   if (!parsed.success) throw new Error('Invalid cart item.');
 
-  const { user, sessionId, cartSupabase } = await getCartActor();
-  if (user) {
-    await removeCartItem(cartSupabase, user.id, parsed.data.cartItemId);
-  } else if (sessionId) {
-    await removeSessionCartItem(cartSupabase, sessionId, parsed.data.cartItemId);
+  const { owner, cartSupabase } = await getCartActor();
+  if (owner) {
+    await removeCartItem(cartSupabase, owner, parsed.data.cartItemId);
   }
   revalidatePath('/cart');
 }
 
 export async function clearCartAction() {
-  const { user, sessionId, cartSupabase } = await getCartActor();
-  if (user) {
-    await clearUserCart(cartSupabase, user.id);
-  } else if (sessionId) {
-    await clearSessionCart(cartSupabase, sessionId);
+  const { owner, cartSupabase } = await getCartActor();
+  if (owner) {
+    await clearCart(cartSupabase, owner);
   }
   revalidatePath('/cart');
 }

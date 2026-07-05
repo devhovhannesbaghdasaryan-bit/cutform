@@ -1,5 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveCatalogMarket, resolveMarket } from '@/lib/market';
+import type { Json, Tables, TypedSupabaseClient } from '@/lib/supabase/types';
 
 export interface CartItemInput {
   catalogItemId?: string;
@@ -12,18 +12,23 @@ export interface CartItemInput {
   configuration?: Record<string, unknown>;
 }
 
-export interface CartItem {
-  id: string;
-  cart_id: string;
-  catalog_item_id: string | null;
-  generated_item_id: string | null;
-  banner_sample_id: string | null;
-  title: string;
-  quantity: number;
-  unit_price_cents: number;
-  currency: string;
-  configuration: Record<string, unknown>;
-}
+export type CartItem = Pick<
+  Tables<'cart_items'>,
+  | 'id'
+  | 'cart_id'
+  | 'catalog_item_id'
+  | 'generated_item_id'
+  | 'banner_sample_id'
+  | 'title'
+  | 'quantity'
+  | 'unit_price_cents'
+  | 'currency'
+> & {
+  configuration: Record<string, Json | undefined>;
+};
+
+/** A cart item without identity columns — the shape copied between carts. */
+export type CartItemSnapshot = Omit<CartItem, 'id' | 'cart_id'>;
 
 export interface CartValidationIssue {
   cartItemId: string;
@@ -55,60 +60,43 @@ export type CartOwner = { userId: string } | { sessionId: string };
  * such as headers. Never creates a cart; returns 0 when no active cart exists
  * or the query fails.
  */
-export async function getActiveCartItemCount(supabase: SupabaseClient, owner: CartOwner) {
+export async function getActiveCartItemCount(supabase: TypedSupabaseClient, owner: CartOwner) {
   const query = supabase.from('carts').select('id, cart_items(id)');
   const { data } = await ('userId' in owner
     ? query.eq('user_id', owner.userId)
     : query.eq('session_id', owner.sessionId))
     .eq('status', 'active')
-    .maybeSingle<{ id: string; cart_items: { id: string }[] }>();
+    .maybeSingle();
   return data?.cart_items?.length ?? 0;
 }
 
-export async function getOrCreateUserCart(supabase: SupabaseClient, userId: string) {
-  const { data: existing, error: existingError } = await supabase
-    .from('carts')
-    .select('id, currency')
-    .eq('user_id', userId)
+export async function getOrCreateCart(supabase: TypedSupabaseClient, owner: CartOwner) {
+  const activeCartQuery = supabase.from('carts').select('id, currency');
+  const { data: existing, error: existingError } = await ('userId' in owner
+    ? activeCartQuery.eq('user_id', owner.userId)
+    : activeCartQuery.eq('session_id', owner.sessionId))
     .eq('status', 'active')
-    .maybeSingle<{ id: string; currency: string }>();
+    .maybeSingle();
 
   if (existingError) throw new Error(existingError.message);
   if (existing) return existing;
 
   const { data, error } = await supabase
     .from('carts')
-    .insert({ user_id: userId, status: 'active' })
+    .insert(
+      'userId' in owner
+        ? { user_id: owner.userId, status: 'active' }
+        : { session_id: owner.sessionId, status: 'active' },
+    )
     .select('id, currency')
-    .single<{ id: string; currency: string }>();
+    .single();
 
   if (error || !data) throw new Error(error?.message ?? 'Unable to create cart.');
   return data;
 }
 
-export async function getOrCreateSessionCart(supabase: SupabaseClient, sessionId: string) {
-  const { data: existing, error: existingError } = await supabase
-    .from('carts')
-    .select('id, currency')
-    .eq('session_id', sessionId)
-    .eq('status', 'active')
-    .maybeSingle<{ id: string; currency: string }>();
-
-  if (existingError) throw new Error(existingError.message);
-  if (existing) return existing;
-
-  const { data, error } = await supabase
-    .from('carts')
-    .insert({ session_id: sessionId, status: 'active' })
-    .select('id, currency')
-    .single<{ id: string; currency: string }>();
-
-  if (error || !data) throw new Error(error?.message ?? 'Unable to create session cart.');
-  return data;
-}
-
-export async function listUserCartItems(supabase: SupabaseClient, userId: string) {
-  const cart = await getOrCreateUserCart(supabase, userId);
+export async function listCartItems(supabase: TypedSupabaseClient, owner: CartOwner) {
+  const cart = await getOrCreateCart(supabase, owner);
   const { data, error } = await supabase
     .from('cart_items')
     .select(
@@ -122,24 +110,9 @@ export async function listUserCartItems(supabase: SupabaseClient, userId: string
   return { cart, items: data ?? [] };
 }
 
-export async function listSessionCartItems(supabase: SupabaseClient, sessionId: string) {
-  const cart = await getOrCreateSessionCart(supabase, sessionId);
-  const { data, error } = await supabase
-    .from('cart_items')
-    .select(
-      'id, cart_id, catalog_item_id, generated_item_id, banner_sample_id, title, quantity, unit_price_cents, currency, configuration',
-    )
-    .eq('cart_id', cart.id)
-    .order('created_at', { ascending: true })
-    .returns<CartItem[]>();
-
-  if (error) throw new Error(error.message);
-  return { cart, items: data ?? [] };
-}
-
-export async function addItemToUserCart(
-  supabase: SupabaseClient,
-  userId: string,
+export async function addItemToCart(
+  supabase: TypedSupabaseClient,
+  owner: CartOwner,
   input: CartItemInput,
 ) {
   const selectedSources = [
@@ -152,7 +125,7 @@ export async function addItemToUserCart(
     throw new Error('Cart item must reference exactly one source.');
   }
 
-  const cart = await getOrCreateUserCart(supabase, userId);
+  const cart = await getOrCreateCart(supabase, owner);
   const { data, error } = await supabase
     .from('cart_items')
     .insert({
@@ -164,53 +137,10 @@ export async function addItemToUserCart(
       quantity: input.quantity ?? 1,
       unit_price_cents: input.unitPriceCents,
       currency: input.currency ?? cart.currency,
-      configuration: input.configuration ?? {},
+      configuration: (input.configuration ?? {}) as Json,
     })
     .select('id')
-    .single<{ id: string }>();
-
-  if (error || !data) throw new Error(error?.message ?? 'Unable to add item to cart.');
-  if (input.currency && input.currency !== cart.currency) {
-    const { error: cartUpdateError } = await supabase
-      .from('carts')
-      .update({ currency: input.currency })
-      .eq('id', cart.id);
-    if (cartUpdateError) throw new Error(cartUpdateError.message);
-  }
-  return data;
-}
-
-export async function addItemToSessionCart(
-  supabase: SupabaseClient,
-  sessionId: string,
-  input: CartItemInput,
-) {
-  const selectedSources = [
-    input.catalogItemId,
-    input.generatedItemId,
-    input.bannerSampleId,
-  ].filter(Boolean);
-
-  if (selectedSources.length !== 1) {
-    throw new Error('Cart item must reference exactly one source.');
-  }
-
-  const cart = await getOrCreateSessionCart(supabase, sessionId);
-  const { data, error } = await supabase
-    .from('cart_items')
-    .insert({
-      cart_id: cart.id,
-      catalog_item_id: input.catalogItemId ?? null,
-      generated_item_id: input.generatedItemId ?? null,
-      banner_sample_id: input.bannerSampleId ?? null,
-      title: input.title,
-      quantity: input.quantity ?? 1,
-      unit_price_cents: input.unitPriceCents,
-      currency: input.currency ?? cart.currency,
-      configuration: input.configuration ?? {},
-    })
-    .select('id')
-    .single<{ id: string }>();
+    .single();
 
   if (error || !data) throw new Error(error?.message ?? 'Unable to add item to cart.');
   if (input.currency && input.currency !== cart.currency) {
@@ -224,8 +154,8 @@ export async function addItemToSessionCart(
 }
 
 export async function updateCartItemQuantity(
-  supabase: SupabaseClient,
-  userId: string,
+  supabase: TypedSupabaseClient,
+  owner: CartOwner,
   cartItemId: string,
   quantity: number,
 ) {
@@ -233,7 +163,7 @@ export async function updateCartItemQuantity(
     throw new Error('Quantity must be a positive integer.');
   }
 
-  const cart = await getOrCreateUserCart(supabase, userId);
+  const cart = await getOrCreateCart(supabase, owner);
   const { error } = await supabase
     .from('cart_items')
     .update({ quantity })
@@ -244,11 +174,11 @@ export async function updateCartItemQuantity(
 }
 
 export async function removeCartItem(
-  supabase: SupabaseClient,
-  userId: string,
+  supabase: TypedSupabaseClient,
+  owner: CartOwner,
   cartItemId: string,
 ) {
-  const cart = await getOrCreateUserCart(supabase, userId);
+  const cart = await getOrCreateCart(supabase, owner);
   const { error } = await supabase
     .from('cart_items')
     .delete()
@@ -258,65 +188,61 @@ export async function removeCartItem(
   if (error) throw new Error(error.message);
 }
 
-export async function clearUserCart(supabase: SupabaseClient, userId: string) {
-  const cart = await getOrCreateUserCart(supabase, userId);
+export async function clearCart(supabase: TypedSupabaseClient, owner: CartOwner) {
+  const cart = await getOrCreateCart(supabase, owner);
   const { error } = await supabase.from('cart_items').delete().eq('cart_id', cart.id);
   if (error) throw new Error(error.message);
 }
 
-export async function updateSessionCartItemQuantity(
-  supabase: SupabaseClient,
-  sessionId: string,
-  cartItemId: string,
-  quantity: number,
-) {
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    throw new Error('Quantity must be a positive integer.');
-  }
-
-  const cart = await getOrCreateSessionCart(supabase, sessionId);
-  const { error } = await supabase
-    .from('cart_items')
-    .update({ quantity })
-    .eq('id', cartItemId)
-    .eq('cart_id', cart.id);
-
-  if (error) throw new Error(error.message);
+export interface CartMergePlan {
+  /** Session items to append to the user cart as new rows. */
+  inserts: CartItemSnapshot[];
+  /** User cart items whose quantity should change. Always empty under current semantics. */
+  quantityUpdates: { cartItemId: string; quantity: number }[];
+  /** User cart item ids to delete. Always empty under current semantics. */
+  deletes: string[];
 }
 
-export async function removeSessionCartItem(
-  supabase: SupabaseClient,
-  sessionId: string,
-  cartItemId: string,
-) {
-  const cart = await getOrCreateSessionCart(supabase, sessionId);
-  const { error } = await supabase
-    .from('cart_items')
-    .delete()
-    .eq('id', cartItemId)
-    .eq('cart_id', cart.id);
-
-  if (error) throw new Error(error.message);
-}
-
-export async function clearSessionCart(supabase: SupabaseClient, sessionId: string) {
-  const cart = await getOrCreateSessionCart(supabase, sessionId);
-  const { error } = await supabase.from('cart_items').delete().eq('cart_id', cart.id);
-  if (error) throw new Error(error.message);
+/**
+ * Pure merge-decision logic for merging a guest (session) cart into a user
+ * cart. Semantics are preserved exactly from the pre-refactor implementation:
+ * every session item is appended to the user cart as a new row. Existing user
+ * items are never coalesced with session items — even when both reference the
+ * same source item with an identical configuration — so quantities are carried
+ * over as-is (never summed) and `userItems` never affects the plan.
+ */
+export function planCartMerge(
+  sessionItems: CartItemSnapshot[],
+  _userItems: CartItem[],
+): CartMergePlan {
+  return {
+    inserts: sessionItems.map((item) => ({
+      catalog_item_id: item.catalog_item_id,
+      generated_item_id: item.generated_item_id,
+      banner_sample_id: item.banner_sample_id,
+      title: item.title,
+      quantity: item.quantity,
+      unit_price_cents: item.unit_price_cents,
+      currency: item.currency,
+      configuration: item.configuration,
+    })),
+    quantityUpdates: [],
+    deletes: [],
+  };
 }
 
 export async function mergeSessionCartIntoUserCart(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   sessionId: string,
   userId: string,
 ) {
-  const userCart = await getOrCreateUserCart(supabase, userId);
+  const userCart = await getOrCreateCart(supabase, { userId });
   const { data: sessionCart, error: sessionCartError } = await supabase
     .from('carts')
     .select('id')
     .eq('session_id', sessionId)
     .eq('status', 'active')
-    .maybeSingle<{ id: string }>();
+    .maybeSingle();
 
   if (sessionCartError) throw new Error(sessionCartError.message);
   if (!sessionCart) return userCart;
@@ -327,13 +253,17 @@ export async function mergeSessionCartIntoUserCart(
       'catalog_item_id, generated_item_id, banner_sample_id, title, quantity, unit_price_cents, currency, configuration',
     )
     .eq('cart_id', sessionCart.id)
-    .returns<Omit<CartItem, 'id' | 'cart_id'>[]>();
+    .returns<CartItemSnapshot[]>();
 
   if (guestItemsError) throw new Error(guestItemsError.message);
 
-  if (guestItems?.length) {
+  // planCartMerge never inspects existing user items (guest items are always
+  // appended), so they are not fetched — matching the pre-refactor queries.
+  const plan = planCartMerge(guestItems ?? [], []);
+
+  if (plan.inserts.length) {
     const { error: insertError } = await supabase.from('cart_items').insert(
-      guestItems.map((item) => ({
+      plan.inserts.map((item) => ({
         cart_id: userCart.id,
         catalog_item_id: item.catalog_item_id,
         generated_item_id: item.generated_item_id,
@@ -349,6 +279,26 @@ export async function mergeSessionCartIntoUserCart(
     if (insertError) throw new Error(insertError.message);
   }
 
+  for (const update of plan.quantityUpdates) {
+    const { error: quantityError } = await supabase
+      .from('cart_items')
+      .update({ quantity: update.quantity })
+      .eq('id', update.cartItemId)
+      .eq('cart_id', userCart.id);
+
+    if (quantityError) throw new Error(quantityError.message);
+  }
+
+  if (plan.deletes.length) {
+    const { error: deleteError } = await supabase
+      .from('cart_items')
+      .delete()
+      .in('id', plan.deletes)
+      .eq('cart_id', userCart.id);
+
+    if (deleteError) throw new Error(deleteError.message);
+  }
+
   const { error: updateError } = await supabase
     .from('carts')
     .update({ status: 'converted' })
@@ -359,17 +309,16 @@ export async function mergeSessionCartIntoUserCart(
 }
 
 export async function validateCartBeforeCheckout(
-  supabase: SupabaseClient,
+  supabase: TypedSupabaseClient,
   userId: string,
   destinationCountryCode?: string | null,
 ) {
-  const { items } = await listUserCartItems(supabase, userId);
+  const { items } = await listCartItems(supabase, { userId });
   const issues: CartValidationIssue[] = [];
   const { data: enabledCurrencies, error: currencyError } = await supabase
     .from('currencies')
     .select('code')
-    .eq('is_enabled', true)
-    .returns<{ code: string }[]>();
+    .eq('is_enabled', true);
   if (currencyError) throw new Error(currencyError.message);
   const enabledCurrencyCodes = new Set((enabledCurrencies ?? []).map((currency) => currency.code));
   const market = await resolveMarket({
@@ -391,7 +340,7 @@ export async function validateCartBeforeCheckout(
         .from('catalog_items')
         .select('status, price_cents, currency')
         .eq('id', item.catalog_item_id)
-        .maybeSingle<{ status: string; price_cents: number; currency: string }>();
+        .maybeSingle();
 
       if (error || !catalogItem || catalogItem.status !== 'published') {
         issues.push({
@@ -432,12 +381,7 @@ export async function validateCartBeforeCheckout(
         .from('generated_items')
         .select('review_status, selected_preview_path, hidden_svg_path, product_type')
         .eq('id', item.generated_item_id)
-        .maybeSingle<{
-          review_status: string;
-          selected_preview_path: string | null;
-          hidden_svg_path: string | null;
-          product_type: string;
-        }>();
+        .maybeSingle();
 
       if (error || !generatedItem || generatedItem.review_status === 'rejected') {
         issues.push({
@@ -463,7 +407,7 @@ export async function validateCartBeforeCheckout(
           .select('id')
           .eq('id', optionId!)
           .eq('generated_item_id', item.generated_item_id)
-          .maybeSingle<{ id: string }>();
+          .maybeSingle();
         if (optionError || !option) {
           issues.push({
             cartItemId: item.id,

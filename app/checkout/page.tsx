@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CountrySwitcherClient } from '@/components/country-switcher-client';
-import { listUserCartItems, validateCartBeforeCheckout } from '@/lib/cart';
+import { listCartItems, validateCartBeforeCheckout } from '@/lib/cart';
 import { normalizeCurrency } from '@/lib/currency';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
@@ -27,7 +27,7 @@ export default async function CheckoutPage() {
 
   const locale = await getRequestLocale();
   const [{ items }, market, geography] = await Promise.all([
-    listUserCartItems(supabase, user.id),
+    listCartItems(supabase, { userId: user.id }),
     resolveMarket(),
     listMarketGeography(supabase),
   ]);

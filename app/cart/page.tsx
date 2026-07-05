@@ -8,7 +8,7 @@ import {
 } from '@/app/cart/actions';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
-import { type CartItem, listSessionCartItems, listUserCartItems, validateCartBeforeCheckout } from '@/lib/cart';
+import { type CartItem, listCartItems, validateCartBeforeCheckout } from '@/lib/cart';
 import { getCartSessionId } from '@/lib/cart-session';
 import { formatLocalizedCurrency, translate, translateTemplate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
@@ -83,9 +83,9 @@ export default async function CartPage() {
   const sessionId = user ? null : await getCartSessionId();
   const cartSupabase = user ? supabase : getServiceSupabase();
   const cartData = user
-    ? await listUserCartItems(supabase, user.id)
+    ? await listCartItems(supabase, { userId: user.id })
     : sessionId
-      ? await listSessionCartItems(cartSupabase, sessionId)
+      ? await listCartItems(cartSupabase, { sessionId })
       : { cart: null, items: [] };
   const items = cartData.items;
   const market = await resolveMarket({ supabase: cartSupabase });

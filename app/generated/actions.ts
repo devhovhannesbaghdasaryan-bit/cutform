@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { addItemToUserCart } from '@/lib/cart';
+import { addItemToCart } from '@/lib/cart';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { selectPersonalizedPreviewOption } from '@/lib/generated-items';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
@@ -97,7 +97,7 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
       .returns<{ id: string; preview_image_path: string; hidden_svg_path: string | null; metadata: Record<string, unknown> }[]>();
     if (optionsError || !options || options.length !== optionIds.length) throw new Error('One or more generated options are unavailable.');
     for (const option of options) {
-      await addItemToUserCart(supabase, user.id, {
+      await addItemToCart(supabase, { userId: user.id }, {
         generatedItemId: item.id,
         title: typeof option.metadata.boilerplateName === 'string' ? option.metadata.boilerplateName : item.title ?? 'Personalized night light',
         quantity: 1,
@@ -117,7 +117,7 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
       });
     }
   } else {
-    await addItemToUserCart(supabase, user.id, {
+    await addItemToCart(supabase, { userId: user.id }, {
       generatedItemId: item.id,
       title: item.title ?? `${item.product_type} ${item.id.slice(0, 8)}`,
       quantity: 1,
