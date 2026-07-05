@@ -1,8 +1,12 @@
 "use server";
 
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { redirect } from "next/navigation";
+import {
+  generationFormSchema,
+  getImageFiles,
+  resolveModelPriceCents,
+  summarizeTextFormatting,
+} from "@/app/personalize/form-parsing";
 import {
   createGeneratedItem,
   createPersonalizedPreviewOptions,
@@ -11,18 +15,21 @@ import { PERSONALIZED_NIGHT_LIGHT } from "@/lib/marketplace-constants";
 import { generateOpenAiImage } from "@/lib/openai-image";
 import {
   buildPersonalizedNightLightOpenAiPayload,
+  friendlyGenerationError,
 } from "@/lib/personalized-night-light-ai";
-import {
-  IMAGE_EXTENSION_BY_MIME,
-  downloadFromBucket,
-  uploadToBucket,
-} from "@/lib/storage";
+import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from "@/lib/storage";
 import { getServerSupabase, getServiceSupabase } from "@/lib/supabase/server";
 import { debitCredits, getCreditBalance, refundCredits } from "@/lib/credits";
-import type { PersonalizationBoilerplate } from "@/lib/personalization-boilerplates";
+import {
+  loadBoilerplate,
+  type PersonalizationBoilerplate,
+} from "@/lib/personalization-boilerplates";
 import { translate } from "@/lib/i18n";
 import { getRequestLocale } from "@/lib/i18n-server";
 
+// Sanctioned exception to the ActionState convention (lib/action-state.ts):
+// the credits dialog in components/personalized-night-light-form.tsx needs the
+// richer `insufficient_credits` code plus required/available credit counts.
 export type PersonalizedGenerationState = {
   code: "idle" | "error" | "insufficient_credits";
   message: string | null;
@@ -32,45 +39,6 @@ export type PersonalizedGenerationState = {
 
 function errorState(message: string): PersonalizedGenerationState {
   return { code: "error", message };
-}
-
-function friendlyGenerationError(error: unknown) {
-  const message = error instanceof Error ? error.message.toLowerCase() : "";
-  if (
-    message.includes("billing hard limit") ||
-    message.includes("billing limit")
-  ) {
-    return "Image generation is temporarily unavailable because the AI service billing limit was reached. Please try again later or contact support. Any generation credits were refunded.";
-  }
-  if (message.includes("rate limit") || message.includes("too many requests")) {
-    return "The image service is busy right now. Please wait a moment and try again. Any generation credits were refunded.";
-  }
-  return "We could not generate your night-light previews. Please try again. Any generation credits were refunded.";
-}
-
-function getImageFiles(formData: FormData) {
-  return formData
-    .getAll("images")
-    .filter((value): value is File => value instanceof File && value.size > 0);
-}
-
-function summarizeTextFormatting(value: FormDataEntryValue | null) {
-  const html = typeof value === "string" ? value.slice(0, 2_000) : "";
-  const styles = [
-    /<(b|strong)(\s|>)/i.test(html) ? "bold emphasis" : null,
-    /<(i|em)(\s|>)/i.test(html) ? "italic emphasis" : null,
-    /text-align\s*:\s*center|align=["']?center/i.test(html)
-      ? "center aligned"
-      : "left aligned",
-  ].filter(Boolean);
-  return styles.join(", ");
-}
-
-function resolveModelPriceCents(formSchema: Record<string, unknown>) {
-  const configured = Number(formSchema.basePriceCents);
-  return Number.isFinite(configured) && configured >= 0
-    ? Math.round(configured)
-    : PERSONALIZED_NIGHT_LIGHT.defaultPriceCents;
 }
 
 async function uploadUserImage(
@@ -104,27 +72,6 @@ async function uploadGeneratedPng(
   });
 }
 
-async function loadBoilerplate(
-  supabase: Awaited<ReturnType<typeof getServerSupabase>>,
-  reference: PersonalizationBoilerplate,
-) {
-  let bytes: Uint8Array;
-  if (reference.image_path.startsWith("/")) {
-    bytes = new Uint8Array(await readFile(path.join(process.cwd(), "public", ...reference.image_path.split("/").filter(Boolean))));
-  } else {
-    const data = await downloadFromBucket(
-      supabase,
-      "catalog-assets",
-      reference.image_path,
-      "Unable to load boilerplate image.",
-    );
-    bytes = new Uint8Array(await data.arrayBuffer());
-  }
-  const extension = reference.image_path.split(".").pop()?.toLowerCase();
-  const mime = extension === "png" ? "image/png" : extension === "webp" ? "image/webp" : extension === "svg" ? "image/svg+xml" : "image/jpeg";
-  return new File([Uint8Array.from(bytes).buffer], `boilerplate.${extension || "jpg"}`, { type: mime });
-}
-
 export async function generatePersonalizedNightLightAction(
   _previousState: PersonalizedGenerationState,
   formData: FormData,
@@ -133,36 +80,33 @@ export async function generatePersonalizedNightLightAction(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const modelId = String(formData.get("modelId") ?? "");
+  const rawModelId = String(formData.get("modelId") ?? "");
   if (!user)
-    redirect(`/login?next=/personalize/${encodeURIComponent(modelId)}`);
+    redirect(`/login?next=/personalize/${encodeURIComponent(rawModelId)}`);
   const locale = await getRequestLocale();
   const t = (key: string) => translate(locale, `nightLight.${key}`);
 
-  const files = getImageFiles(formData);
-  if (files.length !== PERSONALIZED_NIGHT_LIGHT.maxImages) {
-    return errorState(t("errorUpload"));
-  }
-  const customText = String(formData.get("customText") ?? "").trim();
-  if (customText.length > PERSONALIZED_NIGHT_LIGHT.maxTextLength) {
-    return errorState(
-      t("errorText"),
+  const parsed = generationFormSchema.safeParse({
+    modelId: rawModelId,
+    customText: String(formData.get("customText") ?? ""),
+    ledColor: formData.get("ledColor"),
+    images: getImageFiles(formData),
+    boilerplateIds: formData.getAll("boilerplateIds"),
+  });
+  if (!parsed.success) {
+    // Localized error selection stays here; ordering mirrors the original
+    // sequential checks (upload count first, then text length, then model).
+    const invalidFields = new Set(
+      parsed.error.issues.map((issue) => issue.path[0]),
     );
+    if (invalidFields.has("images")) return errorState(t("errorUpload"));
+    if (invalidFields.has("customText")) return errorState(t("errorText"));
+    return errorState(t("errorModel"));
   }
+  const { modelId, customText, ledColor, images: files } = parsed.data;
   const customTextFormatting = summarizeTextFormatting(
     formData.get("customTextHtml"),
   );
-  const allowedColors = new Set(
-    PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map((color) => color.value),
-  );
-  const requestedColor = String(
-    formData.get("ledColor") ?? PERSONALIZED_NIGHT_LIGHT.defaultLedColor,
-  );
-  const ledColor = allowedColors.has(
-    requestedColor as (typeof PERSONALIZED_NIGHT_LIGHT.comfortableLedColors)[number]["value"],
-  )
-    ? requestedColor
-    : PERSONALIZED_NIGHT_LIGHT.defaultLedColor;
   const multiColor = false;
 
   const { data: model, error: modelError } = await supabase
@@ -170,21 +114,12 @@ export async function generatePersonalizedNightLightAction(
     .select("id, slug, title, boilerplate_image_path, status, form_schema")
     .eq("id", modelId)
     .eq("status", "published")
-    .maybeSingle<{
-      id: string;
-      slug: string;
-      title: string;
-      boilerplate_image_path: string | null;
-      status: string;
-      form_schema: Record<string, unknown>;
-    }>();
+    .maybeSingle();
 
   if (modelError || !model)
     return errorState(t("errorModel"));
 
-  const requestedBoilerplateIds = [...new Set(
-    formData.getAll("boilerplateIds").filter((value): value is string => typeof value === "string"),
-  )];
+  const requestedBoilerplateIds = parsed.data.boilerplateIds;
   if (!requestedBoilerplateIds.length) return errorState(t("selectAtLeastOne"));
   const { data: selectedBoilerplates, error: boilerplateError } = await supabase
     .from("personalization_boilerplates")

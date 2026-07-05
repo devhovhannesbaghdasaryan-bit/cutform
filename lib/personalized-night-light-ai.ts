@@ -1,5 +1,20 @@
 import { z } from "zod";
 
+/** Maps raw AI-provider errors to a customer-friendly generation message. */
+export function friendlyGenerationError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (
+    message.includes("billing hard limit") ||
+    message.includes("billing limit")
+  ) {
+    return "Image generation is temporarily unavailable because the AI service billing limit was reached. Please try again later or contact support. Any generation credits were refunded.";
+  }
+  if (message.includes("rate limit") || message.includes("too many requests")) {
+    return "The image service is busy right now. Please wait a moment and try again. Any generation credits were refunded.";
+  }
+  return "We could not generate your night-light previews. Please try again. Any generation credits were refunded.";
+}
+
 export const personalizedNightLightRequestSchema = z.object({
   modelId: z.string().uuid(),
   modelSlug: z.string().min(1),

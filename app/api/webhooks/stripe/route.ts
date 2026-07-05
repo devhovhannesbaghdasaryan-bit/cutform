@@ -1,11 +1,31 @@
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
+import { z } from 'zod';
 import { getServiceSupabase } from '@/lib/supabase/server';
 import type { TablesUpdate } from '@/lib/supabase/types';
 import { getStripe, getStripeWebhookSecret } from '@/lib/stripe';
 import { adjustCredits } from '@/lib/credits';
 
 export const runtime = 'nodejs';
+
+// Metadata contract written by createCreditPackCheckoutAction
+// (app/credits/actions.ts); creditAmount arrives as a string.
+const creditPackMetadataSchema = z.object({
+  purchaseType: z.literal('credit_pack'),
+  transactionId: z.string().min(1),
+  userId: z.string().min(1),
+  creditAmount: z.coerce.number().int().positive(),
+  packKey: z.string().optional(),
+});
+
+// Metadata contract written by createCheckoutOrderAction
+// (app/checkout/actions.ts); userId is written but not consumed here.
+const orderMetadataSchema = z.object({
+  purchaseType: z.literal('order'),
+  transactionId: z.string().min(1),
+  orderId: z.string().min(1),
+  userId: z.string().min(1).optional(),
+});
 
 async function markTransactionStatus(
   transactionId: string | undefined,
@@ -19,12 +39,11 @@ async function markTransactionStatus(
 }
 
 async function fulfillCreditPack(session: Stripe.Checkout.Session) {
-  const transactionId = session.metadata?.transactionId;
-  const userId = session.metadata?.userId;
-  const creditAmount = Number(session.metadata?.creditAmount ?? 0);
-  if (!transactionId || !userId || !Number.isInteger(creditAmount) || creditAmount <= 0) {
+  const parsed = creditPackMetadataSchema.safeParse(session.metadata ?? {});
+  if (!parsed.success) {
     throw new Error('Credit checkout session is missing fulfillment metadata.');
   }
+  const { transactionId, userId, creditAmount, packKey } = parsed.data;
 
   const service = getServiceSupabase();
   const { data: transaction, error } = await service
@@ -43,7 +62,7 @@ async function fulfillCreditPack(session: Stripe.Checkout.Session) {
     referenceId: session.id,
     metadata: {
       transactionId,
-      packKey: session.metadata?.packKey ?? null,
+      packKey: packKey ?? null,
       stripeCheckoutSessionId: session.id,
     },
   });
@@ -59,9 +78,9 @@ async function fulfillCreditPack(session: Stripe.Checkout.Session) {
 }
 
 async function fulfillOrderPayment(session: Stripe.Checkout.Session) {
-  const transactionId = session.metadata?.transactionId;
-  const orderId = session.metadata?.orderId;
-  if (!transactionId || !orderId) throw new Error('Order checkout session is missing fulfillment metadata.');
+  const parsed = orderMetadataSchema.safeParse(session.metadata ?? {});
+  if (!parsed.success) throw new Error('Order checkout session is missing fulfillment metadata.');
+  const { transactionId, orderId } = parsed.data;
 
   const service = getServiceSupabase();
   const { data: transaction, error } = await service
@@ -113,17 +132,18 @@ export async function POST(req: Request) {
     );
   }
 
+  // Narrowing on event.type types event.data.object as Stripe.Checkout.Session.
   if (event.type === 'checkout.session.completed') {
-    await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session);
+    await handleCheckoutCompleted(event.data.object);
   }
 
   if (event.type === 'checkout.session.expired') {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = event.data.object;
     await markTransactionStatus(session.metadata?.transactionId, 'cancelled', session.id);
   }
 
   if (event.type === 'checkout.session.async_payment_failed') {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = event.data.object;
     await markTransactionStatus(session.metadata?.transactionId, 'failed', session.id);
   }
 

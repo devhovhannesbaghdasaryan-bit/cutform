@@ -7,11 +7,18 @@ const optionalNonEmpty = z
   .optional()
   .transform((v) => (v && v.length > 0 ? v : undefined));
 
-const envSchema = z.object({
+// Single source of truth for env keys: each key literal appears exactly once.
+// `publicShape` holds the keys exposed to the client via `publicEnv`;
+// `serverShape` extends it with everything else `getServerEnv()` returns.
+const publicShape = {
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: optionalNonEmpty,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: optionalNonEmpty,
   NEXT_PUBLIC_SITE_URL: z.string().url(),
+};
+
+const serverShape = {
+  ...publicShape,
   SUPABASE_SECRET_KEY: optionalNonEmpty,
   SUPABASE_SERVICE_ROLE_KEY: optionalNonEmpty,
   OPENAI_API_KEY: optionalNonEmpty,
@@ -22,25 +29,39 @@ const envSchema = z.object({
   EXCHANGE_RATE_API_URL: optionalNonEmpty,
   EXCHANGE_RATE_API_KEY: optionalNonEmpty,
   EXCHANGE_RATE_PROVIDER: optionalNonEmpty,
-});
+};
 
-const publicEnvSchema = envSchema
-  .pick({
-    NEXT_PUBLIC_SUPABASE_URL: true,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: true,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: true,
-    NEXT_PUBLIC_SITE_URL: true,
-  })
-  .refine(
-    (env) => env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    { message: 'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is required' },
-  )
+// Cross-field fallback shared by both parse paths: prefer the new publishable
+// key, fall back to the legacy anon key, and fail loudly when neither is set.
+// Zod does not catch exceptions thrown in transforms, so the plain Error (and
+// its exact message) propagates to the caller.
+function applySupabaseKeyFallback<
+  T extends {
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string;
+    NEXT_PUBLIC_SUPABASE_ANON_KEY?: string;
+  },
+>(env: T) {
+  const publishableKey =
+    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!publishableKey) {
+    throw new Error('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is required');
+  }
+  return { ...env, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishableKey };
+}
+
+const publicEnvSchema = z.object(publicShape).transform(applySupabaseKeyFallback);
+
+const serverEnvSchema = z
+  .object(serverShape)
+  .transform(applySupabaseKeyFallback)
   .transform((env) => ({
     ...env,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
-      env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    SUPABASE_SECRET_KEY: env.SUPABASE_SECRET_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY,
   }));
 
+// The literal `process.env.NEXT_PUBLIC_*` member accesses below are required:
+// the Next.js compiler statically inlines them into the client bundle, so this
+// input object cannot be built dynamically (e.g. from the schema's keys).
 export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
@@ -48,33 +69,12 @@ export const publicEnv = publicEnvSchema.parse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
 });
 
+// Env is static per process, so parse once and reuse the result. (Tests reset
+// module state via vi.resetModules(), which also resets this cache.)
+let serverEnv: z.infer<typeof serverEnvSchema> | null = null;
+
 export function getServerEnv() {
-  const env = envSchema.parse({
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    OPENAI_IMAGE_MODEL: process.env.OPENAI_IMAGE_MODEL,
-    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
-    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    EXCHANGE_RATE_API_URL: process.env.EXCHANGE_RATE_API_URL,
-    EXCHANGE_RATE_API_KEY: process.env.EXCHANGE_RATE_API_KEY,
-    EXCHANGE_RATE_PROVIDER: process.env.EXCHANGE_RATE_PROVIDER,
-  });
-
-  const publishableKey =
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!publishableKey) {
-    throw new Error('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is required');
-  }
-
-  return {
-    ...env,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: publishableKey,
-    SUPABASE_SECRET_KEY: env.SUPABASE_SECRET_KEY ?? env.SUPABASE_SERVICE_ROLE_KEY,
-  };
+  // Server code can read process.env wholesale; z.object strips unknown keys.
+  serverEnv ??= serverEnvSchema.parse(process.env);
+  return serverEnv;
 }
