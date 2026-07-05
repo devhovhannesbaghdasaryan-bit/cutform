@@ -5,49 +5,18 @@ import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import type { AppLocale } from '@/lib/i18n';
 import { getCountryDisplayName, listMarketGeography } from '@/lib/market';
+import type { CatalogItemMedia } from '@/lib/marketplace';
+import type { CatalogSeoMetadata } from '@/lib/seo';
+import type { Tables } from '@/lib/supabase/types';
 
 export const dynamic = 'force-dynamic';
 
-interface EditableCatalogItem {
-  id: string;
-  title: string;
-  slug: string;
-  category_id: string;
-  subcategory_id: string | null;
-  item_type: string;
-  description: string | null;
-  price_cents: number;
-  status: string;
-  is_popular: boolean;
-  is_customizable: boolean;
-  thumbnail_path: string | null;
-  manufacturing_notes: string | null;
-  sizes: unknown;
-  characteristics: string | null;
-}
+type SeoMetadata = CatalogSeoMetadata &
+  Pick<Tables<'catalog_item_seo_metadata'>, 'generated_by_ai' | 'reviewed_by_admin'> & {
+    locale: AppLocale;
+  };
 
-interface SeoMetadata {
-  locale: AppLocale;
-  seo_slug: string | null;
-  seo_title: string | null;
-  seo_description: string | null;
-  keywords: string[] | null;
-  og_title: string | null;
-  og_description: string | null;
-  social_image_path: string | null;
-  noindex: boolean;
-  generated_by_ai: boolean;
-  reviewed_by_admin: boolean;
-}
-
-interface CatalogMedia {
-  id: string;
-  media_type: 'image' | 'video';
-  storage_path: string;
-  alt_text: string | null;
-  sort_order: number;
-  is_primary: boolean;
-}
+type CatalogMedia = Omit<CatalogItemMedia, 'poster_path'>;
 
 export default async function EditAdminItemPage({
   params,
@@ -72,19 +41,17 @@ export default async function EditAdminItemPage({
         'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics',
       )
       .eq('id', id)
-      .maybeSingle<EditableCatalogItem>(),
+      .maybeSingle(),
     supabase
       .from('categories')
       .select('id, name')
       .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .returns<{ id: string; name: string }[]>(),
+      .order('sort_order', { ascending: true }),
     supabase
       .from('subcategories')
       .select('id, name, category_id')
       .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .returns<{ id: string; name: string; category_id: string }[]>(),
+      .order('sort_order', { ascending: true }),
     supabase
       .from('catalog_item_seo_metadata')
       .select('locale, seo_slug, seo_title, seo_description, keywords, og_title, og_description, social_image_path, noindex, generated_by_ai, reviewed_by_admin')
@@ -101,14 +68,7 @@ export default async function EditAdminItemPage({
     supabase
       .from('catalog_item_market_rules')
       .select('id, region_id, country_code, visibility_override, shipping_rate_cents')
-      .eq('catalog_item_id', id)
-      .returns<{
-        id: string;
-        region_id: string | null;
-        country_code: string | null;
-        visibility_override: boolean | null;
-        shipping_rate_cents: number | null;
-      }[]>(),
+      .eq('catalog_item_id', id),
   ]);
 
   if (error || !item) notFound();

@@ -10,55 +10,6 @@ import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-interface ProfileDetail {
-  user_id: string;
-  role: string;
-  status: string;
-  display_name: string | null;
-  preferred_locale: string | null;
-  internal_notes: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface BalanceDetail {
-  balance: number;
-  updated_at: string;
-}
-
-interface CompactOrder {
-  id: string;
-  status: string;
-  payment_status: string;
-  subtotal_cents: number;
-  created_at: string;
-}
-
-interface CompactGeneratedItem {
-  id: string;
-  title: string | null;
-  product_type: string;
-  review_status: string;
-  created_at: string;
-}
-
-interface CompactTransaction {
-  id: string;
-  type: string;
-  status: string;
-  amount_cents: number;
-  currency: string;
-  provider: string | null;
-  created_at: string;
-}
-
-interface AuditRow {
-  id: string;
-  action: string;
-  reason: string | null;
-  created_at: string;
-}
-
 export default async function AdminUserDetailPage({
   params,
 }: {
@@ -79,40 +30,36 @@ export default async function AdminUserDetailPage({
       .from('profiles')
       .select('user_id, role, status, display_name, preferred_locale, internal_notes, created_at, updated_at')
       .eq('user_id', id)
-      .maybeSingle<ProfileDetail>(),
+      .maybeSingle(),
     supabase
       .from('credit_accounts')
       .select('balance, updated_at')
       .eq('user_id', id)
-      .maybeSingle<BalanceDetail>(),
+      .maybeSingle(),
     supabase
       .from('orders')
       .select('id, status, payment_status, subtotal_cents, created_at')
       .eq('user_id', id)
       .order('created_at', { ascending: false })
-      .limit(8)
-      .returns<CompactOrder[]>(),
+      .limit(8),
     supabase
       .from('generated_items')
       .select('id, title, product_type, review_status, created_at')
       .eq('user_id', id)
       .order('created_at', { ascending: false })
-      .limit(8)
-      .returns<CompactGeneratedItem[]>(),
+      .limit(8),
     supabase
       .from('transactions')
       .select('id, type, status, amount_cents, currency, provider, created_at')
       .eq('user_id', id)
       .order('created_at', { ascending: false })
-      .limit(8)
-      .returns<CompactTransaction[]>(),
+      .limit(8),
     supabase
       .from('admin_audit_log')
       .select('id, action, reason, created_at')
       .eq('target_user_id', id)
       .order('created_at', { ascending: false })
-      .limit(8)
-      .returns<AuditRow[]>(),
+      .limit(8),
   ]);
 
   if (error || !profile) notFound();

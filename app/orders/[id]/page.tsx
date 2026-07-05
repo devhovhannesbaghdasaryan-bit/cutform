@@ -2,38 +2,25 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
+import type { OrderRow } from '@/lib/orders';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-interface OrderDetail {
-  id: string;
-  status: string;
-  payment_status: string;
-  subtotal_cents: number;
-  shipping_cents: number;
-  total_cents: number;
-  currency: string;
-  shipping_address: Record<string, unknown> | null;
-  contact_email: string | null;
-  created_at: string;
-}
-
-interface OrderItem {
-  id: string;
-  title: string;
-  quantity: number;
-  unit_price_cents: number;
-  total_price_cents: number;
-  currency: string;
-  image_path: string | null;
-  selected_preview_path: string | null;
-  custom_text: string | null;
-  led_color: string | null;
-  multi_color: boolean;
-  banner_size_key: string | null;
-}
+type OrderDetail = Pick<
+  OrderRow,
+  | 'id'
+  | 'status'
+  | 'payment_status'
+  | 'subtotal_cents'
+  | 'shipping_cents'
+  | 'total_cents'
+  | 'currency'
+  | 'shipping_address'
+  | 'contact_email'
+  | 'created_at'
+>;
 
 export default async function OrderDetailPage({
   params,
@@ -60,8 +47,7 @@ export default async function OrderDetailPage({
       .select(
         'id, title, quantity, unit_price_cents, total_price_cents, currency, image_path, selected_preview_path, custom_text, led_color, multi_color, banner_size_key',
       )
-      .eq('order_id', id)
-      .returns<OrderItem[]>(),
+      .eq('order_id', id),
   ]);
 
   if (error || !order) notFound();

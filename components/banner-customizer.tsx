@@ -6,21 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { customizeBannerSampleAction, generateBannerAction } from '@/app/banners/actions';
-
-interface BannerSample {
-  id: string;
-  title: string;
-  image_path: string;
-}
-
-interface BannerPreset {
-  key: string;
-  name: string;
-  width_mm: number;
-  height_mm: number;
-  material: string;
-  finish: string;
-}
+import type { BannerPreset, BannerSample } from '@/lib/banners';
 
 export type BannerCopy = { sample: string; size: string; text: string; textPlaceholder: string; previewText: string; custom: string; review: string; unavailable: string; advancedPrompt: string; promptPlaceholder: string; reference: string; rights: string; generate: string; disclaimer: string };
 

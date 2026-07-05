@@ -1,5 +1,18 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ProductType } from '@/lib/marketplace-constants';
+import type { Json, Tables } from '@/lib/supabase/types';
+
+export type GeneratedItemRow = Omit<
+  Tables<'generated_items'>,
+  'generation_options' | 'manufacturing_metadata'
+> & {
+  generation_options: Record<string, Json | undefined>;
+  manufacturing_metadata: Record<string, Json | undefined>;
+};
+
+export type PersonalizedPreviewOptionRow = Omit<Tables<'personalized_preview_options'>, 'metadata'> & {
+  metadata: Record<string, Json | undefined>;
+};
 
 export interface GeneratedItemInput {
   userId: string;

@@ -2,26 +2,12 @@ import Link from 'next/link';
 import { AdvancedBannerGenerationPanel, BannerCustomizer } from '@/components/banner-customizer';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
+import type { BannerSample } from '@/lib/banners';
 import { translate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
-
-interface BannerSample {
-  id: string;
-  title: string;
-  image_path: string;
-}
-
-interface BannerPreset {
-  key: string;
-  name: string;
-  width_mm: number;
-  height_mm: number;
-  material: string;
-  finish: string;
-}
 
 export default async function BannersPage() {
   const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
@@ -30,14 +16,12 @@ export default async function BannersPage() {
       .from('banner_samples')
       .select('id, title, image_path')
       .eq('status', 'published')
-      .order('created_at', { ascending: false })
-      .returns<BannerSample[]>(),
+      .order('created_at', { ascending: false }),
     supabase
       .from('banner_size_presets')
       .select('key, name, width_mm, height_mm, material, finish')
       .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .returns<BannerPreset[]>(),
+      .order('sort_order', { ascending: true }),
   ]);
 
   const fallbackSamples: BannerSample[] = samples?.length

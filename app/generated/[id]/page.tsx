@@ -7,40 +7,35 @@ import { Button } from '@/components/ui/button';
 import { getServerSupabase } from '@/lib/supabase/server';
 import { formatLocalizedCurrency, formatLocalizedDate, translate, translateTemplate, translateWithFallback } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getBoilerplateName } from '@/lib/personalization-boilerplates';
+import type { GeneratedItemRow, PersonalizedPreviewOptionRow } from '@/lib/generated-items';
+import { getBoilerplateName, type PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
 
 export const dynamic = 'force-dynamic';
 
-interface GeneratedItemDetail {
-  id: string;
-  title: string | null;
-  product_type: string;
-  review_status: string;
-  credit_cost: number;
-  preview_path: string | null;
-  selected_preview_path: string | null;
-  custom_text: string | null;
-  color: string | null;
-  multi_color: boolean;
-  svg_content: string;
-  manufacturing_metadata: Record<string, unknown>;
-  generation_options: Record<string, unknown>;
-  created_at: string;
-}
+type GeneratedItemDetail = Pick<
+  GeneratedItemRow,
+  | 'id'
+  | 'title'
+  | 'product_type'
+  | 'review_status'
+  | 'credit_cost'
+  | 'preview_path'
+  | 'selected_preview_path'
+  | 'custom_text'
+  | 'color'
+  | 'multi_color'
+  | 'svg_content'
+  | 'manufacturing_metadata'
+  | 'generation_options'
+  | 'created_at'
+>;
 
-interface PreviewOption {
-  id: string;
-  option_index: number;
-  preview_image_path: string;
-  status: string;
-  metadata: Record<string, unknown>;
-  boilerplate: {
-    admin_name: string;
-    name_en: string | null;
-    name_hy: string | null;
-    name_ru: string | null;
-  } | null;
-}
+type PreviewOption = Pick<
+  PersonalizedPreviewOptionRow,
+  'id' | 'option_index' | 'preview_image_path' | 'status' | 'metadata'
+> & {
+  boilerplate: Pick<PersonalizationBoilerplate, 'admin_name' | 'name_en' | 'name_hy' | 'name_ru'> | null;
+};
 
 export default async function GeneratedItemPage({
   params,

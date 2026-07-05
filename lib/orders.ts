@@ -3,6 +3,13 @@ import { validateCartBeforeCheckout } from '@/lib/cart';
 import { getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
 import { resolveMarket } from '@/lib/market';
 import { calculateOrderTotals, type ShippingAddress } from '@/lib/shipping';
+import type { Json, Tables } from '@/lib/supabase/types';
+
+export type OrderRow = Omit<Tables<'orders'>, 'shipping_address'> & {
+  shipping_address: Record<string, Json | undefined> | null;
+};
+
+export type OrderItemRow = Tables<'order_items'>;
 
 interface CartItemForOrder {
   id: string;

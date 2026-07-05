@@ -9,15 +9,6 @@ import { getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-type Profile = {
-  display_name: string | null;
-  role: string;
-  status: string;
-  preferred_locale: string | null;
-  preferred_currency: string | null;
-  created_at: string;
-};
-
 export default async function ProfilePage() {
   const [supabase, locale] = await Promise.all([getServerSupabase(), getRequestLocale()]);
   const {
@@ -30,7 +21,7 @@ export default async function ProfilePage() {
     .from('profiles')
     .select('display_name, role, status, preferred_locale, preferred_currency, created_at')
     .eq('user_id', user.id)
-    .maybeSingle<Profile>();
+    .maybeSingle();
 
   const displayName = profile?.display_name
     ?? user.user_metadata?.display_name

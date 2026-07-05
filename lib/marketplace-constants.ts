@@ -1,3 +1,13 @@
+export const MARKETPLACE_CATEGORIES = [
+  { slug: 'toys', name: 'Toys' },
+  { slug: 'constructors', name: 'Constructors' },
+  { slug: 'decorations', name: 'Decorations' },
+  { slug: 'night-lights', name: 'Night lights' },
+  { slug: 'banners', name: 'Banners' },
+] as const;
+
+export type MarketplaceCategorySlug = (typeof MARKETPLACE_CATEGORIES)[number]['slug'];
+
 export const CATEGORY_SLUGS = {
   toys: 'toys',
   constructors: 'constructors',

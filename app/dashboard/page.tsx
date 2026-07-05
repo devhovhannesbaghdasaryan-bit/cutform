@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/site-header';
-import { ProductCard, type ProductCardItem } from '@/components/product-card';
+import { ProductCard } from '@/components/product-card';
 import { EmptyState } from '@/components/empty-state';
 import { formatLocalizedDate, translate, translateWithFallback } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
@@ -18,47 +18,24 @@ export default async function DashboardPage() {
   const { data: products, error } = await supabase
     .from('products')
     .select('id, title, svg_content, price_cents, created_at')
-    .order('created_at', { ascending: false })
-    .returns<ProductCardItem[]>();
+    .order('created_at', { ascending: false });
   const { data: generatedItems } = await supabase
     .from('generated_items')
     .select('id, title, product_type, review_status, credit_cost, preview_path, selected_preview_path, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(12)
-    .returns<
-      {
-        id: string;
-        title: string | null;
-        product_type: string;
-        review_status: string;
-        credit_cost: number;
-        preview_path: string | null;
-        selected_preview_path: string | null;
-        created_at: string;
-      }[]
-    >();
+    .limit(12);
   const { data: creditAccount } = await supabase
     .from('credit_accounts')
     .select('balance')
     .eq('user_id', user.id)
-    .maybeSingle<{ balance: number }>();
+    .maybeSingle();
   const { data: orders } = await supabase
     .from('orders')
     .select('id, status, payment_status, subtotal_cents, currency, created_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(6)
-    .returns<
-      {
-        id: string;
-        status: string;
-        payment_status: string;
-        subtotal_cents: number;
-        currency: string;
-        created_at: string;
-      }[]
-    >();
+    .limit(6);
 
   if (error) {
     return (

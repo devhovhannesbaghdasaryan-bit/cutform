@@ -3,16 +3,7 @@ import { getServerSupabase } from '@/lib/supabase/server';
 import type { AppLocale } from '@/lib/i18n';
 import type { CatalogSeoMetadata } from '@/lib/seo';
 import { resolveCatalogMarkets, resolveMarket } from '@/lib/market';
-
-export const MARKETPLACE_CATEGORIES = [
-  { slug: 'toys', name: 'Toys' },
-  { slug: 'constructors', name: 'Constructors' },
-  { slug: 'decorations', name: 'Decorations' },
-  { slug: 'night-lights', name: 'Night lights' },
-  { slug: 'banners', name: 'Banners' },
-] as const;
-
-export type MarketplaceCategorySlug = (typeof MARKETPLACE_CATEGORIES)[number]['slug'];
+import type { MarketplaceCategorySlug } from '@/lib/marketplace-constants';
 
 export interface MarketplaceCategory {
   id: string;

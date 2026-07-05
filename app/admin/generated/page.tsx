@@ -4,16 +4,6 @@ import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-interface GeneratedReviewItem {
-  id: string;
-  user_id: string;
-  title: string | null;
-  product_type: string;
-  review_status: string;
-  credit_cost: number;
-  created_at: string;
-}
-
 export default async function AdminGeneratedPage({
   searchParams,
 }: {
@@ -29,7 +19,7 @@ export default async function AdminGeneratedPage({
   if (params.status) query = query.eq('review_status', params.status);
   if (params.type) query = query.eq('product_type', params.type);
 
-  const { data: items, error } = await query.returns<GeneratedReviewItem[]>();
+  const { data: items, error } = await query;
 
   return (
     <main className="container space-y-6 py-10">

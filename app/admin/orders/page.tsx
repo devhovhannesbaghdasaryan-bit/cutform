@@ -4,17 +4,6 @@ import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-interface AdminOrder {
-  id: string;
-  user_id: string;
-  status: string;
-  payment_status: string;
-  subtotal_cents: number;
-  currency: string;
-  contact_email: string | null;
-  created_at: string;
-}
-
 export default async function AdminOrdersPage({
   searchParams,
 }: {
@@ -31,7 +20,7 @@ export default async function AdminOrdersPage({
   if (params.status) query = query.eq('status', params.status);
   if (params.payment) query = query.eq('payment_status', params.payment);
 
-  const { data: orders, error } = await query.returns<AdminOrder[]>();
+  const { data: orders, error } = await query;
 
   return (
     <main className="container space-y-6 py-10">

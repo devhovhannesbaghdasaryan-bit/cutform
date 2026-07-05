@@ -3,50 +3,17 @@ import { reviewGeneratedItemAction } from '@/app/admin/generated/actions';
 import { AssetPreviewCard } from './asset-preview-card';
 import { ManufacturingSvgForm } from './manufacturing-svg-form';
 import { requireAdmin } from '@/lib/admin';
+import type { GeneratedItemRow, PersonalizedPreviewOptionRow } from '@/lib/generated-items';
 import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-interface GeneratedAdminDetail {
-  id: string;
-  user_id: string;
-  title: string | null;
-  product_type: string;
-  review_status: string;
-  credit_cost: number;
-  source_image_path: string | null;
-  original_image_paths: string[];
-  preview_path: string | null;
-  selected_preview_path: string | null;
-  hidden_svg_path: string | null;
-  custom_text: string | null;
-  color: string | null;
-  multi_color: boolean;
-  prompt: string | null;
-  svg_content: string;
-  manufacturing_metadata: Record<string, unknown>;
-  generation_options: Record<string, unknown>;
-  created_at: string;
-  updated_at: string;
-}
+type GeneratedAdminDetail = Omit<GeneratedItemRow, 'category_id' | 'subcategory_id' | 'generated_by'>;
 
-interface PreviewOption {
-  id: string;
-  option_index: number;
-  preview_image_path: string;
-  hidden_svg_path: string | null;
-  status: string;
-  metadata: Record<string, unknown>;
-}
-
-interface Artifact {
-  id: string;
-  artifact_type: string;
-  storage_path: string | null;
-  content_text: string | null;
-  metadata: Record<string, unknown>;
-  created_at: string;
-}
+type PreviewOption = Pick<
+  PersonalizedPreviewOptionRow,
+  'id' | 'option_index' | 'preview_image_path' | 'hidden_svg_path' | 'status' | 'metadata'
+>;
 
 export default async function AdminGeneratedDetailPage({
   params,
@@ -74,8 +41,7 @@ export default async function AdminGeneratedDetailPage({
       .from('generated_item_artifacts')
       .select('id, artifact_type, storage_path, content_text, metadata, created_at')
       .eq('generated_item_id', id)
-      .order('created_at', { ascending: false })
-      .returns<Artifact[]>(),
+      .order('created_at', { ascending: false }),
   ]);
 
   if (error || !item) notFound();

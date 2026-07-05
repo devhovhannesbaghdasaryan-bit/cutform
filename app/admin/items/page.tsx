@@ -6,18 +6,6 @@ import { formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-interface AdminCatalogItem {
-  id: string;
-  title: string;
-  slug: string;
-  price_cents: number;
-  status: string;
-  is_popular: boolean;
-  is_customizable: boolean;
-  created_at: string;
-  category: { name: string; slug: string } | null;
-}
-
 export default async function AdminItemsPage({
   searchParams,
 }: {
@@ -48,12 +36,11 @@ export default async function AdminItemsPage({
   if (params.q) query = query.ilike('title', `%${params.q}%`);
 
   const [{ data: items, error }, { data: categories }] = await Promise.all([
-    query.returns<AdminCatalogItem[]>(),
+    query,
     supabase
       .from('categories')
       .select('slug, name')
-      .order('sort_order', { ascending: true })
-      .returns<{ slug: string; name: string }[]>(),
+      .order('sort_order', { ascending: true }),
   ]);
 
   const filteredItems = (items ?? []).filter(

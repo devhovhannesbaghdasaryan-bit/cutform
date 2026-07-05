@@ -1,15 +1,13 @@
 import Link from 'next/link';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import type { Tables } from '@/lib/supabase/types';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { SvgRender } from './svg-render';
 
-export interface ProductCardItem {
-  id: string;
-  title: string;
-  svg_content: string;
-  price_cents: number;
-  created_at: string;
-}
+export type ProductCardItem = Pick<
+  Tables<'products'>,
+  'id' | 'title' | 'svg_content' | 'price_cents' | 'created_at'
+>;
 
 export function ProductCard({ product }: { product: ProductCardItem }) {
   return (
