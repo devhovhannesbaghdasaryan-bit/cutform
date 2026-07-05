@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { generateImage } from 'ai';
 import { openai, type OpenAIImageModelEditOptions } from '@ai-sdk/openai';
 import { z } from 'zod';
-import { requireAdmin } from '@/lib/admin';
+import { requireAdmin, requireAdminPermission } from '@/lib/admin';
 import { updateGeneratedReviewStatus } from '@/lib/generated-items';
 import { downloadFromBucket, uploadToBucket } from '@/lib/storage';
 import { writeAdminAuditLog } from '@/lib/transactions';
@@ -58,7 +58,7 @@ export async function generateManufacturingSvgAction(
     return { status: 'error', message: parsed.error.issues[0]?.message ?? 'Invalid generation settings.' };
   }
 
-  const { supabase, user } = await requireAdmin();
+  const { supabase, user } = await requireAdminPermission('generated_review');
   const settings = parsed.data;
 
   try {
@@ -185,7 +185,7 @@ export async function reviewGeneratedItemAction(formData: FormData) {
 
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid review action.');
 
-  const { supabase, user } = await requireAdmin();
+  const { supabase, user } = await requireAdminPermission('generated_review');
   const { generatedItemId, decision, note } = parsed.data;
 
   await updateGeneratedReviewStatus(supabase, generatedItemId, decision);

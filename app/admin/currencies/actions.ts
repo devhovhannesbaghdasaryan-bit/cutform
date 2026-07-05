@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { requireAdmin } from '@/lib/admin';
+import { requireAdminPermission } from '@/lib/admin';
 import { APP_CURRENCIES, normalizeCurrency } from '@/lib/currency';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
@@ -19,7 +19,7 @@ export async function updateCurrencySettingsAction(formData: FormData) {
   const parsed = currencySettingsSchema.safeParse({ enabledCurrencies });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid currency settings.');
 
-  const { supabase, user } = await requireAdmin();
+  const { supabase, user } = await requireAdminPermission('transactions_manage');
 
   for (const currency of APP_CURRENCIES) {
     const { error } = await supabase

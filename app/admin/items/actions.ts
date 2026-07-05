@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { actionError, actionSuccess, type ActionState } from '@/lib/action-state';
-import { requireAdmin } from '@/lib/admin';
+import { requireAdminPermission } from '@/lib/admin';
 import { APP_LOCALES } from '@/lib/i18n';
 import type { Json } from '@/lib/supabase/types';
 import {
@@ -171,7 +171,7 @@ export async function createCatalogItemAction(
   const parsed = parseItemForm(formData);
   if (!parsed.success) return actionError(parsed.error.issues[0]?.message ?? 'Invalid item.');
 
-  const { supabase, user } = await requireAdmin();
+  const { supabase, user } = await requireAdminPermission('catalog_manage');
   const item = parsed.data;
   const validCategory = await validateCategoryExists(supabase, item.categoryId);
   if (!validCategory) return actionError('Selected category does not exist.');
@@ -246,7 +246,7 @@ export async function updateCatalogItemAction(
   const parsed = parseItemForm(formData);
   if (!parsed.success) return actionError(parsed.error.issues[0]?.message ?? 'Invalid item.');
 
-  const { supabase, user } = await requireAdmin();
+  const { supabase, user } = await requireAdminPermission('catalog_manage');
   const item = parsed.data;
   const validCategory = await validateCategoryExists(supabase, item.categoryId);
   if (!validCategory) return actionError('Selected category does not exist.');

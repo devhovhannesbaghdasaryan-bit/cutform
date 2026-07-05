@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { actionError, actionSuccess, type ActionState } from '@/lib/action-state';
-import { requireAdmin, requireAdminPermission } from '@/lib/admin';
+import { requireAdminPermission } from '@/lib/admin';
 import { buildBannerManufacturingInstructions } from '@/lib/banner-manufacturing';
 import { uploadToBucket } from '@/lib/storage';
 import type { Json } from '@/lib/supabase/types';
@@ -41,7 +41,7 @@ export async function updateOrderStatusAction(
   });
   if (!parsed.success) return actionError(parsed.error.issues[0]?.message ?? 'Invalid order status.');
 
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireAdminPermission('orders_manage');
   const { orderId, status, paymentStatus } = parsed.data;
   const { error } = await supabase
     .from('orders')
