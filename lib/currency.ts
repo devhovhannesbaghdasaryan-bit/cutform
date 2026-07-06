@@ -87,12 +87,6 @@ export async function listEnabledCurrencies(supabase?: SupabaseClient) {
   return currencies.filter((currency) => currency.is_enabled);
 }
 
-export async function getDefaultCurrency(supabase?: SupabaseClient): Promise<AppCurrency> {
-  const enabled = await listEnabledCurrencies(supabase);
-  const preferredDefault = enabled.find((currency) => currency.is_default)?.code;
-  return preferredDefault ?? enabled.find((currency) => currency.code === DEFAULT_CURRENCY)?.code ?? enabled[0]?.code ?? DEFAULT_CURRENCY;
-}
-
 export async function getActiveCurrency() {
   const supabase = await getServerSupabase();
   const {

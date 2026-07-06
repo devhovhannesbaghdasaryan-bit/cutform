@@ -80,12 +80,6 @@ export interface PersonalizationModel {
   } | null;
 }
 
-export interface AdminCatalogFilters {
-  status?: string;
-  categorySlug?: string;
-  query?: string;
-}
-
 const CATALOG_SELECT = `
   id,
   title,
@@ -232,19 +226,6 @@ export async function getCatalogItem(slug: string) {
   return resolution.get(data.id)?.availability.available === false ? null : data;
 }
 
-export async function getCatalogItemById(id: string) {
-  noStore();
-  const supabase = await getServerSupabase();
-  const { data, error } = await supabase
-    .from('catalog_items')
-    .select(CATALOG_SELECT)
-    .eq('id', id)
-    .maybeSingle<CatalogItem>();
-
-  if (error) throw new Error(error.message);
-  return data;
-}
-
 export async function getCatalogItemSeoMetadata(catalogItemId: string, locale: AppLocale) {
   noStore();
   const supabase = await getServerSupabase();
@@ -340,25 +321,4 @@ export async function getPublishedPersonalizationModel(slug: string) {
 
   if (error) throw new Error(error.message);
   return data;
-}
-
-export async function listAdminCatalogItems(filters: AdminCatalogFilters = {}) {
-  noStore();
-  const supabase = await getServerSupabase();
-
-  let query = supabase
-    .from('catalog_items')
-    .select(CATALOG_SELECT)
-    .order('created_at', { ascending: false });
-
-  if (filters.status) query = query.eq('status', filters.status);
-  if (filters.categorySlug) query = query.eq('categories.slug', filters.categorySlug);
-  if (filters.query) query = query.ilike('title', `%${filters.query}%`);
-
-  const { data, error } = await query.returns<CatalogItem[]>();
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).filter(
-    (item) => !filters.categorySlug || item.category?.slug === filters.categorySlug,
-  );
 }

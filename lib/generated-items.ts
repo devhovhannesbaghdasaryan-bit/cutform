@@ -128,48 +128,6 @@ export async function createPersonalizedPreviewOptions(
   return data ?? [];
 }
 
-export async function selectPersonalizedPreviewOption(
-  supabase: SupabaseClient,
-  generatedItemId: string,
-  optionId: string,
-) {
-  const { data: option, error: optionError } = await supabase
-    .from('personalized_preview_options')
-    .select('preview_image_path, manufacturing_file_path')
-    .eq('id', optionId)
-    .eq('generated_item_id', generatedItemId)
-    .maybeSingle<{ preview_image_path: string; manufacturing_file_path: string }>();
-
-  if (optionError || !option) {
-    throw new Error(optionError?.message ?? 'Preview option was not found.');
-  }
-
-  const { error: discardError } = await supabase
-    .from('personalized_preview_options')
-    .update({ status: 'discarded' })
-    .eq('generated_item_id', generatedItemId);
-
-  if (discardError) throw new Error(discardError.message);
-
-  const { error: selectError } = await supabase
-    .from('personalized_preview_options')
-    .update({ status: 'selected' })
-    .eq('id', optionId);
-
-  if (selectError) throw new Error(selectError.message);
-
-  const { error: generatedError } = await supabase
-    .from('generated_items')
-    .update({
-      selected_preview_path: option.preview_image_path,
-      manufacturing_file_path: option.manufacturing_file_path,
-      review_status: 'review_required',
-    })
-    .eq('id', generatedItemId);
-
-  if (generatedError) throw new Error(generatedError.message);
-}
-
 export async function listGeneratedItemsForAdminReview(
   supabase: SupabaseClient,
   filters: GeneratedItemAdminListFilters = {},

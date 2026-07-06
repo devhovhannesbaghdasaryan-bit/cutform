@@ -1,20 +1,9 @@
-import type { AppLocale } from '@/lib/i18n';
 import type { TypedSupabaseClient } from '@/lib/supabase/types';
-import { writeAdminAuditLog } from '@/lib/transactions';
 
 export interface AdminUserFilters {
   q?: string;
   role?: string;
   status?: string;
-}
-
-export interface AdminUserUpdateInput {
-  targetUserId: string;
-  actorUserId: string;
-  role: 'user' | 'admin';
-  status: 'active' | 'suspended' | 'disabled';
-  preferredLocale?: AppLocale | null;
-  internalNotes?: string | null;
 }
 
 export async function listAdminUsers(
@@ -115,45 +104,4 @@ export async function getAdminUserDetail(supabase: TypedSupabaseClient, userId: 
     transactions: transactions ?? [],
     auditRows: auditRows ?? [],
   };
-}
-
-export async function updateAdminUserProfile(
-  supabase: TypedSupabaseClient,
-  input: AdminUserUpdateInput,
-) {
-  const { data: before } = await supabase
-    .from('profiles')
-    .select('role, status, preferred_locale, internal_notes')
-    .eq('user_id', input.targetUserId)
-    .maybeSingle();
-
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      role: input.role,
-      status: input.status,
-      preferred_locale: input.preferredLocale ?? null,
-      internal_notes: input.internalNotes ?? null,
-    })
-    .eq('user_id', input.targetUserId);
-
-  if (error) throw new Error(error.message);
-
-  await writeAdminAuditLog(supabase, {
-    actorUserId: input.actorUserId,
-    targetUserId: input.targetUserId,
-    action: 'admin_user_profile_updated',
-    entityType: 'profile',
-    entityId: input.targetUserId,
-    reason: 'Admin profile update',
-    metadata: {
-      before,
-      after: {
-        role: input.role,
-        status: input.status,
-        preferredLocale: input.preferredLocale ?? null,
-        internalNotes: input.internalNotes ?? null,
-      },
-    },
-  });
 }

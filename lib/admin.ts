@@ -62,18 +62,6 @@ export async function requireAdminPermission(permission: AdminPermission) {
   return context;
 }
 
-export async function canManageUsers(userId: string) {
-  return hasAdminPermission(userId, 'users_manage');
-}
-
-export async function canAdjustBalances(userId: string) {
-  return hasAdminPermission(userId, 'balances_adjust');
-}
-
-export async function canViewTransactions(userId: string) {
-  return hasAdminPermission(userId, 'transactions_manage');
-}
-
 export async function getCurrentUserRole() {
   const supabase = await getServerSupabase();
   const {

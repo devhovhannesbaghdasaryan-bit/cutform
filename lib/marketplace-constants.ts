@@ -8,21 +8,6 @@ export const MARKETPLACE_CATEGORIES = [
 
 export type MarketplaceCategorySlug = (typeof MARKETPLACE_CATEGORIES)[number]['slug'];
 
-export const CATEGORY_SLUGS = {
-  toys: 'toys',
-  constructors: 'constructors',
-  decorations: 'decorations',
-  nightLights: 'night-lights',
-  banners: 'banners',
-} as const;
-
-export const SUBCATEGORY_SLUGS = {
-  personalized: 'personalized',
-} as const;
-
-export const CATALOG_ITEM_STATUSES = ['draft', 'published', 'archived'] as const;
-export type CatalogItemStatus = (typeof CATALOG_ITEM_STATUSES)[number];
-
 export const PRODUCT_TYPES = [
   'night_light',
   'personalized_night_light',
@@ -32,23 +17,6 @@ export const PRODUCT_TYPES = [
   'banner',
 ] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
-
-export const ORDER_STATUSES = [
-  'draft',
-  'pending_payment',
-  'paid',
-  'review_required',
-  'approved_for_production',
-  'in_production',
-  'ready_to_ship',
-  'shipped',
-  'cancelled',
-  'refunded',
-] as const;
-export type OrderStatus = (typeof ORDER_STATUSES)[number];
-
-export const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded', 'failed'] as const;
-export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 export const PERSONALIZED_NIGHT_LIGHT = {
   maxImages: 1,

@@ -1,9 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { adjustCredits, getCreditBalance } from '@/lib/credits';
-
-export async function getBannerCreditBalance(supabase: SupabaseClient, userId: string) {
-  return getCreditBalance(supabase, userId);
-}
+import { adjustCredits } from '@/lib/credits';
 
 export async function debitBannerCredits(
   supabase: SupabaseClient,

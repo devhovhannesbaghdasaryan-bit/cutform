@@ -17,13 +17,6 @@ export const manufacturingProcessSchema = z.enum([
 
 export const capabilityConfidenceSchema = z.enum(['confirmed', 'quoted', 'assumed', 'needs_manual']);
 
-export const numericRangeSchema = z.object({
-  min: z.number().nullable(),
-  max: z.number().nullable(),
-  unit: z.string(),
-  confidence: capabilityConfidenceSchema,
-});
-
 export const workEnvelopeSchema = z.object({
   xMm: z.number().nullable(),
   yMm: z.number().nullable(),

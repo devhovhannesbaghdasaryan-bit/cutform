@@ -102,41 +102,6 @@ export function createCreditPurchaseTransaction(
   return createTransactionRecord(supabase, { ...input, type: 'credit_purchase' });
 }
 
-export function createCreditSpendTransaction(
-  supabase: SupabaseClient,
-  input: Omit<TransactionInput, 'type'>,
-) {
-  return createTransactionRecord(supabase, { ...input, type: 'credit_spend' });
-}
-
-export function createCreditRefundTransaction(
-  supabase: SupabaseClient,
-  input: Omit<TransactionInput, 'type'>,
-) {
-  return createTransactionRecord(supabase, { ...input, type: 'credit_refund' });
-}
-
-export function createManualAdjustmentTransaction(
-  supabase: SupabaseClient,
-  input: Omit<TransactionInput, 'type'>,
-) {
-  return createTransactionRecord(supabase, { ...input, type: 'manual_adjustment' });
-}
-
-export function createOrderPaymentTransaction(
-  supabase: SupabaseClient,
-  input: Omit<TransactionInput, 'type'>,
-) {
-  return createTransactionRecord(supabase, { ...input, type: 'payment' });
-}
-
-export function createOrderRefundTransaction(
-  supabase: SupabaseClient,
-  input: Omit<TransactionInput, 'type'>,
-) {
-  return createTransactionRecord(supabase, { ...input, type: 'refund' });
-}
-
 export async function writeAdminAuditLog(supabase: SupabaseClient, input: AuditLogInput) {
   const { error } = await supabase.from('admin_audit_log').insert({
     actor_user_id: input.actorUserId,

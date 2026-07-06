@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { addItemToCart } from '@/lib/cart';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
-import { selectPersonalizedPreviewOption } from '@/lib/generated-items';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 async function requireUser(next = '/dashboard') {
@@ -25,28 +24,6 @@ function getGeneratedSalePriceCents(options: Record<string, unknown> | null) {
 
 function getGeneratedSaleCurrency(options: Record<string, unknown> | null) {
   return normalizeCurrency(options?.saleCurrency ?? options?.currency) ?? 'AMD';
-}
-
-export async function selectGeneratedPreviewAction(formData: FormData) {
-  const parsed = z.object({
-    generatedItemId: z.string().uuid(),
-    optionId: z.string().uuid(),
-  }).safeParse({
-    generatedItemId: formData.get('generatedItemId'),
-    optionId: formData.get('optionId'),
-  });
-
-  if (!parsed.success) throw new Error('Invalid preview selection.');
-
-  const { supabase } = await requireUser(`/generated/${parsed.data.generatedItemId}`);
-  await selectPersonalizedPreviewOption(
-    supabase,
-    parsed.data.generatedItemId,
-    parsed.data.optionId,
-  );
-
-  revalidatePath('/dashboard');
-  revalidatePath(`/generated/${parsed.data.generatedItemId}`);
 }
 
 export async function addGeneratedItemToCartAction(formData: FormData) {

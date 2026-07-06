@@ -25,8 +25,6 @@ export const CREDIT_PACKS = [
   },
 ] as const;
 
-export type CreditPackKey = (typeof CREDIT_PACKS)[number]['key'];
-
 export function getCreditPack(key: string) {
   return CREDIT_PACKS.find((pack) => pack.key === key) ?? null;
 }
