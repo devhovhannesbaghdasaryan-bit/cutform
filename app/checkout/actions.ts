@@ -3,9 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { getServerEnv } from '@/lib/env';
 import { createOrderFromCart } from '@/lib/orders';
-import { createCheckoutSessionForTransaction } from '@/lib/stripe';
+import { initiateAmeriaPayment } from '@/lib/payments/ameria';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
 
@@ -67,7 +66,7 @@ export async function createCheckoutOrderAction(formData: FormData) {
       total_cents: number;
       currency: string;
       exchange_rate_context: Record<string, unknown>;
-      payment_provider_route: 'stripe' | 'bank_manual' | null;
+      payment_provider_route: 'ameria' | 'bank_manual' | null;
     }>();
 
   if (totalError || !orderTotals) throw new Error(totalError?.message ?? 'Unable to read order total.');
@@ -104,26 +103,16 @@ export async function createCheckoutOrderAction(formData: FormData) {
   revalidatePath('/checkout');
   revalidatePath('/orders');
 
-  if (orderTotals.payment_provider_route !== 'stripe') {
+  if (orderTotals.payment_provider_route !== 'ameria') {
     redirect(`/orders/${order.id}?checkout=bank_pending`);
   }
 
-  const siteUrl = getServerEnv().NEXT_PUBLIC_SITE_URL;
-  const checkoutUrl = await createCheckoutSessionForTransaction(service, {
+  const { redirectUrl } = await initiateAmeriaPayment(service, {
     transactionId: transaction.id,
-    customerEmail: user.email ?? undefined,
-    currency: orderTotals.currency,
     amountCents: orderTotals.total_cents,
-    productName: `Uniqraft order ${order.id.slice(0, 8)}`,
-    metadata: {
-      purchaseType: 'order',
-      transactionId: transaction.id,
-      orderId: order.id,
-      userId: user.id,
-    },
-    successUrl: `${siteUrl}/orders/${order.id}?checkout=success`,
-    cancelUrl: `${siteUrl}/checkout?checkout=cancelled`,
+    currency: orderTotals.currency,
+    description: `Uniqraft order ${order.id.slice(0, 8)}`,
+    locale: parsed.data.locale || null,
   });
-
-  redirect(checkoutUrl);
+  redirect(redirectUrl);
 }

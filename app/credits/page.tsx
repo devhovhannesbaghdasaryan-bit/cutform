@@ -4,10 +4,11 @@ import { createCreditPackCheckoutAction } from '@/app/credits/actions';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
 import { CREDIT_PACKS } from '@/lib/credit-packs';
-import { convertMoney, getActiveCurrency, getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
+import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { getTranslations } from 'next-intl/server';
 import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
+import { getPaymentRoute } from '@/lib/payments/router';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -63,11 +64,12 @@ export default async function CreditsPage() {
         normalizeCurrency(pack.currency) ?? 'AMD',
         activeCurrency,
       );
+      const paymentRoute = await getPaymentRoute(converted.currency);
       return {
         ...pack,
         displayPriceCents: converted.amountCents,
         displayCurrency: converted.currency,
-        paymentRoute: getPaymentRouteForCurrency(converted.currency),
+        paymentRoute,
       };
     }),
   );
@@ -137,7 +139,7 @@ export default async function CreditsPage() {
                   <p className="text-2xl font-bold">{pack.creditAmount} {t('credits.unit')}</p>
                   <p className="text-sm text-muted-foreground">{formatLocalizedCurrency(locale, pack.displayPriceCents, pack.displayCurrency)}</p>
                   <p className="text-xs text-muted-foreground">
-                    {pack.paymentRoute === 'stripe' ? t('credits.stripe') : t('credits.manual')}
+                    {pack.paymentRoute === 'ameria' ? t('credits.ameria') : t('credits.manual')}
                   </p>
                 </div>
                 <p className="min-h-10 text-xs text-muted-foreground">{pack.description}</p>

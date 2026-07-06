@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { validateCartBeforeCheckout } from '@/lib/cart';
-import { getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
+import { normalizeCurrency } from '@/lib/currency';
+import { getPaymentRoute } from '@/lib/payments/router';
 import { resolveMarket } from '@/lib/market';
 import { calculateOrderTotals, type ShippingAddress } from '@/lib/shipping';
 import type { Json, Tables } from '@/lib/supabase/types';
@@ -265,7 +266,7 @@ export async function createOrderFromCart(
   }
 
   const orderCurrency = normalizeCurrency(cartItems[0]?.currency) ?? normalizeCurrency(cart.currency) ?? 'AMD';
-  const paymentProviderRoute = getPaymentRouteForCurrency(orderCurrency);
+  const paymentProviderRoute = await getPaymentRoute(orderCurrency);
   const market = await resolveMarket({ checkoutCountryCode: address.countryCode, supabase });
   const totals = await calculateOrderTotals({
     items: cartItems,

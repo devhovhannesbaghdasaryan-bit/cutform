@@ -1672,7 +1672,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      next_ameria_order_id: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

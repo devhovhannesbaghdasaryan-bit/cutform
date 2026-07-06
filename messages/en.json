@@ -1,14 +1,15 @@
 {
   "credits": {
     "title": "Credits",
-    "subtitle": "Credits power AI generation. EUR/USD packs use Stripe Checkout. AMD/RUB packs create a pending bank/manual payment request.",
+    "subtitle": "Credits power AI generation. EUR/USD packs use Ameriabank checkout. AMD/RUB packs create a pending bank/manual payment request.",
     "balance": "Current balance",
     "unit": "credits",
     "activity": "Recent credit activity",
     "noActivity": "No credit activity yet.",
     "noReference": "No reference",
     "packs": "Credit packs",
-    "packsHelp": "Select an enabled currency from the header. Stripe is used for EUR/USD; AMD/RUB stay pending until bank payment is confirmed.",
+    "packsHelp": "Select an enabled currency from the header. Ameriabank is used for EUR/USD; AMD/RUB stay pending until bank payment is confirmed.",
+    "ameria": "Ameriabank checkout",
     "stripe": "Stripe checkout",
     "manual": "Bank/manual pending",
     "buy": "Buy pack",

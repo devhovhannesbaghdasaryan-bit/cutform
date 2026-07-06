@@ -6,6 +6,7 @@ import { getServerEnv } from '@/lib/env';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { resolveMarket } from '@/lib/market';
 import type { Json } from '@/lib/supabase/types';
+import type { PaymentRoute } from '@/lib/payments/types';
 
 export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
@@ -16,7 +17,7 @@ export const DEFAULT_CURRENCY: AppCurrency = 'AMD';
 export const CURRENCY_COOKIE = 'uq_currency';
 export const LEGACY_CURRENCY_COOKIE = 'snip_currency';
 
-export type PaymentRoute = 'stripe' | 'bank_manual';
+export type { PaymentRoute };
 
 export interface CurrencySettings {
   code: AppCurrency;
@@ -61,12 +62,15 @@ export function normalizeCurrency(value: unknown): AppCurrency | null {
   return APP_CURRENCIES.includes(upper as AppCurrency) ? (upper as AppCurrency) : null;
 }
 
-export function isStripeCurrency(currency: AppCurrency) {
+// Card currencies (USD/EUR) route to Ameriabank vPOS; AMD/RUB fall back to the
+// manual/bank route. Live routing is DB-driven via getPaymentRoute() in
+// lib/payments/router.ts; this pure currency→route helper backs unit tests.
+function isCardCurrency(currency: AppCurrency) {
   return currency === 'USD' || currency === 'EUR';
 }
 
 export function getPaymentRouteForCurrency(currency: AppCurrency): PaymentRoute {
-  return isStripeCurrency(currency) ? 'stripe' : 'bank_manual';
+  return isCardCurrency(currency) ? 'ameria' : 'bank_manual';
 }
 
 export async function listCurrencySettings(

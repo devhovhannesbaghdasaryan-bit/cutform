@@ -40,3 +40,6 @@ products
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code local overrides (may contain secrets)
+.claude/settings.local.json

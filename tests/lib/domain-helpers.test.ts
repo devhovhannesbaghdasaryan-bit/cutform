@@ -62,9 +62,9 @@ describe('currency helpers', () => {
     expect(normalizeCurrency(42)).toBeNull();
   });
 
-  it('routes Stripe currencies to stripe and the rest to bank_manual', () => {
-    expect(getPaymentRouteForCurrency('USD')).toBe('stripe');
-    expect(getPaymentRouteForCurrency('EUR')).toBe('stripe');
+  it('routes card currencies to ameria and the rest to bank_manual', () => {
+    expect(getPaymentRouteForCurrency('USD')).toBe('ameria');
+    expect(getPaymentRouteForCurrency('EUR')).toBe('ameria');
     expect(getPaymentRouteForCurrency('AMD')).toBe('bank_manual');
     expect(getPaymentRouteForCurrency('RUB')).toBe('bank_manual');
   });
