@@ -159,6 +159,7 @@ export default async function AdminTransactionDetailPage({
                 <option value="manual_refund">Record manual refund</option>
                 <option value="reversal">Create reversal</option>
                 <option value="reconcile">Reconcile status</option>
+                <option value="ameria_check">Check with Ameriabank</option>
               </select>
             </label>
             <label className="space-y-2 text-sm">
