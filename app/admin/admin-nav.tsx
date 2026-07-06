@@ -17,7 +17,7 @@ const links = [
   { href: '/admin', label: 'Overview', icon: LayoutDashboard },
   { href: '/admin/create', label: 'Create', icon: Sparkles },
   { href: '/admin/items', label: 'Items', icon: Boxes },
-  { href: '/personalization', label: 'Personalization', icon: SlidersHorizontal },
+  { href: '/admin/personalization', label: 'Personalization', icon: SlidersHorizontal },
   { href: '/admin/orders', label: 'Orders', icon: ClipboardList },
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/transactions', label: 'Transactions', icon: CreditCard },

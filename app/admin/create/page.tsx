@@ -13,7 +13,7 @@ const actions = [
     icon: Boxes,
   },
   {
-    href: '/personalization/night-lights',
+    href: '/admin/personalization/night-lights',
     title: 'Personalized model',
     description: 'Publish or replace Night lights > Personalized model templates.',
     icon: Sparkles,

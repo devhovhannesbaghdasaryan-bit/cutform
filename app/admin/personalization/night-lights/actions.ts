@@ -69,7 +69,7 @@ async function uploadModelImage(
 }
 
 function revalidatePersonalization(slug?: string | null) {
-  revalidatePath('/personalization/night-lights');
+  revalidatePath('/admin/personalization/night-lights');
   revalidatePath('/catalog/night-lights/personalized');
   if (slug) revalidatePath(`/personalize/${slug}`);
 }

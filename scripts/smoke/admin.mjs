@@ -3,8 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 const requiredRoutes = [
   'app/admin/page.tsx',
   'app/admin/create/page.tsx',
-  'app/personalization/page.tsx',
-  'app/personalization/night-lights/page.tsx',
+  'app/admin/personalization/page.tsx',
+  'app/admin/personalization/night-lights/page.tsx',
   'app/admin/items/new/page.tsx',
   'app/admin/items/[id]/page.tsx',
   'app/admin/users/page.tsx',
@@ -34,11 +34,13 @@ for (const removedRoute of [
   'app/admin/actions.ts',
   'app/create/page.tsx',
   'app/api/generate/route.ts',
+  'app/personalization/page.tsx',
+  'app/personalization/night-lights/page.tsx',
 ]) {
   if (existsSync(removedRoute)) throw new Error(`Retired route still exists: ${removedRoute}`);
 }
 
-const personalizationActions = readFileSync('app/personalization/night-lights/actions.ts', 'utf8');
+const personalizationActions = readFileSync('app/admin/personalization/night-lights/actions.ts', 'utf8');
 for (const action of [
   'savePersonalizationBoilerplateAction',
   'removePersonalizationBoilerplateAction',
@@ -48,7 +50,7 @@ for (const action of [
   if (!personalizationActions.includes(action)) throw new Error(`Missing personalization admin action: ${action}`);
 }
 
-const personalizationPage = readFileSync('app/personalization/night-lights/page.tsx', 'utf8');
+const personalizationPage = readFileSync('app/admin/personalization/night-lights/page.tsx', 'utf8');
 for (const contract of ['ImageUploadField', 'mockImagePath', 'boilerplateImagePath', 'resolvePublicStorageUrl', 'openai_file_id']) {
   if (!personalizationPage.includes(contract)) throw new Error(`Missing personalization image contract: ${contract}`);
 }
