@@ -151,7 +151,7 @@ Important local routes:
 | Personalization categories | <http://localhost:3000/personalization> |
 | Night light templates | <http://localhost:3000/personalization/night-lights> |
 
-Credit packs and order payments use Stripe Checkout when Stripe environment variables are configured. Admins can still perform guarded manual credit adjustments from the admin user detail page with an audit reason.
+Credit packs and order payments route through Ameriabank when the currency is configured for it; other currencies stay pending until a bank/manual payment is confirmed. Admins can still perform guarded manual credit adjustments from the admin user detail page with an audit reason.
 
 Uploaded user images require an explicit rights confirmation. Generated previews are approximate and require admin/production review before manufacturing.
 
