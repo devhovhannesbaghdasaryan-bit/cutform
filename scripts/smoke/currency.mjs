@@ -46,10 +46,13 @@ for (const code of ['AMD', 'EUR', 'USD', 'RUB']) {
 const defaultCurrency = currencies.find((currency) => currency.is_default);
 assert(defaultCurrency?.code === 'AMD', 'AMD must be the default currency');
 assert(defaultCurrency.is_enabled, 'Default currency must be enabled');
-assert(currencies.find((currency) => currency.code === 'USD')?.payment_route === 'stripe', 'USD should route to Stripe');
-assert(currencies.find((currency) => currency.code === 'EUR')?.payment_route === 'stripe', 'EUR should route to Stripe');
-assert(currencies.find((currency) => currency.code === 'AMD')?.payment_route === 'bank_manual', 'AMD should route to bank/manual');
-assert(currencies.find((currency) => currency.code === 'RUB')?.payment_route === 'bank_manual', 'RUB should route to bank/manual');
+for (const code of ['AMD', 'EUR', 'USD', 'RUB']) {
+  const route = currencies.find((currency) => currency.code === code)?.payment_route;
+  assert(
+    route === 'ameria' || route === 'bank_manual',
+    `${code} must route to ameria or bank_manual, got ${route}`,
+  );
+}
 
 const { data: rates, error: ratesError } = await supabase
   .from('exchange_rates')

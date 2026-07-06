@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 import { getServerEnv } from '@/lib/env';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { resolveMarket } from '@/lib/market';
+import type { PaymentRoute } from '@/lib/payments/types';
 
 export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
@@ -12,7 +13,7 @@ export type AppCurrency = (typeof APP_CURRENCIES)[number];
 export const DEFAULT_CURRENCY: AppCurrency = 'AMD';
 export const CURRENCY_COOKIE = 'snip_currency';
 
-export type PaymentRoute = 'stripe' | 'bank_manual';
+export type { PaymentRoute };
 
 export interface CurrencySettings {
   code: AppCurrency;
@@ -55,14 +56,6 @@ export function normalizeCurrency(value: unknown): AppCurrency | null {
   if (typeof value !== 'string') return null;
   const upper = value.trim().toUpperCase();
   return APP_CURRENCIES.includes(upper as AppCurrency) ? (upper as AppCurrency) : null;
-}
-
-export function isStripeCurrency(currency: AppCurrency) {
-  return currency === 'USD' || currency === 'EUR';
-}
-
-export function getPaymentRouteForCurrency(currency: AppCurrency): PaymentRoute {
-  return isStripeCurrency(currency) ? 'stripe' : 'bank_manual';
 }
 
 export async function listCurrencySettings(

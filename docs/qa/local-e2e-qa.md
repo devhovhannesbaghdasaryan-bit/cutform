@@ -62,10 +62,10 @@ The UI workflow smoke verifies:
 - Password login with a disposable confirmed admin.
 - Protected admin page rendering for dashboard, users, transactions, items, orders, generated items, banner samples, and personalized models.
 
-The full manual click-through checklist is not complete. The in-app Browser runner fails locally with `CreateProcessAsUserW failed: 5`, so these flows still need a human browser pass with configured test accounts, Stripe test keys, and OpenAI credentials:
+The full manual click-through checklist is not complete. The in-app Browser runner fails locally with `CreateProcessAsUserW failed: 5`, so these flows still need a human browser pass with configured test accounts, Ameriabank test credentials, and OpenAI credentials:
 
 - Register flow and email verification through the real browser session.
 - Admin user, transaction, SEO, catalog, generated item, and order mutation workflows through the rendered admin UI.
-- Stripe checkout and webhook confirmation.
+- Ameriabank checkout and callback confirmation.
 - OpenAI-backed generation flows for personalized night lights, banners, night lights, and 2D items.
 - Final order placement checks for generated/personalized assets in admin order details.

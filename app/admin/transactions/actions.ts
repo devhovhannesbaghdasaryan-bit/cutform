@@ -4,10 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { createTransactionRecord, writeAdminAuditLog } from '@/lib/transactions';
+import { settleAmeriaPayment } from '@/lib/payments/fulfillment';
+import { getServiceSupabase } from '@/lib/supabase/server';
 
 const transactionActionSchema = z.object({
   transactionId: z.string().uuid(),
-  actionType: z.enum(['note', 'manual_refund', 'reversal', 'reconcile']),
+  actionType: z.enum(['note', 'manual_refund', 'reversal', 'reconcile', 'ameria_check']),
   status: z.enum(['pending', 'succeeded', 'failed', 'cancelled', 'reversed']).optional().or(z.literal('')),
   amountCents: z.coerce.number().int().min(0).optional(),
   note: z.string().trim().min(3, 'Note or reason is required.'),
@@ -118,6 +120,27 @@ export async function adminTransactionAction(formData: FormData) {
       entityId: transaction.id,
       reason: values.note,
       metadata: { before: transaction.status, after: values.status },
+    });
+  }
+
+  if (values.actionType === 'ameria_check') {
+    if (transaction.provider !== 'ameria' && transaction.payment_provider_route !== 'ameria') {
+      throw new Error('This transaction did not go through Ameriabank.');
+    }
+    if (!transaction.provider_reference) {
+      throw new Error('Transaction has no Ameriabank PaymentID to check.');
+    }
+
+    const result = await settleAmeriaPayment(getServiceSupabase(), transaction.provider_reference);
+
+    await writeAdminAuditLog(supabase, {
+      actorUserId: user.id,
+      targetUserId: transaction.user_id,
+      action: 'transaction_ameria_checked',
+      entityType: 'transaction',
+      entityId: transaction.id,
+      reason: values.note,
+      metadata: { before: transaction.status, outcome: result.outcome },
     });
   }
 

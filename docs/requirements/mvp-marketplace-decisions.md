@@ -1,5 +1,7 @@
 # Marketplace MVP Product Decisions
 
+> **Superseded (2026-07-06):** Payment processing now routes through Ameriabank vPOS for all currencies (with a manual bank fallback). Stripe references below are historical. See `docs/superpowers/specs/2026-07-06-ameriabank-payments-design.md`.
+
 Date: 2026-06-16
 
 This file records the implementation defaults used by the MVP task list.
