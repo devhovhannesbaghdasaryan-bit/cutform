@@ -28,6 +28,7 @@ const serverShape = {
   AMERIA_USERNAME: optionalNonEmpty,
   AMERIA_PASSWORD: optionalNonEmpty,
   AMERIA_ORDER_ID_BASE: optionalNonEmpty,
+  POLAR_ENABLED: optionalNonEmpty,
   EXCHANGE_RATE_API_URL: optionalNonEmpty,
   EXCHANGE_RATE_API_KEY: optionalNonEmpty,
   EXCHANGE_RATE_PROVIDER: optionalNonEmpty,
