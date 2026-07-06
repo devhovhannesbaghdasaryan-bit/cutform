@@ -1186,6 +1186,7 @@ export type Database = {
       }
       orders: {
         Row: {
+          billing_country_code: string | null
           cart_id: string | null
           contact_email: string | null
           created_at: string
@@ -1207,6 +1208,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          billing_country_code?: string | null
           cart_id?: string | null
           contact_email?: string | null
           created_at?: string
@@ -1228,6 +1230,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          billing_country_code?: string | null
           cart_id?: string | null
           contact_email?: string | null
           created_at?: string
