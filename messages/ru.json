@@ -468,6 +468,7 @@
     "generationInstruction": "Инструкция для AI-генерации",
     "displayOrder": "Порядок отображения",
     "requiresSvg": "Требуется производственный файл",
+    "openaiFileId": "ID файла OpenAI",
     "updateBoilerplate": "Обновить шаблон",
     "addBoilerplate": "Добавить шаблон",
     "modelTitle": "Название",

@@ -55,7 +55,7 @@ export default async function NightLightPersonalizationPage() {
       .returns<{ id: string; name: string; category_id: string }[]>(),
     supabase
       .from('personalization_boilerplates')
-      .select('id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order')
+      .select('id, model_id, admin_name, name_en, name_hy, name_ru, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order')
       .order('sort_order')
       .returns<PersonalizationBoilerplate[]>(),
   ]);
@@ -198,6 +198,11 @@ async function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boil
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" defaultChecked={boilerplate?.is_active ?? true} /> {t('profile.status.active')}</label>
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="generateHiddenSvg" defaultChecked={boilerplate?.generate_hidden_svg ?? false} /> {t('personalization.requiresSvg')}</label>
       </div>
+      {boilerplate ? (
+        <p className="text-xs text-muted-foreground md:col-span-3">
+          {t('personalization.openaiFileId')}: <code>{boilerplate.openai_file_id}</code>
+        </p>
+      ) : null}
       <div className="flex items-center gap-2 md:col-span-3">
         <Button type="submit" size="sm">{boilerplate ? t('personalization.updateBoilerplate') : t('personalization.addBoilerplate')}</Button>
         {boilerplate ? (

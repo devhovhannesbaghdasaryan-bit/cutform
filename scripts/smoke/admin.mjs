@@ -49,7 +49,7 @@ for (const action of [
 }
 
 const personalizationPage = readFileSync('app/personalization/night-lights/page.tsx', 'utf8');
-for (const contract of ['ImageUploadField', 'mockImagePath', 'boilerplateImagePath', 'resolvePublicStorageUrl']) {
+for (const contract of ['ImageUploadField', 'mockImagePath', 'boilerplateImagePath', 'resolvePublicStorageUrl', 'openai_file_id']) {
   if (!personalizationPage.includes(contract)) throw new Error(`Missing personalization image contract: ${contract}`);
 }
 
