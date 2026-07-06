@@ -39,7 +39,12 @@ for (const removedRoute of [
 }
 
 const personalizationActions = readFileSync('app/personalization/night-lights/actions.ts', 'utf8');
-for (const action of ['savePersonalizationBoilerplateAction', 'removePersonalizationBoilerplateAction']) {
+for (const action of [
+  'savePersonalizationBoilerplateAction',
+  'removePersonalizationBoilerplateAction',
+  'uploadReferenceImage',
+  'deleteReferenceFile',
+]) {
   if (!personalizationActions.includes(action)) throw new Error(`Missing personalization admin action: ${action}`);
 }
 
