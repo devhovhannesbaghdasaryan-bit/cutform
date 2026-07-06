@@ -1,19 +1,24 @@
 import { redirect } from 'next/navigation';
 import { Coins } from 'lucide-react';
-import { createCreditPackCheckoutAction } from '@/app/credits/actions';
+import { CreditPurchaseForm } from '@/components/credits/credit-purchase-form';
 import { SiteHeader } from '@/components/site-header';
-import { Button } from '@/components/ui/button';
 import { CREDIT_PACKS } from '@/lib/credit-packs';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { getTranslations } from 'next-intl/server';
 import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getPaymentRoute } from '@/lib/payments/router';
+import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
+import { isPolarEnabled } from '@/lib/payments/polar';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CreditsPage() {
+export default async function CreditsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
+  const { checkout: checkoutStatus } = await searchParams;
   const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
   const user = await getCurrentUser();
   if (!user) redirect('/login');
@@ -64,20 +69,30 @@ export default async function CreditsPage() {
         normalizeCurrency(pack.currency) ?? 'AMD',
         activeCurrency,
       );
-      const paymentRoute = await getPaymentRoute(converted.currency);
       return {
         ...pack,
         displayPriceCents: converted.amountCents,
         displayCurrency: converted.currency,
-        paymentRoute,
       };
     }),
   );
+  const [market, geography] = await Promise.all([resolveMarket(), listMarketGeography(supabase)]);
+  const countries = geography.countries
+    .filter((country) => country.is_active)
+    .map((country) => ({ code: country.code, label: getCountryDisplayName(country.code, locale) }))
+    .sort((a, b) => a.label.localeCompare(b.label, locale));
+  const defaultBillingCountry = market.countryCode ?? 'AM';
+  const polarEnabled = isPolarEnabled();
 
   return (
     <>
       <SiteHeader email={user.email ?? ''} />
       <main className="container max-w-3xl space-y-6 py-10">
+        {checkoutStatus === 'polar_unavailable' ? (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            {t('checkout.polar_unavailable')}
+          </div>
+        ) : null}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">{t('credits.title')}</h1>
           <p className="text-muted-foreground">
@@ -132,21 +147,23 @@ export default async function CreditsPage() {
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {displayPacks.map((pack) => (
-              <form key={pack.key} action={createCreditPackCheckoutAction} className="space-y-4 rounded-md border p-4">
-                <input type="hidden" name="packKey" value={pack.key} />
+              <CreditPurchaseForm
+                key={pack.key}
+                packKey={pack.key}
+                countries={countries}
+                defaultCountry={defaultBillingCountry}
+                polarEnabled={polarEnabled}
+                billingLabel={t('checkout.billing_country')}
+                unavailableLabel={t('checkout.polar_unavailable')}
+                buyLabel={t('credits.buy')}
+              >
                 <div>
                   <h3 className="font-medium">{pack.name}</h3>
                   <p className="text-2xl font-bold">{pack.creditAmount} {t('credits.unit')}</p>
                   <p className="text-sm text-muted-foreground">{formatLocalizedCurrency(locale, pack.displayPriceCents, pack.displayCurrency)}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {pack.paymentRoute === 'ameria' ? t('credits.ameria') : t('credits.manual')}
-                  </p>
                 </div>
                 <p className="min-h-10 text-xs text-muted-foreground">{pack.description}</p>
-                <Button type="submit" className="w-full">
-                  {t('credits.buy')}
-                </Button>
-              </form>
+              </CreditPurchaseForm>
             ))}
           </div>
           {pendingRequests?.length ? (
