@@ -137,7 +137,7 @@ async function ImageUploadField({
       <input type="hidden" name={pathName} value={currentPath ?? ''} />
       <div className="flex aspect-[4/3] max-w-sm items-center justify-center overflow-hidden rounded-md border bg-muted/30">
         {currentUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- Admin uploads can include SVG files.
+          // biome-ignore lint/performance/noImgElement: admin uploads can be SVG
           <img
             src={currentUrl}
             alt={t('personalization.currentImageAlt', { label: label.toLowerCase() })}

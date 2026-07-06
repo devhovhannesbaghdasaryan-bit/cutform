@@ -408,12 +408,14 @@ export async function validateCartBeforeCheckout(
           item.configuration,
           'personalizedPreviewOptionId',
         );
-        const { data: option, error: optionError } = await supabase
-          .from('personalized_preview_options')
-          .select('id')
-          .eq('id', optionId!)
-          .eq('generated_item_id', item.generated_item_id)
-          .maybeSingle();
+        const { data: option, error: optionError } = optionId
+          ? await supabase
+              .from('personalized_preview_options')
+              .select('id')
+              .eq('id', optionId)
+              .eq('generated_item_id', item.generated_item_id)
+              .maybeSingle()
+          : { data: null, error: null };
         if (optionError || !option) {
           issues.push({
             cartItemId: item.id,

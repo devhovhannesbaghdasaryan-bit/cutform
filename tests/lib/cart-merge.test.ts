@@ -102,7 +102,9 @@ describe('planCartMerge', () => {
     const existing = [userItem()];
 
     const plan = planCartMerge(sessionItems, existing);
-    plan.inserts[0]!.title = 'Changed';
+    const first = plan.inserts[0];
+    if (!first) throw new Error('expected planCartMerge to produce at least one insert');
+    first.title = 'Changed';
     plan.inserts.push(snapshot({ title: 'Extra' }));
 
     expect(sessionItem.title).toBe('Walnut coaster');

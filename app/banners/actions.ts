@@ -176,8 +176,8 @@ export async function generateBannerAction(formData: FormData) {
   let generatedId: string | null = null;
   const creditSupabase = cost > 0 ? getServiceSupabase() : null;
   try {
-    if (cost > 0) {
-      await debitBannerCredits(creditSupabase!, {
+    if (creditSupabase) {
+      await debitBannerCredits(creditSupabase, {
         userId: user.id,
         amount: cost,
         metadata: { prompt: parsed.data.prompt, sizeKey: parsed.data.sizeKey },
@@ -209,8 +209,8 @@ export async function generateBannerAction(formData: FormData) {
     });
     generatedId = generated.id;
   } catch (error) {
-    if (debited) {
-      await refundBannerCredits(creditSupabase!, {
+    if (debited && creditSupabase) {
+      await refundBannerCredits(creditSupabase, {
         userId: user.id,
         amount: cost,
         metadata: { reason: error instanceof Error ? error.message : 'banner_generation_failed' },

@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!lib/supabase/database.types.ts", "!messages/**", "!**/*.css"]
+    "includes": [
+      "**",
+      "!lib/supabase/database.types.ts",
+      "!messages",
+      "!scripts",
+      "!supabase/templates",
+      "!**/*.css"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -30,7 +37,7 @@
     "linter": { "enabled": false }
   },
   "linter": {
-    "enabled": false
+    "enabled": true
   },
   "assist": {
     "enabled": false

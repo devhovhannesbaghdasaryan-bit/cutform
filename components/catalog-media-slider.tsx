@@ -48,13 +48,14 @@ export function CatalogMediaSlider({
   return (
     <div className="group/media relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border border-black/10 bg-white/35 text-center shadow-inner">
       {sourceUrl && current?.media_type === 'image' ? (
-        // eslint-disable-next-line @next/next/no-img-element -- Storage URLs are admin-managed and can include SVG.
+        // biome-ignore lint/performance/noImgElement: admin-managed storage URLs can be SVG; next/image cannot render SVG markup
         <img
           src={sourceUrl}
           alt={current.alt_text ?? fallbackTitle}
           className="h-full w-full object-cover"
         />
       ) : sourceUrl && current?.media_type === 'video' ? (
+        // biome-ignore lint/a11y/noStaticElementInteractions: hover play/pause is a non-essential enhancement; the video element carries its own controls
         <div className="relative h-full w-full" onMouseEnter={playVideo} onMouseLeave={pauseVideo}>
           <video
             ref={videoRef}

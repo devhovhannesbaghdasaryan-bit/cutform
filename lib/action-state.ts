@@ -31,7 +31,8 @@ export function zodErrorToState(error: z.ZodError): ActionState<never> {
   const fieldErrors: Record<string, string[]> = {};
   for (const issue of error.issues) {
     const key = issue.path.join('.') || '_root';
-    (fieldErrors[key] ??= []).push(issue.message);
+    fieldErrors[key] ??= [];
+    fieldErrors[key].push(issue.message);
   }
   return actionError(error.issues[0]?.message ?? 'Invalid input.', fieldErrors);
 }

@@ -193,7 +193,7 @@ export default async function CartPage() {
                     <div key={item.id} className="grid gap-4 p-4 sm:grid-cols-[96px_1fr_auto]">
                       <div className="flex aspect-square items-center justify-center overflow-hidden rounded-md border bg-muted text-xs text-muted-foreground">
                         {previewUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element -- Signed generated-asset URLs are dynamic and expire.
+                          // biome-ignore lint/performance/noImgElement: signed generated-asset URLs are dynamic and expire
                           <img
                             src={previewUrl}
                             alt={t('cart.preview_alt', { name: item.title })}

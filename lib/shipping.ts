@@ -65,6 +65,7 @@ export async function calculateOrderTotals({
   const shippingLines: ShippingLineTotal[] = [];
 
   for (const item of catalogItems) {
+    // biome-ignore lint/style/noNonNullAssertion: resolutions has an entry for every catalog item id
     const resolution = resolutions.get(item.catalog_item_id)!;
     if (
       !resolution.availability.available ||

@@ -264,5 +264,6 @@ export async function resolveCatalogMarket(
   market: ResolvedMarket,
   supabase?: SupabaseClient,
 ) {
+  // biome-ignore lint/style/noNonNullAssertion: resolveCatalogMarkets returns an entry for every requested id
   return (await resolveCatalogMarkets([itemId], market, supabase)).get(itemId)!;
 }

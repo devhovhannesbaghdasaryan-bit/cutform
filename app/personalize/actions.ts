@@ -132,7 +132,7 @@ export async function generatePersonalizedNightLightAction(
   if (creditCost > 0) {
     try {
       creditSupabase = getServiceSupabase();
-      const availableCredits = await getCreditBalance(creditSupabase!, user.id);
+      const availableCredits = await getCreditBalance(creditSupabase, user.id);
       if (availableCredits < creditCost) {
         return {
           code: 'insufficient_credits',
@@ -141,7 +141,7 @@ export async function generatePersonalizedNightLightAction(
           availableCredits,
         };
       }
-      await debitCredits(creditSupabase!, {
+      await debitCredits(creditSupabase, {
         userId: user.id,
         amount: creditCost,
         referenceType: 'personalized_night_light',
@@ -247,9 +247,9 @@ export async function generatePersonalizedNightLightAction(
     }
     await createPersonalizedPreviewOptions(supabase, options);
   } catch (error) {
-    if (debited) {
+    if (debited && creditSupabase) {
       try {
-        await refundCredits(creditSupabase!, {
+        await refundCredits(creditSupabase, {
           userId: user.id,
           amount: creditCost,
           referenceType: 'personalized_night_light',

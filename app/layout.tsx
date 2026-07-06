@@ -25,6 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang={getLocaleForFormatting(locale)} suppressHydrationWarning>
       <head>
         <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline theme bootstrap script; no user input
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('snip-theme');var d=t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){}})()`,
           }}

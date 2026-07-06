@@ -12,10 +12,14 @@ export function MarketRulesSection({
   marketRules: MarketRuleFormValue[];
 }) {
   const regionRuleById = new Map(
-    marketRules.filter((rule) => rule.region_id).map((rule) => [rule.region_id!, rule]),
+    marketRules
+      .filter((rule): rule is typeof rule & { region_id: string } => Boolean(rule.region_id))
+      .map((rule) => [rule.region_id, rule]),
   );
   const countryRuleByCode = new Map(
-    marketRules.filter((rule) => rule.country_code).map((rule) => [rule.country_code!, rule]),
+    marketRules
+      .filter((rule): rule is typeof rule & { country_code: string } => Boolean(rule.country_code))
+      .map((rule) => [rule.country_code, rule]),
   );
 
   return (

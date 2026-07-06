@@ -131,5 +131,5 @@ export async function setCurrencyPreferenceAction(formData: FormData) {
   revalidatePath('/credits');
 
   const next = parsed.data.next;
-  if (next && next.startsWith('/') && !next.startsWith('//')) redirect(next);
+  if (next?.startsWith('/') && !next.startsWith('//')) redirect(next);
 }

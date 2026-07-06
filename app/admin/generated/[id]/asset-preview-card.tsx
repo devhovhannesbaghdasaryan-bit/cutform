@@ -33,8 +33,7 @@ export function AssetPreviewCard({
         >
           {url ? (
             isSvg ? (
-              // SVGs are sanitized before storage; rendering as an image keeps their scripts inert.
-              // eslint-disable-next-line @next/next/no-img-element
+              // biome-ignore lint/performance/noImgElement: sanitized SVG rendered inline; next/image cannot render SVG markup
               <img src={url} alt="" className="h-full w-full object-contain p-1" />
             ) : (
               <Image src={url} alt="" fill unoptimized sizes="80px" className="object-cover" />
@@ -76,6 +75,7 @@ export function AssetPreviewCard({
       </div>
 
       {url ? (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: native <dialog> closes on Escape; onClick only handles backdrop dismiss
         <dialog
           ref={dialogRef}
           aria-label={`${title} preview`}
@@ -100,7 +100,7 @@ export function AssetPreviewCard({
           </div>
           <div className="grid max-h-[75dvh] min-h-48 place-items-center overflow-auto bg-muted/50 p-2 sm:min-h-72 sm:p-4">
             {isSvg ? (
-              // eslint-disable-next-line @next/next/no-img-element
+              // biome-ignore lint/performance/noImgElement: sanitized SVG rendered inline; next/image cannot render SVG markup
               <img src={url} alt={title} className="max-h-[70vh] max-w-full object-contain" />
             ) : (
               <Image

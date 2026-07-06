@@ -133,8 +133,7 @@ export function PersonalizedNightLightForm({
                     className="sr-only"
                   />
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                    {/* Dynamic signed storage URLs are intentionally rendered without Next image optimization. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {/* biome-ignore lint/performance/noImgElement: dynamic signed storage URL; next/image cannot optimize expiring URLs */}
                     <img
                       src={option.imageUrl}
                       alt=""
@@ -163,9 +162,10 @@ export function PersonalizedNightLightForm({
 
       <section className="space-y-2">
         <Label htmlFor="images">{copy.image}</Label>
+        {/* biome-ignore lint/a11y/noLabelWithoutControl: label wraps the file input control */}
         <label className="relative flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-dashed bg-muted/30 p-5 text-center text-sm text-muted-foreground transition hover:bg-muted/50">
           {filePreview ? (
-            // eslint-disable-next-line @next/next/no-img-element
+            // biome-ignore lint/performance/noImgElement: local FileReader data-URL preview
             <img
               src={filePreview}
               alt=""
@@ -238,7 +238,7 @@ export function PersonalizedNightLightForm({
           </span>
         </div>
         <div className="overflow-hidden rounded-md border bg-background">
-          <div className="flex gap-1 border-b bg-muted/40 p-1" aria-label="Text formatting">
+          <div className="flex gap-1 border-b bg-muted/40 p-1" role="toolbar" aria-label="Text formatting">
             <EditorButton label="Bold" onClick={() => format('bold')}>
               <Bold className="h-4 w-4" />
             </EditorButton>
@@ -258,10 +258,12 @@ export function PersonalizedNightLightForm({
                 {copy.textPlaceholder}
               </span>
             ) : null}
+            {/* biome-ignore lint/a11y/useSemanticElements: rich contentEditable editor; textarea/input cannot hold formatted content */}
             <div
               ref={editorRef}
               id="customTextEditor"
               contentEditable
+              tabIndex={0}
               role="textbox"
               aria-multiline="true"
               className="min-h-24 px-3 py-2 text-sm outline-none"

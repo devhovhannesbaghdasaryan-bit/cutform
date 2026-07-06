@@ -218,7 +218,10 @@ export default async function AdminGeneratedDetailPage({
                 placeholder="Reason, production concerns, or change request."
               />
             </div>
-            <button className="h-10 w-full rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">
+            <button
+              type="submit"
+              className="h-10 w-full rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+            >
               Save review
             </button>
           </form>

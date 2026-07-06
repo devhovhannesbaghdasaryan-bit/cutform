@@ -45,7 +45,7 @@ export default async function PersonalizedNightLightsPage() {
                 <article key={model.id} className="rounded-lg border bg-card p-4">
                   <div className="flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border bg-muted text-sm text-muted-foreground">
                     {mockImagePath ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- Admin-managed mock images can include SVG files.
+                      // biome-ignore lint/performance/noImgElement: admin-managed mock images can be SVG
                       <img
                         src={resolvePublicStorageUrl('catalog-assets', mockImagePath) ?? undefined}
                         alt={t('personalizedList.previewAlt', { title: model.title })}

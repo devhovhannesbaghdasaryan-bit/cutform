@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { generateImage } from 'ai';
 import { openai, type OpenAIImageModelEditOptions } from '@ai-sdk/openai';
 import { z } from 'zod';
-import { requireAdmin, requireAdminPermission } from '@/lib/admin';
+import { type requireAdmin, requireAdminPermission } from '@/lib/admin';
 import { updateGeneratedReviewStatus } from '@/lib/generated-items';
 import { downloadFromBucket, uploadToBucket } from '@/lib/storage';
 import { writeAdminAuditLog } from '@/lib/transactions';

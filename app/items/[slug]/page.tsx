@@ -90,6 +90,7 @@ export default async function CatalogItemDetailPage({
       <MarketplaceHeader />
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data serialized from trusted server data, not user input
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <main className="container max-w-6xl space-y-8 py-10">

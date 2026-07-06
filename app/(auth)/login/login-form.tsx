@@ -40,7 +40,8 @@ export function LoginForm({
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-2" aria-label={copy.socialOptions}>
+      {/* biome-ignore lint/a11y/useSemanticElements: div+role="group" preserves existing markup; a native fieldset's default browser chrome is not desired here */}
+      <div className="grid gap-2" role="group" aria-label={copy.socialOptions}>
         {providers.map((provider) => (
           <form action={socialLoginAction} key={provider.id}>
             <input type="hidden" name="provider" value={provider.id} />

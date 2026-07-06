@@ -10,7 +10,7 @@ import type { Json } from '@/lib/supabase/types';
 import {
   type AdminSupabase,
   getOptionalFile,
-  itemSchema,
+  type itemSchema,
   parseItemForm,
   parseKeywords,
   parseSizesJson,
