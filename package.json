@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
     "test": "vitest run",
     "db:types": "supabase gen types typescript --local --schema public > lib/supabase/database.types.ts",
     "smoke:i18n": "node scripts/smoke/i18n.mjs",
@@ -48,6 +50,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.2",
     "@next/eslint-plugin-next": "^16.2.6",
     "@tailwindcss/postcss": "^4.3.0",
     "@types/node": "^25.9.0",
