@@ -3,9 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { getServerEnv } from '@/lib/env';
 import { createOrderFromCart } from '@/lib/orders';
-import { getStripe } from '@/lib/stripe';
+import { initiateAmeriaPayment } from '@/lib/payments/ameria';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
 
@@ -69,7 +68,7 @@ export async function createCheckoutOrderAction(formData: FormData) {
       total_cents: number;
       currency: string;
       exchange_rate_context: Record<string, unknown>;
-      payment_provider_route: 'stripe' | 'bank_manual' | null;
+      payment_provider_route: 'ameria' | 'bank_manual' | null;
     }>();
 
   if (totalError || !orderTotals) throw new Error(totalError?.message ?? 'Unable to read order total.');
@@ -106,42 +105,16 @@ export async function createCheckoutOrderAction(formData: FormData) {
   revalidatePath('/checkout');
   revalidatePath('/orders');
 
-  if (orderTotals.payment_provider_route !== 'stripe') {
+  if (orderTotals.payment_provider_route !== 'ameria') {
     redirect(`/orders/${order.id}?checkout=bank_pending`);
   }
 
-  const siteUrl = getServerEnv().NEXT_PUBLIC_SITE_URL;
-  const session = await getStripe().checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    customer_email: user.email ?? undefined,
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: orderTotals.currency.toLowerCase(),
-          unit_amount: orderTotals.total_cents,
-          product_data: {
-            name: `Uniqraft order ${order.id.slice(0, 8)}`,
-          },
-        },
-      },
-    ],
-    metadata: {
-      purchaseType: 'order',
-      transactionId: transaction.id,
-      orderId: order.id,
-      userId: user.id,
-    },
-    success_url: `${siteUrl}/orders/${order.id}?checkout=success`,
-    cancel_url: `${siteUrl}/checkout?checkout=cancelled`,
+  const { redirectUrl } = await initiateAmeriaPayment(service, {
+    transactionId: transaction.id,
+    amountCents: orderTotals.total_cents,
+    currency: orderTotals.currency,
+    description: `Uniqraft order ${order.id.slice(0, 8)}`,
+    locale: parsed.data.locale || null,
   });
-
-  await service
-    .from('transactions')
-    .update({ provider_reference: session.id })
-    .eq('id', transaction.id);
-
-  if (!session.url) throw new Error('Stripe did not return a checkout URL.');
-  redirect(session.url);
+  redirect(redirectUrl);
 }
