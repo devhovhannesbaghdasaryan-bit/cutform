@@ -45,7 +45,7 @@ describe('generateOpenAiImage', () => {
 
     expect(result.bytes).toEqual(new Uint8Array(Buffer.from('generated-bytes')));
     expect(create).toHaveBeenCalledTimes(1);
-    // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test double for the Responses API request body
     const requestBody = (create.mock.calls[0] as any[])[0];
     expect(requestBody.model).toBe('gpt-5-mini');
     expect(requestBody.store).toBe(false);
