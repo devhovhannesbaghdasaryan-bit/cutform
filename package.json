@@ -21,6 +21,7 @@
     "smoke:runtime": "node scripts/smoke/runtime-local.mjs",
     "smoke:db-workflows": "node scripts/smoke/db-workflows.mjs",
     "smoke:ui-workflows": "node scripts/smoke/ui-workflows.mjs",
+    "smoke:payments": "node scripts/smoke/payments-ameria.mjs",
     "smoke": "pnpm smoke:i18n && pnpm smoke:seo && pnpm smoke:redesign && pnpm smoke:generation && pnpm smoke:credits && pnpm smoke:currency && pnpm smoke:markets && pnpm smoke:catalog-media && pnpm smoke:admin"
   },
   "dependencies": {
