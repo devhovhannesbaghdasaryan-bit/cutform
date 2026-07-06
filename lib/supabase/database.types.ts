@@ -1286,6 +1286,7 @@ export type Database = {
           name_en: string | null
           name_hy: string | null
           name_ru: string | null
+          openai_file_id: string
           sort_order: number
           updated_at: string
         }
@@ -1302,6 +1303,7 @@ export type Database = {
           name_en?: string | null
           name_hy?: string | null
           name_ru?: string | null
+          openai_file_id: string
           sort_order?: number
           updated_at?: string
         }
@@ -1318,6 +1320,7 @@ export type Database = {
           name_en?: string | null
           name_hy?: string | null
           name_ru?: string | null
+          openai_file_id?: string
           sort_order?: number
           updated_at?: string
         }
