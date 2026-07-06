@@ -470,6 +470,7 @@
     "generationInstruction": "AI generation instruction",
     "displayOrder": "Display order",
     "requiresSvg": "Requires manufacturing file",
+    "openaiFileId": "OpenAI file ID",
     "updateBoilerplate": "Update boilerplate",
     "addBoilerplate": "Add boilerplate",
     "modelTitle": "Title",

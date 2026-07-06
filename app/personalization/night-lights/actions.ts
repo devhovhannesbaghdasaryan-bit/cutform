@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
+import { getOpenAiClient } from '@/lib/openai-client';
+import { deleteReferenceFile, uploadReferenceImage } from '@/lib/openai-files';
 
 const imageExtByMime: Record<string, string> = {
   ...IMAGE_EXTENSION_BY_MIME,
@@ -155,14 +157,47 @@ export async function savePersonalizationBoilerplateAction(formData: FormData) {
 
   const { supabase, user } = await requireAdminPermission('catalog_manage');
   const values = parsed.data;
-  const imageUpload = await uploadModelImage(
-    supabase,
-    user.id,
-    getFile(formData, 'imageFile'),
-    'boilerplate',
-  );
-  const imagePath = imageUpload ?? values.imagePath;
-  if (!imagePath) throw new Error('Upload a boilerplate image.');
+  const newImageFile = getFile(formData, 'imageFile');
+
+  let imagePath: string;
+  let openaiFileId: string;
+  let previousOpenaiFileId: string | null = null;
+
+  if (newImageFile) {
+    const ext = imageExtByMime[newImageFile.type];
+    if (!ext) throw new Error('Upload PNG, JPG, WEBP, or SVG images only.');
+    if (newImageFile.size > 10 * 1024 * 1024)
+      throw new Error('Template images must be 10 MB or smaller.');
+
+    // OpenAI upload happens first: if it fails, nothing is persisted.
+    openaiFileId = await uploadReferenceImage(getOpenAiClient(), newImageFile);
+    imagePath = await uploadToBucket(supabase, {
+      bucket: 'catalog-assets',
+      path: `${user.id}/personalization-models/boilerplate-${crypto.randomUUID()}.${ext}`,
+      body: await newImageFile.arrayBuffer(),
+      contentType: newImageFile.type,
+    });
+
+    if (values.id) {
+      const { data: existing } = await supabase
+        .from('personalization_boilerplates')
+        .select('openai_file_id')
+        .eq('id', values.id)
+        .maybeSingle<{ openai_file_id: string }>();
+      previousOpenaiFileId = existing?.openai_file_id ?? null;
+    }
+  } else if (!values.id) {
+    throw new Error('Upload a boilerplate image.');
+  } else {
+    const { data: existing } = await supabase
+      .from('personalization_boilerplates')
+      .select('openai_file_id, image_path')
+      .eq('id', values.id)
+      .maybeSingle<{ openai_file_id: string; image_path: string }>();
+    if (!existing) throw new Error('Boilerplate not found.');
+    openaiFileId = existing.openai_file_id;
+    imagePath = existing.image_path;
+  }
 
   const payload = {
     model_id: values.modelId,
@@ -171,6 +206,7 @@ export async function savePersonalizationBoilerplateAction(formData: FormData) {
     name_hy: values.nameHy || null,
     name_ru: values.nameRu || null,
     image_path: imagePath,
+    openai_file_id: openaiFileId,
     manufacturing_process: values.manufacturingProcess,
     generation_instruction: values.generationInstruction,
     sort_order: values.sortOrder,
@@ -188,6 +224,8 @@ export async function savePersonalizationBoilerplateAction(formData: FormData) {
   const { error } = await query;
   if (error) throw new Error(error.message);
 
+  if (previousOpenaiFileId) await deleteReferenceFile(getOpenAiClient(), previousOpenaiFileId);
+
   const { data: model } = await supabase
     .from('personalization_models')
     .select('slug')
@@ -204,11 +242,20 @@ export async function removePersonalizationBoilerplateAction(formData: FormData)
   if (!parsed.success) throw new Error('Invalid boilerplate.');
 
   const { supabase } = await requireAdminPermission('catalog_manage');
+  const { data: existing } = await supabase
+    .from('personalization_boilerplates')
+    .select('openai_file_id')
+    .eq('id', parsed.data.id)
+    .maybeSingle<{ openai_file_id: string }>();
+
   const { error } = await supabase
     .from('personalization_boilerplates')
     .delete()
     .eq('id', parsed.data.id);
   if (error) throw new Error(error.message);
+
+  if (existing?.openai_file_id)
+    await deleteReferenceFile(getOpenAiClient(), existing.openai_file_id);
 
   const { data: model } = await supabase
     .from('personalization_models')

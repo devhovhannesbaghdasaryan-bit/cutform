@@ -238,7 +238,11 @@ export function PersonalizedNightLightForm({
           </span>
         </div>
         <div className="overflow-hidden rounded-md border bg-background">
-          <div className="flex gap-1 border-b bg-muted/40 p-1" role="toolbar" aria-label="Text formatting">
+          <div
+            className="flex gap-1 border-b bg-muted/40 p-1"
+            role="toolbar"
+            aria-label="Text formatting"
+          >
             <EditorButton label="Bold" onClick={() => format('bold')}>
               <Bold className="h-4 w-4" />
             </EditorButton>

@@ -23,6 +23,7 @@ const serverShape = {
   SUPABASE_SERVICE_ROLE_KEY: optionalNonEmpty,
   OPENAI_API_KEY: optionalNonEmpty,
   OPENAI_IMAGE_MODEL: optionalNonEmpty,
+  OPENAI_RESPONSES_MODEL: optionalNonEmpty,
   AMERIA_API_BASE_URL: optionalNonEmpty,
   AMERIA_CLIENT_ID: optionalNonEmpty,
   AMERIA_USERNAME: optionalNonEmpty,

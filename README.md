@@ -64,6 +64,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<PUBLISHABLE_KEY from supabase status>
 SUPABASE_SECRET_KEY=<SECRET_KEY from supabase status>
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 OPENAI_API_KEY=sk-...
+# OPENAI_IMAGE_MODEL=gpt-image-2
+# OPENAI_RESPONSES_MODEL=gpt-5-mini
 ```
 
 Local Supabase ships demo JWT keys — they are stable across resets and safe to

@@ -31,7 +31,11 @@ export function LanguageSwitcher({ activeLocale = 'en' }: { activeLocale?: AppLo
 
   return (
     // biome-ignore lint/a11y/useSemanticElements: div+role="group" preserves existing markup; a native fieldset's default browser chrome is not desired here
-    <div className="inline-flex rounded-md border bg-background p-0.5" role="group" aria-label="Language">
+    <div
+      className="inline-flex rounded-md border bg-background p-0.5"
+      role="group"
+      aria-label="Language"
+    >
       {APP_LOCALES.map((locale) => (
         <button
           key={locale}

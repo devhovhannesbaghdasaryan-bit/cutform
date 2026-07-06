@@ -58,7 +58,7 @@ export default async function NightLightPersonalizationPage() {
     supabase
       .from('personalization_boilerplates')
       .select(
-        'id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order',
+        'id, model_id, admin_name, name_en, name_hy, name_ru, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order',
       )
       .order('sort_order')
       .returns<PersonalizationBoilerplate[]>(),
@@ -137,7 +137,7 @@ async function ImageUploadField({
       <input type="hidden" name={pathName} value={currentPath ?? ''} />
       <div className="flex aspect-[4/3] max-w-sm items-center justify-center overflow-hidden rounded-md border bg-muted/30">
         {currentUrl ? (
-          // biome-ignore lint/performance/noImgElement: admin uploads can be SVG
+          // biome-ignore lint/performance/noImgElement: admin uploads can be SVG; next/image cannot render SVG markup
           <img
             src={currentUrl}
             alt={t('personalization.currentImageAlt', { label: label.toLowerCase() })}
@@ -241,6 +241,11 @@ async function BoilerplateForm({
           {t('personalization.requiresSvg')}
         </label>
       </div>
+      {boilerplate ? (
+        <p className="text-xs text-muted-foreground md:col-span-3">
+          {t('personalization.openaiFileId')}: <code>{boilerplate.openai_file_id}</code>
+        </p>
+      ) : null}
       <div className="flex items-center gap-2 md:col-span-3">
         <Button type="submit" size="sm">
           {boilerplate
