@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PersonalizationBoilerplate } from "@/lib/personalization-boilerplates";
 
 /** Maps raw AI-provider errors to a customer-friendly generation message. */
 export function friendlyGenerationError(error: unknown) {
@@ -37,33 +38,6 @@ export const personalizedNightLightRequestSchema = z.object({
 export type PersonalizedNightLightRequest = z.infer<
   typeof personalizedNightLightRequestSchema
 >;
-
-export const NIGHT_LIGHT_BOILERPLATES = [
-  {
-    optionIndex: 1,
-    publicPath: "/product-references/night-lights/rectangular-uv-print.jpg",
-    fileName: "rectangular-uv-print.jpg",
-    process: "UV_PRINT" as const,
-    instruction:
-      "Use the attached rectangular clear acrylic panel and rectangular wood base as the authoritative product geometry. Preserve its panel silhouette, proportions, slot, base, and cable placement. Apply a tasteful full-color design to the printable acrylic area.",
-  },
-  {
-    optionIndex: 2,
-    publicPath: "/product-references/night-lights/round-uv-print.jpg",
-    fileName: "round-uv-print.jpg",
-    process: "UV_PRINT" as const,
-    instruction:
-      "Use the attached round clear acrylic panel and round wood base as the authoritative product geometry. Preserve its circle, proportions, slot, base, and cable placement. Apply a tasteful full-color design to the printable acrylic area.",
-  },
-  {
-    optionIndex: 3,
-    publicPath: "/product-references/night-lights/contour-laser-engraved.jpg",
-    fileName: "contour-laser-engraved.jpg",
-    process: "CO2_LASER_ENGRAVE" as const,
-    instruction:
-      "Use the attached contour-cut, laser-engraved acrylic example as the authoritative production style. Convert the user subject into sparse monochrome vector line art engraved into clear acrylic, with no colored ink or filled photographic image.",
-  },
-] as const;
 
 export function buildPersonalizedNightLightPrompt(
   input: PersonalizedNightLightRequest,
@@ -114,6 +88,9 @@ export function buildPersonalizedNightLightPrompt(
 
 export function buildPersonalizedNightLightOpenAiPayload(
   input: PersonalizedNightLightRequest,
+  selectedBoilerplates: Array<
+    Pick<PersonalizationBoilerplate, "image_path" | "manufacturing_process">
+  >,
 ) {
   const parsed = personalizedNightLightRequestSchema.parse(input);
   return {
@@ -121,11 +98,11 @@ export function buildPersonalizedNightLightOpenAiPayload(
     images: [
       ...parsed.userImagePaths,
       ...(parsed.boilerplateImagePath ? [parsed.boilerplateImagePath] : []),
-      ...NIGHT_LIGHT_BOILERPLATES.map((reference) => reference.publicPath),
+      ...selectedBoilerplates.map((reference) => reference.image_path),
     ],
-    expectedOptions: 3,
+    expectedOptions: selectedBoilerplates.length,
     outputContract: {
-      previews: "3 generated preview image paths or files",
+      previews: `${selectedBoilerplates.length} generated preview image paths or files`,
       metadata: [
         "modelId",
         "customText",
@@ -133,13 +110,11 @@ export function buildPersonalizedNightLightOpenAiPayload(
         "multiColor",
         "templateVersion",
       ],
-      optionProcesses: NIGHT_LIGHT_BOILERPLATES.map(
-        ({ optionIndex, process, publicPath }) => ({
-          optionIndex,
-          process,
-          publicPath,
-        }),
-      ),
+      optionProcesses: selectedBoilerplates.map((reference, index) => ({
+        optionIndex: index + 1,
+        process: reference.manufacturing_process,
+        publicPath: reference.image_path,
+      })),
     },
   };
 }
