@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { validateCartBeforeCheckout } from '@/lib/cart';
 import { normalizeCurrency } from '@/lib/currency';
-import { getPaymentRoute } from '@/lib/payments/router';
+import { resolvePaymentRoute } from '@/lib/payments/router';
 import { resolveMarket } from '@/lib/market';
 import { calculateOrderTotals, type ShippingAddress } from '@/lib/shipping';
 import type { Json, Tables } from '@/lib/supabase/types';
@@ -233,7 +233,12 @@ function getRecordValue(record: Record<string, unknown> | undefined, key: string
 export async function createOrderFromCart(
   supabase: SupabaseClient,
   userId: string,
-  options: { contactEmail?: string | null; locale?: string | null; shippingAddress?: ShippingAddress } = {},
+  options: {
+    contactEmail?: string | null;
+    locale?: string | null;
+    shippingAddress?: ShippingAddress;
+    billingCountryCode?: string | null;
+  } = {},
 ) {
   const address = options.shippingAddress;
   if (!address) throw new Error('Shipping address is required.');
@@ -266,7 +271,8 @@ export async function createOrderFromCart(
   }
 
   const orderCurrency = normalizeCurrency(cartItems[0]?.currency) ?? normalizeCurrency(cart.currency) ?? 'AMD';
-  const paymentProviderRoute = await getPaymentRoute(orderCurrency);
+  const billingCountryCode = options.billingCountryCode ?? address.countryCode;
+  const paymentProviderRoute = resolvePaymentRoute(billingCountryCode);
   const market = await resolveMarket({ checkoutCountryCode: address.countryCode, supabase });
   const totals = await calculateOrderTotals({
     items: cartItems,
@@ -292,6 +298,7 @@ export async function createOrderFromCart(
       currency: orderCurrency,
       exchange_rate_context: { items: exchangeRateContexts },
       payment_provider_route: paymentProviderRoute,
+      billing_country_code: billingCountryCode,
       contact_email: options.contactEmail ?? null,
       locale: options.locale ?? null,
       cart_id: cart.id,
