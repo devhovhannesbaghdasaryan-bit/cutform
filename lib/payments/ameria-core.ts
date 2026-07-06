@@ -108,13 +108,15 @@ export function decideOutcome(
     && (details.currencyCode === expectedCode || details.currencyCode === expected.currency);
 
   const state = details.paymentState;
-  if (details.responseCode === '00' && (state.includes('deposited') || state.includes('approved'))) {
+  if (details.responseCode === '00' && state.includes('deposited')) {
     return { outcome: amountMatches ? 'succeeded' : 'failed', amountMatches };
   }
   if (state.includes('void') || state.includes('cancel')) {
     return { outcome: 'cancelled', amountMatches };
   }
-  if (state === '' || state.includes('started')) {
+  // 'approved' = authorized; treated as pending (not success) until the
+  // merchant account is confirmed single-stage against the live API.
+  if (state === '' || state.includes('started') || state.includes('approved')) {
     return { outcome: 'pending', amountMatches };
   }
   return { outcome: 'failed', amountMatches };

@@ -163,6 +163,12 @@ describe('decideOutcome', () => {
     ).toBe('pending');
   });
 
+  it('stays pending for an approved (authorized-only) payment until capture mode is confirmed', () => {
+    expect(
+      decideOutcome({ ...paid, responseCode: '00', paymentState: 'payment_approved' }, expected).outcome,
+    ).toBe('pending');
+  });
+
   it('is cancelled for voided payments', () => {
     expect(
       decideOutcome({ ...paid, responseCode: '', paymentState: 'payment_void' }, expected).outcome,
