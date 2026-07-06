@@ -18,15 +18,13 @@ import { getActiveCartItemCount } from '@/lib/cart';
 import { getCreditBalanceForDisplay } from '@/lib/credits';
 import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 
 export async function SiteHeader({ email }: { email: string }) {
   const supabase = await getServerSupabase();
   const locale = await getRequestLocale();
   const t = await getTranslations();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const role = await getCurrentUserRole();
   const isAdmin = role === 'admin';
   const [creditBalance, cartCount] = user

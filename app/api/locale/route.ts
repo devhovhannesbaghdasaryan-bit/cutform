@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { APP_LOCALES, LOCALE_COOKIE, normalizeLocale } from '@/lib/i18n-config';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServiceSupabase } from '@/lib/supabase/server';
 
 // Accepts anything normalizeLocale can map ('hy', 'ru-RU', 'EN', ...) and
 // narrows the result to an APP_LOCALES member; everything else fails the parse.
@@ -24,10 +24,7 @@ export async function POST(request: NextRequest) {
   // never fail the request. RLS only allows admins to update profiles rows,
   // hence the service client scoped to the authenticated user's id.
   try {
-    const supabase = await getServerSupabase();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
 
     if (user) {
       await getServiceSupabase()

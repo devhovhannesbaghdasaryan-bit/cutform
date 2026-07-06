@@ -7,14 +7,14 @@ import { getTranslations } from 'next-intl/server';
 import { formatLocalizedDate } from '@/lib/i18n';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
   const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login');
 
   const { data: products, error } = await supabase

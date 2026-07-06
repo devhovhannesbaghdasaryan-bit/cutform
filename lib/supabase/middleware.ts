@@ -81,6 +81,10 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
+  // Per-request session refresh: the one place that can write refreshed auth
+  // cookies (middleware runs outside the React cache scope). Intentionally
+  // separate from getCurrentUser (lib/supabase/server.ts), which only reads and
+  // validates the session within a render.
   const {
     data: { user },
   } = await supabase.auth.getUser();

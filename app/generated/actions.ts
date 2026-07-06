@@ -5,13 +5,11 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { addItemToCart } from '@/lib/cart';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 async function requireUser(next = '/dashboard') {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect(`/login?next=${encodeURIComponent(next)}`);
   return { supabase, user };

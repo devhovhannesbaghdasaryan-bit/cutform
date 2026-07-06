@@ -3,7 +3,7 @@ import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { getServerEnv } from '@/lib/env';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { resolveMarket } from '@/lib/market';
 import type { Json } from '@/lib/supabase/types';
 
@@ -89,9 +89,7 @@ export async function listEnabledCurrencies(supabase?: SupabaseClient) {
 
 export async function getActiveCurrency() {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const cookieStore = await cookies();
   const cookieCurrency = normalizeCurrency(

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { getServerEnv } from '@/lib/env';
 import { createOrderFromCart } from '@/lib/orders';
 import { createCheckoutSessionForTransaction } from '@/lib/stripe';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
 
 const checkoutSchema = z.object({
@@ -38,9 +38,7 @@ export async function createCheckoutOrderAction(formData: FormData) {
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid checkout data.');
 
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login?next=/checkout');
 
   const order = await createOrderFromCart(supabase, user.id, {

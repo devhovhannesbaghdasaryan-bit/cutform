@@ -8,7 +8,7 @@ import { updateActiveCartCurrency } from '@/app/currency/actions';
 import { getCartSessionId } from '@/lib/cart-session';
 import { CURRENCY_COOKIE, LEGACY_CURRENCY_COOKIE, listEnabledCurrencies, normalizeCurrency } from '@/lib/currency';
 import { COUNTRY_COOKIE, normalizeCountryCode, resolveMarket } from '@/lib/market';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServiceSupabase } from '@/lib/supabase/server';
 
 const countrySchema = z.object({
   country: z.string().trim().length(2),
@@ -40,8 +40,7 @@ export async function setCountryPreferenceAction(formData: FormData) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  const supabase = await getServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const sessionId = user ? null : await getCartSessionId({ create: false });
   if (user) {
     const { error: profileError } = await service

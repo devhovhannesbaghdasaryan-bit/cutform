@@ -18,7 +18,7 @@ import {
   friendlyGenerationError,
 } from "@/lib/personalized-night-light-ai";
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from "@/lib/storage";
-import { getServerSupabase, getServiceSupabase } from "@/lib/supabase/server";
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from "@/lib/supabase/server";
 import { debitCredits, getCreditBalance, refundCredits } from "@/lib/credits";
 import {
   loadBoilerplate,
@@ -76,9 +76,7 @@ export async function generatePersonalizedNightLightAction(
   formData: FormData,
 ): Promise<PersonalizedGenerationState> {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const rawModelId = String(formData.get("modelId") ?? "");
   if (!user)
     redirect(`/login?next=/personalize/${encodeURIComponent(rawModelId)}`);

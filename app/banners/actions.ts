@@ -6,7 +6,7 @@ import { debitBannerCredits, refundBannerCredits } from '@/lib/banner-credits';
 import { createGeneratedItem } from '@/lib/generated-items';
 import { BANNER_CREDIT_COSTS } from '@/lib/marketplace-constants';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 const bannerGenerationSchema = z.object({
   prompt: z.string().trim().min(5, 'Prompt is required.').max(2000),
@@ -85,9 +85,7 @@ export async function customizeBannerSampleAction(formData: FormData) {
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid banner customization.');
 
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login?next=/banners');
 
   const [{ data: sample, error: sampleError }, { data: preset, error: presetError }] = await Promise.all([
@@ -165,9 +163,7 @@ export async function generateBannerAction(formData: FormData) {
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid banner request.');
 
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login?next=/banners');
 
   const cost = BANNER_CREDIT_COSTS.advancedGeneration;

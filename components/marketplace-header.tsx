@@ -11,15 +11,13 @@ import { getCartSessionId } from '@/lib/cart-session';
 import { getCreditBalanceForDisplay } from '@/lib/credits';
 import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 export async function MarketplaceHeader() {
   const supabase = await getServerSupabase();
   const locale = await getRequestLocale();
   const t = await getTranslations();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const role = user ? await getCurrentUserRole() : null;
   const sessionId = user ? null : await getCartSessionId();
   const [creditBalance, cartCount] = user

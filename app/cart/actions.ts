@@ -11,14 +11,12 @@ import {
 } from '@/lib/cart';
 import { getCartSessionId } from '@/lib/cart-session';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { resolveCatalogMarket, resolveMarket } from '@/lib/market';
 
 async function getCartActor() {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (user) {
     const owner: CartOwner = { userId: user.id };

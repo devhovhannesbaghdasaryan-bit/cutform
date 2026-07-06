@@ -8,7 +8,7 @@ import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { getPrimaryCatalogMedia } from '@/lib/catalog-media';
 import { getPublishedPersonalizationModel, listPublishedCatalogItems } from '@/lib/marketplace';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getBoilerplateName, type PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
@@ -45,9 +45,7 @@ export default async function PersonalizedModelPage({
       .sort((a, b) => Number(b.is_popular) - Number(a.is_popular))
       .slice(0, 10))
     .catch(() => []);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   const { data: boilerplateRows } = await supabase
     .from('personalization_boilerplates')
     .select('id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order')

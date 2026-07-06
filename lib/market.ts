@@ -2,7 +2,7 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies, headers } from 'next/headers';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 // Writes always target COUNTRY_COOKIE; LEGACY_COUNTRY_COOKIE exists only as a
 // read fallback for pre-rename visitors (Phase 17 rename).
@@ -130,7 +130,7 @@ export async function resolveMarket(options: {
   }
 
   const supabase = await getServerSupabase();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')

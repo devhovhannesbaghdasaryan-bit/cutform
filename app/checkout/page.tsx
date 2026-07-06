@@ -12,7 +12,7 @@ import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
 import { calculateOrderTotals } from '@/lib/shipping';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
 import { getTranslations } from 'next-intl/server';
 
@@ -20,9 +20,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage() {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect('/login?next=/checkout');
 

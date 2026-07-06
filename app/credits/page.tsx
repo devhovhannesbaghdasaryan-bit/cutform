@@ -8,15 +8,13 @@ import { convertMoney, getActiveCurrency, getPaymentRouteForCurrency, normalizeC
 import { getTranslations } from 'next-intl/server';
 import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
 export default async function CreditsPage() {
   const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login');
 
   const { data: account } = await supabase

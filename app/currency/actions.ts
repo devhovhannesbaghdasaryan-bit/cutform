@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { getCartSessionId } from '@/lib/cart-session';
 import { CURRENCY_COOKIE, convertMoney, normalizeCurrency } from '@/lib/currency';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServiceSupabase } from '@/lib/supabase/server';
 
 const currencySchema = z.object({
   currency: z.string().trim().min(3).max(3),
@@ -108,10 +108,7 @@ export async function setCurrencyPreferenceAction(formData: FormData) {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (user) {
     const { error } = await service
       .from('profiles')

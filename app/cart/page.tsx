@@ -18,7 +18,7 @@ import { normalizeCurrency } from '@/lib/currency';
 import { resolveMarket } from '@/lib/market';
 import { calculateOrderTotals } from '@/lib/shipping';
 import { resolvePublicStorageUrl } from '@/lib/storage';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,9 +77,7 @@ async function getCartPreviewUrls(supabase: SupabaseClient, items: CartItem[]) {
 
 export default async function CartPage() {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const locale = await getRequestLocale();
   const t = await getTranslations();

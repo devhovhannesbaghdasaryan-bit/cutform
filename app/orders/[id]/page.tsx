@@ -3,7 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { getOrderDetail } from '@/lib/orders';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getTranslations } from 'next-intl/server';
@@ -17,9 +17,7 @@ export default async function OrderDetailPage({
 }) {
   const { id } = await params;
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect(`/login?next=/orders/${id}`);
 

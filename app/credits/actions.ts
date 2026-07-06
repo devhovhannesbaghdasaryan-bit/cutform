@@ -7,7 +7,7 @@ import { getCreditPack } from '@/lib/credit-packs';
 import { convertMoney, getActiveCurrency, getPaymentRouteForCurrency, normalizeCurrency } from '@/lib/currency';
 import { getServerEnv } from '@/lib/env';
 import { createCheckoutSessionForTransaction } from '@/lib/stripe';
-import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServiceSupabase } from '@/lib/supabase/server';
 import { createCreditPurchaseTransaction } from '@/lib/transactions';
 
 const creditPackRequestSchema = z.object({
@@ -23,10 +23,7 @@ export async function createCreditPackCheckoutAction(formData: FormData) {
   const pack = getCreditPack(parsed.data.packKey);
   if (!pack) throw new Error('Unknown credit pack.');
 
-  const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login?next=/credits');
 
   const service = getServiceSupabase();

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 
 export const ADMIN_PERMISSIONS = [
   'catalog_manage',
@@ -15,9 +15,7 @@ export type AdminPermission = (typeof ADMIN_PERMISSIONS)[number];
 
 export async function requireAdmin() {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect('/login?next=/admin');
 
@@ -64,9 +62,7 @@ export async function requireAdminPermission(permission: AdminPermission) {
 
 export async function getCurrentUserRole() {
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) return null;
 

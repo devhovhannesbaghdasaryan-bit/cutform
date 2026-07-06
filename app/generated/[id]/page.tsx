@@ -4,7 +4,7 @@ import { addGeneratedItemToCartAction } from '@/app/generated/actions';
 import { GeneratedPreviewSelector } from '@/components/generated-preview-selector';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { getTranslations } from 'next-intl/server';
 import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { tDynamic } from '@/lib/i18n-dynamic';
@@ -46,9 +46,7 @@ export default async function GeneratedItemPage({
 }) {
   const { id } = await params;
   const supabase = await getServerSupabase();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) redirect(`/login?next=/generated/${id}`);
 

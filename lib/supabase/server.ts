@@ -42,6 +42,25 @@ export const getServerSupabase = cache(async () => {
 });
 
 /**
+ * The authenticated user for the current request, or null.
+ *
+ * Wrapped in React.cache so the auth-server validation runs once per request
+ * no matter how many components, actions, or lib helpers ask for the user.
+ * `getUser()` is a network round-trip that validates the JWT (unlike the
+ * local-only getSession), so deduping it removes the repeated calls across the
+ * layout, headers, pricing/market resolution, and the page. The session token
+ * is refreshed once in middleware (lib/supabase/middleware.ts); this only
+ * reads and validates it.
+ */
+export const getCurrentUser = cache(async () => {
+  const supabase = await getServerSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user;
+});
+
+/**
  * Secret-key client for privileged operations. Never expose to the browser.
  * Legacy service-role keys remain supported for local Supabase compatibility.
  *

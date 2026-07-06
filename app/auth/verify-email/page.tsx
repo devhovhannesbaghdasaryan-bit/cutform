@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/supabase/server';
 import { getTranslations } from 'next-intl/server';
 import { VerifyEmailClient } from './verify-email-client';
 
@@ -9,8 +9,7 @@ export default async function VerifyEmailPage({
   searchParams: Promise<{ email?: string }>;
 }) {
   const { email: emailFromQuery } = await searchParams;
-  const [supabase, t] = await Promise.all([getServerSupabase(), getTranslations()]);
-  const { data: { user } } = await supabase.auth.getUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getTranslations()]);
 
   // Already confirmed → straight to the dashboard.
   if (user?.email_confirmed_at) redirect('/dashboard');
