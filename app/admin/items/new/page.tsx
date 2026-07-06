@@ -35,7 +35,10 @@ export default async function NewAdminItemPage() {
           categories={categories ?? []}
           subcategories={subcategories ?? []}
           marketRegions={geography.regions}
-          marketCountries={geography.countries.map((country) => ({ ...country, label: getCountryDisplayName(country.code) }))}
+          marketCountries={geography.countries.map((country) => ({
+            ...country,
+            label: getCountryDisplayName(country.code),
+          }))}
         />
       )}
     </main>

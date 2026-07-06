@@ -12,21 +12,29 @@ import { formatLocalizedCurrency } from '@/lib/i18n';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import type { CatalogItem } from '@/lib/marketplace';
 
-export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogItem; locale?: AppLocale }) {
+export async function CatalogItemCard({
+  item,
+  locale = 'en',
+}: {
+  item: CatalogItem;
+  locale?: AppLocale;
+}) {
   const t = await getTranslations();
   const media = sortCatalogMedia(item.media ?? []);
   const sliderMedia = media.length
     ? media
     : item.thumbnail_path
-      ? [{
-          id: `${item.id}-thumbnail`,
-          media_type: 'image' as const,
-          storage_path: item.thumbnail_path,
-          alt_text: item.title,
-          poster_path: null,
-          sort_order: 0,
-          is_primary: true,
-        }]
+      ? [
+          {
+            id: `${item.id}-thumbnail`,
+            media_type: 'image' as const,
+            storage_path: item.thumbnail_path,
+            alt_text: item.title,
+            poster_path: null,
+            sort_order: 0,
+            is_primary: true,
+          },
+        ]
       : [];
   const activeCurrency = await getActiveCurrency();
   const convertedPrice = await convertMoney(
@@ -75,7 +83,13 @@ export async function CatalogItemCard({ item, locale = 'en' }: { item: CatalogIt
           </p>
           <form action={addCatalogItemToCartAction}>
             <input type="hidden" name="itemId" value={item.id} />
-            <Button type="submit" size="sm" variant="outline" className="shadow-sm" aria-label={`Add ${item.title} to cart`}>
+            <Button
+              type="submit"
+              size="sm"
+              variant="outline"
+              className="shadow-sm"
+              aria-label={`Add ${item.title} to cart`}
+            >
               <ShoppingCart className="h-4 w-4" />
             </Button>
           </form>

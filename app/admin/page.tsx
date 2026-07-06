@@ -30,7 +30,9 @@ export default async function AdminPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Admin panel</h1>
-          <p className="text-muted-foreground">Manage marketplace items, orders, and production review.</p>
+          <p className="text-muted-foreground">
+            Manage marketplace items, orders, and production review.
+          </p>
         </div>
         <Button asChild>
           <Link href="/admin/items/new">
@@ -42,8 +44,18 @@ export default async function AdminPage() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard title="Catalog items" value={itemCount ?? 0} href="/admin/items" icon={Boxes} />
-        <MetricCard title="Orders" value={orderCount ?? 0} href="/admin/orders" icon={ClipboardList} />
-        <MetricCard title="Needs review" value={reviewCount ?? 0} href="/admin/generated" icon={ClipboardList} />
+        <MetricCard
+          title="Orders"
+          value={orderCount ?? 0}
+          href="/admin/orders"
+          icon={ClipboardList}
+        />
+        <MetricCard
+          title="Needs review"
+          value={reviewCount ?? 0}
+          href="/admin/generated"
+          icon={ClipboardList}
+        />
         <MetricCard title="Users" value={userCount ?? 0} href="/admin/users" icon={Users} />
         <MetricCard
           title="Transactions"

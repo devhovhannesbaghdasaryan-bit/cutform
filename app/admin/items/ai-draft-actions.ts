@@ -22,12 +22,7 @@ const toyDecorationGenerationSchema = z.object({
 
 function titleFromPrompt(prompt: string | undefined, fallback: string) {
   if (!prompt) return fallback;
-  return prompt
-    .split(/[.!?]/)[0]
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 80)
-    || fallback;
+  return prompt.split(/[.!?]/)[0].replace(/\s+/g, ' ').trim().slice(0, 80) || fallback;
 }
 
 function buildToyDecorationDraftMetadata(input: {
@@ -38,7 +33,10 @@ function buildToyDecorationDraftMetadata(input: {
 }) {
   const categoryLabel = input.categorySlug === 'toys' ? 'Toy' : 'Decoration';
   const title = titleFromPrompt(input.prompt, `${categoryLabel} draft from image`);
-  const finish = input.categorySlug === 'toys' ? 'smooth child-safe finish pending review' : 'decorative finish pending review';
+  const finish =
+    input.categorySlug === 'toys'
+      ? 'smooth child-safe finish pending review'
+      : 'decorative finish pending review';
   const sizes = TOY_DECORATION_SIZE_PRESETS.map((preset) => ({
     key: preset.key,
     label: preset.label,
@@ -85,7 +83,8 @@ export async function generateToyDecorationDraftAction(formData: FormData) {
     targetCategory: formData.get('targetCategory'),
     prompt: formData.get('prompt') || undefined,
   });
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid generation request.');
+  if (!parsed.success)
+    throw new Error(parsed.error.issues[0]?.message ?? 'Invalid generation request.');
 
   const referenceFile = getOptionalFile(formData, 'referenceFile');
   if (!parsed.data.prompt && !referenceFile) {
@@ -98,7 +97,8 @@ export async function generateToyDecorationDraftAction(formData: FormData) {
     .select('id')
     .eq('slug', parsed.data.targetCategory)
     .maybeSingle<{ id: string }>();
-  if (categoryError || !category) throw new Error(categoryError?.message ?? 'Target category was not found.');
+  if (categoryError || !category)
+    throw new Error(categoryError?.message ?? 'Target category was not found.');
 
   const uploadedReference = await uploadAdminCatalogAsset(
     supabase,
@@ -139,7 +139,9 @@ export async function generateToyDecorationDraftAction(formData: FormData) {
         'AI-assisted draft. Admin must review before publishing.',
         uploadedReference ? `Reference image: ${uploadedReference}` : null,
         parsed.data.prompt ? `Prompt: ${parsed.data.prompt}` : null,
-      ].filter(Boolean).join('\n'),
+      ]
+        .filter(Boolean)
+        .join('\n'),
       sizes: metadata.sizes,
       characteristics: metadata.characteristics,
       created_by: user.id,

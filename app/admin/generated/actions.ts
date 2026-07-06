@@ -40,7 +40,12 @@ async function downloadAsDataUrl(
   bucket: string,
   storagePath: string,
 ) {
-  const data = await downloadFromBucket(supabase, bucket, storagePath, `Unable to load ${storagePath}.`);
+  const data = await downloadFromBucket(
+    supabase,
+    bucket,
+    storagePath,
+    `Unable to load ${storagePath}.`,
+  );
   return `data:${mediaTypeForPath(storagePath)};base64,${Buffer.from(await data.arrayBuffer()).toString('base64')}`;
 }
 
@@ -55,52 +60,64 @@ export async function generateManufacturingFileAction(
     model: formData.get('model'),
   });
   if (!parsed.success) {
-    return { status: 'error', message: parsed.error.issues[0]?.message ?? 'Invalid generation settings.' };
+    return {
+      status: 'error',
+      message: parsed.error.issues[0]?.message ?? 'Invalid generation settings.',
+    };
   }
 
   const { supabase, user } = await requireAdminPermission('generated_review');
   const settings = parsed.data;
 
   try {
-    const [{ data: item, error: itemError }, { data: option, error: optionError }] = await Promise.all([
-      supabase
-        .from('generated_items')
-        .select('id, user_id, source_image_path, original_image_paths, selected_preview_path, manufacturing_metadata')
-        .eq('id', settings.generatedItemId)
-        .maybeSingle<{
-          id: string;
-          user_id: string;
-          source_image_path: string | null;
-          original_image_paths: string[];
-          selected_preview_path: string | null;
-          manufacturing_metadata: Record<string, unknown>;
-        }>(),
-      supabase
-        .from('personalized_preview_options')
-        .select('id, generated_item_id, preview_image_path, manufacturing_file_path, status, metadata')
-        .eq('id', settings.optionId)
-        .eq('generated_item_id', settings.generatedItemId)
-        .maybeSingle<{
-          id: string;
-          generated_item_id: string;
-          preview_image_path: string;
-          manufacturing_file_path: string | null;
-          status: string;
-          metadata: Record<string, unknown>;
-        }>(),
-    ]);
+    const [{ data: item, error: itemError }, { data: option, error: optionError }] =
+      await Promise.all([
+        supabase
+          .from('generated_items')
+          .select(
+            'id, user_id, source_image_path, original_image_paths, selected_preview_path, manufacturing_metadata',
+          )
+          .eq('id', settings.generatedItemId)
+          .maybeSingle<{
+            id: string;
+            user_id: string;
+            source_image_path: string | null;
+            original_image_paths: string[];
+            selected_preview_path: string | null;
+            manufacturing_metadata: Record<string, unknown>;
+          }>(),
+        supabase
+          .from('personalized_preview_options')
+          .select(
+            'id, generated_item_id, preview_image_path, manufacturing_file_path, status, metadata',
+          )
+          .eq('id', settings.optionId)
+          .eq('generated_item_id', settings.generatedItemId)
+          .maybeSingle<{
+            id: string;
+            generated_item_id: string;
+            preview_image_path: string;
+            manufacturing_file_path: string | null;
+            status: string;
+            metadata: Record<string, unknown>;
+          }>(),
+      ]);
     if (itemError || !item) throw new Error(itemError?.message ?? 'Generated item was not found.');
-    if (optionError || !option) throw new Error(optionError?.message ?? 'Preview option was not found.');
+    if (optionError || !option)
+      throw new Error(optionError?.message ?? 'Preview option was not found.');
 
-    const sourcePaths = [...new Set([
-      ...(item.source_image_path ? [item.source_image_path] : []),
-      ...item.original_image_paths,
-    ])].slice(0, 3);
+    const sourcePaths = [
+      ...new Set([
+        ...(item.source_image_path ? [item.source_image_path] : []),
+        ...item.original_image_paths,
+      ]),
+    ].slice(0, 3);
     const [previewImage, ...sourceImages] = await Promise.all([
       downloadAsDataUrl(supabase, 'generated-assets', option.preview_image_path),
       ...sourcePaths.map((storagePath) => downloadAsDataUrl(supabase, 'user-uploads', storagePath)),
     ]);
-    const editableSourceImage = sourceImages.find((image) => !image.startsWith('data:image/svg+xml')) ?? previewImage;
+    const editableSourceImage =
+      sourceImages.find((image) => !image.startsWith('data:image/svg+xml')) ?? previewImage;
     const imageEdit = await generateImage({
       model: openai.image(settings.model),
       prompt: { images: [editableSourceImage], text: settings.prompt },
@@ -142,7 +159,8 @@ export async function generateManufacturingFileAction(
       .eq('id', option.id);
     if (updateOptionError) throw new Error(updateOptionError.message);
 
-    const isSelected = option.status === 'selected' || item.selected_preview_path === option.preview_image_path;
+    const isSelected =
+      option.status === 'selected' || item.selected_preview_path === option.preview_image_path;
     if (isSelected) {
       const { error: updateItemError } = await supabase
         .from('generated_items')
@@ -160,14 +178,19 @@ export async function generateManufacturingFileAction(
     await writeAdminAuditLog(supabase, {
       actorUserId: user.id,
       targetUserId: item.user_id,
-      action: option.manufacturing_file_path ? 'manufacturing_png_regenerated' : 'manufacturing_png_generated',
+      action: option.manufacturing_file_path
+        ? 'manufacturing_png_regenerated'
+        : 'manufacturing_png_generated',
       entityType: 'personalized_preview_option',
       entityId: option.id,
       metadata: { storagePath, model: settings.model, format: 'png' },
     });
 
     revalidatePath(`/admin/generated/${settings.generatedItemId}`);
-    return { status: 'success', message: 'Manufacturing PNG generated and attached to this option.' };
+    return {
+      status: 'success',
+      message: 'Manufacturing PNG generated and attached to this option.',
+    };
   } catch (error) {
     return {
       status: 'error',

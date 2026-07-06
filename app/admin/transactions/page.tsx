@@ -73,7 +73,9 @@ export default async function AdminTransactionsPage({
     <main className="container space-y-6 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-        <p className="text-muted-foreground">Inspect payments, credit activity, refunds, and manual adjustments.</p>
+        <p className="text-muted-foreground">
+          Inspect payments, credit activity, refunds, and manual adjustments.
+        </p>
       </div>
 
       <form className="grid gap-3 rounded-lg border p-4 md:grid-cols-[1fr_160px_160px_150px_150px_auto]">
@@ -179,16 +181,24 @@ export default async function AdminTransactionsPage({
               {filteredTransactions.map((transaction) => (
                 <tr key={transaction.id} className="border-t">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/transactions/${transaction.id}`} className="font-medium hover:underline">
+                    <Link
+                      href={`/admin/transactions/${transaction.id}`}
+                      className="font-medium hover:underline"
+                    >
                       {transaction.id.slice(0, 8)}
                     </Link>
                     {transaction.order_id && (
-                      <p className="text-xs text-muted-foreground">Order {transaction.order_id.slice(0, 8)}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Order {transaction.order_id.slice(0, 8)}
+                      </p>
                     )}
                   </td>
                   <td className="px-4 py-3">
                     {transaction.user_id ? (
-                      <Link href={`/admin/users/${transaction.user_id}`} className="hover:underline">
+                      <Link
+                        href={`/admin/users/${transaction.user_id}`}
+                        className="hover:underline"
+                      >
                         {transaction.user_id.slice(0, 8)}
                       </Link>
                     ) : (
@@ -196,10 +206,14 @@ export default async function AdminTransactionsPage({
                     )}
                   </td>
                   <td className="px-4 py-3">{transaction.type}</td>
-                  <td className="px-4 py-3">{formatPrice(transaction.amount_cents, transaction.currency)}</td>
+                  <td className="px-4 py-3">
+                    {formatPrice(transaction.amount_cents, transaction.currency)}
+                  </td>
                   <td className="px-4 py-3">
                     <p>{transaction.payment_provider_route ?? transaction.provider ?? '-'}</p>
-                    <p className="text-xs text-muted-foreground">{transaction.provider_reference ?? ''}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {transaction.provider_reference ?? ''}
+                    </p>
                   </td>
                   <td className="px-4 py-3">{transaction.status}</td>
                   <td className="px-4 py-3">{formatDate(transaction.created_at)}</td>

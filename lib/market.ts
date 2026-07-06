@@ -82,7 +82,9 @@ export function getCountryDisplayName(code: string, locale = 'en') {
 async function findCountry(supabase: SupabaseClient, code: string) {
   const { data, error } = await supabase
     .from('countries')
-    .select('code, region_id, default_currency_code, region:market_regions(default_currency_code, is_active)')
+    .select(
+      'code, region_id, default_currency_code, region:market_regions(default_currency_code, is_active)',
+    )
     .eq('code', code)
     .eq('is_active', true)
     .maybeSingle<{
@@ -96,10 +98,9 @@ async function findCountry(supabase: SupabaseClient, code: string) {
   return data;
 }
 
-export async function resolveMarket(options: {
-  checkoutCountryCode?: string | null;
-  supabase?: SupabaseClient;
-} = {}): Promise<ResolvedMarket> {
+export async function resolveMarket(
+  options: { checkoutCountryCode?: string | null; supabase?: SupabaseClient } = {},
+): Promise<ResolvedMarket> {
   const service = options.supabase ?? getServiceSupabase();
   const checkoutCode = normalizeCountryCode(options.checkoutCountryCode);
   if (checkoutCode) {
@@ -120,13 +121,14 @@ export async function resolveMarket(options: {
   );
   if (cookieCode) {
     const country = await findCountry(service, cookieCode);
-    if (country) return {
-      countryCode: country.code,
-      regionId: country.region_id,
-      countryDefaultCurrency: country.default_currency_code,
-      regionDefaultCurrency: country.region?.default_currency_code ?? null,
-      source: 'cookie',
-    };
+    if (country)
+      return {
+        countryCode: country.code,
+        regionId: country.region_id,
+        countryDefaultCurrency: country.default_currency_code,
+        regionDefaultCurrency: country.region?.default_currency_code ?? null,
+        source: 'cookie',
+      };
   }
 
   const supabase = await getServerSupabase();
@@ -140,13 +142,14 @@ export async function resolveMarket(options: {
     const profileCode = normalizeCountryCode(profile?.preferred_country_code);
     if (profileCode) {
       const country = await findCountry(service, profileCode);
-      if (country) return {
-        countryCode: country.code,
-        regionId: country.region_id,
-        countryDefaultCurrency: country.default_currency_code,
-        regionDefaultCurrency: country.region?.default_currency_code ?? null,
-        source: 'profile',
-      };
+      if (country)
+        return {
+          countryCode: country.code,
+          regionId: country.region_id,
+          countryDefaultCurrency: country.default_currency_code,
+          regionDefaultCurrency: country.region?.default_currency_code ?? null,
+          source: 'profile',
+        };
     }
   }
 
@@ -156,13 +159,14 @@ export async function resolveMarket(options: {
   );
   if (geoCode) {
     const country = await findCountry(service, geoCode);
-    if (country) return {
-      countryCode: country.code,
-      regionId: country.region_id,
-      countryDefaultCurrency: country.default_currency_code,
-      regionDefaultCurrency: country.region?.default_currency_code ?? null,
-      source: 'geo',
-    };
+    if (country)
+      return {
+        countryCode: country.code,
+        regionId: country.region_id,
+        countryDefaultCurrency: country.default_currency_code,
+        regionDefaultCurrency: country.region?.default_currency_code ?? null,
+        source: 'geo',
+      };
   }
 
   return {
@@ -175,10 +179,16 @@ export async function resolveMarket(options: {
 }
 
 export async function listMarketGeography(supabase: SupabaseClient = getServiceSupabase()) {
-  const [{ data: regions, error: regionError }, { data: countries, error: countryError }] = await Promise.all([
-    supabase.from('market_regions').select('*').order('sort_order').returns<MarketRegion[]>(),
-    supabase.from('countries').select('*').order('sort_order').order('code').returns<MarketCountry[]>(),
-  ]);
+  const [{ data: regions, error: regionError }, { data: countries, error: countryError }] =
+    await Promise.all([
+      supabase.from('market_regions').select('*').order('sort_order').returns<MarketRegion[]>(),
+      supabase
+        .from('countries')
+        .select('*')
+        .order('sort_order')
+        .order('code')
+        .returns<MarketCountry[]>(),
+    ]);
   if (regionError) throw new Error(regionError.message);
   if (countryError) throw new Error(countryError.message);
   return { regions: regions ?? [], countries: countries ?? [] };
@@ -196,7 +206,13 @@ export async function resolveCatalogMarkets(
     for (const itemId of itemIds) {
       result.set(itemId, {
         availability: { itemId, visible: true, available: true, reason: 'country_unknown' },
-        shipping: { itemId, baseAmountCents: null, baseCurrency: 'AMD', source: 'missing', ruleId: null },
+        shipping: {
+          itemId,
+          baseAmountCents: null,
+          baseCurrency: 'AMD',
+          source: 'missing',
+          ruleId: null,
+        },
       });
     }
     return result;
@@ -204,7 +220,9 @@ export async function resolveCatalogMarkets(
 
   const { data, error } = await supabase
     .from('catalog_item_market_rules')
-    .select('id, catalog_item_id, region_id, country_code, visibility_override, shipping_rate_cents')
+    .select(
+      'id, catalog_item_id, region_id, country_code, visibility_override, shipping_rate_cents',
+    )
     .in('catalog_item_id', itemIds)
     .or(`region_id.eq.${market.regionId},country_code.eq.${market.countryCode}`)
     .returns<MarketRuleRow[]>();
@@ -214,14 +232,13 @@ export async function resolveCatalogMarkets(
     const itemRules = (data ?? []).filter((rule) => rule.catalog_item_id === itemId);
     const regionRule = itemRules.find((rule) => rule.region_id === market.regionId);
     const countryRule = itemRules.find((rule) => rule.country_code === market.countryCode);
-    const visible = countryRule?.visibility_override
-      ?? regionRule?.visibility_override
-      ?? true;
-    const shippingRule = countryRule?.shipping_rate_cents != null
-      ? countryRule
-      : regionRule?.shipping_rate_cents != null
-        ? regionRule
-        : null;
+    const visible = countryRule?.visibility_override ?? regionRule?.visibility_override ?? true;
+    const shippingRule =
+      countryRule?.shipping_rate_cents != null
+        ? countryRule
+        : regionRule?.shipping_rate_cents != null
+          ? regionRule
+          : null;
     const available = visible && Boolean(shippingRule);
     result.set(itemId, {
       availability: {

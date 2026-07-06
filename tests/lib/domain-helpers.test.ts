@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  getCatalogMediaKind,
-  getPrimaryCatalogMedia,
-  sortCatalogMedia,
-} from '@/lib/catalog-media';
+import { getCatalogMediaKind, getPrimaryCatalogMedia, sortCatalogMedia } from '@/lib/catalog-media';
 import { CREDIT_PACKS, getCreditPack } from '@/lib/credit-packs';
 import { normalizeCurrency, getPaymentRouteForCurrency } from '@/lib/currency';
 import type { CatalogItemMedia } from '@/lib/marketplace';

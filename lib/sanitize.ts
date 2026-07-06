@@ -32,11 +32,16 @@ export function preflightSvg(input: string): SvgPreflightResult {
   if (/<a[\s>]/i.test(cleanSvg)) warnings.push('SVG contains links; remove before production.');
   if (/href\s*=\s*["']https?:/i.test(cleanSvg)) warnings.push('SVG references external URLs.');
   if (/javascript:/i.test(cleanSvg)) warnings.push('SVG contains a javascript: URI.');
-  if (/<style[\s>]/i.test(cleanSvg)) warnings.push('SVG contains embedded CSS; verify cutter compatibility.');
+  if (/<style[\s>]/i.test(cleanSvg))
+    warnings.push('SVG contains embedded CSS; verify cutter compatibility.');
   if (!/(<path[\s>]|<polygon[\s>]|<polyline[\s>]|<circle[\s>]|<rect[\s>])/i.test(cleanSvg)) {
     warnings.push('SVG does not contain common cuttable vector elements.');
   }
-  if (!/(data-layer|inkscape:label|id=["'][^"']*(cut|engrave|score|outline|base)[^"']*["'])/i.test(cleanSvg)) {
+  if (
+    !/(data-layer|inkscape:label|id=["'][^"']*(cut|engrave|score|outline|base)[^"']*["'])/i.test(
+      cleanSvg,
+    )
+  ) {
     warnings.push('SVG is missing obvious cut/engrave layer markers.');
   }
 

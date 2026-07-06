@@ -6,11 +6,7 @@ import { addCatalogItemToCartAction } from '@/app/cart/actions';
 import { CatalogMediaSlider } from '@/components/catalog-media-slider';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { sortCatalogMedia } from '@/lib/catalog-media';
 import { getCatalogItem, getCatalogItemSeoMetadata } from '@/lib/marketplace';
@@ -76,15 +72,17 @@ export default async function CatalogItemDetailPage({
   const sliderMedia = media.length
     ? media
     : item.thumbnail_path
-      ? [{
-          id: `${item.id}-thumbnail`,
-          media_type: 'image' as const,
-          storage_path: item.thumbnail_path,
-          alt_text: item.title,
-          poster_path: null,
-          sort_order: 0,
-          is_primary: true,
-        }]
+      ? [
+          {
+            id: `${item.id}-thumbnail`,
+            media_type: 'image' as const,
+            storage_path: item.thumbnail_path,
+            alt_text: item.title,
+            poster_path: null,
+            sort_order: 0,
+            is_primary: true,
+          },
+        ]
       : [];
 
   return (
@@ -134,9 +132,13 @@ export default async function CatalogItemDetailPage({
 
             <div className="rounded-lg border p-5">
               <p className="text-sm text-muted-foreground">{t('common.price')}</p>
-              <p className="text-4xl font-bold">{formatPrice(convertedPrice.amountCents, convertedPrice.currency)}</p>
+              <p className="text-4xl font-bold">
+                {formatPrice(convertedPrice.amountCents, convertedPrice.currency)}
+              </p>
               {convertedPrice.exchangeRateContext.isStale ? (
-                <p className="mt-1 text-xs text-muted-foreground">{t('product.exchange_rate_note')}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t('product.exchange_rate_note')}
+                </p>
               ) : null}
             </div>
 
@@ -150,7 +152,12 @@ export default async function CatalogItemDetailPage({
               </form>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button size="lg" variant="outline" aria-disabled="true" className="cursor-not-allowed opacity-50">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    aria-disabled="true"
+                    className="cursor-not-allowed opacity-50"
+                  >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     {t('product.buy')}
                   </Button>

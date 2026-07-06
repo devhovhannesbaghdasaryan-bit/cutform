@@ -95,8 +95,7 @@ export async function updateSession(request: NextRequest) {
   // Resolution below feeds the write of LOCALE_COOKIE (the new name), so a
   // visitor arriving with only the legacy cookie keeps their locale losslessly.
   const explicitLocale = normalizeLocale(
-    request.cookies.get(LOCALE_COOKIE)?.value
-      ?? request.cookies.get(LEGACY_LOCALE_COOKIE)?.value,
+    request.cookies.get(LOCALE_COOKIE)?.value ?? request.cookies.get(LEGACY_LOCALE_COOKIE)?.value,
   );
   let activeLocale = localePrefixedPath?.locale ?? explicitLocale;
 
@@ -111,7 +110,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (!activeLocale) {
-    const regionCode = request.headers.get('x-vercel-ip-country') ?? request.headers.get('cf-ipcountry');
+    const regionCode =
+      request.headers.get('x-vercel-ip-country') ?? request.headers.get('cf-ipcountry');
     activeLocale = regionCode
       ? getDefaultLocaleForRegion(regionCode)
       : normalizeLocale(request.headers.get('accept-language')?.split(',')[0]) || DEFAULT_LOCALE;
@@ -136,12 +136,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (
-    user &&
-    !user.email_confirmed_at &&
-    isProtected &&
-    routePath !== VERIFY_EMAIL_PATH
-  ) {
+  if (user && !user.email_confirmed_at && isProtected && routePath !== VERIFY_EMAIL_PATH) {
     const url = request.nextUrl.clone();
     url.pathname = VERIFY_EMAIL_PATH;
     url.searchParams.set('locale', activeLocale);

@@ -82,41 +82,45 @@ export async function customizeBannerSampleAction(formData: FormData) {
     sizeKey: formData.get('sizeKey'),
     bannerText: formData.get('bannerText'),
   });
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid banner customization.');
+  if (!parsed.success)
+    throw new Error(parsed.error.issues[0]?.message ?? 'Invalid banner customization.');
 
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
   if (!user) redirect('/login?next=/banners');
 
-  const [{ data: sample, error: sampleError }, { data: preset, error: presetError }] = await Promise.all([
-    supabase
-      .from('banner_samples')
-      .select('id, title, image_path, prompt, reference_paths')
-      .eq('id', parsed.data.sampleId)
-      .eq('status', 'published')
-      .maybeSingle<{
-        id: string;
-        title: string;
-        image_path: string;
-        prompt: string | null;
-        reference_paths: string[];
-      }>(),
-    supabase
-      .from('banner_size_presets')
-      .select('key, name, width_mm, height_mm, material, finish')
-      .eq('key', parsed.data.sizeKey)
-      .eq('is_active', true)
-      .maybeSingle<{
-        key: string;
-        name: string;
-        width_mm: number;
-        height_mm: number;
-        material: string;
-        finish: string;
-      }>(),
-  ]);
-  if (sampleError || !sample) throw new Error(sampleError?.message ?? 'Banner sample is not available.');
-  if (presetError || !preset) throw new Error(presetError?.message ?? 'Banner size is not available.');
+  const [{ data: sample, error: sampleError }, { data: preset, error: presetError }] =
+    await Promise.all([
+      supabase
+        .from('banner_samples')
+        .select('id, title, image_path, prompt, reference_paths')
+        .eq('id', parsed.data.sampleId)
+        .eq('status', 'published')
+        .maybeSingle<{
+          id: string;
+          title: string;
+          image_path: string;
+          prompt: string | null;
+          reference_paths: string[];
+        }>(),
+      supabase
+        .from('banner_size_presets')
+        .select('key, name, width_mm, height_mm, material, finish')
+        .eq('key', parsed.data.sizeKey)
+        .eq('is_active', true)
+        .maybeSingle<{
+          key: string;
+          name: string;
+          width_mm: number;
+          height_mm: number;
+          material: string;
+          finish: string;
+        }>(),
+    ]);
+  if (sampleError || !sample)
+    throw new Error(sampleError?.message ?? 'Banner sample is not available.');
+  if (presetError || !preset)
+    throw new Error(presetError?.message ?? 'Banner size is not available.');
 
   const previewPath = await uploadCustomizedBannerPreview(
     supabase,
@@ -160,7 +164,8 @@ export async function generateBannerAction(formData: FormData) {
     sizeKey: formData.get('sizeKey'),
     uploadRightsConfirmed: formData.get('uploadRightsConfirmed'),
   });
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid banner request.');
+  if (!parsed.success)
+    throw new Error(parsed.error.issues[0]?.message ?? 'Invalid banner request.');
 
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
@@ -179,7 +184,11 @@ export async function generateBannerAction(formData: FormData) {
       });
       debited = true;
     }
-    const referencePath = await uploadReferenceImage(supabase, user.id, getFile(formData, 'referenceFile'));
+    const referencePath = await uploadReferenceImage(
+      supabase,
+      user.id,
+      getFile(formData, 'referenceFile'),
+    );
     const previewPath = await uploadGeneratedBannerPreview(supabase, user.id, parsed.data.prompt);
     const generated = await createGeneratedItem(supabase, {
       userId: user.id,

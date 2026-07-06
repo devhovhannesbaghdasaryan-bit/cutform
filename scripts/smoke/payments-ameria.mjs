@@ -11,7 +11,10 @@ function loadEnvFile(path) {
     if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
     const index = trimmed.indexOf('=');
     const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, '');
+    const value = trimmed
+      .slice(index + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -25,7 +28,9 @@ const username = process.env.AMERIA_USERNAME;
 const password = process.env.AMERIA_PASSWORD;
 
 if (!baseUrl || !clientId || !username || !password) {
-  throw new Error('AMERIA_API_BASE_URL, AMERIA_CLIENT_ID, AMERIA_USERNAME and AMERIA_PASSWORD are required.');
+  throw new Error(
+    'AMERIA_API_BASE_URL, AMERIA_CLIENT_ID, AMERIA_USERNAME and AMERIA_PASSWORD are required.',
+  );
 }
 
 function assert(condition, message) {
@@ -58,9 +63,17 @@ const init = await postJson('/api/VPOS/InitPayment', {
   Opaque: `smoke-${orderId}`,
 });
 
-assert(Number(init.ResponseCode) === 1, `InitPayment rejected: ${init.ResponseMessage ?? init.ResponseCode}`);
-assert(typeof init.PaymentID === 'string' && init.PaymentID.length > 0, 'InitPayment returned no PaymentID');
-console.log(`InitPayment OK — PaymentID ${init.PaymentID}, hosted page ${baseUrl}/Payments/Pay?id=${init.PaymentID}&lang=en`);
+assert(
+  Number(init.ResponseCode) === 1,
+  `InitPayment rejected: ${init.ResponseMessage ?? init.ResponseCode}`,
+);
+assert(
+  typeof init.PaymentID === 'string' && init.PaymentID.length > 0,
+  'InitPayment returned no PaymentID',
+);
+console.log(
+  `InitPayment OK — PaymentID ${init.PaymentID}, hosted page ${baseUrl}/Payments/Pay?id=${init.PaymentID}&lang=en`,
+);
 
 const details = await postJson('/api/VPOS/GetPaymentDetails', {
   PaymentID: init.PaymentID,
@@ -69,7 +82,10 @@ const details = await postJson('/api/VPOS/GetPaymentDetails', {
 });
 
 const state = String(details.PaymentState ?? '').toLowerCase();
-assert(state === '' || state.includes('started'), `Fresh payment should be in a started state, got "${state}"`);
+assert(
+  state === '' || state.includes('started'),
+  `Fresh payment should be in a started state, got "${state}"`,
+);
 assert(String(details.Opaque ?? '') === `smoke-${orderId}`, 'Opaque did not round-trip');
 console.log(`GetPaymentDetails OK — state "${state}", Opaque round-tripped`);
 console.log('payments-ameria smoke passed');

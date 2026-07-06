@@ -13,7 +13,11 @@ import {
 } from './basics-fields';
 import { MarketRulesSection } from './market-rules-fields';
 import { MediaSection, ThumbnailFields } from './media-fields';
-import { ManufacturingNotesField, PriceField, SizesCharacteristicsFields } from './pricing-size-fields';
+import {
+  ManufacturingNotesField,
+  PriceField,
+  SizesCharacteristicsFields,
+} from './pricing-size-fields';
 import { SeoSection } from './seo-section';
 import type {
   CatalogMediaFormValue,

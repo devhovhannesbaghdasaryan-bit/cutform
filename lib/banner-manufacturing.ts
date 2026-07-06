@@ -51,11 +51,7 @@ async function loadKnowledgeBase() {
 
 async function loadManufacturingGuidance() {
   if (!guidanceCache) {
-    const files = [
-      'ai-skills.md',
-      'tool-capability-schema.md',
-      'rag-manuals.md',
-    ];
+    const files = ['ai-skills.md', 'tool-capability-schema.md', 'rag-manuals.md'];
     const entries = await Promise.all(
       files.map(async (file) => {
         const content = await readFile(
@@ -71,7 +67,7 @@ async function loadManufacturingGuidance() {
 }
 
 function pickBannerPreset(key: string | null) {
-  return key ? BANNER_PRESETS.find((preset) => preset.key === key) ?? null : null;
+  return key ? (BANNER_PRESETS.find((preset) => preset.key === key) ?? null) : null;
 }
 
 function summarizeTool(tool: ManufacturingTool) {
@@ -108,10 +104,14 @@ function getReviewWarnings(tools: ManufacturingTool[], input: BannerManufacturin
   ];
 
   if (!preset) warnings.push('Ordered banner size preset is missing or not mapped to dimensions.');
-  if (!input.sourceImagePath) warnings.push('No source image path was available for production input.');
-  if (!input.quantity || input.quantity < 1) warnings.push('Quantity must be confirmed before production.');
+  if (!input.sourceImagePath)
+    warnings.push('No source image path was available for production input.');
+  if (!input.quantity || input.quantity < 1)
+    warnings.push('Quantity must be confirmed before production.');
   if (tools.some((tool) => tool.rag.manualSearchStatus !== 'found')) {
-    warnings.push('One or more selected tools require vendor manual review before final machine settings are used.');
+    warnings.push(
+      'One or more selected tools require vendor manual review before final machine settings are used.',
+    );
   }
 
   return unique(warnings);
@@ -154,7 +154,7 @@ export function renderBannerManufacturingDrawing(input: BannerManufacturingInput
   const preset = pickBannerPreset(input.bannerSizeKey);
   const label = preset
     ? `${preset.name} - ${preset.widthMm}x${preset.heightMm} mm`
-    : input.bannerSizeKey ?? 'Size requires review';
+    : (input.bannerSizeKey ?? 'Size requires review');
   const title = escapeSvgText(input.title.slice(0, 80));
   const source = escapeSvgText(input.sourceImagePath.slice(0, 110));
   const displayLabel = escapeSvgText(label);
@@ -226,7 +226,8 @@ export async function buildBannerManufacturingInstructions(
       primaryMedia: drawing.materialAssumption,
       finish: drawing.finishAssumption,
       ink: 'Eco-solvent or UV ink profile must be confirmed against the selected media.',
-      mounting: 'Grommets, hem, adhesive backing, or frame mounting must be confirmed before production.',
+      mounting:
+        'Grommets, hem, adhesive backing, or frame mounting must be confirmed before production.',
     },
     drawings: [drawing],
     productionPath: [

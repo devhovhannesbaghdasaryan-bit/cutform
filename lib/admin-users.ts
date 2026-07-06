@@ -24,17 +24,14 @@ export async function listAdminUsers(
   const filteredUsers = (users ?? []).filter((user) => {
     if (!search) return true;
     return (
-      user.user_id.toLowerCase().includes(search)
-      || user.display_name?.toLowerCase().includes(search)
+      user.user_id.toLowerCase().includes(search) ||
+      user.display_name?.toLowerCase().includes(search)
     );
   });
 
   const userIds = filteredUsers.map((user) => user.user_id);
   const { data: balances } = userIds.length
-    ? await supabase
-        .from('credit_accounts')
-        .select('user_id, balance')
-        .in('user_id', userIds)
+    ? await supabase.from('credit_accounts').select('user_id, balance').in('user_id', userIds)
     : { data: [] };
   const { data: orderOwners } = userIds.length
     ? await supabase.from('orders').select('user_id').in('user_id', userIds)
@@ -60,7 +57,9 @@ export async function getAdminUserDetail(supabase: TypedSupabaseClient, userId: 
   ] = await Promise.all([
     supabase
       .from('profiles')
-      .select('user_id, role, status, display_name, preferred_locale, internal_notes, created_at, updated_at')
+      .select(
+        'user_id, role, status, display_name, preferred_locale, internal_notes, created_at, updated_at',
+      )
       .eq('user_id', userId)
       .maybeSingle(),
     supabase

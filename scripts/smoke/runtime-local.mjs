@@ -1,4 +1,8 @@
-const baseUrl = process.env.UQ_SMOKE_BASE_URL ?? process.env.SNIP_SMOKE_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+const baseUrl =
+  process.env.UQ_SMOKE_BASE_URL ??
+  process.env.SNIP_SMOKE_BASE_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  'http://localhost:3000';
 const rootUrl = baseUrl.replace(/\/$/, '');
 
 async function fetchPage(pathOrUrl) {
@@ -87,4 +91,6 @@ for (const url of sitemapUrls) {
   assert(body.includes('<title>'), `Sitemap URL ${url} is missing a title tag`);
 }
 
-console.log(`Runtime smoke passed: ${routeChecks.length} route checks and ${sitemapUrls.length} sitemap URLs at ${rootUrl}`);
+console.log(
+  `Runtime smoke passed: ${routeChecks.length} route checks and ${sitemapUrls.length} sitemap URLs at ${rootUrl}`,
+);

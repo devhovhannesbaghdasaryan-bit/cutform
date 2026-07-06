@@ -16,7 +16,9 @@ const dictionaries = Object.fromEntries(
   LOCALES.map((locale) => {
     const raw = readFileSync(`messages/${locale}.json`, 'utf8');
     if (/[ÂÐÕ][^\n]*"/.test(raw) || raw.includes('�')) {
-      throw new Error(`messages/${locale}.json appears to contain mojibake or replacement characters`);
+      throw new Error(
+        `messages/${locale}.json appears to contain mojibake or replacement characters`,
+      );
     }
     return [locale, flatten(JSON.parse(raw))];
   }),
@@ -53,7 +55,9 @@ for (const key of allKeys) {
   const prefix = `${key}.`;
   for (const other of allKeys) {
     if (other.startsWith(prefix)) {
-      throw new Error(`Leaf/branch conflict: '${key}' is both a message and a namespace ('${other}')`);
+      throw new Error(
+        `Leaf/branch conflict: '${key}' is both a message and a namespace ('${other}')`,
+      );
     }
   }
 }

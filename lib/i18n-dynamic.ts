@@ -21,5 +21,5 @@ type LooseTranslator = {
 
 export function tDynamic(t: TranslatorLike, key: string, fallback?: string): string {
   const loose = t as LooseTranslator;
-  return loose.has(key) ? loose(key) : fallback ?? key;
+  return loose.has(key) ? loose(key) : (fallback ?? key);
 }

@@ -19,22 +19,42 @@ const CATALOG_ASSET_EXTENSIONS: Record<string, string> = {
 
 export const seoLocaleSchema = z.object({
   seoTitle: z.string().trim().max(70, 'SEO title must be 70 characters or fewer.').optional(),
-  seoDescription: z.string().trim().max(170, 'Meta description must be 170 characters or fewer.').optional(),
-  seoKeywords: z.string().trim().refine(
-    (value) => parseKeywords(value).length <= 10,
-    'Use 10 SEO keywords or fewer.',
-  ).optional(),
+  seoDescription: z
+    .string()
+    .trim()
+    .max(170, 'Meta description must be 170 characters or fewer.')
+    .optional(),
+  seoKeywords: z
+    .string()
+    .trim()
+    .refine((value) => parseKeywords(value).length <= 10, 'Use 10 SEO keywords or fewer.')
+    .optional(),
   ogTitle: z.string().trim().max(90, 'Open Graph title must be 90 characters or fewer.').optional(),
-  ogDescription: z.string().trim().max(220, 'Open Graph description must be 220 characters or fewer.').optional(),
+  ogDescription: z
+    .string()
+    .trim()
+    .max(220, 'Open Graph description must be 220 characters or fewer.')
+    .optional(),
   socialImagePath: z.string().trim().optional(),
 });
 
 export const itemSchema = z.object({
   title: z.string().trim().min(1, 'Title is required.'),
-  slug: z.string().trim().min(1, 'Slug is required.').regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a URL-safe slug.'),
+  slug: z
+    .string()
+    .trim()
+    .min(1, 'Slug is required.')
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a URL-safe slug.'),
   categoryId: z.uuid('Choose a category.'),
   subcategoryId: z.union([z.uuid(), z.literal('')]),
-  itemType: z.enum(['standard', 'toy', 'decoration', 'night_light', 'personalized_night_light', 'banner']),
+  itemType: z.enum([
+    'standard',
+    'toy',
+    'decoration',
+    'night_light',
+    'personalized_night_light',
+    'banner',
+  ]),
   description: z.string().trim().optional(),
   priceCents: z.coerce.number().int().min(0, 'Price cannot be negative.'),
   status: z.enum(['draft', 'published', 'archived']),
@@ -51,7 +71,10 @@ export const itemSchema = z.object({
   }),
 });
 
-export function readSeoLocale(formData: FormData, locale: AppLocale): z.infer<typeof seoLocaleSchema> {
+export function readSeoLocale(
+  formData: FormData,
+  locale: AppLocale,
+): z.infer<typeof seoLocaleSchema> {
   return {
     seoTitle: String(formData.get(`seoTitle_${locale}`) ?? '').trim() || undefined,
     seoDescription: String(formData.get(`seoDescription_${locale}`) ?? '').trim() || undefined,
@@ -98,7 +121,10 @@ export function parseSizesJson(value: string | undefined): Json[] {
 
 export function parseKeywords(value: string | undefined) {
   return value
-    ? value.split(',').map((keyword) => keyword.trim()).filter(Boolean)
+    ? value
+        .split(',')
+        .map((keyword) => keyword.trim())
+        .filter(Boolean)
     : [];
 }
 
@@ -123,7 +149,8 @@ export async function uploadAdminCatalogAsset(
   if (!file) return null;
   const extension = CATALOG_ASSET_EXTENSIONS[file.type];
   if (!extension) throw new Error('Upload PNG, JPG, WEBP, SVG, MP4, or WEBM files only.');
-  if (file.size > CATALOG_ASSET_MAX_BYTES) throw new Error('Catalog media must be 50 MB or smaller.');
+  if (file.size > CATALOG_ASSET_MAX_BYTES)
+    throw new Error('Catalog media must be 50 MB or smaller.');
 
   return uploadToBucket(supabase, {
     bucket: 'catalog-assets',
@@ -190,7 +217,12 @@ export async function syncCatalogItemMedia(
   for (const file of getOptionalFiles(formData, 'mediaFiles')) {
     const mediaType = getCatalogMediaKind(file.type);
     if (!mediaType) throw new Error('Upload PNG, JPG, WEBP, SVG, MP4, or WEBM files only.');
-    const path = await uploadAdminCatalogAsset(supabase, userId, file, `items/${catalogItemId}/media`);
+    const path = await uploadAdminCatalogAsset(
+      supabase,
+      userId,
+      file,
+      `items/${catalogItemId}/media`,
+    );
     if (!path) continue;
     uploadedRows.push({
       catalog_item_id: catalogItemId,
@@ -208,7 +240,10 @@ export async function syncCatalogItemMedia(
     });
   }
 
-  if (thumbnailPath && !(currentMedia ?? []).some((media) => media.storage_path === thumbnailPath)) {
+  if (
+    thumbnailPath &&
+    !(currentMedia ?? []).some((media) => media.storage_path === thumbnailPath)
+  ) {
     uploadedRows.unshift({
       catalog_item_id: catalogItemId,
       media_type: 'image',

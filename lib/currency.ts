@@ -73,9 +73,7 @@ export function getPaymentRouteForCurrency(currency: AppCurrency): PaymentRoute 
   return isCardCurrency(currency) ? 'ameria' : 'bank_manual';
 }
 
-export async function listCurrencySettings(
-  supabase: SupabaseClient = getServiceSupabase(),
-) {
+export async function listCurrencySettings(supabase: SupabaseClient = getServiceSupabase()) {
   const { data, error } = await supabase
     .from('currencies')
     .select('code, name, symbol, is_enabled, is_default, payment_route, sort_order')
@@ -127,7 +125,10 @@ function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function rowToContext(row: ExchangeRateRow, source: ExchangeRateContext['source']): ExchangeRateContext {
+function rowToContext(
+  row: ExchangeRateRow,
+  source: ExchangeRateContext['source'],
+): ExchangeRateContext {
   return {
     baseCurrency: row.base_currency as AppCurrency,
     targetCurrency: row.target_currency as AppCurrency,
@@ -230,7 +231,7 @@ async function fetchProviderRate(baseCurrency: AppCurrency, targetCurrency: AppC
     throw new Error(`Exchange-rate provider returned ${response.status}.`);
   }
 
-  const payload = await response.json() as {
+  const payload = (await response.json()) as {
     rates?: Record<string, number>;
     conversion_rates?: Record<string, number>;
     result?: string;
@@ -265,10 +266,18 @@ export async function getExchangeRate(
 
   try {
     const fetched = await fetchProviderRate(baseCurrency, targetCurrency);
-    const row = await insertRate(supabase, baseCurrency, targetCurrency, fetched.rate, fetched.provider, false, {
-      source: 'provider',
-      result: fetched.payload.result ?? null,
-    });
+    const row = await insertRate(
+      supabase,
+      baseCurrency,
+      targetCurrency,
+      fetched.rate,
+      fetched.provider,
+      false,
+      {
+        source: 'provider',
+        result: fetched.payload.result ?? null,
+      },
+    );
     return rowToContext(row, 'provider');
   } catch (error) {
     const cached = await findCachedRate(supabase, baseCurrency, targetCurrency);

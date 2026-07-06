@@ -1,5 +1,16 @@
 import Link from 'next/link';
-import { Banknote, Boxes, ClipboardList, CreditCard, Globe2, LayoutDashboard, SlidersHorizontal, Sparkles, Store, Users } from 'lucide-react';
+import {
+  Banknote,
+  Boxes,
+  ClipboardList,
+  CreditCard,
+  Globe2,
+  LayoutDashboard,
+  SlidersHorizontal,
+  Sparkles,
+  Store,
+  Users,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const links = [

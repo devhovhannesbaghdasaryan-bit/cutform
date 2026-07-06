@@ -7,7 +7,11 @@ import { Label } from '@/components/ui/label';
 import { registerAction } from '@/app/(auth)/actions';
 import { errorOf, idleState } from '@/lib/action-state';
 
-export function RegisterForm({ copy }: { copy: { email: string; password: string; minPassword: string; create: string; creating: string } }) {
+export function RegisterForm({
+  copy,
+}: {
+  copy: { email: string; password: string; minPassword: string; create: string; creating: string };
+}) {
   const [state, action, pending] = useActionState(registerAction, idleState);
   const error = errorOf(state);
 
@@ -19,7 +23,14 @@ export function RegisterForm({ copy }: { copy: { email: string; password: string
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">{copy.password}</Label>
-        <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+        />
         <p className="text-xs text-muted-foreground">{copy.minPassword}</p>
       </div>
       {error && (

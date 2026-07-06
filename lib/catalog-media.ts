@@ -1,6 +1,11 @@
 import type { CatalogItemMedia } from '@/lib/marketplace';
 
-export const CATALOG_MEDIA_IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'] as const;
+export const CATALOG_MEDIA_IMAGE_MIME_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/svg+xml',
+] as const;
 export const CATALOG_MEDIA_VIDEO_MIME_TYPES = ['video/mp4', 'video/webm'] as const;
 
 export type CatalogMediaKind = 'image' | 'video';

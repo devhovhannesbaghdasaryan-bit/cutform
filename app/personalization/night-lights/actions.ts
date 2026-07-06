@@ -13,7 +13,11 @@ const imageExtByMime: Record<string, string> = {
 const modelSchema = z.object({
   id: z.string().uuid().optional(),
   title: z.string().trim().min(1, 'Title is required.'),
-  slug: z.string().trim().min(1).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a URL-safe slug.'),
+  slug: z
+    .string()
+    .trim()
+    .min(1)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a URL-safe slug.'),
   subcategoryId: z.union([z.string().uuid(), z.literal('')]),
   mockImagePath: z.string().trim().optional(),
   boilerplateImagePath: z.string().trim().optional(),
@@ -91,7 +95,12 @@ export async function savePersonalizationModelAction(formData: FormData) {
     .eq('slug', 'night-lights')
     .maybeSingle<{ id: string }>();
   if (!category) throw new Error('Night lights category is not configured.');
-  const mockUpload = await uploadModelImage(supabase, user.id, getFile(formData, 'mockImageFile'), 'mock');
+  const mockUpload = await uploadModelImage(
+    supabase,
+    user.id,
+    getFile(formData, 'mockImageFile'),
+    'mock',
+  );
   const boilerplateUpload = await uploadModelImage(
     supabase,
     user.id,
@@ -114,7 +123,10 @@ export async function savePersonalizationModelAction(formData: FormData) {
   };
 
   if (values.id) {
-    const { error } = await supabase.from('personalization_models').update(payload).eq('id', values.id);
+    const { error } = await supabase
+      .from('personalization_models')
+      .update(payload)
+      .eq('id', values.id);
     if (error) throw new Error(error.message);
   } else {
     const { error } = await supabase.from('personalization_models').insert(payload);
@@ -143,7 +155,12 @@ export async function savePersonalizationBoilerplateAction(formData: FormData) {
 
   const { supabase, user } = await requireAdminPermission('catalog_manage');
   const values = parsed.data;
-  const imageUpload = await uploadModelImage(supabase, user.id, getFile(formData, 'imageFile'), 'boilerplate');
+  const imageUpload = await uploadModelImage(
+    supabase,
+    user.id,
+    getFile(formData, 'imageFile'),
+    'boilerplate',
+  );
   const imagePath = imageUpload ?? values.imagePath;
   if (!imagePath) throw new Error('Upload a boilerplate image.');
 
@@ -162,7 +179,11 @@ export async function savePersonalizationBoilerplateAction(formData: FormData) {
   };
 
   const query = values.id
-    ? supabase.from('personalization_boilerplates').update(payload).eq('id', values.id).eq('model_id', values.modelId)
+    ? supabase
+        .from('personalization_boilerplates')
+        .update(payload)
+        .eq('id', values.id)
+        .eq('model_id', values.modelId)
     : supabase.from('personalization_boilerplates').insert(payload);
   const { error } = await query;
   if (error) throw new Error(error.message);
@@ -183,7 +204,10 @@ export async function removePersonalizationBoilerplateAction(formData: FormData)
   if (!parsed.success) throw new Error('Invalid boilerplate.');
 
   const { supabase } = await requireAdminPermission('catalog_manage');
-  const { error } = await supabase.from('personalization_boilerplates').delete().eq('id', parsed.data.id);
+  const { error } = await supabase
+    .from('personalization_boilerplates')
+    .delete()
+    .eq('id', parsed.data.id);
   if (error) throw new Error(error.message);
 
   const { data: model } = await supabase

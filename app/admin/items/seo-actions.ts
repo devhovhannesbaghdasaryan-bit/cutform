@@ -19,14 +19,18 @@ export type SeoGenerationState = {
 const seoGenerationSchema = z.object({
   catalogItemId: z.uuid(),
   locale: localeSchema,
-  fields: z.array(z.enum([
-    'seoTitle',
-    'seoDescription',
-    'keywords',
-    'ogTitle',
-    'ogDescription',
-    'socialImagePath',
-  ])).default([]),
+  fields: z
+    .array(
+      z.enum([
+        'seoTitle',
+        'seoDescription',
+        'keywords',
+        'ogTitle',
+        'ogDescription',
+        'socialImagePath',
+      ]),
+    )
+    .default([]),
 });
 
 const seoDraftSaveSchema = z.object({
@@ -53,7 +57,11 @@ export async function generateCatalogItemSeoDraftAction(
   });
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid SEO generation request.', draft: null, locale: 'en' };
+    return {
+      error: parsed.error.issues[0]?.message ?? 'Invalid SEO generation request.',
+      draft: null,
+      locale: 'en',
+    };
   }
 
   const { supabase } = await requireAdminPermission('seo_manage');
@@ -61,7 +69,9 @@ export async function generateCatalogItemSeoDraftAction(
   const [{ data: item, error }, { data: existingSeo }] = await Promise.all([
     supabase
       .from('catalog_items')
-      .select('id, title, slug, description, thumbnail_path, manufacturing_notes, characteristics, categories(name)')
+      .select(
+        'id, title, slug, description, thumbnail_path, manufacturing_notes, characteristics, categories(name)',
+      )
       .eq('id', catalogItemId)
       .maybeSingle<{
         id: string;
@@ -75,7 +85,9 @@ export async function generateCatalogItemSeoDraftAction(
       }>(),
     supabase
       .from('catalog_item_seo_metadata')
-      .select('seo_title, seo_description, keywords, og_title, og_description, social_image_path, seo_slug')
+      .select(
+        'seo_title, seo_description, keywords, og_title, og_description, social_image_path, seo_slug',
+      )
       .eq('catalog_item_id', catalogItemId)
       .eq('locale', locale)
       .maybeSingle<{
@@ -105,18 +117,31 @@ export async function generateCatalogItemSeoDraftAction(
 
   const selectedFields = parsed.data.fields.length
     ? new Set(parsed.data.fields)
-    : new Set(['seoTitle', 'seoDescription', 'keywords', 'ogTitle', 'ogDescription', 'socialImagePath']);
+    : new Set([
+        'seoTitle',
+        'seoDescription',
+        'keywords',
+        'ogTitle',
+        'ogDescription',
+        'socialImagePath',
+      ]);
 
   return {
     error: null,
     locale,
     draft: {
-      seoTitle: selectedFields.has('seoTitle') ? draft.seoTitle : existingSeo?.seo_title ?? '',
-      seoDescription: selectedFields.has('seoDescription') ? draft.seoDescription : existingSeo?.seo_description ?? '',
-      keywords: selectedFields.has('keywords') ? draft.keywords : existingSeo?.keywords ?? [],
-      ogTitle: selectedFields.has('ogTitle') ? draft.ogTitle : existingSeo?.og_title ?? '',
-      ogDescription: selectedFields.has('ogDescription') ? draft.ogDescription : existingSeo?.og_description ?? '',
-      socialImagePath: selectedFields.has('socialImagePath') ? item.thumbnail_path : existingSeo?.social_image_path ?? item.thumbnail_path,
+      seoTitle: selectedFields.has('seoTitle') ? draft.seoTitle : (existingSeo?.seo_title ?? ''),
+      seoDescription: selectedFields.has('seoDescription')
+        ? draft.seoDescription
+        : (existingSeo?.seo_description ?? ''),
+      keywords: selectedFields.has('keywords') ? draft.keywords : (existingSeo?.keywords ?? []),
+      ogTitle: selectedFields.has('ogTitle') ? draft.ogTitle : (existingSeo?.og_title ?? ''),
+      ogDescription: selectedFields.has('ogDescription')
+        ? draft.ogDescription
+        : (existingSeo?.og_description ?? ''),
+      socialImagePath: selectedFields.has('socialImagePath')
+        ? item.thumbnail_path
+        : (existingSeo?.social_image_path ?? item.thumbnail_path),
       seoSlug: existingSeo?.seo_slug ?? item.slug,
     },
   };

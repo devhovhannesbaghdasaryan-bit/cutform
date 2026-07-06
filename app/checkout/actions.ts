@@ -20,8 +20,16 @@ const checkoutSchema = z.object({
   city: z.string().trim().min(2).max(100),
   administrativeArea: z.string().trim().max(100).optional().or(z.literal('')),
   postalCode: z.string().trim().max(30).optional().or(z.literal('')),
-  countryCode: z.string().trim().regex(/^[A-Z]{2}$/),
-  billingCountryCode: z.string().trim().regex(/^[A-Z]{2}$/).optional().or(z.literal('')),
+  countryCode: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{2}$/),
+  billingCountryCode: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{2}$/)
+    .optional()
+    .or(z.literal('')),
 });
 
 export async function createCheckoutOrderAction(formData: FormData) {
@@ -67,7 +75,9 @@ export async function createCheckoutOrderAction(formData: FormData) {
 
   const { data: orderTotals, error: totalError } = await supabase
     .from('orders')
-    .select('subtotal_cents, shipping_cents, total_cents, currency, exchange_rate_context, payment_provider_route')
+    .select(
+      'subtotal_cents, shipping_cents, total_cents, currency, exchange_rate_context, payment_provider_route',
+    )
     .eq('id', order.id)
     .eq('user_id', user.id)
     .single<{
@@ -79,7 +89,8 @@ export async function createCheckoutOrderAction(formData: FormData) {
       payment_provider_route: 'ameria' | 'bank_manual' | null;
     }>();
 
-  if (totalError || !orderTotals) throw new Error(totalError?.message ?? 'Unable to read order total.');
+  if (totalError || !orderTotals)
+    throw new Error(totalError?.message ?? 'Unable to read order total.');
 
   const service = getServiceSupabase();
   const transaction = await createTransactionRecord(service, {

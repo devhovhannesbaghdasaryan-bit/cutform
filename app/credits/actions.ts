@@ -13,7 +13,12 @@ import { createCreditPurchaseTransaction } from '@/lib/transactions';
 
 const creditPackRequestSchema = z.object({
   packKey: z.string().trim().min(1),
-  billingCountryCode: z.string().trim().regex(/^[A-Z]{2}$/).optional().or(z.literal('')),
+  billingCountryCode: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{2}$/)
+    .optional()
+    .or(z.literal('')),
 });
 
 export async function requestManualCreditPackAction(formData: FormData) {

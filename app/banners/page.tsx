@@ -9,7 +9,11 @@ import { getServerSupabase } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export default async function BannersPage() {
-  const [supabase, t, tBanner] = await Promise.all([getServerSupabase(), getTranslations(), getTranslations('banner')]);
+  const [supabase, t, tBanner] = await Promise.all([
+    getServerSupabase(),
+    getTranslations(),
+    getTranslations('banner'),
+  ]);
   const [{ data: samples }, { data: presets }] = await Promise.all([
     listBannerSamples(supabase),
     listBannerSizePresets(supabase),
@@ -18,7 +22,26 @@ export default async function BannersPage() {
   const fallbackSamples: BannerSample[] = samples?.length
     ? samples
     : [{ id: 'mock-store-banner', title: t('banners.sampleFallback'), image_path: 'mock-banner' }];
-  const bannerCopy = Object.fromEntries((['sample','size','text','textPlaceholder','previewText','custom','review','unavailable','advancedPrompt','promptPlaceholder','reference','rights','generate','disclaimer'] as const).map((key) => [key, tBanner.raw(key)])) as Parameters<typeof BannerCustomizer>[0]['copy'];
+  const bannerCopy = Object.fromEntries(
+    (
+      [
+        'sample',
+        'size',
+        'text',
+        'textPlaceholder',
+        'previewText',
+        'custom',
+        'review',
+        'unavailable',
+        'advancedPrompt',
+        'promptPlaceholder',
+        'reference',
+        'rights',
+        'generate',
+        'disclaimer',
+      ] as const
+    ).map((key) => [key, tBanner.raw(key)]),
+  ) as Parameters<typeof BannerCustomizer>[0]['copy'];
 
   return (
     <>
@@ -28,9 +51,7 @@ export default async function BannersPage() {
           <div>
             <p className="text-sm text-muted-foreground">{t('banners.eyebrow')}</p>
             <h1 className="text-3xl font-bold tracking-tight">{t('banners.title')}</h1>
-            <p className="mt-2 max-w-2xl text-muted-foreground">
-              {t('banners.subtitle')}
-            </p>
+            <p className="mt-2 max-w-2xl text-muted-foreground">{t('banners.subtitle')}</p>
           </div>
           <Button asChild variant="outline">
             <Link href="/catalog?category=banners">{t('banners.filter')}</Link>
@@ -40,9 +61,7 @@ export default async function BannersPage() {
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold tracking-tight">{t('banners.customize')}</h2>
-            <p className="text-sm text-muted-foreground">
-              {t('banners.customizeHelp')}
-            </p>
+            <p className="text-sm text-muted-foreground">{t('banners.customizeHelp')}</p>
           </div>
           <BannerCustomizer samples={fallbackSamples} presets={presets ?? []} copy={bannerCopy} />
         </section>
@@ -50,9 +69,7 @@ export default async function BannersPage() {
         <section className="space-y-4">
           <div>
             <h2 className="text-xl font-semibold tracking-tight">{t('banners.advanced')}</h2>
-            <p className="text-sm text-muted-foreground">
-              {t('banners.advancedHelp')}
-            </p>
+            <p className="text-sm text-muted-foreground">{t('banners.advancedHelp')}</p>
           </div>
           <AdvancedBannerGenerationPanel presets={presets ?? []} copy={bannerCopy} />
         </section>

@@ -18,7 +18,8 @@ for (const retiredFile of [
   'app/api/generate/route.ts',
   'lib/generation-schema.ts',
 ]) {
-  if (existsSync(retiredFile)) throw new Error(`Retired generator file still exists: ${retiredFile}`);
+  if (existsSync(retiredFile))
+    throw new Error(`Retired generator file still exists: ${retiredFile}`);
 }
 
 const personalizedAction = readFileSync('app/personalize/actions.ts', 'utf8');
@@ -29,15 +30,18 @@ for (const contract of [
   'manufacturingFilePath: null',
   'manufacturingSvgStatus: "pending_admin_generation"',
 ]) {
-  if (!personalizedAction.includes(contract)) throw new Error(`Missing personalized generation contract: ${contract}`);
+  if (!personalizedAction.includes(contract))
+    throw new Error(`Missing personalized generation contract: ${contract}`);
 }
 
 for (const removedContract of ['createPreviewSvg(', 'uploadGeneratedSvg(', 'hiddenSvgs:']) {
-  if (personalizedAction.includes(removedContract)) throw new Error(`Customer generation still creates manufacturing SVGs: ${removedContract}`);
+  if (personalizedAction.includes(removedContract))
+    throw new Error(`Customer generation still creates manufacturing SVGs: ${removedContract}`);
 }
 
 const cartAction = readFileSync('app/generated/actions.ts', 'utf8');
-if (!cartAction.includes("formData.getAll('optionIds')")) throw new Error('Generated results do not support multi-option carting');
+if (!cartAction.includes("formData.getAll('optionIds')"))
+  throw new Error('Generated results do not support multi-option carting');
 
 const sanitize = readFileSync('lib/sanitize.ts', 'utf8');
 for (const warning of ['missing a viewBox', 'missing obvious cut/engrave layer markers']) {
@@ -45,8 +49,13 @@ for (const warning of ['missing a viewBox', 'missing obvious cut/engrave layer m
 }
 
 const generatedDetail = readFileSync('app/generated/[id]/page.tsx', 'utf8');
-for (const contract of ['extractValidationWarnings', "t('generated.warnings')", 'getTranslations']) {
-  if (!generatedDetail.includes(contract)) throw new Error(`Generated detail is missing warning rendering: ${contract}`);
+for (const contract of [
+  'extractValidationWarnings',
+  "t('generated.warnings')",
+  'getTranslations',
+]) {
+  if (!generatedDetail.includes(contract))
+    throw new Error(`Generated detail is missing warning rendering: ${contract}`);
 }
 
 console.log('Personalized generation smoke passed');

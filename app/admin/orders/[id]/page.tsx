@@ -25,8 +25,14 @@ export default async function AdminOrderDetailPage({
 
   if (!detail) notFound();
 
-  const { order, items, itemsError, catalogInfoById, generatedInfoById, latestInstructionByItemId } =
-    detail;
+  const {
+    order,
+    items,
+    itemsError,
+    catalogInfoById,
+    generatedInfoById,
+    latestInstructionByItemId,
+  } = detail;
 
   return (
     <main className="container max-w-5xl space-y-8 py-10">
@@ -52,10 +58,14 @@ export default async function AdminOrderDetailPage({
                     key={item.id}
                     item={item}
                     catalogInfo={
-                      item.catalog_item_id ? catalogInfoById.get(item.catalog_item_id) ?? null : null
+                      item.catalog_item_id
+                        ? (catalogInfoById.get(item.catalog_item_id) ?? null)
+                        : null
                     }
                     generatedInfo={
-                      item.generated_item_id ? generatedInfoById.get(item.generated_item_id) ?? null : null
+                      item.generated_item_id
+                        ? (generatedInfoById.get(item.generated_item_id) ?? null)
+                        : null
                     }
                     latestInstruction={latestInstructionByItemId.get(item.id) ?? null}
                     orderId={order.id}
@@ -82,7 +92,9 @@ export default async function AdminOrderDetailPage({
           <div className="rounded-lg border p-5">
             <h2 className="font-semibold">Shipping address</h2>
             <pre className="mt-3 overflow-auto rounded-md bg-muted p-3 text-xs">
-              {order.shipping_address ? JSON.stringify(order.shipping_address, null, 2) : 'No shipping address yet.'}
+              {order.shipping_address
+                ? JSON.stringify(order.shipping_address, null, 2)
+                : 'No shipping address yet.'}
             </pre>
           </div>
         </section>
@@ -182,7 +194,7 @@ function OrderItemDetail({
           <Info label="Manufacturing file" value={item.manufacturing_file_path ?? '-'} />
           <Info label="Original images" value={item.original_image_paths.join(', ') || '-'} />
           <Info label="Text" value={item.custom_text ?? '-'} />
-          <Info label="LED" value={item.multi_color ? 'Multi color' : item.led_color ?? '-'} />
+          <Info label="LED" value={item.multi_color ? 'Multi color' : (item.led_color ?? '-')} />
           <Info label="Banner size" value={item.banner_size_key ?? '-'} />
           {isBanner ? (
             <Info label="Manufacturing status" value={latestInstruction?.status ?? 'not_started'} />
@@ -214,7 +226,10 @@ function OrderItemDetail({
             {latestInstruction ? (
               <div className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
                 <Info label="Source image" value={latestInstruction.source_image_path} />
-                <Info label="Drawing files" value={latestInstruction.drawing_paths.join(', ') || '-'} />
+                <Info
+                  label="Drawing files"
+                  value={latestInstruction.drawing_paths.join(', ') || '-'}
+                />
               </div>
             ) : null}
           </div>
@@ -229,7 +244,10 @@ function OrderItemDetail({
             <Snapshot title="Admin catalog characteristics" value={catalogInfo} />
           ) : null}
           {latestInstruction ? (
-            <Snapshot title="Banner manufacturing instructions" value={latestInstruction.instructions} />
+            <Snapshot
+              title="Banner manufacturing instructions"
+              value={latestInstruction.instructions}
+            />
           ) : null}
         </div>
       </div>

@@ -25,52 +25,92 @@ export const dynamic = 'force-dynamic';
 const ABSOLUTE_URL_PATTERN = /^https?:\/\//i;
 
 async function getCartPreviewUrls(supabase: SupabaseClient, items: CartItem[]) {
-  const catalogIds = items.flatMap((item) => item.catalog_item_id ? [item.catalog_item_id] : []);
-  const generatedIds = items.flatMap((item) => item.generated_item_id ? [item.generated_item_id] : []);
-  const bannerIds = items.flatMap((item) => item.banner_sample_id ? [item.banner_sample_id] : []);
+  const catalogIds = items.flatMap((item) => (item.catalog_item_id ? [item.catalog_item_id] : []));
+  const generatedIds = items.flatMap((item) =>
+    item.generated_item_id ? [item.generated_item_id] : [],
+  );
+  const bannerIds = items.flatMap((item) => (item.banner_sample_id ? [item.banner_sample_id] : []));
 
   const [catalogResult, generatedResult, bannerResult] = await Promise.all([
     catalogIds.length
-      ? supabase.from('catalog_items').select('id, thumbnail_path').in('id', catalogIds).returns<{ id: string; thumbnail_path: string | null }[]>()
+      ? supabase
+          .from('catalog_items')
+          .select('id, thumbnail_path')
+          .in('id', catalogIds)
+          .returns<{ id: string; thumbnail_path: string | null }[]>()
       : Promise.resolve({ data: [] as { id: string; thumbnail_path: string | null }[] }),
     generatedIds.length
-      ? supabase.from('generated_items').select('id, selected_preview_path, preview_path').in('id', generatedIds).returns<{ id: string; selected_preview_path: string | null; preview_path: string | null }[]>()
-      : Promise.resolve({ data: [] as { id: string; selected_preview_path: string | null; preview_path: string | null }[] }),
+      ? supabase
+          .from('generated_items')
+          .select('id, selected_preview_path, preview_path')
+          .in('id', generatedIds)
+          .returns<
+            { id: string; selected_preview_path: string | null; preview_path: string | null }[]
+          >()
+      : Promise.resolve({
+          data: [] as {
+            id: string;
+            selected_preview_path: string | null;
+            preview_path: string | null;
+          }[],
+        }),
     bannerIds.length
-      ? supabase.from('banner_samples').select('id, image_path').in('id', bannerIds).returns<{ id: string; image_path: string | null }[]>()
+      ? supabase
+          .from('banner_samples')
+          .select('id, image_path')
+          .in('id', bannerIds)
+          .returns<{ id: string; image_path: string | null }[]>()
       : Promise.resolve({ data: [] as { id: string; image_path: string | null }[] }),
   ]);
 
-  const catalogPaths = new Map((catalogResult.data ?? []).map((row) => [row.id, row.thumbnail_path]));
-  const generatedPaths = new Map((generatedResult.data ?? []).map((row) => [row.id, row.selected_preview_path ?? row.preview_path]));
+  const catalogPaths = new Map(
+    (catalogResult.data ?? []).map((row) => [row.id, row.thumbnail_path]),
+  );
+  const generatedPaths = new Map(
+    (generatedResult.data ?? []).map((row) => [
+      row.id,
+      row.selected_preview_path ?? row.preview_path,
+    ]),
+  );
   const bannerPaths = new Map((bannerResult.data ?? []).map((row) => [row.id, row.image_path]));
   const previews = new Map<string, string>();
 
-  await Promise.all(items.map(async (item) => {
-    if (item.catalog_item_id) {
-      const url = resolvePublicStorageUrl('catalog-assets', catalogPaths.get(item.catalog_item_id));
-      if (url) previews.set(item.id, url);
-      return;
-    }
-    if (item.banner_sample_id) {
-      const url = resolvePublicStorageUrl('banner-assets', bannerPaths.get(item.banner_sample_id));
-      if (url) previews.set(item.id, url);
-      return;
-    }
-    if (!item.generated_item_id) return;
+  await Promise.all(
+    items.map(async (item) => {
+      if (item.catalog_item_id) {
+        const url = resolvePublicStorageUrl(
+          'catalog-assets',
+          catalogPaths.get(item.catalog_item_id),
+        );
+        if (url) previews.set(item.id, url);
+        return;
+      }
+      if (item.banner_sample_id) {
+        const url = resolvePublicStorageUrl(
+          'banner-assets',
+          bannerPaths.get(item.banner_sample_id),
+        );
+        if (url) previews.set(item.id, url);
+        return;
+      }
+      if (!item.generated_item_id) return;
 
-    const configuredPath = item.configuration.selectedPreviewPath;
-    const path = typeof configuredPath === 'string'
-      ? configuredPath
-      : generatedPaths.get(item.generated_item_id);
-    if (!path) return;
-    if (ABSOLUTE_URL_PATTERN.test(path) || path.startsWith('/')) {
-      previews.set(item.id, path);
-      return;
-    }
-    const { data } = await supabase.storage.from('generated-assets').createSignedUrl(path, 60 * 60);
-    if (data?.signedUrl) previews.set(item.id, data.signedUrl);
-  }));
+      const configuredPath = item.configuration.selectedPreviewPath;
+      const path =
+        typeof configuredPath === 'string'
+          ? configuredPath
+          : generatedPaths.get(item.generated_item_id);
+      if (!path) return;
+      if (ABSOLUTE_URL_PATTERN.test(path) || path.startsWith('/')) {
+        previews.set(item.id, path);
+        return;
+      }
+      const { data } = await supabase.storage
+        .from('generated-assets')
+        .createSignedUrl(path, 60 * 60);
+      if (data?.signedUrl) previews.set(item.id, data.signedUrl);
+    }),
+  );
 
   return previews;
 }
@@ -91,9 +131,7 @@ export default async function CartPage() {
   const items = cartData.items;
   const market = await resolveMarket({ supabase: cartSupabase });
   const previewUrls = await getCartPreviewUrls(cartSupabase, items);
-  const issues = user
-    ? await validateCartBeforeCheckout(supabase, user.id).catch(() => [])
-    : [];
+  const issues = user ? await validateCartBeforeCheckout(supabase, user.id).catch(() => []) : [];
   const issueByItem = new Map(issues.map((issue) => [issue.cartItemId, issue]));
   const subtotal = items.reduce((sum, item) => sum + item.unit_price_cents * item.quantity, 0);
   const subtotalCurrency = items[0]?.currency ?? cartData.cart?.currency ?? 'AMD';
@@ -131,7 +169,9 @@ export default async function CartPage() {
           <div className="rounded-lg border border-dashed p-10 text-center">
             <ShoppingCart className="mx-auto h-10 w-10 text-muted-foreground" />
             <h2 className="mt-4 text-lg font-semibold">{t('cart.empty')}</h2>
-            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{t('cart.empty_description')}</p>
+            <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+              {t('cart.empty_description')}
+            </p>
             <Button asChild className="mt-5">
               <Link href="/catalog">{t('cart.browse_catalog')}</Link>
             </Button>
@@ -168,16 +208,17 @@ export default async function CartPage() {
                       </div>
                       <div className="min-w-0 space-y-2">
                         <p className="font-medium">{item.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {itemType}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{itemType}</p>
                         {issue && (
                           <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                             {tDynamic(t, `cart.issue.${issue.code}`)}
                           </p>
                         )}
                         <div className="flex flex-wrap items-center gap-2">
-                          <form action={updateCartQuantityAction} className="flex items-center gap-2">
+                          <form
+                            action={updateCartQuantityAction}
+                            className="flex items-center gap-2"
+                          >
                             <input type="hidden" name="cartItemId" value={item.id} />
                             <input
                               name="quantity"
@@ -189,7 +230,12 @@ export default async function CartPage() {
                               aria-label={t('cart.quantity_label', { name: item.title })}
                               className="h-9 w-20 rounded-md border border-input bg-background px-3 text-sm disabled:opacity-60"
                             />
-                            <Button type="submit" variant="outline" size="sm" disabled={isGenerated}>
+                            <Button
+                              type="submit"
+                              variant="outline"
+                              size="sm"
+                              disabled={isGenerated}
+                            >
                               {t('cart.update_quantity')}
                             </Button>
                           </form>
@@ -204,10 +250,15 @@ export default async function CartPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-semibold">
-                          {formatLocalizedCurrency(locale, item.unit_price_cents * item.quantity, item.currency)}
+                          {formatLocalizedCurrency(
+                            locale,
+                            item.unit_price_cents * item.quantity,
+                            item.currency,
+                          )}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatLocalizedCurrency(locale, item.unit_price_cents, item.currency)} {t('common.each')}
+                          {formatLocalizedCurrency(locale, item.unit_price_cents, item.currency)}{' '}
+                          {t('common.each')}
                         </p>
                       </div>
                     </div>
@@ -222,20 +273,26 @@ export default async function CartPage() {
                 <dl className="mt-4 space-y-3 text-sm">
                   <div className="flex justify-between">
                     <dt className="text-muted-foreground">{t('cart.subtotal')}</dt>
-                    <dd className="font-medium">{formatLocalizedCurrency(locale, subtotal, subtotalCurrency)}</dd>
+                    <dd className="font-medium">
+                      {formatLocalizedCurrency(locale, subtotal, subtotalCurrency)}
+                    </dd>
                   </div>
                   <div className="flex justify-between">
                     <dt className="text-muted-foreground">{t('cart.shipping')}</dt>
-                    <dd>{totals
-                      ? formatLocalizedCurrency(locale, totals.shippingCents, totals.currency)
-                      : market.countryCode
-                        ? t('cart.shipping_unavailable')
-                        : t('cart.select_country')}</dd>
+                    <dd>
+                      {totals
+                        ? formatLocalizedCurrency(locale, totals.shippingCents, totals.currency)
+                        : market.countryCode
+                          ? t('cart.shipping_unavailable')
+                          : t('cart.select_country')}
+                    </dd>
                   </div>
                   {totals ? (
                     <div className="flex justify-between border-t pt-3 text-base">
                       <dt className="font-medium">{t('cart.total')}</dt>
-                      <dd className="font-bold">{formatLocalizedCurrency(locale, totals.totalCents, totals.currency)}</dd>
+                      <dd className="font-bold">
+                        {formatLocalizedCurrency(locale, totals.totalCents, totals.currency)}
+                      </dd>
                     </div>
                   ) : null}
                   <div className="flex justify-between">
@@ -257,9 +314,7 @@ export default async function CartPage() {
                   </Button>
                 )}
                 {issues.length > 0 && (
-                  <p className="mt-2 text-sm text-destructive">
-                    {t('cart.resolve_issues')}
-                  </p>
+                  <p className="mt-2 text-sm text-destructive">{t('cart.resolve_issues')}</p>
                 )}
               </div>
 

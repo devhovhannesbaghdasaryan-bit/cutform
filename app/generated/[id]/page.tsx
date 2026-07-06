@@ -10,7 +10,10 @@ import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import type { GeneratedItemRow, PersonalizedPreviewOptionRow } from '@/lib/generated-items';
-import { getBoilerplateName, type PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
+import {
+  getBoilerplateName,
+  type PersonalizationBoilerplate,
+} from '@/lib/personalization-boilerplates';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,14 +39,13 @@ type PreviewOption = Pick<
   PersonalizedPreviewOptionRow,
   'id' | 'option_index' | 'preview_image_path' | 'status' | 'metadata'
 > & {
-  boilerplate: Pick<PersonalizationBoilerplate, 'admin_name' | 'name_en' | 'name_hy' | 'name_ru'> | null;
+  boilerplate: Pick<
+    PersonalizationBoilerplate,
+    'admin_name' | 'name_en' | 'name_hy' | 'name_ru'
+  > | null;
 };
 
-export default async function GeneratedItemPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function GeneratedItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
@@ -61,7 +63,9 @@ export default async function GeneratedItemPage({
       .maybeSingle<GeneratedItemDetail>(),
     supabase
       .from('personalized_preview_options')
-      .select('id, option_index, preview_image_path, status, metadata, boilerplate:personalization_boilerplates(admin_name, name_en, name_hy, name_ru)')
+      .select(
+        'id, option_index, preview_image_path, status, metadata, boilerplate:personalization_boilerplates(admin_name, name_en, name_hy, name_ru)',
+      )
       .eq('generated_item_id', id)
       .order('option_index', { ascending: true })
       .returns<PreviewOption[]>(),
@@ -71,27 +75,39 @@ export default async function GeneratedItemPage({
 
   if (error || !item) notFound();
 
-  const previewOptions = await Promise.all((options ?? []).map(async (option) => ({
-    ...option,
-    previewUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60)).data?.signedUrl ?? null,
-  })));
+  const previewOptions = await Promise.all(
+    (options ?? []).map(async (option) => ({
+      ...option,
+      previewUrl:
+        (
+          await supabase.storage
+            .from('generated-assets')
+            .createSignedUrl(option.preview_image_path, 60 * 60)
+        ).data?.signedUrl ?? null,
+    })),
+  );
 
   const selectedPath = item.selected_preview_path ?? item.preview_path;
   const fallbackPreviewUrl = selectedPath
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(selectedPath, 60 * 60)).data?.signedUrl ?? null
+    ? ((await supabase.storage.from('generated-assets').createSignedUrl(selectedPath, 60 * 60)).data
+        ?.signedUrl ?? null)
     : null;
   const warnings = extractValidationWarnings(item.manufacturing_metadata);
-  const bannerDetails = item.product_type === 'banner' ? extractBannerDetails(item.generation_options) : null;
-  const canOrder = item.review_status !== 'rejected' && (item.product_type !== 'personalized_night_light' || previewOptions.length > 0);
+  const bannerDetails =
+    item.product_type === 'banner' ? extractBannerDetails(item.generation_options) : null;
+  const canOrder =
+    item.review_status !== 'rejected' &&
+    (item.product_type !== 'personalized_night_light' || previewOptions.length > 0);
   const salePriceCents = Number(item.generation_options.salePriceCents ?? 0);
   const localizedProductType = tDynamic(
     t,
     `generated.productType.${item.product_type}`,
     item.product_type.replaceAll('_', ' '),
   );
-  const itemTitle = item.product_type === 'personalized_night_light'
-    ? localizedProductType
-    : item.title ?? localizedProductType;
+  const itemTitle =
+    item.product_type === 'personalized_night_light'
+      ? localizedProductType
+      : (item.title ?? localizedProductType);
   const reviewStatus = tDynamic(
     t,
     `status.${item.review_status}`,
@@ -112,7 +128,8 @@ export default async function GeneratedItemPage({
             </p>
             <h1 className="text-3xl font-bold tracking-tight">{itemTitle}</h1>
             <p className="text-muted-foreground">
-              {reviewStatus} &middot; {t('generated.creditsUsed', { count: String(item.credit_cost) })}
+              {reviewStatus} &middot;{' '}
+              {t('generated.creditsUsed', { count: String(item.credit_cost) })}
             </p>
           </div>
           <Button asChild variant="outline">
@@ -135,11 +152,13 @@ export default async function GeneratedItemPage({
                     : t('generated.option', { number: String(option.option_index) }),
               }))}
               fallbackPreviewUrl={fallbackPreviewUrl}
-              priceLabel={salePriceCents > 0
-                ? t('generated.priceEach', {
-                    price: formatLocalizedCurrency(locale, salePriceCents, 'AMD'),
-                  })
-                : null}
+              priceLabel={
+                salePriceCents > 0
+                  ? t('generated.priceEach', {
+                      price: formatLocalizedCurrency(locale, salePriceCents, 'AMD'),
+                    })
+                  : null
+              }
               copy={{
                 resultsTitle: t('nightLight.results'),
                 resultsHelp: t('nightLight.resultsHelp'),
@@ -174,10 +193,12 @@ export default async function GeneratedItemPage({
             <div className="rounded-lg border bg-card p-5 shadow-sm">
               <h2 className="font-semibold">{t('generated.customization')}</h2>
               <dl className="mt-4 space-y-3 text-sm">
-                {item.custom_text ? <div>
-                  <dt className="text-muted-foreground">{t('generated.personalizedText')}</dt>
-                  <dd>{item.custom_text}</dd>
-                </div> : null}
+                {item.custom_text ? (
+                  <div>
+                    <dt className="text-muted-foreground">{t('generated.personalizedText')}</dt>
+                    <dd>{item.custom_text}</dd>
+                  </div>
+                ) : null}
                 <div>
                   <dt className="text-muted-foreground">{t('generated.lightColor')}</dt>
                   <dd className="capitalize">{lightColor}</dd>
@@ -201,20 +222,24 @@ export default async function GeneratedItemPage({
               </div>
             ) : null}
 
-            {item.product_type !== 'personalized_night_light' ? <form action={addGeneratedItemToCartAction} className="rounded-lg border p-5">
-              <input type="hidden" name="generatedItemId" value={item.id} />
-              {salePriceCents > 0 && (
-                <p className="mb-3 text-center text-lg font-semibold">{formatLocalizedCurrency(locale, salePriceCents, 'AMD')}</p>
-              )}
-              <Button type="submit" className="w-full" disabled={!canOrder}>
-                {t('generated.addToCart')}
-              </Button>
-              {!canOrder && (
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {t('generated.selectPreview')}
-                </p>
-              )}
-            </form> : null}
+            {item.product_type !== 'personalized_night_light' ? (
+              <form action={addGeneratedItemToCartAction} className="rounded-lg border p-5">
+                <input type="hidden" name="generatedItemId" value={item.id} />
+                {salePriceCents > 0 && (
+                  <p className="mb-3 text-center text-lg font-semibold">
+                    {formatLocalizedCurrency(locale, salePriceCents, 'AMD')}
+                  </p>
+                )}
+                <Button type="submit" className="w-full" disabled={!canOrder}>
+                  {t('generated.addToCart')}
+                </Button>
+                {!canOrder && (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {t('generated.selectPreview')}
+                  </p>
+                )}
+              </form>
+            ) : null}
           </aside>
         </div>
       </main>
@@ -224,11 +249,15 @@ export default async function GeneratedItemPage({
 
 function extractValidationWarnings(metadata: Record<string, unknown>) {
   const warnings = metadata.validationWarnings ?? metadata.warnings ?? [];
-  return Array.isArray(warnings) ? warnings.filter((warning): warning is string => typeof warning === 'string') : [];
+  return Array.isArray(warnings)
+    ? warnings.filter((warning): warning is string => typeof warning === 'string')
+    : [];
 }
 
 function asRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function asString(value: unknown) {
@@ -245,7 +274,9 @@ function extractBannerDetails(options: Record<string, unknown>) {
   const sizeLabel = [
     asString(sizePreset.name) ?? asString(options.bannerSizeKey) ?? 'Size requires review',
     dimensions,
-  ].filter(Boolean).join(' - ');
+  ]
+    .filter(Boolean)
+    .join(' - ');
   const placementLabel = [
     asString(placement.zone) ?? 'center',
     asString(placement.alignment) ?? 'center',

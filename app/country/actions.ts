@@ -6,7 +6,12 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { updateActiveCartCurrency } from '@/app/currency/actions';
 import { getCartSessionId } from '@/lib/cart-session';
-import { CURRENCY_COOKIE, LEGACY_CURRENCY_COOKIE, listEnabledCurrencies, normalizeCurrency } from '@/lib/currency';
+import {
+  CURRENCY_COOKIE,
+  LEGACY_CURRENCY_COOKIE,
+  listEnabledCurrencies,
+  normalizeCurrency,
+} from '@/lib/currency';
 import { COUNTRY_COOKIE, normalizeCountryCode, resolveMarket } from '@/lib/market';
 import { getCurrentUser, getServiceSupabase } from '@/lib/supabase/server';
 
@@ -50,7 +55,10 @@ export async function setCountryPreferenceAction(formData: FormData) {
     if (profileError) throw new Error(profileError.message);
   }
 
-  let cartQuery = service.from('carts').update({ destination_country_code: countryCode }).eq('status', 'active');
+  let cartQuery = service
+    .from('carts')
+    .update({ destination_country_code: countryCode })
+    .eq('status', 'active');
   cartQuery = user ? cartQuery.eq('user_id', user.id) : cartQuery.eq('session_id', sessionId ?? '');
   const { error: cartError } = await cartQuery;
   if (cartError) throw new Error(cartError.message);
@@ -60,17 +68,22 @@ export async function setCountryPreferenceAction(formData: FormData) {
     cookieStore.get(CURRENCY_COOKIE)?.value ?? cookieStore.get(LEGACY_CURRENCY_COOKIE)?.value,
   );
   const { data: profile } = user
-    ? await service.from('profiles').select('preferred_currency').eq('user_id', user.id).maybeSingle<{ preferred_currency: string | null }>()
+    ? await service
+        .from('profiles')
+        .select('preferred_currency')
+        .eq('user_id', user.id)
+        .maybeSingle<{ preferred_currency: string | null }>()
     : { data: null };
   const explicitProfileCurrency = normalizeCurrency(profile?.preferred_currency);
   if (!explicitCookieCurrency && !explicitProfileCurrency) {
     const market = await resolveMarket({ checkoutCountryCode: countryCode, supabase: service });
     const enabled = await listEnabledCurrencies(service);
     const enabledCodes = new Set(enabled.map((item) => item.code));
-    const geographicCurrency = normalizeCurrency(market.countryDefaultCurrency)
-      ?? normalizeCurrency(market.regionDefaultCurrency)
-      ?? enabled.find((item) => item.is_default)?.code
-      ?? 'AMD';
+    const geographicCurrency =
+      normalizeCurrency(market.countryDefaultCurrency) ??
+      normalizeCurrency(market.regionDefaultCurrency) ??
+      enabled.find((item) => item.is_default)?.code ??
+      'AMD';
     if (enabledCodes.has(geographicCurrency)) {
       await updateActiveCartCurrency({
         service,

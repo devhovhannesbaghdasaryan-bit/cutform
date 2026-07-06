@@ -37,10 +37,7 @@ export default async function AdminItemsPage({
 
   const [{ data: items, error }, { data: categories }] = await Promise.all([
     query,
-    supabase
-      .from('categories')
-      .select('slug, name')
-      .order('sort_order', { ascending: true }),
+    supabase.from('categories').select('slug, name').order('sort_order', { ascending: true }),
   ]);
 
   const filteredItems = (items ?? []).filter(
@@ -127,7 +124,9 @@ export default async function AdminItemsPage({
                   <td className="px-4 py-3">{formatPrice(item.price_cents)}</td>
                   <td className="px-4 py-3 capitalize">{item.status}</td>
                   <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {[item.is_popular && 'popular', item.is_customizable && 'custom'].filter(Boolean).join(', ') || '-'}
+                    {[item.is_popular && 'popular', item.is_customizable && 'custom']
+                      .filter(Boolean)
+                      .join(', ') || '-'}
                   </td>
                 </tr>
               ))}

@@ -27,11 +27,7 @@ const fieldOptions = [
   ['socialImagePath', 'Social image'],
 ] as const;
 
-export function SeoMetadataManager({
-  catalogItemId,
-}: {
-  catalogItemId: string;
-}) {
+export function SeoMetadataManager({ catalogItemId }: { catalogItemId: string }) {
   const [state, action, pending] = useActionState(generateCatalogItemSeoDraftAction, initialState);
 
   return (
@@ -39,7 +35,8 @@ export function SeoMetadataManager({
       <div>
         <h2 className="font-semibold">AI SEO draft</h2>
         <p className="text-sm text-muted-foreground">
-          Generate a localized draft, review it, edit the fields, then save it into the item metadata.
+          Generate a localized draft, review it, edit the fields, then save it into the item
+          metadata.
         </p>
       </div>
 
@@ -74,7 +71,8 @@ export function SeoMetadataManager({
           </div>
         </div>
         <p className="warning-panel rounded-md border px-3 py-2 text-xs">
-          Generation does not overwrite current metadata. Saving the reviewed draft below replaces the selected locale metadata.
+          Generation does not overwrite current metadata. Saving the reviewed draft below replaces
+          the selected locale metadata.
         </p>
         {state.error && (
           <p role="alert" className="text-sm text-destructive">
@@ -87,7 +85,10 @@ export function SeoMetadataManager({
       </form>
 
       {state.draft && (
-        <form action={saveGeneratedCatalogItemSeoDraftAction} className="space-y-4 rounded-md border bg-muted/20 p-4">
+        <form
+          action={saveGeneratedCatalogItemSeoDraftAction}
+          className="space-y-4 rounded-md border bg-muted/20 p-4"
+        >
           <input type="hidden" name="catalogItemId" value={catalogItemId} />
           <input type="hidden" name="locale" value={state.locale} />
           <div className="flex flex-wrap items-center justify-between gap-3">

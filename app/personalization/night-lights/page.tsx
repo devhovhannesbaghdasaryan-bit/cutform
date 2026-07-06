@@ -43,7 +43,9 @@ export default async function NightLightPersonalizationPage() {
   const [{ data: models }, { data: subcategories }, { data: boilerplates }] = await Promise.all([
     supabase
       .from('personalization_models')
-      .select('id, category_id, subcategory_id, title, slug, mock_image_path, boilerplate_image_path, form_schema, status')
+      .select(
+        'id, category_id, subcategory_id, title, slug, mock_image_path, boilerplate_image_path, form_schema, status',
+      )
       .eq('category_id', category.id)
       .order('updated_at', { ascending: false })
       .returns<ModelRow[]>(),
@@ -55,7 +57,9 @@ export default async function NightLightPersonalizationPage() {
       .returns<{ id: string; name: string; category_id: string }[]>(),
     supabase
       .from('personalization_boilerplates')
-      .select('id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order')
+      .select(
+        'id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order',
+      )
       .order('sort_order')
       .returns<PersonalizationBoilerplate[]>(),
   ]);
@@ -66,7 +70,9 @@ export default async function NightLightPersonalizationPage() {
         <Button asChild variant="ghost" className="mb-3 px-0">
           <Link href="/personalization">{t('personalization.back')}</Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">{t('personalization.nightLightsTitle')}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {t('personalization.nightLightsTitle')}
+        </h1>
         <p className="mt-2 text-muted-foreground">{t('personalization.nightLightsSubtitle')}</p>
       </div>
 
@@ -88,9 +94,15 @@ export default async function NightLightPersonalizationPage() {
                 </p>
               </div>
               <div className="space-y-4">
-                {(boilerplates ?? []).filter((item) => item.model_id === model.id).map((boilerplate) => (
-                  <BoilerplateForm key={boilerplate.id} modelId={model.id} boilerplate={boilerplate} />
-                ))}
+                {(boilerplates ?? [])
+                  .filter((item) => item.model_id === model.id)
+                  .map((boilerplate) => (
+                    <BoilerplateForm
+                      key={boilerplate.id}
+                      modelId={model.id}
+                      boilerplate={boilerplate}
+                    />
+                  ))}
                 <BoilerplateForm modelId={model.id} />
               </div>
             </div>
@@ -126,7 +138,11 @@ async function ImageUploadField({
       <div className="flex aspect-[4/3] max-w-sm items-center justify-center overflow-hidden rounded-md border bg-muted/30">
         {currentUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- Admin uploads can include SVG files.
-          <img src={currentUrl} alt={t('personalization.currentImageAlt', { label: label.toLowerCase() })} className="h-full w-full object-contain" />
+          <img
+            src={currentUrl}
+            alt={t('personalization.currentImageAlt', { label: label.toLowerCase() })}
+            className="h-full w-full object-contain"
+          />
         ) : (
           <div className="flex flex-col items-center gap-2 p-6 text-center text-sm text-muted-foreground">
             <ImageOff className="h-6 w-6" />
@@ -148,12 +164,21 @@ async function ImageUploadField({
   );
 }
 
-async function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boilerplate?: PersonalizationBoilerplate }) {
+async function BoilerplateForm({
+  modelId,
+  boilerplate,
+}: {
+  modelId: string;
+  boilerplate?: PersonalizationBoilerplate;
+}) {
   const t = await getTranslations();
   const fieldId = `boilerplate-image-${boilerplate?.id ?? `${modelId}-new`}`;
 
   return (
-    <form action={savePersonalizationBoilerplateAction} className="grid gap-3 rounded-lg border bg-muted/20 p-4 md:grid-cols-3">
+    <form
+      action={savePersonalizationBoilerplateAction}
+      className="grid gap-3 rounded-lg border bg-muted/20 p-4 md:grid-cols-3"
+    >
       <input type="hidden" name="modelId" value={modelId} />
       {boilerplate ? <input type="hidden" name="id" value={boilerplate.id} /> : null}
       <div className="space-y-1.5">
@@ -184,24 +209,52 @@ async function BoilerplateForm({ modelId, boilerplate }: { modelId: string; boil
       </div>
       <div className="space-y-1.5">
         <Label>{t('personalization.manufacturingProcess')}</Label>
-        <Input name="manufacturingProcess" defaultValue={boilerplate?.manufacturing_process ?? ''} required />
+        <Input
+          name="manufacturingProcess"
+          defaultValue={boilerplate?.manufacturing_process ?? ''}
+          required
+        />
       </div>
       <div className="space-y-1.5 md:col-span-2">
         <Label>{t('personalization.generationInstruction')}</Label>
-        <Textarea name="generationInstruction" defaultValue={boilerplate?.generation_instruction ?? ''} required />
+        <Textarea
+          name="generationInstruction"
+          defaultValue={boilerplate?.generation_instruction ?? ''}
+          required
+        />
       </div>
       <div className="space-y-1.5">
         <Label>{t('personalization.displayOrder')}</Label>
         <Input name="sortOrder" type="number" defaultValue={boilerplate?.sort_order ?? 0} />
       </div>
       <div className="flex flex-wrap items-center gap-5 md:col-span-2">
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="isActive" defaultChecked={boilerplate?.is_active ?? true} /> {t('profile.status.active')}</label>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="generateHiddenSvg" defaultChecked={boilerplate?.generate_hidden_svg ?? false} /> {t('personalization.requiresSvg')}</label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="isActive" defaultChecked={boilerplate?.is_active ?? true} />{' '}
+          {t('profile.status.active')}
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="generateHiddenSvg"
+            defaultChecked={boilerplate?.generate_hidden_svg ?? false}
+          />{' '}
+          {t('personalization.requiresSvg')}
+        </label>
       </div>
       <div className="flex items-center gap-2 md:col-span-3">
-        <Button type="submit" size="sm">{boilerplate ? t('personalization.updateBoilerplate') : t('personalization.addBoilerplate')}</Button>
+        <Button type="submit" size="sm">
+          {boilerplate
+            ? t('personalization.updateBoilerplate')
+            : t('personalization.addBoilerplate')}
+        </Button>
         {boilerplate ? (
-          <Button type="submit" size="sm" variant="destructive" formAction={removePersonalizationBoilerplateAction} formNoValidate>
+          <Button
+            type="submit"
+            size="sm"
+            variant="destructive"
+            formAction={removePersonalizationBoilerplateAction}
+            formNoValidate
+          >
             {t('cart.remove')}
           </Button>
         ) : null}
@@ -238,10 +291,16 @@ async function ModelForm({
       </div>
       <div className="space-y-2">
         <Label>{t('personalization.subcategory')}</Label>
-        <select name="subcategoryId" defaultValue={model?.subcategory_id ?? ''} className="h-10 w-full rounded-md border bg-background px-3 text-sm">
+        <select
+          name="subcategoryId"
+          defaultValue={model?.subcategory_id ?? ''}
+          className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+        >
           <option value="">{t('personalization.none')}</option>
           {subcategories.map((subcategory) => (
-            <option key={subcategory.id} value={subcategory.id}>{subcategory.name}</option>
+            <option key={subcategory.id} value={subcategory.id}>
+              {subcategory.name}
+            </option>
           ))}
         </select>
       </div>
@@ -266,16 +325,27 @@ async function ModelForm({
           type="number"
           min="0"
           step="1"
-          defaultValue={Number(schema.basePriceCents ?? PERSONALIZED_NIGHT_LIGHT.defaultPriceCents) / 100}
+          defaultValue={
+            Number(schema.basePriceCents ?? PERSONALIZED_NIGHT_LIGHT.defaultPriceCents) / 100
+          }
         />
       </div>
       <div className="space-y-2">
         <Label>{t('personalization.creditCost')}</Label>
-        <Input name="creditCost" type="number" min="0" defaultValue={Number(schema.creditCost ?? 0)} />
+        <Input
+          name="creditCost"
+          type="number"
+          min="0"
+          defaultValue={Number(schema.creditCost ?? 0)}
+        />
       </div>
       <div className="space-y-2">
         <Label>{t('personalization.status')}</Label>
-        <select name="status" defaultValue={model?.status ?? 'draft'} className="h-10 w-full rounded-md border bg-background px-3 text-sm">
+        <select
+          name="status"
+          defaultValue={model?.status ?? 'draft'}
+          className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+        >
           <option value="draft">{t('status.draft')}</option>
           <option value="published">{t('status.published')}</option>
           <option value="archived">{t('status.archived')}</option>
@@ -286,7 +356,9 @@ async function ModelForm({
         <Textarea name="productionNotes" defaultValue={String(schema.productionNotes ?? '')} />
       </div>
       <div className="md:col-span-2">
-        <Button type="submit">{model?.id ? t('personalization.saveModel') : t('personalization.createModel')}</Button>
+        <Button type="submit">
+          {model?.id ? t('personalization.saveModel') : t('personalization.createModel')}
+        </Button>
       </div>
     </form>
   );

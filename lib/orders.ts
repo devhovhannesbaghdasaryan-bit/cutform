@@ -75,7 +75,13 @@ export type GeneratedOrderInfo = Pick<Tables<'generated_items'>, 'id' | 'product
 
 export type BannerManufacturingInstruction = Pick<
   Tables<'banner_manufacturing_instructions'>,
-  'id' | 'order_item_id' | 'source_image_path' | 'instructions' | 'drawing_paths' | 'status' | 'created_at'
+  | 'id'
+  | 'order_item_id'
+  | 'source_image_path'
+  | 'instructions'
+  | 'drawing_paths'
+  | 'status'
+  | 'created_at'
 >;
 
 export async function getOrderDetail(
@@ -86,7 +92,9 @@ export async function getOrderDetail(
   const [{ data: order, error }, { data: items, error: itemsError }] = await Promise.all([
     supabase
       .from('orders')
-      .select('id, status, payment_status, subtotal_cents, shipping_cents, total_cents, currency, shipping_address, contact_email, created_at')
+      .select(
+        'id, status, payment_status, subtotal_cents, shipping_cents, total_cents, currency, shipping_address, contact_email, created_at',
+      )
       .eq('id', orderId)
       .eq('user_id', opts.userId)
       .maybeSingle<OrderDetailRow>(),
@@ -149,7 +157,9 @@ export async function getOrderDetailForAdmin(supabase: SupabaseClient, orderId: 
         : Promise.resolve({ data: [] as GeneratedOrderInfo[] }),
       supabase
         .from('banner_manufacturing_instructions')
-        .select('id, order_item_id, source_image_path, instructions, drawing_paths, status, created_at')
+        .select(
+          'id, order_item_id, source_image_path, instructions, drawing_paths, status, created_at',
+        )
         .eq('order_id', orderId)
         .order('created_at', { ascending: false })
         .returns<BannerManufacturingInstruction[]>(),
@@ -164,7 +174,14 @@ export async function getOrderDetailForAdmin(supabase: SupabaseClient, orderId: 
     }
   }
 
-  return { order, items, itemsError, catalogInfoById, generatedInfoById, latestInstructionByItemId };
+  return {
+    order,
+    items,
+    itemsError,
+    catalogInfoById,
+    generatedInfoById,
+    latestInstructionByItemId,
+  };
 }
 
 interface CartItemForOrder {
@@ -195,7 +212,10 @@ interface GeneratedOrderSource {
   credit_cost: number;
 }
 
-export function buildOrderItemSnapshot(item: CartItemForOrder, source?: GeneratedOrderSource | null) {
+export function buildOrderItemSnapshot(
+  item: CartItemForOrder,
+  source?: GeneratedOrderSource | null,
+) {
   return {
     itemSnapshot: {
       title: item.title,
@@ -226,7 +246,7 @@ function getStringRecordValue(record: Record<string, unknown> | undefined, key: 
 function getRecordValue(record: Record<string, unknown> | undefined, key: string) {
   const value = record?.[key];
   return value && typeof value === 'object' && !Array.isArray(value)
-    ? value as Record<string, unknown>
+    ? (value as Record<string, unknown>)
     : {};
 }
 
@@ -258,7 +278,9 @@ export async function createOrderFromCart(
 
   const { data: cartItems, error: itemsError } = await supabase
     .from('cart_items')
-    .select('id, catalog_item_id, generated_item_id, title, quantity, unit_price_cents, currency, configuration')
+    .select(
+      'id, catalog_item_id, generated_item_id, title, quantity, unit_price_cents, currency, configuration',
+    )
     .eq('cart_id', cart.id)
     .returns<CartItemForOrder[]>();
 
@@ -267,10 +289,13 @@ export async function createOrderFromCart(
 
   const cartCurrencies = new Set(cartItems.map((item) => item.currency));
   if (cartCurrencies.size > 1) {
-    throw new Error('Cart contains multiple currencies. Switch currency or re-add items before checkout.');
+    throw new Error(
+      'Cart contains multiple currencies. Switch currency or re-add items before checkout.',
+    );
   }
 
-  const orderCurrency = normalizeCurrency(cartItems[0]?.currency) ?? normalizeCurrency(cart.currency) ?? 'AMD';
+  const orderCurrency =
+    normalizeCurrency(cartItems[0]?.currency) ?? normalizeCurrency(cart.currency) ?? 'AMD';
   const billingCountryCode = options.billingCountryCode ?? address.countryCode;
   const paymentProviderRoute = resolvePaymentRoute(billingCountryCode);
   const market = await resolveMarket({ checkoutCountryCode: address.countryCode, supabase });
@@ -363,8 +388,8 @@ export async function createOrderFromCart(
         led_color: source?.color ?? null,
         multi_color: source?.multi_color ?? false,
         banner_size_key:
-          getStringRecordValue(item.configuration, 'bannerSizeKey')
-          ?? getStringRecordValue(source?.generation_options, 'bannerSizeKey'),
+          getStringRecordValue(item.configuration, 'bannerSizeKey') ??
+          getStringRecordValue(source?.generation_options, 'bannerSizeKey'),
       };
     }),
   );

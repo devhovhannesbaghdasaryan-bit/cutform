@@ -15,7 +15,12 @@ import type { InitiatePaymentInput, InitiatePaymentResult } from '@/lib/payments
 
 export function getAmeriaConfig(): AmeriaConfig {
   const env = getServerEnv();
-  if (!env.AMERIA_API_BASE_URL || !env.AMERIA_CLIENT_ID || !env.AMERIA_USERNAME || !env.AMERIA_PASSWORD) {
+  if (
+    !env.AMERIA_API_BASE_URL ||
+    !env.AMERIA_CLIENT_ID ||
+    !env.AMERIA_USERNAME ||
+    !env.AMERIA_PASSWORD
+  ) {
     throw new Error(
       'AMERIA_API_BASE_URL, AMERIA_CLIENT_ID, AMERIA_USERNAME and AMERIA_PASSWORD are required for Ameriabank payments.',
     );

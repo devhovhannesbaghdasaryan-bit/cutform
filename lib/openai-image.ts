@@ -35,9 +35,7 @@ export async function generateOpenAiImage(input: OpenAiImageInput) {
 
   const { image, providerMetadata } = await generateImage({
     model: openai.image(getImageModel()),
-    prompt: referenceImages.length
-      ? { text: input.prompt, images: referenceImages }
-      : input.prompt,
+    prompt: referenceImages.length ? { text: input.prompt, images: referenceImages } : input.prompt,
     size: size === 'auto' ? undefined : size,
     providerOptions: {
       openai: referenceImages.length

@@ -10,7 +10,10 @@ export type GeneratedItemRow = Omit<
   manufacturing_metadata: Record<string, Json | undefined>;
 };
 
-export type PersonalizedPreviewOptionRow = Omit<Tables<'personalized_preview_options'>, 'metadata'> & {
+export type PersonalizedPreviewOptionRow = Omit<
+  Tables<'personalized_preview_options'>,
+  'metadata'
+> & {
   metadata: Record<string, Json | undefined>;
 };
 
@@ -168,40 +171,89 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
 
   if (error || !item) return null;
 
-  const sourcePaths = [...new Set([
-    ...(item.source_image_path ? [item.source_image_path] : []),
-    ...item.original_image_paths,
-  ])];
-  const sourceAssets = await Promise.all(sourcePaths.map(async (storagePath) => {
-    const [preview, download] = await Promise.all([
-      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60),
-      supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60, { download: fileName(storagePath) }),
-    ]);
-    return { storagePath, url: preview.data?.signedUrl ?? null, downloadUrl: download.data?.signedUrl ?? null };
-  }));
-  const optionAssets = await Promise.all((options ?? []).map(async (option) => ({
-    ...option,
-    previewUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60)).data?.signedUrl ?? null,
-    previewDownloadUrl: (await supabase.storage.from('generated-assets').createSignedUrl(option.preview_image_path, 60 * 60, { download: fileName(option.preview_image_path) })).data?.signedUrl ?? null,
-    manufacturingFileUrl: option.manufacturing_file_path
-      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.manufacturing_file_path, 60 * 60)).data?.signedUrl ?? null
-      : null,
-    manufacturingFileDownloadUrl: option.manufacturing_file_path
-      ? (await supabase.storage.from('generated-assets').createSignedUrl(option.manufacturing_file_path, 60 * 60, { download: fileName(option.manufacturing_file_path) })).data?.signedUrl ?? null
-      : null,
-  })));
+  const sourcePaths = [
+    ...new Set([
+      ...(item.source_image_path ? [item.source_image_path] : []),
+      ...item.original_image_paths,
+    ]),
+  ];
+  const sourceAssets = await Promise.all(
+    sourcePaths.map(async (storagePath) => {
+      const [preview, download] = await Promise.all([
+        supabase.storage.from('user-uploads').createSignedUrl(storagePath, 60 * 60),
+        supabase.storage
+          .from('user-uploads')
+          .createSignedUrl(storagePath, 60 * 60, { download: fileName(storagePath) }),
+      ]);
+      return {
+        storagePath,
+        url: preview.data?.signedUrl ?? null,
+        downloadUrl: download.data?.signedUrl ?? null,
+      };
+    }),
+  );
+  const optionAssets = await Promise.all(
+    (options ?? []).map(async (option) => ({
+      ...option,
+      previewUrl:
+        (
+          await supabase.storage
+            .from('generated-assets')
+            .createSignedUrl(option.preview_image_path, 60 * 60)
+        ).data?.signedUrl ?? null,
+      previewDownloadUrl:
+        (
+          await supabase.storage
+            .from('generated-assets')
+            .createSignedUrl(option.preview_image_path, 60 * 60, {
+              download: fileName(option.preview_image_path),
+            })
+        ).data?.signedUrl ?? null,
+      manufacturingFileUrl: option.manufacturing_file_path
+        ? ((
+            await supabase.storage
+              .from('generated-assets')
+              .createSignedUrl(option.manufacturing_file_path, 60 * 60)
+          ).data?.signedUrl ?? null)
+        : null,
+      manufacturingFileDownloadUrl: option.manufacturing_file_path
+        ? ((
+            await supabase.storage
+              .from('generated-assets')
+              .createSignedUrl(option.manufacturing_file_path, 60 * 60, {
+                download: fileName(option.manufacturing_file_path),
+              })
+          ).data?.signedUrl ?? null)
+        : null,
+    })),
+  );
   const parentPreviewPath = item.selected_preview_path ?? item.preview_path;
   const parentPreviewUrl = parentPreviewPath
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60)).data?.signedUrl ?? null
+    ? ((await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60))
+        .data?.signedUrl ?? null)
     : null;
   const parentPreviewDownloadUrl = parentPreviewPath
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(parentPreviewPath, 60 * 60, { download: fileName(parentPreviewPath) })).data?.signedUrl ?? null
+    ? ((
+        await supabase.storage
+          .from('generated-assets')
+          .createSignedUrl(parentPreviewPath, 60 * 60, { download: fileName(parentPreviewPath) })
+      ).data?.signedUrl ?? null)
     : null;
   const parentManufacturingFileUrl = item.manufacturing_file_path
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.manufacturing_file_path, 60 * 60)).data?.signedUrl ?? null
+    ? ((
+        await supabase.storage
+          .from('generated-assets')
+          .createSignedUrl(item.manufacturing_file_path, 60 * 60)
+      ).data?.signedUrl ?? null)
     : null;
   const parentManufacturingFileDownloadUrl = item.manufacturing_file_path
-    ? (await supabase.storage.from('generated-assets').createSignedUrl(item.manufacturing_file_path, 60 * 60, { download: fileName(item.manufacturing_file_path) })).data?.signedUrl ?? null
+    ? ((
+        await supabase.storage
+          .from('generated-assets')
+          .createSignedUrl(item.manufacturing_file_path, 60 * 60, {
+            download: fileName(item.manufacturing_file_path),
+          })
+      ).data?.signedUrl ?? null)
     : null;
 
   return {

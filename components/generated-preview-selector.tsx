@@ -92,7 +92,11 @@ export function GeneratedPreviewSelector({
                 <label
                   key={option.id}
                   className={`group cursor-pointer rounded-lg border-2 p-3 transition focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ${
-                    selected ? 'border-primary bg-primary/5' : active ? 'border-cyber-cyan/60' : 'border-border hover:border-primary/50'
+                    selected
+                      ? 'border-primary bg-primary/5'
+                      : active
+                        ? 'border-cyber-cyan/60'
+                        : 'border-border hover:border-primary/50'
                   }`}
                 >
                   <input
@@ -132,7 +136,9 @@ export function GeneratedPreviewSelector({
           </div>
           <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
             {priceLabel ? <p className="font-semibold">{priceLabel}</p> : <span />}
-            <Button type="submit" disabled={!selectedIds.size}>{copy.addSelected}</Button>
+            <Button type="submit" disabled={!selectedIds.size}>
+              {copy.addSelected}
+            </Button>
           </div>
         </section>
       ) : null}

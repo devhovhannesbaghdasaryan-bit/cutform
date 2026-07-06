@@ -54,12 +54,17 @@ export async function CategoryNavigation({
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">{categoryName}</h3>
                 {categoryDescription ? (
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{categoryDescription}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                    {categoryDescription}
+                  </p>
                 ) : null}
                 {children.length ? (
                   <div className="mt-4 flex flex-wrap justify-center gap-2">
                     {children.map((child) => (
-                      <span key={child.id} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+                      <span
+                        key={child.id}
+                        className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground"
+                      >
                         {tDynamic(t, `subcategory.${child.slug}.name`, child.name)}
                       </span>
                     ))}

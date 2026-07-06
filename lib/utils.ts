@@ -1,6 +1,11 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { type AppLocale, DEFAULT_LOCALE, formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
+import {
+  type AppLocale,
+  DEFAULT_LOCALE,
+  formatLocalizedCurrency,
+  formatLocalizedDate,
+} from '@/lib/i18n';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,10 +20,11 @@ export function formatDate(d: string | Date, locale: AppLocale = DEFAULT_LOCALE)
 }
 
 export function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 70)
-    || `draft-${crypto.randomUUID().slice(0, 8)}`;
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 70) || `draft-${crypto.randomUUID().slice(0, 8)}`
+  );
 }

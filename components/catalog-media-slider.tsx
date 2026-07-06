@@ -20,9 +20,11 @@ export function CatalogMediaSlider({
   const [index, setIndex] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const current = media[index] ?? null;
-  const sourceUrl = current ? resolvePublicStorageUrl('catalog-assets', current.storage_path) : null;
+  const sourceUrl = current
+    ? resolvePublicStorageUrl('catalog-assets', current.storage_path)
+    : null;
   const posterUrl = current?.poster_path
-    ? resolvePublicStorageUrl('catalog-assets', current.poster_path) ?? undefined
+    ? (resolvePublicStorageUrl('catalog-assets', current.poster_path) ?? undefined)
     : undefined;
   const hasMultiple = media.length > 1;
 
@@ -53,11 +55,7 @@ export function CatalogMediaSlider({
           className="h-full w-full object-cover"
         />
       ) : sourceUrl && current?.media_type === 'video' ? (
-        <div
-          className="relative h-full w-full"
-          onMouseEnter={playVideo}
-          onMouseLeave={pauseVideo}
-        >
+        <div className="relative h-full w-full" onMouseEnter={playVideo} onMouseLeave={pauseVideo}>
           <video
             ref={videoRef}
             src={sourceUrl}
@@ -79,11 +77,15 @@ export function CatalogMediaSlider({
         <div className="flex h-full w-full items-center justify-center p-4">
           <div className="space-y-2">
             {fallbackCategory ? (
-              <p className="text-xs font-medium uppercase text-black/55">
-                {fallbackCategory}
-              </p>
+              <p className="text-xs font-medium uppercase text-black/55">{fallbackCategory}</p>
             ) : null}
-            <p className={compact ? 'text-lg font-semibold leading-tight text-black/80' : 'text-3xl font-bold text-black/80'}>
+            <p
+              className={
+                compact
+                  ? 'text-lg font-semibold leading-tight text-black/80'
+                  : 'text-3xl font-bold text-black/80'
+              }
+            >
               {fallbackTitle}
             </p>
           </div>

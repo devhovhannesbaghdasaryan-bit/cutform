@@ -8,7 +8,9 @@ import { PAYMENT_ROUTES, type PaymentRoute } from '@/lib/payments/types';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 const currencySettingsSchema = z.object({
-  enabledCurrencies: z.array(z.enum(APP_CURRENCIES)).min(1, 'At least one currency must remain enabled.'),
+  enabledCurrencies: z
+    .array(z.enum(APP_CURRENCIES))
+    .min(1, 'At least one currency must remain enabled.'),
   // Zod v4's z.record with an enum key schema requires every enum member to be present,
   // which would reject a payload that omits a currency. z.partialRecord tolerates missing
   // entries while still restricting keys to APP_CURRENCIES and values to PAYMENT_ROUTES.
@@ -28,7 +30,8 @@ export async function updateCurrencySettingsAction(formData: FormData) {
   }
 
   const parsed = currencySettingsSchema.safeParse({ enabledCurrencies, paymentRoutes });
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid currency settings.');
+  if (!parsed.success)
+    throw new Error(parsed.error.issues[0]?.message ?? 'Invalid currency settings.');
 
   const { supabase, user } = await requireAdminPermission('transactions_manage');
 

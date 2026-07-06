@@ -7,7 +7,8 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Uniqraft - Personalized Products, Made Yours',
-  description: 'Customize meaningful products and create personalized designs made uniquely for you.',
+  description:
+    'Customize meaningful products and create personalized designs made uniquely for you.',
   icons: {
     icon: [
       { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },

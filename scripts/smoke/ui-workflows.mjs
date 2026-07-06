@@ -4,10 +4,14 @@ import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { createClient } from '@supabase/supabase-js';
 
-const baseUrl = (process.env.UQ_SMOKE_BASE_URL ?? process.env.SNIP_SMOKE_BASE_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
+const baseUrl = (
+  process.env.UQ_SMOKE_BASE_URL ??
+  process.env.SNIP_SMOKE_BASE_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  'http://localhost:3000'
+).replace(/\/$/, '');
 const chromePath =
-  process.env.CHROME_PATH
-  ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+  process.env.CHROME_PATH ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const port = Number(process.env.UQ_CHROME_DEBUG_PORT ?? process.env.SNIP_CHROME_DEBUG_PORT ?? 9333);
 const runId = `ui-${Date.now()}`;
 const createdUserIds = [];
@@ -20,7 +24,10 @@ function loadEnvFile(path) {
     if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
     const index = trimmed.indexOf('=');
     const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, '');
+    const value = trimmed
+      .slice(index + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -32,7 +39,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for UI workflow smoke.');
+  throw new Error(
+    'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for UI workflow smoke.',
+  );
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -62,22 +71,26 @@ async function waitFor(condition, label, timeoutMs = 10000) {
 
 async function connectBrowser() {
   const userDataDir = mkdtempSync(join(tmpdir(), 'uq-ui-smoke-'));
-  const chrome = spawn(chromePath, [
-    '--headless=new',
-    '--disable-gpu',
-    '--disable-gpu-compositing',
-    '--disable-software-rasterizer',
-    '--disable-features=VizDisplayCompositor',
-    '--no-sandbox',
-    '--disable-dev-shm-usage',
-    `--remote-debugging-port=${port}`,
-    '--remote-allow-origins=*',
-    `--user-data-dir=${userDataDir}`,
-    'about:blank',
-  ], {
-    stdio: 'ignore',
-    windowsHide: true,
-  });
+  const chrome = spawn(
+    chromePath,
+    [
+      '--headless=new',
+      '--disable-gpu',
+      '--disable-gpu-compositing',
+      '--disable-software-rasterizer',
+      '--disable-features=VizDisplayCompositor',
+      '--no-sandbox',
+      '--disable-dev-shm-usage',
+      `--remote-debugging-port=${port}`,
+      '--remote-allow-origins=*',
+      `--user-data-dir=${userDataDir}`,
+      'about:blank',
+    ],
+    {
+      stdio: 'ignore',
+      windowsHide: true,
+    },
+  );
 
   const pages = await waitFor(async () => {
     try {
@@ -90,8 +103,9 @@ async function connectBrowser() {
     }
   }, 'Chrome debugging endpoint');
 
-  const page = pages.find((target) => target.type === 'page' && target.url === 'about:blank')
-    ?? pages.find((target) => target.type === 'page');
+  const page =
+    pages.find((target) => target.type === 'page' && target.url === 'about:blank') ??
+    pages.find((target) => target.type === 'page');
   assert(page, 'Chrome did not expose a page debugging target');
 
   const ws = new WebSocket(page.webSocketDebuggerUrl);
@@ -193,20 +207,25 @@ async function waitForText(browser, expected, label = expected) {
 }
 
 async function clickByText(browser, text) {
-  const clicked = await evaluate(browser, `
+  const clicked = await evaluate(
+    browser,
+    `
     const text = ${JSON.stringify(text)};
     const candidates = [...document.querySelectorAll('a, button')];
     const element = candidates.find((node) => node.innerText.trim().includes(text));
     if (!element) return false;
     element.click();
     return true;
-  `);
+  `,
+  );
   assert(clicked, `Expected clickable text: ${text}`);
   await wait(900);
 }
 
 async function fillInput(browser, name, value) {
-  const filled = await evaluate(browser, `
+  const filled = await evaluate(
+    browser,
+    `
     const field = document.querySelector(${JSON.stringify(`input[name="${name}"], textarea[name="${name}"]`)});
     if (!field) return false;
     const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(field), 'value')?.set;
@@ -215,27 +234,34 @@ async function fillInput(browser, name, value) {
     field.dispatchEvent(new Event('input', { bubbles: true }));
     field.dispatchEvent(new Event('change', { bubbles: true }));
     return true;
-  `);
+  `,
+  );
   assert(filled, `Expected input named ${name}`);
 }
 
 async function checkInput(browser, name) {
-  const checked = await evaluate(browser, `
+  const checked = await evaluate(
+    browser,
+    `
     const input = document.querySelector(${JSON.stringify(`input[name="${name}"]`)});
     if (!input) return false;
     if (!input.checked) input.click();
     return input.checked;
-  `);
+  `,
+  );
   assert(checked, `Expected checkbox named ${name}`);
 }
 
 async function submitCurrentForm(browser) {
-  const submitted = await evaluate(browser, `
+  const submitted = await evaluate(
+    browser,
+    `
     const button = document.querySelector('button[type="submit"]');
     if (!button) return false;
     button.click();
     return true;
-  `);
+  `,
+  );
   assert(submitted, 'Expected a submit button on current page');
   await wait(1500);
 }
@@ -253,19 +279,17 @@ async function createQaUser(label, role = 'user') {
   if (error || !data.user) throw new Error(error?.message ?? `Unable to create ${label} user`);
   createdUserIds.push(data.user.id);
 
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .upsert(
-      {
-        user_id: data.user.id,
-        role,
-        status: 'active',
-        preferred_locale: 'en',
-        display_name: `${label} ${runId}`,
-        internal_notes: runId,
-      },
-      { onConflict: 'user_id' },
-    );
+  const { error: profileError } = await supabase.from('profiles').upsert(
+    {
+      user_id: data.user.id,
+      role,
+      status: 'active',
+      preferred_locale: 'en',
+      display_name: `${label} ${runId}`,
+      internal_notes: runId,
+    },
+    { onConflict: 'user_id' },
+  );
   if (profileError) throw new Error(profileError.message);
 
   if (role === 'admin') {
@@ -313,14 +337,17 @@ async function runGuestAndCustomerFlow(customerUser) {
     await navigate(browser, '/en/catalog');
     text = await waitForText(browser, 'Marketplace catalog', 'catalog page title');
 
-    const addedTitle = await evaluate(browser, `
+    const addedTitle = await evaluate(
+      browser,
+      `
       const form = [...document.querySelectorAll('form')].find((node) => node.querySelector('button[aria-label^="Add "]'));
       if (!form) return null;
       const card = form.closest('[class*="rounded"]') ?? form.parentElement;
       const title = card?.innerText?.split('\\n').find((line) => line.trim().length > 0) ?? 'Catalog item';
       form.querySelector('button').click();
       return title.trim();
-    `);
+    `,
+    );
     assert(addedTitle, 'Could not click catalog add-to-cart button');
     await wait(1200);
 
@@ -333,7 +360,9 @@ async function runGuestAndCustomerFlow(customerUser) {
     await login(browser, customerUser, '/cart');
     text = await waitFor(async () => {
       const current = await bodyText(browser);
-      return current.includes('Shopping cart') && !current.includes('Your cart is empty') ? current : null;
+      return current.includes('Shopping cart') && !current.includes('Your cart is empty')
+        ? current
+        : null;
     }, 'merged customer cart after login');
     assert(text.includes('Checkout review'), 'Logged-in cart did not show checkout review');
 
@@ -346,7 +375,9 @@ async function runGuestAndCustomerFlow(customerUser) {
     await navigate(browser, '/en/cart');
     text = await bodyText(browser);
 
-    const updated = await evaluate(browser, `
+    const updated = await evaluate(
+      browser,
+      `
       const input = document.querySelector('input[name="quantity"]');
       if (!input) return false;
       input.value = '2';
@@ -354,15 +385,19 @@ async function runGuestAndCustomerFlow(customerUser) {
       const updateButton = [...document.querySelectorAll('button')].find((button) => button.innerText.includes('Update'));
       updateButton?.click();
       return Boolean(updateButton);
-    `);
+    `,
+    );
     assert(updated, 'Could not update cart quantity');
     await wait(1200);
 
-    const removed = await evaluate(browser, `
+    const removed = await evaluate(
+      browser,
+      `
       const removeButton = [...document.querySelectorAll('button')].find((button) => button.innerText.includes('Remove'));
       removeButton?.click();
       return Boolean(removeButton);
-    `);
+    `,
+    );
     assert(removed, 'Could not remove cart item');
     await wait(1200);
     text = await bodyText(browser);
@@ -371,7 +406,10 @@ async function runGuestAndCustomerFlow(customerUser) {
     await navigate(browser, '/en/banners');
     text = await waitForText(browser, 'Banners for stores', 'banners page title');
     assert(text.includes('Advanced AI banner'), 'Advanced banner generation UI was not visible');
-    assert(text.includes('Review customized banner'), 'Banner sample customization form was not visible');
+    assert(
+      text.includes('Review customized banner'),
+      'Banner sample customization form was not visible',
+    );
 
     await fillInput(browser, 'bannerText', `${runId} launch sale`);
     await clickByText(browser, 'Review customized banner');
@@ -380,28 +418,41 @@ async function runGuestAndCustomerFlow(customerUser) {
 
     await clickByText(browser, 'Add selected result to cart');
     text = await waitForText(browser, 'Shopping cart', 'cart after customized banner');
-    assert(text.includes('Generated item'), 'Customized banner was not added as a generated cart item');
+    assert(
+      text.includes('Generated item'),
+      'Customized banner was not added as a generated cart item',
+    );
 
     await navigate(browser, '/en/checkout');
     text = await waitForText(browser, 'Checkout review', 'checkout review for generated banner');
-    assert(text.includes('Order items') && text.includes('Create order'), 'Checkout review did not render order creation controls');
+    assert(
+      text.includes('Order items') && text.includes('Create order'),
+      'Checkout review did not render order creation controls',
+    );
 
     await navigate(browser, '/en/banners');
     await waitForText(browser, 'Advanced AI banner', 'advanced banner form');
     await fillInput(browser, 'prompt', `${runId} grand opening window banner in warm brand colors`);
     await checkInput(browser, 'uploadRightsConfirmed');
     await clickByText(browser, 'Generate with credits');
-    text = await waitForText(browser, 'Add selected result to cart', 'advanced generated banner detail');
+    text = await waitForText(
+      browser,
+      'Add selected result to cart',
+      'advanced generated banner detail',
+    );
     assert(text.includes('5 credits'), 'Advanced banner generation did not record credit cost');
 
     await navigate(browser, '/en/catalog/night-lights/personalized');
     text = await waitForText(browser, 'Personalized night lights', 'personalized listing title');
     assert(text.includes('Personalized'), 'Personalized model/subcategory content was not visible');
 
-    const personalizeHref = await evaluate(browser, `
+    const personalizeHref = await evaluate(
+      browser,
+      `
       const link = [...document.querySelectorAll('a')].find((node) => node.href.includes('/personalize/'));
       return link?.pathname ?? null;
-    `);
+    `,
+    );
     assert(personalizeHref, 'Personalized model link was not visible');
 
     await navigate(browser, personalizeHref);

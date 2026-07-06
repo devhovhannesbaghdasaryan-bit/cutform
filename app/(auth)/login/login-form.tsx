@@ -13,9 +13,28 @@ const providers = [
   { id: 'telegram', copyKey: 'telegram', mark: 'T' },
 ] as const;
 
-type LoginCopy = { socialOptions: string; facebook: string; google: string; x: string; telegram: string; useEmail: string; email: string; password: string; login: string; loggingIn: string };
+type LoginCopy = {
+  socialOptions: string;
+  facebook: string;
+  google: string;
+  x: string;
+  telegram: string;
+  useEmail: string;
+  email: string;
+  password: string;
+  login: string;
+  loggingIn: string;
+};
 
-export function LoginForm({ next, oauthError, copy }: { next: string; oauthError?: string; copy: LoginCopy }) {
+export function LoginForm({
+  next,
+  oauthError,
+  copy,
+}: {
+  next: string;
+  oauthError?: string;
+  copy: LoginCopy;
+}) {
   const [state, action, pending] = useActionState(loginAction, idleState);
   const error = errorOf(state);
 
@@ -27,7 +46,10 @@ export function LoginForm({ next, oauthError, copy }: { next: string; oauthError
             <input type="hidden" name="provider" value={provider.id} />
             <input type="hidden" name="next" value={next} />
             <Button type="submit" variant="outline" className="w-full justify-start gap-3">
-              <span aria-hidden="true" className="flex size-5 items-center justify-center rounded-full text-xs font-bold">
+              <span
+                aria-hidden="true"
+                className="flex size-5 items-center justify-center rounded-full text-xs font-bold"
+              >
                 {provider.mark}
               </span>
               {copy[provider.copyKey]}
@@ -36,7 +58,10 @@ export function LoginForm({ next, oauthError, copy }: { next: string; oauthError
         ))}
       </div>
 
-      <div className="flex items-center gap-3 text-xs uppercase text-muted-foreground" aria-hidden="true">
+      <div
+        className="flex items-center gap-3 text-xs uppercase text-muted-foreground"
+        aria-hidden="true"
+      >
         <span className="h-px flex-1 bg-border" />
         {copy.useEmail}
         <span className="h-px flex-1 bg-border" />
@@ -56,7 +81,13 @@ export function LoginForm({ next, oauthError, copy }: { next: string; oauthError
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">{copy.password}</Label>
-          <Input id="password" name="password" type="password" autoComplete="current-password" required />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            required
+          />
         </div>
         <Button type="submit" className="w-full" disabled={pending}>
           {pending ? copy.loggingIn : copy.login}

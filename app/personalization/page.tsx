@@ -33,7 +33,9 @@ export default async function PersonalizationPage() {
                   {t(category.href ? 'personalization.available' : 'personalization.comingSoon')}
                 </span>
               </div>
-              <h2 className="mt-5 text-lg font-semibold">{tDynamic(t, `personalization.${category.slug}`)}</h2>
+              <h2 className="mt-5 text-lg font-semibold">
+                {tDynamic(t, `personalization.${category.slug}`)}
+              </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {t(category.href ? 'personalization.manage' : 'personalization.unavailable')}
               </p>
@@ -49,7 +51,11 @@ export default async function PersonalizationPage() {
               {content}
             </Link>
           ) : (
-            <div key={category.slug} aria-disabled="true" className="cursor-not-allowed rounded-lg border bg-muted/20 p-5 opacity-60">
+            <div
+              key={category.slug}
+              aria-disabled="true"
+              className="cursor-not-allowed rounded-lg border bg-muted/20 p-5 opacity-60"
+            >
               {content}
             </div>
           );

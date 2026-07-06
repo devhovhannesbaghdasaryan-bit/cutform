@@ -10,7 +10,10 @@ import { getServiceSupabase } from '@/lib/supabase/server';
 const transactionActionSchema = z.object({
   transactionId: z.string().uuid(),
   actionType: z.enum(['note', 'manual_refund', 'reversal', 'reconcile', 'ameria_check']),
-  status: z.enum(['pending', 'succeeded', 'failed', 'cancelled', 'reversed']).optional().or(z.literal('')),
+  status: z
+    .enum(['pending', 'succeeded', 'failed', 'cancelled', 'reversed'])
+    .optional()
+    .or(z.literal('')),
   amountCents: z.coerce.number().int().min(0).optional(),
   note: z.string().trim().min(3, 'Note or reason is required.'),
 });
@@ -24,13 +27,16 @@ export async function adminTransactionAction(formData: FormData) {
     note: formData.get('note'),
   });
 
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid transaction action.');
+  if (!parsed.success)
+    throw new Error(parsed.error.issues[0]?.message ?? 'Invalid transaction action.');
 
   const { supabase, user } = await requireAdminPermission('transactions_manage');
   const values = parsed.data;
   const { data: transaction, error } = await supabase
     .from('transactions')
-    .select('id, user_id, order_id, type, status, amount_cents, currency, provider, payment_provider_route, provider_reference, exchange_rate_context, metadata')
+    .select(
+      'id, user_id, order_id, type, status, amount_cents, currency, provider, payment_provider_route, provider_reference, exchange_rate_context, metadata',
+    )
     .eq('id', values.transactionId)
     .maybeSingle<{
       id: string;
@@ -87,7 +93,10 @@ export async function adminTransactionAction(formData: FormData) {
     await writeAdminAuditLog(supabase, {
       actorUserId: user.id,
       targetUserId: transaction.user_id,
-      action: values.actionType === 'manual_refund' ? 'transaction_manual_refund' : 'transaction_reversal_created',
+      action:
+        values.actionType === 'manual_refund'
+          ? 'transaction_manual_refund'
+          : 'transaction_reversal_created',
       entityType: 'transaction',
       entityId: correction.id,
       reason: values.note,

@@ -16,7 +16,12 @@
       "role": "primary_production",
       "status": "quoted_candidate",
       "materials": ["mild steel sheet", "stainless steel sheet", "aluminum sheet"],
-      "operations": ["air bending", "bottom bending", "flanging", "box/pan bends with suitable tooling"],
+      "operations": [
+        "air bending",
+        "bottom bending",
+        "flanging",
+        "box/pan bends with suitable tooling"
+      ],
       "workEnvelope": {
         "xMm": null,
         "yMm": null,
@@ -43,13 +48,29 @@
         "Avoid holes, slots, and engraving too close to bend lines.",
         "Validate flat pattern against available tooling before quoting."
       ],
-      "setupRequirements": ["Correct punch/die set", "backgauge setup", "test bend and angle correction"],
-      "safetyRequirements": ["Press brake guarding", "trained operator", "hand-clearance procedure"],
+      "setupRequirements": [
+        "Correct punch/die set",
+        "backgauge setup",
+        "test bend and angle correction"
+      ],
+      "safetyRequirements": [
+        "Press brake guarding",
+        "trained operator",
+        "hand-clearance procedure"
+      ],
       "goodUseCases": ["metal brackets", "enclosures", "trays", "chassis parts"],
-      "poorUseCases": ["deep drawn forms", "compound curves", "tight internal closed boxes without special tooling"],
+      "poorUseCases": [
+        "deep drawn forms",
+        "compound curves",
+        "tight internal closed boxes without special tooling"
+      ],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
-        "preferredDocuments": ["KCN-16025 OEM manual", "Delem DA69S operator/programming manual", "press brake tooling catalog"],
+        "preferredDocuments": [
+          "KCN-16025 OEM manual",
+          "Delem DA69S operator/programming manual",
+          "press brake tooling catalog"
+        ],
         "missingDocuments": ["machine-specific capacity chart", "available punch/die inventory"],
         "ingestionTags": ["sheet-metal", "bending", "delem-da69s", "press-brake"]
       },
@@ -84,13 +105,38 @@
         "Avoid inaccessible seams and joints that cannot be shielded or clamped.",
         "Add fixtures for repeatable production welds."
       ],
-      "setupRequirements": ["Raycus 3000 W source", "Super 23T gun", "Hanli chiller", "wire feeder", "shielding gas"],
-      "safetyRequirements": ["Class 4 laser enclosure or controlled area", "laser eyewear rated for wavelength/power", "fume extraction", "fire watch"],
-      "goodUseCases": ["stainless frames", "sheet metal assemblies", "decorative metal products", "thin-gauge production welds"],
-      "poorUseCases": ["poorly fitted joints", "unknown coated metals", "structural welds without qualification"],
+      "setupRequirements": [
+        "Raycus 3000 W source",
+        "Super 23T gun",
+        "Hanli chiller",
+        "wire feeder",
+        "shielding gas"
+      ],
+      "safetyRequirements": [
+        "Class 4 laser enclosure or controlled area",
+        "laser eyewear rated for wavelength/power",
+        "fume extraction",
+        "fire watch"
+      ],
+      "goodUseCases": [
+        "stainless frames",
+        "sheet metal assemblies",
+        "decorative metal products",
+        "thin-gauge production welds"
+      ],
+      "poorUseCases": [
+        "poorly fitted joints",
+        "unknown coated metals",
+        "structural welds without qualification"
+      ],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
-        "preferredDocuments": ["HLW-3000 OEM manual", "Raycus 3000 W laser source manual", "Super 23T welding head manual", "Hanli chiller manual"],
+        "preferredDocuments": [
+          "HLW-3000 OEM manual",
+          "Raycus 3000 W laser source manual",
+          "Super 23T welding head manual",
+          "Hanli chiller manual"
+        ],
         "missingDocuments": ["welding parameter chart by material/thickness", "laser safety SOP"],
         "ingestionTags": ["laser-welding", "raycus", "super-23t", "hanli"]
       },
@@ -109,7 +155,11 @@
       "role": "finishing",
       "status": "quoted_candidate",
       "materials": ["vinyl", "banner", "backlit film", "adhesive media", "photo paper"],
-      "operations": ["roll-to-roll printing", "large-format graphics", "decals before contour cutting"],
+      "operations": [
+        "roll-to-roll printing",
+        "large-format graphics",
+        "decals before contour cutting"
+      ],
       "workEnvelope": {
         "xMm": 3200,
         "yMm": null,
@@ -135,13 +185,25 @@
         "Keep text and fine details above media/resolution limits.",
         "Pair with plotter or laser only when material is safe for that process."
       ],
-      "setupRequirements": ["Epson i3200 printheads", "Maintop RIP setup", "media profile", "drying/curing time"],
+      "setupRequirements": [
+        "Epson i3200 printheads",
+        "Maintop RIP setup",
+        "media profile",
+        "drying/curing time"
+      ],
       "safetyRequirements": ["ventilation for eco-solvent inks", "PPE for ink handling"],
       "goodUseCases": ["signage", "stickers", "wall graphics", "printed product surfaces"],
-      "poorUseCases": ["direct rigid-object printing", "food-contact decoration without certified materials"],
+      "poorUseCases": [
+        "direct rigid-object printing",
+        "food-contact decoration without certified materials"
+      ],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
-        "preferredDocuments": ["XT-3202 printer manual", "Epson i3200 printhead datasheet", "Maintop RIP user guide"],
+        "preferredDocuments": [
+          "XT-3202 printer manual",
+          "Epson i3200 printhead datasheet",
+          "Maintop RIP user guide"
+        ],
         "missingDocuments": ["ink compatibility list", "ICC profiles", "maintenance schedule"],
         "ingestionTags": ["printing", "eco-solvent", "epson-i3200", "maintop"]
       },
@@ -160,7 +222,11 @@
       "role": "primary_production",
       "status": "quoted_candidate",
       "materials": ["PLA", "PETG", "TPU", "ABS if enclosed/heated conditions are verified"],
-      "operations": ["single-material FFF printing", "large prototype printing", "jigs and fixtures"],
+      "operations": [
+        "single-material FFF printing",
+        "large prototype printing",
+        "jigs and fixtures"
+      ],
       "workEnvelope": {
         "xMm": 800,
         "yMm": 800,
@@ -187,9 +253,16 @@
         "Use fillets and ribs instead of thick solid masses."
       ],
       "setupRequirements": ["slicer profile", "filament drying", "bed leveling", "test coupon"],
-      "safetyRequirements": ["ventilation for ABS/ASA", "thermal runaway checks", "fire-safe operating area"],
+      "safetyRequirements": [
+        "ventilation for ABS/ASA",
+        "thermal runaway checks",
+        "fire-safe operating area"
+      ],
       "goodUseCases": ["large prototypes", "patterns", "fixtures", "display objects"],
-      "poorUseCases": ["tight high-temperature engineering parts without verified enclosure", "transparent optical parts"],
+      "poorUseCases": [
+        "tight high-temperature engineering parts without verified enclosure",
+        "transparent optical parts"
+      ],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
         "preferredDocuments": ["L1S80 printer manual", "slicer profile", "material profiles"],
@@ -212,8 +285,22 @@
       "process": "additive_fff",
       "role": "primary_production",
       "status": "quoted_candidate",
-      "materials": ["PLA", "PETG", "TPU", "ABS", "ASA", "PA", "PC", "fiber-filled filaments if nozzle/hotend is compatible"],
-      "operations": ["multi-material FFF printing", "multi-color FFF printing", "production prototyping", "small-batch parts"],
+      "materials": [
+        "PLA",
+        "PETG",
+        "TPU",
+        "ABS",
+        "ASA",
+        "PA",
+        "PC",
+        "fiber-filled filaments if nozzle/hotend is compatible"
+      ],
+      "operations": [
+        "multi-material FFF printing",
+        "multi-color FFF printing",
+        "production prototyping",
+        "small-batch parts"
+      ],
       "workEnvelope": {
         "xMm": 305,
         "yMm": 320,
@@ -227,7 +314,11 @@
       },
       "power": { "value": 1800, "unit": "W", "confidence": "quoted" },
       "inputFormats": ["3MF", "STL", "STEP via slicer/CAD conversion", "G-code"],
-      "software": ["Bambu Studio", "Bambu Handy", "Bambu Suite if laser/cutting modules are present"],
+      "software": [
+        "Bambu Studio",
+        "Bambu Handy",
+        "Bambu Suite if laser/cutting modules are present"
+      ],
       "hardLimits": [
         "Quoted nozzles: 0.2, 0.4, 0.6, 0.8 mm.",
         "Quoted layer height range is 0.16-0.6 mm.",
@@ -240,13 +331,36 @@
         "Use inserts, bosses, and generous fillets for assembled products.",
         "Use 3MF with material assignments for multi-color or multi-material designs."
       ],
-      "setupRequirements": ["Bambu Studio profile", "filament profiles", "bed plate selection", "calibration flow"],
-      "safetyRequirements": ["ventilation for engineering polymers", "hot-surface awareness", "laser safety only if laser module is installed"],
-      "goodUseCases": ["multi-color prototypes", "small product parts", "jigs", "replacement parts", "complex geometry"],
-      "poorUseCases": ["large flat panels", "certified load-bearing parts without testing", "food-contact parts without certified workflow"],
+      "setupRequirements": [
+        "Bambu Studio profile",
+        "filament profiles",
+        "bed plate selection",
+        "calibration flow"
+      ],
+      "safetyRequirements": [
+        "ventilation for engineering polymers",
+        "hot-surface awareness",
+        "laser safety only if laser module is installed"
+      ],
+      "goodUseCases": [
+        "multi-color prototypes",
+        "small product parts",
+        "jigs",
+        "replacement parts",
+        "complex geometry"
+      ],
+      "poorUseCases": [
+        "large flat panels",
+        "certified load-bearing parts without testing",
+        "food-contact parts without certified workflow"
+      ],
       "rag": {
         "manualSearchStatus": "candidate_found",
-        "preferredDocuments": ["Bambu Lab H2C official wiki/manual", "Bambu Studio documentation", "material compatibility guides"],
+        "preferredDocuments": [
+          "Bambu Lab H2C official wiki/manual",
+          "Bambu Studio documentation",
+          "material compatibility guides"
+        ],
         "missingDocuments": ["exact purchased configuration", "official H2C service manual"],
         "ingestionTags": ["3d-printing", "bambu-lab", "h2c", "bambu-studio"]
       }
@@ -290,14 +404,26 @@
         "Design hidden alignment pins or lap joints for assembled sections.",
         "Run scaled test coupons before full-size production."
       ],
-      "setupRequirements": ["large-format slicer profile", "filament drying", "adhesion plan", "print monitoring"],
+      "setupRequirements": [
+        "large-format slicer profile",
+        "filament drying",
+        "adhesion plan",
+        "print monitoring"
+      ],
       "safetyRequirements": ["ventilation", "fire-safe area", "overnight monitoring policy"],
       "goodUseCases": ["large display parts", "furniture prototypes", "molds", "signage forms"],
-      "poorUseCases": ["high-precision mechanical assemblies in one piece", "thin tall parts without bracing"],
+      "poorUseCases": [
+        "high-precision mechanical assemblies in one piece",
+        "thin tall parts without bracing"
+      ],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
         "preferredDocuments": ["T1-100 printer manual", "firmware guide", "slicer profile"],
-        "missingDocuments": ["material compatibility", "bed temperature", "enclosure specification"],
+        "missingDocuments": [
+          "material compatibility",
+          "bed temperature",
+          "enclosure specification"
+        ],
         "ingestionTags": ["3d-printing", "fff", "very-large-format"]
       }
     },
@@ -313,8 +439,18 @@
       "process": "vinyl_cutting",
       "role": "finishing",
       "status": "quoted_candidate",
-      "materials": ["vinyl film", "heat-transfer vinyl", "paper", "masking film", "thin adhesive sheet"],
-      "operations": ["kiss cutting", "through cutting thin films", "contour cutting if optical registration exists"],
+      "materials": [
+        "vinyl film",
+        "heat-transfer vinyl",
+        "paper",
+        "masking film",
+        "thin adhesive sheet"
+      ],
+      "operations": [
+        "kiss cutting",
+        "through cutting thin films",
+        "contour cutting if optical registration exists"
+      ],
       "workEnvelope": {
         "xMm": 1200,
         "yMm": null,
@@ -390,8 +526,18 @@
         "Include kerf allowance and trim allowance.",
         "Deburr and square critical faces after cutting if needed."
       ],
-      "setupRequirements": ["correct blade", "vise/clamping", "coolant", "stop block for repeated cuts"],
-      "safetyRequirements": ["eye protection", "blade guard", "clamping before cut", "chip handling"],
+      "setupRequirements": [
+        "correct blade",
+        "vise/clamping",
+        "coolant",
+        "stop block for repeated cuts"
+      ],
+      "safetyRequirements": [
+        "eye protection",
+        "blade guard",
+        "clamping before cut",
+        "chip handling"
+      ],
       "goodUseCases": ["frame stock prep", "tube cuts before welding", "bar stock cutting"],
       "poorUseCases": ["intricate profiles", "sheet cutting", "finished decorative edges"],
       "rag": {
@@ -440,9 +586,23 @@
         "Keep holes and weld seams away from high-deformation zones.",
         "Prototype one part before batch production."
       ],
-      "setupRequirements": ["roller set", "material test bend", "radius template", "springback compensation"],
-      "safetyRequirements": ["pinch point controls", "trained operator", "gloves appropriate for handling only"],
-      "goodUseCases": ["furniture frames", "guards", "rounded metal product frames", "sign structures"],
+      "setupRequirements": [
+        "roller set",
+        "material test bend",
+        "radius template",
+        "springback compensation"
+      ],
+      "safetyRequirements": [
+        "pinch point controls",
+        "trained operator",
+        "gloves appropriate for handling only"
+      ],
+      "goodUseCases": [
+        "furniture frames",
+        "guards",
+        "rounded metal product frames",
+        "sign structures"
+      ],
       "poorUseCases": ["sharp-corner bends", "thin-wall precision tubing without mandrel tooling"],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
@@ -464,7 +624,15 @@
       "process": "cnc_routing",
       "role": "primary_production",
       "status": "quoted_candidate",
-      "materials": ["plywood", "MDF", "hardwood", "softwood", "acrylic", "foam", "aluminum with verified tooling"],
+      "materials": [
+        "plywood",
+        "MDF",
+        "hardwood",
+        "softwood",
+        "acrylic",
+        "foam",
+        "aluminum with verified tooling"
+      ],
       "operations": ["2.5D cutting", "pocketing", "drilling", "engraving", "relief carving"],
       "workEnvelope": {
         "xMm": 2000,
@@ -492,14 +660,39 @@
         "Use climb/conventional strategy appropriate to material and finish.",
         "Specify tabs, onion skin, or vacuum strategy for cut-through parts."
       ],
-      "setupRequirements": ["CAM toolpath", "spoilboard", "dust collector", "tool library", "workholding plan", "zeroing routine"],
-      "safetyRequirements": ["dust extraction", "eye/hearing protection", "trained operator", "fire control for wood dust"],
+      "setupRequirements": [
+        "CAM toolpath",
+        "spoilboard",
+        "dust collector",
+        "tool library",
+        "workholding plan",
+        "zeroing routine"
+      ],
+      "safetyRequirements": [
+        "dust extraction",
+        "eye/hearing protection",
+        "trained operator",
+        "fire control for wood dust"
+      ],
       "goodUseCases": ["furniture", "wooden constructors", "signs", "molds", "large panels"],
-      "poorUseCases": ["very tiny details below cutter diameter", "sharp internal square pockets", "thin unsupported tall features"],
+      "poorUseCases": [
+        "very tiny details below cutter diameter",
+        "sharp internal square pockets",
+        "thin unsupported tall features"
+      ],
       "rag": {
         "manualSearchStatus": "needs_vendor_manual",
-        "preferredDocuments": ["KD2030 CNC router manual", "LNC/Baoyuan MW2500 controller manual", "HQD 9 kW spindle manual", "CAM postprocessor notes"],
-        "missingDocuments": ["tool inventory", "vacuum/dust collection specification", "postprocessor"],
+        "preferredDocuments": [
+          "KD2030 CNC router manual",
+          "LNC/Baoyuan MW2500 controller manual",
+          "HQD 9 kW spindle manual",
+          "CAM postprocessor notes"
+        ],
+        "missingDocuments": [
+          "tool inventory",
+          "vacuum/dust collection specification",
+          "postprocessor"
+        ],
         "ingestionTags": ["cnc-router", "woodworking", "lnc-mw2500", "hqd-spindle"]
       },
       "notes": "Quote lists rack-and-pinion X/Y, ball screw Z, 1500 W servo drives, 380 V 50 Hz, and an additional printer attachment."
@@ -529,7 +722,11 @@
         "Use antistatic ducting and fire-safe dust handling."
       ],
       "setupRequirements": ["ducting", "blast gates", "filter maintenance schedule"],
-      "safetyRequirements": ["respiratory dust control", "spark/fire precautions", "regular emptying"],
+      "safetyRequirements": [
+        "respiratory dust control",
+        "spark/fire precautions",
+        "regular emptying"
+      ],
       "goodUseCases": ["CNC router dust collection", "wood shop cleanup"],
       "poorUseCases": ["metal sparks", "fine hazardous dust without certified filtration"],
       "rag": {
@@ -551,8 +748,22 @@
       "process": "uv_printing",
       "role": "finishing",
       "status": "available",
-      "materials": ["acrylic", "wood", "glass", "metal", "PVC", "foam board", "ceramic tile", "leather if ink-compatible"],
-      "operations": ["direct-to-object printing", "white ink underbase", "varnish/clear coat if equipped", "full-color surface graphics"],
+      "materials": [
+        "acrylic",
+        "wood",
+        "glass",
+        "metal",
+        "PVC",
+        "foam board",
+        "ceramic tile",
+        "leather if ink-compatible"
+      ],
+      "operations": [
+        "direct-to-object printing",
+        "white ink underbase",
+        "varnish/clear coat if equipped",
+        "full-color surface graphics"
+      ],
       "workEnvelope": {
         "xMm": 2500,
         "yMm": 1300,
@@ -580,11 +791,25 @@
       ],
       "setupRequirements": ["RIP profile", "material jig", "surface cleaning/primer", "test print"],
       "safetyRequirements": ["UV light guarding", "ink PPE", "ventilation"],
-      "goodUseCases": ["printed acrylic signs", "custom panels", "decorated wood products", "branded product surfaces"],
-      "poorUseCases": ["deep textured surfaces", "flexible products without tested ink", "food-contact surfaces without certified ink"],
+      "goodUseCases": [
+        "printed acrylic signs",
+        "custom panels",
+        "decorated wood products",
+        "branded product surfaces"
+      ],
+      "poorUseCases": [
+        "deep textured surfaces",
+        "flexible products without tested ink",
+        "food-contact surfaces without certified ink"
+      ],
       "rag": {
         "manualSearchStatus": "not_searched",
-        "preferredDocuments": ["UV printer model manual", "RIP manual", "ink datasheets", "primer datasheets"],
+        "preferredDocuments": [
+          "UV printer model manual",
+          "RIP manual",
+          "ink datasheets",
+          "primer datasheets"
+        ],
         "missingDocuments": ["exact model", "ink set", "printhead model", "maximum object height"],
         "ingestionTags": ["uv-printing", "flatbed", "finishing"]
       }
@@ -600,7 +825,14 @@
       "process": "laser_cutting",
       "role": "primary_production",
       "status": "available",
-      "materials": ["plywood up to 10 mm", "MDF", "acrylic", "paper", "cardboard", "leather if safe/verified"],
+      "materials": [
+        "plywood up to 10 mm",
+        "MDF",
+        "acrylic",
+        "paper",
+        "cardboard",
+        "leather if safe/verified"
+      ],
       "operations": ["2D cutting", "engraving", "scoring", "kerf-based joinery"],
       "workEnvelope": {
         "xMm": 1300,
@@ -629,14 +861,46 @@
         "Avoid thin bridges below roughly 2x material thickness unless tested.",
         "Add dogbones only when parts will later be CNC-routed; laser internal corners can be sharp."
       ],
-      "setupRequirements": ["material focus", "air assist", "exhaust", "power/speed test grid", "kerf test"],
-      "safetyRequirements": ["exhaust", "fire watch", "laser-safe enclosure", "no PVC/vinyl", "CO2 extinguisher nearby"],
-      "goodUseCases": ["wooden constructors", "acrylic night lights", "packaging prototypes", "decorations", "templates"],
-      "poorUseCases": ["thick hardwood", "metal cutting", "load-bearing furniture joints without testing"],
+      "setupRequirements": [
+        "material focus",
+        "air assist",
+        "exhaust",
+        "power/speed test grid",
+        "kerf test"
+      ],
+      "safetyRequirements": [
+        "exhaust",
+        "fire watch",
+        "laser-safe enclosure",
+        "no PVC/vinyl",
+        "CO2 extinguisher nearby"
+      ],
+      "goodUseCases": [
+        "wooden constructors",
+        "acrylic night lights",
+        "packaging prototypes",
+        "decorations",
+        "templates"
+      ],
+      "poorUseCases": [
+        "thick hardwood",
+        "metal cutting",
+        "load-bearing furniture joints without testing"
+      ],
       "rag": {
         "manualSearchStatus": "not_searched",
-        "preferredDocuments": ["exact CO2 laser controller manual", "laser tube manual", "chiller manual", "material parameter library"],
-        "missingDocuments": ["exact model", "controller type", "lens/focal length", "chiller model"],
+        "preferredDocuments": [
+          "exact CO2 laser controller manual",
+          "laser tube manual",
+          "chiller manual",
+          "material parameter library"
+        ],
+        "missingDocuments": [
+          "exact model",
+          "controller type",
+          "lens/focal length",
+          "chiller model"
+        ],
         "ingestionTags": ["co2-laser", "laser-cutting", "plywood", "acrylic"]
       }
     },
@@ -651,8 +915,19 @@
       "process": "fiber_laser_cutting",
       "role": "primary_production",
       "status": "available",
-      "materials": ["mild steel", "stainless steel", "aluminum", "galvanized steel", "brass/copper if source and optics allow"],
-      "operations": ["sheet metal laser cutting", "pipe/tube laser cutting", "engraved marking", "piercing"],
+      "materials": [
+        "mild steel",
+        "stainless steel",
+        "aluminum",
+        "galvanized steel",
+        "brass/copper if source and optics allow"
+      ],
+      "operations": [
+        "sheet metal laser cutting",
+        "pipe/tube laser cutting",
+        "engraved marking",
+        "piercing"
+      ],
       "workEnvelope": {
         "xMm": null,
         "yMm": null,
@@ -678,14 +953,48 @@
         "Avoid tiny tabs or narrow bridges that overheat.",
         "For pipe cutting, define profile, diameter, wall thickness, rotation datum, and seam location."
       ],
-      "setupRequirements": ["nesting software", "assist gas", "nozzle/lens selection", "focus calibration", "pierce test"],
-      "safetyRequirements": ["Class 4 laser safety", "fume extraction", "assist gas safety", "fire control", "eye protection for service work"],
-      "goodUseCases": ["metal signs", "brackets", "flat sheet assemblies", "tube frames", "decorative metal panels"],
-      "poorUseCases": ["nonmetal materials", "thick plate beyond 3 kW capacity", "unknown coated metals without fume review"],
+      "setupRequirements": [
+        "nesting software",
+        "assist gas",
+        "nozzle/lens selection",
+        "focus calibration",
+        "pierce test"
+      ],
+      "safetyRequirements": [
+        "Class 4 laser safety",
+        "fume extraction",
+        "assist gas safety",
+        "fire control",
+        "eye protection for service work"
+      ],
+      "goodUseCases": [
+        "metal signs",
+        "brackets",
+        "flat sheet assemblies",
+        "tube frames",
+        "decorative metal panels"
+      ],
+      "poorUseCases": [
+        "nonmetal materials",
+        "thick plate beyond 3 kW capacity",
+        "unknown coated metals without fume review"
+      ],
       "rag": {
         "manualSearchStatus": "not_searched",
-        "preferredDocuments": ["exact fiber laser cutter manual", "laser source manual", "cutting head manual", "tube chuck/manual", "material thickness chart"],
-        "missingDocuments": ["exact model", "bed size", "pipe diameter/length capacity", "assist gas setup", "source brand"],
+        "preferredDocuments": [
+          "exact fiber laser cutter manual",
+          "laser source manual",
+          "cutting head manual",
+          "tube chuck/manual",
+          "material thickness chart"
+        ],
+        "missingDocuments": [
+          "exact model",
+          "bed size",
+          "pipe diameter/length capacity",
+          "assist gas setup",
+          "source brand"
+        ],
         "ingestionTags": ["fiber-laser", "metal-cutting", "pipe-cutting", "sheet-metal"]
       }
     }

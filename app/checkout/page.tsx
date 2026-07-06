@@ -41,7 +41,9 @@ export default async function CheckoutPage({
 
   if (!items.length) redirect('/cart');
 
-  const issues = await validateCartBeforeCheckout(supabase, user.id, market.countryCode).catch(() => []);
+  const issues = await validateCartBeforeCheckout(supabase, user.id, market.countryCode).catch(
+    () => [],
+  );
 
   const issueByItem = new Map(issues.map((issue) => [issue.cartItemId, issue]));
   const subtotal = items.reduce((sum, item) => sum + item.unit_price_cents * item.quantity, 0);
@@ -71,9 +73,7 @@ export default async function CheckoutPage({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('checkout.review')}</h1>
-            <p className="text-muted-foreground">
-              {t('checkout.review_help')}
-            </p>
+            <p className="text-muted-foreground">{t('checkout.review_help')}</p>
           </div>
           <Button asChild variant="outline">
             <Link href="/cart">{t('checkout.back_to_cart')}</Link>
@@ -93,7 +93,8 @@ export default async function CheckoutPage({
                     <div>
                       <p className="font-medium">{item.title}</p>
                       <p className="text-sm text-muted-foreground">
-                        {t('order.qty', { count: item.quantity })} &middot; {item.generated_item_id ? t('cart.generated_item') : t('cart.catalog_item')}
+                        {t('order.qty', { count: item.quantity })} &middot;{' '}
+                        {item.generated_item_id ? t('cart.generated_item') : t('cart.catalog_item')}
                       </p>
                       {issue ? (
                         <p className="mt-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -115,7 +116,11 @@ export default async function CheckoutPage({
               <Label>{t('checkout.destination')}</Label>
               <p className="text-xs text-muted-foreground">{t('checkout.destination_help')}</p>
               {market.countryCode ? (
-                <CountrySwitcherClient activeCountry={market.countryCode} countries={countries} placeholder={t('checkout.country')} />
+                <CountrySwitcherClient
+                  activeCountry={market.countryCode}
+                  countries={countries}
+                  placeholder={t('checkout.country')}
+                />
               ) : (
                 <p className="text-sm text-destructive">{t('checkout.select_country')}</p>
               )}
@@ -125,9 +130,7 @@ export default async function CheckoutPage({
               <input type="hidden" name="countryCode" value={market.countryCode ?? ''} />
               <div>
                 <h2 className="font-semibold">{t('order.summary')}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t('checkout.payment_note')}
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{t('checkout.payment_note')}</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="contactEmail">{t('checkout.contact_email')}</Label>
@@ -149,7 +152,12 @@ export default async function CheckoutPage({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="addressLine1">{t('checkout.address1')}</Label>
-                <Input id="addressLine1" name="addressLine1" autoComplete="address-line1" required />
+                <Input
+                  id="addressLine1"
+                  name="addressLine1"
+                  autoComplete="address-line1"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="addressLine2">{t('checkout.address2')}</Label>
@@ -162,7 +170,11 @@ export default async function CheckoutPage({
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="administrativeArea">{t('checkout.region')}</Label>
-                  <Input id="administrativeArea" name="administrativeArea" autoComplete="address-level1" />
+                  <Input
+                    id="administrativeArea"
+                    name="administrativeArea"
+                    autoComplete="address-level1"
+                  />
                 </div>
               </div>
               <div className="space-y-2">
@@ -175,11 +187,19 @@ export default async function CheckoutPage({
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">{t('cart.shipping')}</span>
-                <span className="font-semibold">{totals ? formatPrice(totals.shippingCents, totals.currency) : t('checkout.select_destination')}</span>
+                <span className="font-semibold">
+                  {totals
+                    ? formatPrice(totals.shippingCents, totals.currency)
+                    : t('checkout.select_destination')}
+                </span>
               </div>
               <div className="flex justify-between border-t pt-4 text-lg">
                 <span>{t('cart.total')}</span>
-                <span className="font-bold">{totals ? formatPrice(totals.totalCents, totals.currency) : formatPrice(subtotal, subtotalCurrency)}</span>
+                <span className="font-bold">
+                  {totals
+                    ? formatPrice(totals.totalCents, totals.currency)
+                    : formatPrice(subtotal, subtotalCurrency)}
+                </span>
               </div>
               {issues.length ? (
                 <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">

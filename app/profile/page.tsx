@@ -1,5 +1,13 @@
 import Link from 'next/link';
-import { CalendarDays, Coins, Languages, LayoutDashboard, Mail, ShieldCheck, UserCircle } from 'lucide-react';
+import {
+  CalendarDays,
+  Coins,
+  Languages,
+  LayoutDashboard,
+  Mail,
+  ShieldCheck,
+  UserCircle,
+} from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { SiteHeader } from '@/components/site-header';
 import { Button } from '@/components/ui/button';
@@ -12,7 +20,11 @@ import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
-  const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
+  const [supabase, locale, t] = await Promise.all([
+    getServerSupabase(),
+    getRequestLocale(),
+    getTranslations(),
+  ]);
   const user = await getCurrentUser();
 
   if (!user) redirect('/login?next=/profile');
@@ -23,12 +35,17 @@ export default async function ProfilePage() {
     .eq('user_id', user.id)
     .maybeSingle();
 
-  const displayName = profile?.display_name
-    ?? user.user_metadata?.display_name
-    ?? user.email?.split('@')[0]
-    ?? t('profile.memberFallback');
+  const displayName =
+    profile?.display_name ??
+    user.user_metadata?.display_name ??
+    user.email?.split('@')[0] ??
+    t('profile.memberFallback');
   const preferredLanguage = profile?.preferred_locale
-    ? tDynamic(t, `profile.language.${profile.preferred_locale}`, profile.preferred_locale.toUpperCase())
+    ? tDynamic(
+        t,
+        `profile.language.${profile.preferred_locale}`,
+        profile.preferred_locale.toUpperCase(),
+      )
     : t('profile.notSelected');
   const memberSince = formatLocalizedDate(locale, profile?.created_at ?? user.created_at);
   const accountStatus = profile?.status ?? 'active';
@@ -57,21 +74,36 @@ export default async function ProfilePage() {
           </Button>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t('profile.details')}>
-          <ProfileDetail icon={Mail} label={t('profile.email')} value={user.email ?? t('profile.notAvailable')} />
+        <section
+          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          aria-label={t('profile.details')}
+        >
+          <ProfileDetail
+            icon={Mail}
+            label={t('profile.email')}
+            value={user.email ?? t('profile.notAvailable')}
+          />
           <ProfileDetail
             icon={ShieldCheck}
             label={t('profile.accountStatus')}
             value={tDynamic(t, `profile.status.${accountStatus}`, accountStatus)}
           />
+          <ProfileDetail icon={CalendarDays} label={t('profile.memberSince')} value={memberSince} />
           <ProfileDetail
-            icon={CalendarDays}
-            label={t('profile.memberSince')}
-            value={memberSince}
+            icon={Languages}
+            label={t('profile.preferredLanguage')}
+            value={preferredLanguage}
           />
-          <ProfileDetail icon={Languages} label={t('profile.preferredLanguage')} value={preferredLanguage} />
-          <ProfileDetail icon={Coins} label={t('profile.preferredCurrency')} value={profile?.preferred_currency ?? t('profile.notSelected')} />
-          <ProfileDetail icon={ShieldCheck} label={t('profile.accountType')} value={tDynamic(t, `profile.role.${accountRole}`, accountRole)} />
+          <ProfileDetail
+            icon={Coins}
+            label={t('profile.preferredCurrency')}
+            value={profile?.preferred_currency ?? t('profile.notSelected')}
+          />
+          <ProfileDetail
+            icon={ShieldCheck}
+            label={t('profile.accountType')}
+            value={tDynamic(t, `profile.role.${accountRole}`, accountRole)}
+          />
         </section>
 
         <section className="rounded-xl border bg-card p-6 shadow-sm">
@@ -80,10 +112,18 @@ export default async function ProfilePage() {
             <p className="text-sm text-muted-foreground">{t('profile.shortcutsHelp')}</p>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button asChild><Link href="/dashboard">{t('profile.yourProducts')}</Link></Button>
-            <Button asChild variant="outline"><Link href="/credits">{t('profile.credits')}</Link></Button>
-            <Button asChild variant="outline"><Link href="/cart">{t('profile.cart')}</Link></Button>
-            <Button asChild variant="outline"><Link href="/catalog">{t('profile.browseCatalog')}</Link></Button>
+            <Button asChild>
+              <Link href="/dashboard">{t('profile.yourProducts')}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/credits">{t('profile.credits')}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/cart">{t('profile.cart')}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/catalog">{t('profile.browseCatalog')}</Link>
+            </Button>
           </div>
         </section>
       </main>

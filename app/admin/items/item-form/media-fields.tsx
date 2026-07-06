@@ -41,7 +41,10 @@ export function MediaSection({ media }: { media?: CatalogMediaFormValue[] }) {
             .slice()
             .sort((a, b) => a.sort_order - b.sort_order)
             .map((mediaItem) => (
-              <div key={mediaItem.id} className="grid gap-3 rounded-md border bg-muted/20 p-3 md:grid-cols-[80px_1fr_110px_90px_90px]">
+              <div
+                key={mediaItem.id}
+                className="grid gap-3 rounded-md border bg-muted/20 p-3 md:grid-cols-[80px_1fr_110px_90px_90px]"
+              >
                 <div className="text-xs">
                   <p className="font-medium uppercase">{mediaItem.media_type}</p>
                   <p className="break-all text-muted-foreground">{mediaItem.storage_path}</p>

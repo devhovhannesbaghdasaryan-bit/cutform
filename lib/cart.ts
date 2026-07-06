@@ -64,7 +64,8 @@ export async function getActiveCartItemCount(supabase: TypedSupabaseClient, owne
   const query = supabase.from('carts').select('id, cart_items(id)');
   const { data } = await ('userId' in owner
     ? query.eq('user_id', owner.userId)
-    : query.eq('session_id', owner.sessionId))
+    : query.eq('session_id', owner.sessionId)
+  )
     .eq('status', 'active')
     .maybeSingle();
   return data?.cart_items?.length ?? 0;
@@ -74,7 +75,8 @@ export async function getOrCreateCart(supabase: TypedSupabaseClient, owner: Cart
   const activeCartQuery = supabase.from('carts').select('id, currency');
   const { data: existing, error: existingError } = await ('userId' in owner
     ? activeCartQuery.eq('user_id', owner.userId)
-    : activeCartQuery.eq('session_id', owner.sessionId))
+    : activeCartQuery.eq('session_id', owner.sessionId)
+  )
     .eq('status', 'active')
     .maybeSingle();
 
@@ -115,11 +117,9 @@ export async function addItemToCart(
   owner: CartOwner,
   input: CartItemInput,
 ) {
-  const selectedSources = [
-    input.catalogItemId,
-    input.generatedItemId,
-    input.bannerSampleId,
-  ].filter(Boolean);
+  const selectedSources = [input.catalogItemId, input.generatedItemId, input.bannerSampleId].filter(
+    Boolean,
+  );
 
   if (selectedSources.length !== 1) {
     throw new Error('Cart item must reference exactly one source.');
@@ -349,8 +349,11 @@ export async function validateCartBeforeCheckout(
           message: 'This item is no longer available.',
         });
       } else if (
-        catalogItem.price_cents !== (getNumericConfigurationValue(item.configuration, 'sourcePriceCents') ?? item.unit_price_cents)
-        || catalogItem.currency !== (getStringConfigurationValue(item.configuration, 'sourceCurrency') ?? item.currency)
+        catalogItem.price_cents !==
+          (getNumericConfigurationValue(item.configuration, 'sourcePriceCents') ??
+            item.unit_price_cents) ||
+        catalogItem.currency !==
+          (getStringConfigurationValue(item.configuration, 'sourceCurrency') ?? item.currency)
       ) {
         issues.push({
           cartItemId: item.id,
@@ -392,8 +395,8 @@ export async function validateCartBeforeCheckout(
       }
 
       if (
-        generatedItem?.product_type === 'personalized_night_light'
-        && !getStringConfigurationValue(item.configuration, 'personalizedPreviewOptionId')
+        generatedItem?.product_type === 'personalized_night_light' &&
+        !getStringConfigurationValue(item.configuration, 'personalizedPreviewOptionId')
       ) {
         issues.push({
           cartItemId: item.id,
@@ -401,7 +404,10 @@ export async function validateCartBeforeCheckout(
           message: 'This personalized item is missing its generated option.',
         });
       } else if (generatedItem?.product_type === 'personalized_night_light') {
-        const optionId = getStringConfigurationValue(item.configuration, 'personalizedPreviewOptionId');
+        const optionId = getStringConfigurationValue(
+          item.configuration,
+          'personalizedPreviewOptionId',
+        );
         const { data: option, error: optionError } = await supabase
           .from('personalized_preview_options')
           .select('id')

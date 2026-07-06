@@ -24,11 +24,7 @@ export async function updateActiveCartCurrency({
   sessionId?: string | null;
   currency: NonNullable<ReturnType<typeof normalizeCurrency>>;
 }) {
-  let query = service
-    .from('carts')
-    .select('id')
-    .eq('status', 'active')
-    .limit(1);
+  let query = service.from('carts').select('id').eq('status', 'active').limit(1);
 
   if (userId) query = query.eq('user_id', userId);
   else if (sessionId) query = query.eq('session_id', sessionId);
@@ -53,10 +49,14 @@ export async function updateActiveCartCurrency({
   if (itemsError) throw new Error(itemsError.message);
 
   for (const item of items ?? []) {
-    const sourcePrice = typeof item.configuration.sourcePriceCents === 'number'
-      ? item.configuration.sourcePriceCents
-      : item.unit_price_cents;
-    const sourceCurrency = normalizeCurrency(item.configuration.sourceCurrency) ?? normalizeCurrency(item.currency) ?? 'AMD';
+    const sourcePrice =
+      typeof item.configuration.sourcePriceCents === 'number'
+        ? item.configuration.sourcePriceCents
+        : item.unit_price_cents;
+    const sourceCurrency =
+      normalizeCurrency(item.configuration.sourceCurrency) ??
+      normalizeCurrency(item.currency) ??
+      'AMD';
     const converted = await convertMoney(sourcePrice, sourceCurrency, currency, service);
     const { error } = await service
       .from('cart_items')

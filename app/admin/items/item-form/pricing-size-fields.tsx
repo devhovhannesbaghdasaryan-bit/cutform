@@ -20,7 +20,11 @@ export function PriceField({ item }: { item?: Pick<ItemFormValue, 'price_cents'>
   );
 }
 
-export function ManufacturingNotesField({ item }: { item?: Pick<ItemFormValue, 'manufacturing_notes'> }) {
+export function ManufacturingNotesField({
+  item,
+}: {
+  item?: Pick<ItemFormValue, 'manufacturing_notes'>;
+}) {
   return (
     <div className="space-y-2">
       <Label htmlFor="manufacturingNotes">Manufacturing notes</Label>
@@ -33,7 +37,11 @@ export function ManufacturingNotesField({ item }: { item?: Pick<ItemFormValue, '
   );
 }
 
-export function SizesCharacteristicsFields({ item }: { item?: Pick<ItemFormValue, 'sizes' | 'characteristics'> }) {
+export function SizesCharacteristicsFields({
+  item,
+}: {
+  item?: Pick<ItemFormValue, 'sizes' | 'characteristics'>;
+}) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">

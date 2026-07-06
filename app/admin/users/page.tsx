@@ -19,7 +19,9 @@ export default async function AdminUsersPage({
     <main className="container space-y-6 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-        <p className="text-muted-foreground">Search accounts, review status, and open support details.</p>
+        <p className="text-muted-foreground">
+          Search accounts, review status, and open support details.
+        </p>
       </div>
 
       <form className="grid gap-3 rounded-lg border p-4 md:grid-cols-[1fr_180px_180px_auto]">
@@ -79,7 +81,10 @@ export default async function AdminUsersPage({
                 return (
                   <tr key={user.user_id} className="border-t">
                     <td className="px-4 py-3">
-                      <Link href={`/admin/users/${user.user_id}`} className="font-medium hover:underline">
+                      <Link
+                        href={`/admin/users/${user.user_id}`}
+                        className="font-medium hover:underline"
+                      >
                         {user.display_name ?? 'Unnamed user'}
                       </Link>
                       <p className="font-mono text-xs text-muted-foreground">{user.user_id}</p>

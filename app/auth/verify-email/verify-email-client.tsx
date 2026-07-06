@@ -6,18 +6,35 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  resendVerificationAction,
-  verifyOtpAction,
-  logoutAction,
-} from '@/app/(auth)/actions';
+import { resendVerificationAction, verifyOtpAction, logoutAction } from '@/app/(auth)/actions';
 import { idleState } from '@/lib/action-state';
 
-type VerifyCopy = { enterCode: string; verifying: string; verify: string; orClickLink: string; sending: string; resend: string; sent: string; logout: string; backLogin: string };
+type VerifyCopy = {
+  enterCode: string;
+  verifying: string;
+  verify: string;
+  orClickLink: string;
+  sending: string;
+  resend: string;
+  sent: string;
+  logout: string;
+  backLogin: string;
+};
 
-export function VerifyEmailClient({ email, signedIn, copy }: { email: string; signedIn: boolean; copy: VerifyCopy }) {
+export function VerifyEmailClient({
+  email,
+  signedIn,
+  copy,
+}: {
+  email: string;
+  signedIn: boolean;
+  copy: VerifyCopy;
+}) {
   const [verifyState, verifyAction, verifying] = useActionState(verifyOtpAction, idleState);
-  const [resendState, resendAction, resending] = useActionState(resendVerificationAction, idleState);
+  const [resendState, resendAction, resending] = useActionState(
+    resendVerificationAction,
+    idleState,
+  );
 
   useEffect(() => {
     if (verifyState.status === 'error') toast.error(verifyState.error);

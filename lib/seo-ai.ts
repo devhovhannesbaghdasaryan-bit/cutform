@@ -42,11 +42,11 @@ export function buildSeoMetadataPrompt(source: SeoMetadataSource) {
 export function createFallbackSeoMetadataDraft(source: SeoMetadataSource): SeoMetadataDraft {
   const category = source.categoryName ?? 'custom product';
   const cleanTitle = source.title.trim();
-  const baseDescription = source.description?.trim()
-    || `Shop ${cleanTitle}, a ${category.toLowerCase()} available from the Uniqraft marketplace.`;
-  const seoDescription = baseDescription.length > 155
-    ? `${baseDescription.slice(0, 152).trim()}...`
-    : baseDescription;
+  const baseDescription =
+    source.description?.trim() ||
+    `Shop ${cleanTitle}, a ${category.toLowerCase()} available from the Uniqraft marketplace.`;
+  const seoDescription =
+    baseDescription.length > 155 ? `${baseDescription.slice(0, 152).trim()}...` : baseDescription;
 
   return {
     seoTitle: `${cleanTitle} | Uniqraft Marketplace`.slice(0, 70),

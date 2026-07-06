@@ -90,13 +90,15 @@ export async function addCatalogItemToCartAction(formData: FormData) {
 }
 
 export async function updateCartQuantityAction(formData: FormData) {
-  const parsed = z.object({
-    cartItemId: z.string().uuid(),
-    quantity: z.coerce.number().int().positive(),
-  }).safeParse({
-    cartItemId: formData.get('cartItemId'),
-    quantity: formData.get('quantity'),
-  });
+  const parsed = z
+    .object({
+      cartItemId: z.string().uuid(),
+      quantity: z.coerce.number().int().positive(),
+    })
+    .safeParse({
+      cartItemId: formData.get('cartItemId'),
+      quantity: formData.get('quantity'),
+    });
 
   if (!parsed.success) throw new Error('Invalid cart quantity.');
 

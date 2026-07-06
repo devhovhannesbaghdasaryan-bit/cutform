@@ -16,11 +16,7 @@ export function formatLocalizedDate(locale: AppLocale, value: string | Date) {
   }).format(date);
 }
 
-export function formatLocalizedCurrency(
-  locale: AppLocale,
-  cents: number,
-  currency = 'AMD',
-) {
+export function formatLocalizedCurrency(locale: AppLocale, cents: number, currency = 'AMD') {
   return new Intl.NumberFormat(getLocaleForFormatting(locale), {
     style: 'currency',
     currency,

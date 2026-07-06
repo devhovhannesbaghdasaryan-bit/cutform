@@ -11,11 +11,7 @@ import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminUserDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
@@ -29,7 +25,9 @@ export default async function AdminUserDetailPage({
     <main className="container max-w-6xl space-y-8 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{profile.display_name ?? 'User detail'}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {profile.display_name ?? 'User detail'}
+          </h1>
           <p className="font-mono text-sm text-muted-foreground">{profile.user_id}</p>
         </div>
         <Button asChild variant="outline">
@@ -122,7 +120,9 @@ export default async function AdminUserDetailPage({
             <p className="text-sm text-muted-foreground">Balance</p>
             <p className="text-3xl font-bold">{balance?.balance ?? 0} credits</p>
             {balance?.updated_at && (
-              <p className="mt-2 text-xs text-muted-foreground">Updated {formatDate(balance.updated_at)}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Updated {formatDate(balance.updated_at)}
+              </p>
             )}
           </div>
 
@@ -156,7 +156,9 @@ export default async function AdminUserDetailPage({
               placeholder="Reason"
               className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             />
-            <Button type="submit" variant="outline">Apply adjustment</Button>
+            <Button type="submit" variant="outline">
+              Apply adjustment
+            </Button>
           </form>
 
           <AdminTable
@@ -220,8 +222,18 @@ function AdminTable({
             );
             return (
               <div key={row.id} className="flex items-start justify-between gap-4 p-4 text-sm">
-                <div>{row.href ? <Link href={row.href} className="hover:underline">{content}</Link> : content}</div>
-                <p className="shrink-0 text-xs text-muted-foreground">{formatDate(row.createdAt)}</p>
+                <div>
+                  {row.href ? (
+                    <Link href={row.href} className="hover:underline">
+                      {content}
+                    </Link>
+                  ) : (
+                    content
+                  )}
+                </div>
+                <p className="shrink-0 text-xs text-muted-foreground">
+                  {formatDate(row.createdAt)}
+                </p>
               </div>
             );
           })}

@@ -23,11 +23,12 @@ export function getBoilerplateName(
   boilerplate: Pick<PersonalizationBoilerplate, 'admin_name' | 'name_en' | 'name_hy' | 'name_ru'>,
   locale: AppLocale,
 ) {
-  const localized = locale === 'am'
-    ? boilerplate.name_hy
-    : locale === 'ru'
-      ? boilerplate.name_ru
-      : boilerplate.name_en;
+  const localized =
+    locale === 'am'
+      ? boilerplate.name_hy
+      : locale === 'ru'
+        ? boilerplate.name_ru
+        : boilerplate.name_en;
   return localized?.trim() || boilerplate.name_en?.trim() || boilerplate.admin_name;
 }
 
@@ -42,7 +43,11 @@ export async function loadBoilerplate(
 ) {
   let bytes: Uint8Array;
   if (reference.image_path.startsWith('/')) {
-    bytes = new Uint8Array(await readFile(path.join(process.cwd(), 'public', ...reference.image_path.split('/').filter(Boolean))));
+    bytes = new Uint8Array(
+      await readFile(
+        path.join(process.cwd(), 'public', ...reference.image_path.split('/').filter(Boolean)),
+      ),
+    );
   } else {
     const data = await downloadFromBucket(
       supabase,
@@ -53,6 +58,15 @@ export async function loadBoilerplate(
     bytes = new Uint8Array(await data.arrayBuffer());
   }
   const extension = reference.image_path.split('.').pop()?.toLowerCase();
-  const mime = extension === 'png' ? 'image/png' : extension === 'webp' ? 'image/webp' : extension === 'svg' ? 'image/svg+xml' : 'image/jpeg';
-  return new File([Uint8Array.from(bytes).buffer], `boilerplate.${extension || 'jpg'}`, { type: mime });
+  const mime =
+    extension === 'png'
+      ? 'image/png'
+      : extension === 'webp'
+        ? 'image/webp'
+        : extension === 'svg'
+          ? 'image/svg+xml'
+          : 'image/jpeg';
+  return new File([Uint8Array.from(bytes).buffer], `boilerplate.${extension || 'jpg'}`, {
+    type: mime,
+  });
 }

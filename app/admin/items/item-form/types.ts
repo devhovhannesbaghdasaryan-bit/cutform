@@ -1,6 +1,10 @@
 import type { AppLocale } from '@/lib/i18n';
 import type { MarketCountry, MarketRegion } from '@/lib/market';
-import type { CatalogItemMedia, MarketplaceCategory, MarketplaceSubcategory } from '@/lib/marketplace';
+import type {
+  CatalogItemMedia,
+  MarketplaceCategory,
+  MarketplaceSubcategory,
+} from '@/lib/marketplace';
 import type { CatalogSeoMetadata } from '@/lib/seo';
 import type { Tables } from '@/lib/supabase/types';
 

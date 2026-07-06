@@ -24,7 +24,10 @@ const safeNextPath = z
   .transform((value) => (value.startsWith('/') && !value.startsWith('//') ? value : '/dashboard'));
 
 const credentialsSchema = z.object({
-  email: z.string().catch('').transform((value) => value.trim()),
+  email: z
+    .string()
+    .catch('')
+    .transform((value) => value.trim()),
   password: z.string().catch(''),
   next: safeNextPath,
 });
@@ -112,7 +115,9 @@ export async function socialLoginAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(`/login?error=${encodeURIComponent('Unsupported login provider.')}&next=${encodeURIComponent(next)}`);
+    redirect(
+      `/login?error=${encodeURIComponent('Unsupported login provider.')}&next=${encodeURIComponent(next)}`,
+    );
   }
 
   const supabase = await getServerSupabase();
@@ -125,7 +130,9 @@ export async function socialLoginAction(formData: FormData) {
 
   if (error || !data.url) {
     const message = error?.message ?? 'The login provider could not be started.';
-    redirect(`/login?error=${encodeURIComponent(message)}&next=${encodeURIComponent(parsed.data.next)}`);
+    redirect(
+      `/login?error=${encodeURIComponent(message)}&next=${encodeURIComponent(parsed.data.next)}`,
+    );
   }
 
   redirect(data.url);

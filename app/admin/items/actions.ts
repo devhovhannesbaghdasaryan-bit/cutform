@@ -54,29 +54,31 @@ async function upsertSeoMetadata(
   const rows = APP_LOCALES.flatMap((locale) => {
     const seo = item.seo[locale];
     const hasSeo =
-      seo.seoTitle
-      || seo.seoDescription
-      || seo.seoKeywords
-      || seo.ogTitle
-      || seo.ogDescription
-      || seo.socialImagePath;
+      seo.seoTitle ||
+      seo.seoDescription ||
+      seo.seoKeywords ||
+      seo.ogTitle ||
+      seo.ogDescription ||
+      seo.socialImagePath;
 
     if (!hasSeo) return [];
 
-    return [{
-      catalog_item_id: catalogItemId,
-      locale,
-      seo_title: seo.seoTitle ?? null,
-      seo_description: seo.seoDescription ?? null,
-      seo_slug: item.slug,
-      keywords: parseKeywords(seo.seoKeywords),
-      og_title: seo.ogTitle ?? null,
-      og_description: seo.ogDescription ?? null,
-      social_image_path: seo.socialImagePath ?? null,
-      generated_by_ai: false,
-      reviewed_by_admin: true,
-      updated_by: userId,
-    }];
+    return [
+      {
+        catalog_item_id: catalogItemId,
+        locale,
+        seo_title: seo.seoTitle ?? null,
+        seo_description: seo.seoDescription ?? null,
+        seo_slug: item.slug,
+        keywords: parseKeywords(seo.seoKeywords),
+        og_title: seo.ogTitle ?? null,
+        og_description: seo.ogDescription ?? null,
+        social_image_path: seo.socialImagePath ?? null,
+        generated_by_ai: false,
+        reviewed_by_admin: true,
+        updated_by: userId,
+      },
+    ];
   });
 
   if (!rows.length) return;
@@ -104,10 +106,7 @@ async function validateSubcategoryBelongsToCategory(
   return Boolean(data);
 }
 
-async function validateCategoryExists(
-  supabase: AdminSupabase,
-  categoryId: string,
-) {
+async function validateCategoryExists(supabase: AdminSupabase, categoryId: string) {
   const { data, error } = await supabase
     .from('categories')
     .select('id')
@@ -139,7 +138,8 @@ async function syncCatalogItemMarketRules(
     const [kind, id] = target.split(':') as ['region' | 'country', string];
     const visibilityValue = String(formData.get(`market_${kind}_${id}_visibility`) ?? '');
     const shippingValue = String(formData.get(`market_${kind}_${id}_shipping`) ?? '').trim();
-    const visibility = visibilityValue === 'show' ? true : visibilityValue === 'hide' ? false : null;
+    const visibility =
+      visibilityValue === 'show' ? true : visibilityValue === 'hide' ? false : null;
     const shipping = shippingValue === '' ? null : Number(shippingValue);
     if (shipping != null && (!Number.isInteger(shipping) || shipping < 0)) {
       throw new Error('Shipping rates must be non-negative AMD minor-unit amounts.');

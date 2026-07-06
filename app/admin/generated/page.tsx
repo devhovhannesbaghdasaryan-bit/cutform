@@ -78,16 +78,17 @@ export default async function AdminGeneratedPage({
               {items.map((item) => (
                 <tr key={item.id} className="border-t">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/generated/${item.id}`} className="font-medium hover:underline">
+                    <Link
+                      href={`/admin/generated/${item.id}`}
+                      className="font-medium hover:underline"
+                    >
                       {item.title ?? item.id.slice(0, 8)}
                     </Link>
                   </td>
                   <td className="px-4 py-3">{item.user_id.slice(0, 8)}</td>
                   <td className="px-4 py-3">{item.product_type}</td>
                   <td className="px-4 py-3">{item.review_status}</td>
-                  <td className="px-4 py-3">
-                    {item.credit_cost} credits
-                  </td>
+                  <td className="px-4 py-3">{item.credit_cost} credits</td>
                   <td className="px-4 py-3">{formatDate(item.created_at)}</td>
                 </tr>
               ))}

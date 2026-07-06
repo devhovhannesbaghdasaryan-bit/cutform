@@ -53,8 +53,8 @@ export async function calculateOrderTotals({
   supabase: SupabaseClient;
 }): Promise<OrderTotals> {
   const subtotalCents = items.reduce((sum, item) => sum + item.unit_price_cents * item.quantity, 0);
-  const catalogItems = items.filter(
-    (item): item is typeof item & { catalog_item_id: string } => Boolean(item.catalog_item_id),
+  const catalogItems = items.filter((item): item is typeof item & { catalog_item_id: string } =>
+    Boolean(item.catalog_item_id),
   );
   const service = getServiceSupabase();
   const resolutions = await resolveCatalogMarkets(
@@ -66,7 +66,11 @@ export async function calculateOrderTotals({
 
   for (const item of catalogItems) {
     const resolution = resolutions.get(item.catalog_item_id)!;
-    if (!resolution.availability.available || resolution.shipping.baseAmountCents == null || !resolution.shipping.ruleId) {
+    if (
+      !resolution.availability.available ||
+      resolution.shipping.baseAmountCents == null ||
+      !resolution.shipping.ruleId
+    ) {
       throw new Error('One or more catalog items cannot ship to this destination.');
     }
     const converted = await convertMoney(

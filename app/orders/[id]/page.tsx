@@ -10,11 +10,7 @@ import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function OrderDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
@@ -34,8 +30,12 @@ export default async function OrderDetailPage({
       <main className="container max-w-5xl space-y-8 py-10">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">{t('order.created', { date: formatDate(order.created_at) })}</p>
-            <h1 className="text-3xl font-bold tracking-tight">{t('order.title')} {order.id.slice(0, 8)}</h1>
+            <p className="text-sm text-muted-foreground">
+              {t('order.created', { date: formatDate(order.created_at) })}
+            </p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t('order.title')} {order.id.slice(0, 8)}
+            </h1>
             <p className="text-muted-foreground">
               {t('order.status_line', {
                 status: tDynamic(t, `status.${order.status}`, order.status),
@@ -62,18 +62,30 @@ export default async function OrderDetailPage({
                 {items.map((item) => (
                   <div key={item.id} className="grid gap-4 p-4 sm:grid-cols-[96px_1fr_auto]">
                     <div className="flex aspect-square items-center justify-center rounded-md border bg-muted text-xs text-muted-foreground">
-                      {item.image_path || item.selected_preview_path ? t('dashboard.previewSaved') : t('order.no_image')}
+                      {item.image_path || item.selected_preview_path
+                        ? t('dashboard.previewSaved')
+                        : t('order.no_image')}
                     </div>
                     <div>
                       <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{t('order.qty', { count: item.quantity })}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('order.qty', { count: item.quantity })}
+                      </p>
                       {item.custom_text || item.led_color || item.multi_color ? (
                         <p className="mt-1 text-sm text-muted-foreground">
-                          {item.custom_text ? `${t('order.custom_text', { text: item.custom_text })} ` : ''}
+                          {item.custom_text
+                            ? `${t('order.custom_text', { text: item.custom_text })} `
+                            : ''}
                           {item.multi_color
                             ? t('order.led_multi')
                             : item.led_color
-                              ? t('order.led_color', { color: tDynamic(t, `generated.color.${item.led_color}`, item.led_color) })
+                              ? t('order.led_color', {
+                                  color: tDynamic(
+                                    t,
+                                    `generated.color.${item.led_color}`,
+                                    item.led_color,
+                                  ),
+                                })
                               : ''}
                         </p>
                       ) : null}
@@ -84,9 +96,13 @@ export default async function OrderDetailPage({
                       ) : null}
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{formatPrice(item.total_price_cents, item.currency)}</p>
+                      <p className="font-medium">
+                        {formatPrice(item.total_price_cents, item.currency)}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        {t('generated.priceEach', { price: formatPrice(item.unit_price_cents, item.currency) })}
+                        {t('generated.priceEach', {
+                          price: formatPrice(item.unit_price_cents, item.currency),
+                        })}
                       </p>
                     </div>
                   </div>
@@ -117,7 +133,9 @@ export default async function OrderDetailPage({
               {order.shipping_address ? (
                 <div>
                   <dt className="text-muted-foreground">{t('order.shipping_address')}</dt>
-                  <dd className="whitespace-pre-line">{formatShippingAddress(order.shipping_address)}</dd>
+                  <dd className="whitespace-pre-line">
+                    {formatShippingAddress(order.shipping_address)}
+                  </dd>
                 </div>
               ) : null}
             </dl>
@@ -136,5 +154,7 @@ function formatShippingAddress(address: Record<string, unknown>) {
     [address.city, address.administrativeArea, address.postalCode].filter(Boolean).join(', '),
     address.countryCode,
     address.phone,
-  ].filter((value): value is string => typeof value === 'string' && value.length > 0).join('\n');
+  ]
+    .filter((value): value is string => typeof value === 'string' && value.length > 0)
+    .join('\n');
 }

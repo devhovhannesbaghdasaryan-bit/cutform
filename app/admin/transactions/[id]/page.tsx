@@ -65,7 +65,9 @@ export default async function AdminTransactionDetailPage({
     <main className="container max-w-5xl space-y-8 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Transaction {transaction.id.slice(0, 8)}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Transaction {transaction.id.slice(0, 8)}
+          </h1>
           <p className="text-muted-foreground">Created {formatDate(transaction.created_at)}</p>
         </div>
         <Button asChild variant="outline">
@@ -112,7 +114,9 @@ export default async function AdminTransactionDetailPage({
               <h2 className="font-semibold">Audit history</h2>
             </div>
             {!auditRows?.length ? (
-              <p className="p-4 text-sm text-muted-foreground">No audit rows for this transaction.</p>
+              <p className="p-4 text-sm text-muted-foreground">
+                No audit rows for this transaction.
+              </p>
             ) : (
               <div className="divide-y">
                 {auditRows.map((row) => (
@@ -121,7 +125,9 @@ export default async function AdminTransactionDetailPage({
                       <p className="font-medium">{row.action}</p>
                       <p className="text-xs text-muted-foreground">{row.reason ?? 'No reason'}</p>
                     </div>
-                    <p className="shrink-0 text-xs text-muted-foreground">{formatDate(row.created_at)}</p>
+                    <p className="shrink-0 text-xs text-muted-foreground">
+                      {formatDate(row.created_at)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -133,8 +139,14 @@ export default async function AdminTransactionDetailPage({
           <div className="rounded-lg border p-5">
             <p className="text-sm text-muted-foreground">Linked records</p>
             <div className="mt-4 space-y-3 text-sm">
-              <LinkedRecord label="User" href={transaction.user_id ? `/admin/users/${transaction.user_id}` : null} />
-              <LinkedRecord label="Order" href={transaction.order_id ? `/admin/orders/${transaction.order_id}` : null} />
+              <LinkedRecord
+                label="User"
+                href={transaction.user_id ? `/admin/users/${transaction.user_id}` : null}
+              />
+              <LinkedRecord
+                label="Order"
+                href={transaction.order_id ? `/admin/orders/${transaction.order_id}` : null}
+              />
             </div>
           </div>
 

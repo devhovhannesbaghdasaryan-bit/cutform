@@ -187,7 +187,10 @@ export async function listPublishedCatalogItems(categorySlug?: string, subcatego
     return matchesCategory && matchesSubcategory;
   });
   const market = await resolveMarket();
-  const resolutions = await resolveCatalogMarkets(categoryMatches.map((item) => item.id), market);
+  const resolutions = await resolveCatalogMarkets(
+    categoryMatches.map((item) => item.id),
+    market,
+  );
   return categoryMatches.filter((item) => resolutions.get(item.id)?.availability.available ?? true);
 }
 
@@ -205,8 +208,13 @@ export async function listPopularCatalogItems(limit = 4) {
   if (error) throw new Error(error.message);
   const items = data ?? [];
   const market = await resolveMarket();
-  const resolutions = await resolveCatalogMarkets(items.map((item) => item.id), market);
-  return items.filter((item) => resolutions.get(item.id)?.availability.available ?? true).slice(0, limit);
+  const resolutions = await resolveCatalogMarkets(
+    items.map((item) => item.id),
+    market,
+  );
+  return items
+    .filter((item) => resolutions.get(item.id)?.availability.available ?? true)
+    .slice(0, limit);
 }
 
 export async function getCatalogItem(slug: string) {

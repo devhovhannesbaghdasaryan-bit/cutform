@@ -58,7 +58,8 @@ export default async function AdminCurrenciesPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Currencies</h1>
         <p className="text-muted-foreground">
-          Manage enabled storefront currencies, payment routes, and daily exchange-rate cache status.
+          Manage enabled storefront currencies, payment routes, and daily exchange-rate cache
+          status.
         </p>
       </div>
 
@@ -100,13 +101,16 @@ export default async function AdminCurrenciesPage() {
                           {currency.code} {currency.symbol}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {currency.name}{currency.is_default ? ' · default' : ''}
+                          {currency.name}
+                          {currency.is_default ? ' · default' : ''}
                         </p>
                       </td>
                       <td className="px-4 py-3">
                         <select
                           name={`paymentRoute:${currency.code}`}
-                          defaultValue={currency.payment_route === 'ameria' ? 'ameria' : 'bank_manual'}
+                          defaultValue={
+                            currency.payment_route === 'ameria' ? 'ameria' : 'bank_manual'
+                          }
                           className="h-9 rounded-md border border-input bg-background px-2"
                         >
                           <option value="ameria">Ameriabank</option>

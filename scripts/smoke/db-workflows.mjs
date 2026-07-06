@@ -9,7 +9,10 @@ function loadEnvFile(path) {
     if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
     const index = trimmed.indexOf('=');
     const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, '');
+    const value = trimmed
+      .slice(index + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -21,7 +24,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for db workflow smoke.');
+  throw new Error(
+    'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for db workflow smoke.',
+  );
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -116,7 +121,9 @@ try {
   const userCart = await insertSingle('carts', { user_id: customerUser.id, status: 'active' });
   const { data: guestItems, error: guestItemsError } = await supabase
     .from('cart_items')
-    .select('catalog_item_id, generated_item_id, banner_sample_id, title, quantity, unit_price_cents, currency, configuration')
+    .select(
+      'catalog_item_id, generated_item_id, banner_sample_id, title, quantity, unit_price_cents, currency, configuration',
+    )
     .eq('cart_id', sessionCart.id);
   if (guestItemsError) throw new Error(guestItemsError.message);
   assert(guestItems?.length === 1, 'Expected one guest cart item before merge');
@@ -186,7 +193,8 @@ try {
     title: `Personalized smoke ${runId}`,
     prompt: 'DB smoke personalized night light',
     custom_text: 'QA smoke',
-    svg_content: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10h80v80H10z"/></svg>',
+    svg_content:
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10 10h80v80H10z"/></svg>',
     preview_path: `generated/${runId}/preview.png`,
     selected_preview_path: `generated/${runId}/selected.png`,
     manufacturing_file_path: `generated/${runId}/manufacturing.png`,
@@ -220,7 +228,9 @@ try {
 
   const cartItemsForOrder = await supabase
     .from('cart_items')
-    .select('id, catalog_item_id, generated_item_id, title, quantity, unit_price_cents, currency, configuration')
+    .select(
+      'id, catalog_item_id, generated_item_id, title, quantity, unit_price_cents, currency, configuration',
+    )
     .eq('cart_id', userCart.id);
   if (cartItemsForOrder.error) throw new Error(cartItemsForOrder.error.message);
   assert(cartItemsForOrder.data.length === 2, 'Expected catalog and generated item in order cart');
@@ -272,7 +282,10 @@ try {
         ? {
             productType: 'personalized_night_light',
             selectedPreviewPath: `generated/${runId}/selected.png`,
-            originalImagePaths: [`uploads/${runId}/original-1.png`, `uploads/${runId}/original-2.png`],
+            originalImagePaths: [
+              `uploads/${runId}/original-1.png`,
+              `uploads/${runId}/original-2.png`,
+            ],
             customText: 'QA smoke',
             color: 'warm_white',
             multiColor: false,
@@ -304,13 +317,21 @@ try {
 
   const orderItems = await supabase
     .from('order_items')
-    .select('id, title, selected_preview_path, manufacturing_file_path, original_image_paths, custom_text, led_color, personalization_snapshot, production_snapshot')
+    .select(
+      'id, title, selected_preview_path, manufacturing_file_path, original_image_paths, custom_text, led_color, personalization_snapshot, production_snapshot',
+    )
     .eq('order_id', order.id);
   if (orderItems.error) throw new Error(orderItems.error.message);
   const personalizedOrderItem = orderItems.data.find((item) => item.selected_preview_path);
   assert(personalizedOrderItem, 'Expected personalized order item snapshot');
-  assert(personalizedOrderItem.manufacturing_file_path?.endsWith('/manufacturing.png'), 'Expected manufacturing file path on order item');
-  assert(personalizedOrderItem.original_image_paths?.length === 2, 'Expected original image paths on order item');
+  assert(
+    personalizedOrderItem.manufacturing_file_path?.endsWith('/manufacturing.png'),
+    'Expected manufacturing file path on order item',
+  );
+  assert(
+    personalizedOrderItem.original_image_paths?.length === 2,
+    'Expected original image paths on order item',
+  );
   assert(personalizedOrderItem.custom_text === 'QA smoke', 'Expected custom text on order item');
   assert(personalizedOrderItem.led_color === 'warm_white', 'Expected LED color on order item');
 
@@ -329,7 +350,10 @@ try {
     .eq('type', 'manual_adjustment');
   if (transactionRows.error) throw new Error(transactionRows.error.message);
   assert(transactionRows.data.length === 1, 'Expected manual adjustment transaction');
-  assert(transactionRows.data[0].provider_reference === null, 'Expected provider-safe manual transaction reference');
+  assert(
+    transactionRows.data[0].provider_reference === null,
+    'Expected provider-safe manual transaction reference',
+  );
 
   const { error: cartConvertedError } = await supabase
     .from('carts')

@@ -13,7 +13,11 @@ import { formatPrice } from '@/lib/utils';
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
+  const [supabase, locale, t] = await Promise.all([
+    getServerSupabase(),
+    getRequestLocale(),
+    getTranslations(),
+  ]);
   const user = await getCurrentUser();
   if (!user) redirect('/login');
 
@@ -23,7 +27,9 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false });
   const { data: generatedItems } = await supabase
     .from('generated_items')
-    .select('id, title, product_type, review_status, credit_cost, preview_path, selected_preview_path, created_at')
+    .select(
+      'id, title, product_type, review_status, credit_cost, preview_path, selected_preview_path, created_at',
+    )
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(12);
@@ -58,9 +64,7 @@ export default async function DashboardPage() {
       <main className="container space-y-6 py-10">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t('dashboard.subtitle')}
-          </p>
+          <p className="text-sm text-muted-foreground">{t('dashboard.subtitle')}</p>
         </div>
         <section className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-lg border p-4">
@@ -73,12 +77,20 @@ export default async function DashboardPage() {
           </div>
         </section>
         {items.length === 0 && !generatedItems?.length && !orders?.length ? (
-          <EmptyState copy={{ title: t('empty.title'), description: t('empty.description'), browse: t('empty.browse') }} />
+          <EmptyState
+            copy={{
+              title: t('empty.title'),
+              description: t('empty.description'),
+              browse: t('empty.browse'),
+            }}
+          />
         ) : (
           <>
             {(orders?.length ?? 0) > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold tracking-tight">{t('dashboard.recentOrders')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">
+                  {t('dashboard.recentOrders')}
+                </h2>
                 <div className="overflow-hidden rounded-lg border">
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50 text-left">
@@ -94,16 +106,25 @@ export default async function DashboardPage() {
                       {orders?.map((order) => (
                         <tr key={order.id} className="border-t">
                           <td className="px-4 py-3">
-                            <Link href={`/orders/${order.id}`} className="font-medium hover:underline">
+                            <Link
+                              href={`/orders/${order.id}`}
+                              className="font-medium hover:underline"
+                            >
                               {order.id.slice(0, 8)}
                             </Link>
                           </td>
                           <td className="px-4 py-3">
                             {formatPrice(order.subtotal_cents, order.currency)}
                           </td>
-                          <td className="px-4 py-3">{tDynamic(t, `status.${order.payment_status}`, order.payment_status)}</td>
-                          <td className="px-4 py-3">{tDynamic(t, `status.${order.status}`, order.status)}</td>
-                          <td className="px-4 py-3">{formatLocalizedDate(locale, order.created_at)}</td>
+                          <td className="px-4 py-3">
+                            {tDynamic(t, `status.${order.payment_status}`, order.payment_status)}
+                          </td>
+                          <td className="px-4 py-3">
+                            {tDynamic(t, `status.${order.status}`, order.status)}
+                          </td>
+                          <td className="px-4 py-3">
+                            {formatLocalizedDate(locale, order.created_at)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -113,7 +134,9 @@ export default async function DashboardPage() {
             )}
             {(generatedItems?.length ?? 0) > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold tracking-tight">{t('dashboard.generatedItems')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">
+                  {t('dashboard.generatedItems')}
+                </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {generatedItems?.map((item) => (
                     <Link
@@ -122,13 +145,17 @@ export default async function DashboardPage() {
                       className="rounded-lg border p-4 transition-colors hover:bg-accent"
                     >
                       <div className="flex aspect-[4/3] items-center justify-center rounded-md border bg-muted text-sm text-muted-foreground">
-                        {item.selected_preview_path || item.preview_path ? t('dashboard.previewSaved') : t('dashboard.noPreview')}
+                        {item.selected_preview_path || item.preview_path
+                          ? t('dashboard.previewSaved')
+                          : t('dashboard.noPreview')}
                       </div>
                       <div className="mt-4 space-y-1">
                         <p className="font-medium">{item.title ?? item.id.slice(0, 8)}</p>
                         <p className="text-sm text-muted-foreground">{item.product_type}</p>
                         <p className="text-xs text-muted-foreground">
-                          {tDynamic(t, `status.${item.review_status}`, item.review_status)} · {item.credit_cost} {t('dashboard.credits').toLowerCase()} · {formatLocalizedDate(locale, item.created_at)}
+                          {tDynamic(t, `status.${item.review_status}`, item.review_status)} ·{' '}
+                          {item.credit_cost} {t('dashboard.credits').toLowerCase()} ·{' '}
+                          {formatLocalizedDate(locale, item.created_at)}
                         </p>
                       </div>
                     </Link>
@@ -138,7 +165,9 @@ export default async function DashboardPage() {
             )}
             {items.length > 0 && (
               <section className="space-y-4">
-                <h2 className="text-xl font-semibold tracking-tight">{t('dashboard.approvedProducts')}</h2>
+                <h2 className="text-xl font-semibold tracking-tight">
+                  {t('dashboard.approvedProducts')}
+                </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((p) => (
                     <ProductCard key={p.id} product={p} />

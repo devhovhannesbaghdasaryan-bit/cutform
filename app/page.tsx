@@ -78,7 +78,9 @@ export default async function LandingPage() {
                 </div>
                 <div className="flex items-start gap-3 rounded-lg border bg-card/75 p-3 shadow-sm">
                   <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-                  <p className="text-sm text-muted-foreground">{t('generation.preview_disclaimer')}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t('generation.preview_disclaimer')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -87,13 +89,17 @@ export default async function LandingPage() {
                 {heroProducts.map((product, index) => (
                   <article
                     key={product.title}
-                    className={index === 0 ? 'hero-product-card sm:row-span-2' : 'hero-product-card'}
+                    className={
+                      index === 0 ? 'hero-product-card sm:row-span-2' : 'hero-product-card'
+                    }
                   >
                     <div className={index === 0 ? 'h-full min-h-64' : 'h-36 sm:h-full'}>
                       <SvgRender svg={product.svg} className="h-full w-full p-5" />
                     </div>
                     <div className="absolute inset-x-3 bottom-3 rounded-md border bg-card/90 px-3 py-2 shadow-sm backdrop-blur">
-                      <p className="text-xs font-medium uppercase text-muted-foreground">{product.category}</p>
+                      <p className="text-xs font-medium uppercase text-muted-foreground">
+                        {product.category}
+                      </p>
                       <p className="truncate text-sm font-semibold">{product.title}</p>
                     </div>
                   </article>
@@ -173,6 +179,8 @@ async function readHeroProduct(
   return {
     title,
     category,
-    svg: await readFile(path.join(productRoot, group, slug, 'assets', 'hero.svg'), 'utf8').catch(() => ''),
+    svg: await readFile(path.join(productRoot, group, slug, 'assets', 'hero.svg'), 'utf8').catch(
+      () => '',
+    ),
   };
 }

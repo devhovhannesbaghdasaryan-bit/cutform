@@ -44,7 +44,10 @@ export function SeoSection({
           { requireLocalized: locale !== 'en' },
         );
         const previewTitle = currentSeo?.seo_title || item?.title || 'SEO title preview';
-        const previewDescription = currentSeo?.seo_description || item?.description || 'Meta description preview appears here.';
+        const previewDescription =
+          currentSeo?.seo_description ||
+          item?.description ||
+          'Meta description preview appears here.';
 
         return (
           <div key={locale} className="space-y-4 rounded-md border bg-muted/20 p-4">
@@ -66,8 +69,12 @@ export function SeoSection({
             </div>
             <div className="rounded-md border bg-background p-3">
               <p className="truncate text-sm font-medium text-blue-700">{previewTitle}</p>
-              <p className="truncate text-xs text-success">/items/{currentSeo?.seo_slug || item?.slug || 'item-slug'}</p>
-              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{previewDescription}</p>
+              <p className="truncate text-xs text-success">
+                /items/{currentSeo?.seo_slug || item?.slug || 'item-slug'}
+              </p>
+              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+                {previewDescription}
+              </p>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">

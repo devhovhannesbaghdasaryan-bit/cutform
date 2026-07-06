@@ -15,7 +15,12 @@ export const manufacturingProcessSchema = z.enum([
   'dust_collection',
 ]);
 
-export const capabilityConfidenceSchema = z.enum(['confirmed', 'quoted', 'assumed', 'needs_manual']);
+export const capabilityConfidenceSchema = z.enum([
+  'confirmed',
+  'quoted',
+  'assumed',
+  'needs_manual',
+]);
 
 export const workEnvelopeSchema = z.object({
   xMm: z.number().nullable(),

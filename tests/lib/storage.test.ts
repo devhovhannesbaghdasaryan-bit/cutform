@@ -68,7 +68,9 @@ describe('uploadToBucket', () => {
   });
 
   it('throws the storage error message on failure', async () => {
-    const { client } = fakeStorageClient({ upload: { error: { message: 'bucket quota exceeded' } } });
+    const { client } = fakeStorageClient({
+      upload: { error: { message: 'bucket quota exceeded' } },
+    });
     await expect(
       uploadToBucket(client, {
         bucket: 'user-uploads',
@@ -90,8 +92,12 @@ describe('downloadFromBucket', () => {
   });
 
   it('throws the storage error message on failure', async () => {
-    const { client } = fakeStorageClient({ download: { data: null, error: { message: 'Object not found' } } });
-    await expect(downloadFromBucket(client, 'catalog-assets', 'a/b.svg')).rejects.toThrow('Object not found');
+    const { client } = fakeStorageClient({
+      download: { data: null, error: { message: 'Object not found' } },
+    });
+    await expect(downloadFromBucket(client, 'catalog-assets', 'a/b.svg')).rejects.toThrow(
+      'Object not found',
+    );
   });
 
   it('throws the provided fallback message when data is missing without an error', async () => {

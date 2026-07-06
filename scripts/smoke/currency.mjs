@@ -9,7 +9,10 @@ function loadEnvFile(path) {
     if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
     const index = trimmed.indexOf('=');
     const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, '');
+    const value = trimmed
+      .slice(index + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -21,7 +24,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for currency smoke.');
+  throw new Error(
+    'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for currency smoke.',
+  );
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -61,7 +66,10 @@ const { data: rates, error: ratesError } = await supabase
 if (ratesError) throw new Error(ratesError.message);
 
 for (const code of ['AMD', 'EUR', 'USD', 'RUB']) {
-  assert(rates.some((rate) => rate.target_currency === code && Number(rate.rate) > 0), `Missing AMD to ${code} cached rate`);
+  assert(
+    rates.some((rate) => rate.target_currency === code && Number(rate.rate) > 0),
+    `Missing AMD to ${code} cached rate`,
+  );
 }
 
 const previousStates = currencies.map((currency) => ({

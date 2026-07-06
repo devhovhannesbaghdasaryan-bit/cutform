@@ -1,8 +1,8 @@
 // Plain module (no "use server"): server-action files may only export async
 // functions, so the form schema and sync parsing helpers live here instead.
-import { z } from "zod";
-import { PERSONALIZED_NIGHT_LIGHT } from "@/lib/marketplace-constants";
-import type { Json } from "@/lib/supabase/types";
+import { z } from 'zod';
+import { PERSONALIZED_NIGHT_LIGHT } from '@/lib/marketplace-constants';
+import type { Json } from '@/lib/supabase/types';
 
 /**
  * Structural parse of the personalized night-light generation form.
@@ -20,48 +20,40 @@ export const generationFormSchema = z.object({
     .string()
     .catch(PERSONALIZED_NIGHT_LIGHT.defaultLedColor)
     .transform((value) =>
-      PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.some(
-        (color) => color.value === value,
-      )
+      PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.some((color) => color.value === value)
         ? value
         : PERSONALIZED_NIGHT_LIGHT.defaultLedColor,
     ),
   // Wrong count fails the parse; the action maps it to t('errorUpload').
-  images: z
-    .array(z.instanceof(File))
-    .length(PERSONALIZED_NIGHT_LIGHT.maxImages),
+  images: z.array(z.instanceof(File)).length(PERSONALIZED_NIGHT_LIGHT.maxImages),
   // Non-string entries are dropped and duplicates removed; emptiness is
   // checked in the action (t('selectAtLeastOne')) after the model lookup.
   boilerplateIds: z
     .array(z.union([z.string(), z.instanceof(File)]))
     .transform((values) => [
-      ...new Set(
-        values.filter((value): value is string => typeof value === "string"),
-      ),
+      ...new Set(values.filter((value): value is string => typeof value === 'string')),
     ]),
 });
 
 export function getImageFiles(formData: FormData) {
   return formData
-    .getAll("images")
+    .getAll('images')
     .filter((value): value is File => value instanceof File && value.size > 0);
 }
 
 export function summarizeTextFormatting(value: FormDataEntryValue | null) {
-  const html = typeof value === "string" ? value.slice(0, 2_000) : "";
+  const html = typeof value === 'string' ? value.slice(0, 2_000) : '';
   const styles = [
-    /<(b|strong)(\s|>)/i.test(html) ? "bold emphasis" : null,
-    /<(i|em)(\s|>)/i.test(html) ? "italic emphasis" : null,
-    /text-align\s*:\s*center|align=["']?center/i.test(html)
-      ? "center aligned"
-      : "left aligned",
+    /<(b|strong)(\s|>)/i.test(html) ? 'bold emphasis' : null,
+    /<(i|em)(\s|>)/i.test(html) ? 'italic emphasis' : null,
+    /text-align\s*:\s*center|align=["']?center/i.test(html) ? 'center aligned' : 'left aligned',
   ].filter(Boolean);
-  return styles.join(", ");
+  return styles.join(', ');
 }
 
 export function resolveModelPriceCents(formSchema: Json) {
   const configured =
-    formSchema && typeof formSchema === "object" && !Array.isArray(formSchema)
+    formSchema && typeof formSchema === 'object' && !Array.isArray(formSchema)
       ? Number(formSchema.basePriceCents)
       : Number.NaN;
   return Number.isFinite(configured) && configured >= 0

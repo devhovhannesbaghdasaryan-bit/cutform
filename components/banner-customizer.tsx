@@ -8,7 +8,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { customizeBannerSampleAction, generateBannerAction } from '@/app/banners/actions';
 import type { BannerPreset, BannerSample } from '@/lib/banners';
 
-export type BannerCopy = { sample: string; size: string; text: string; textPlaceholder: string; previewText: string; custom: string; review: string; unavailable: string; advancedPrompt: string; promptPlaceholder: string; reference: string; rights: string; generate: string; disclaimer: string };
+export type BannerCopy = {
+  sample: string;
+  size: string;
+  text: string;
+  textPlaceholder: string;
+  previewText: string;
+  custom: string;
+  review: string;
+  unavailable: string;
+  advancedPrompt: string;
+  promptPlaceholder: string;
+  reference: string;
+  rights: string;
+  generate: string;
+  disclaimer: string;
+};
 
 export function BannerCustomizer({
   samples,
@@ -25,9 +40,9 @@ export function BannerCustomizer({
   const selectedSample = samples.find((sample) => sample.id === sampleId);
   const selectedPreset = presets.find((preset) => preset.key === sizeKey);
   const canCustomize =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sampleId)
-    && Boolean(sizeKey)
-    && Boolean(text.trim());
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sampleId) &&
+    Boolean(sizeKey) &&
+    Boolean(text.trim());
   const ratio = useMemo(() => {
     if (!selectedPreset) return '12 / 5';
     return `${selectedPreset.width_mm} / ${selectedPreset.height_mm}`;
@@ -104,27 +119,27 @@ export function BannerCustomizer({
         <Button type="submit" className="w-full" disabled={!canCustomize}>
           {copy.review}
         </Button>
-        {!canCustomize ? (
-          <p className="text-xs text-muted-foreground">
-            {copy.unavailable}
-          </p>
-        ) : null}
+        {!canCustomize ? <p className="text-xs text-muted-foreground">{copy.unavailable}</p> : null}
       </form>
     </div>
   );
 }
 
-export function AdvancedBannerGenerationPanel({ presets, copy }: { presets: BannerPreset[]; copy: BannerCopy }) {
+export function AdvancedBannerGenerationPanel({
+  presets,
+  copy,
+}: {
+  presets: BannerPreset[];
+  copy: BannerCopy;
+}) {
   return (
-    <form action={generateBannerAction} className="grid gap-4 rounded-lg border p-5 md:grid-cols-[1fr_260px_auto]">
+    <form
+      action={generateBannerAction}
+      className="grid gap-4 rounded-lg border p-5 md:grid-cols-[1fr_260px_auto]"
+    >
       <div className="space-y-2 md:col-span-2">
         <Label htmlFor="advancedPrompt">{copy.advancedPrompt}</Label>
-        <Textarea
-          id="advancedPrompt"
-          name="prompt"
-          placeholder={copy.promptPlaceholder}
-          required
-        />
+        <Textarea id="advancedPrompt" name="prompt" placeholder={copy.promptPlaceholder} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="advancedSize">{copy.size}</Label>
@@ -157,9 +172,7 @@ export function AdvancedBannerGenerationPanel({ presets, copy }: { presets: Bann
         <WandSparkles className="mr-2 h-4 w-4" />
         {copy.generate}
       </Button>
-      <p className="text-xs text-muted-foreground md:col-span-3">
-        {copy.disclaimer}
-      </p>
+      <p className="text-xs text-muted-foreground md:col-span-3">{copy.disclaimer}</p>
     </form>
   );
 }

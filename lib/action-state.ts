@@ -15,9 +15,7 @@ export type ActionState<T = null> =
 export const idleState: ActionState<never> = { status: 'idle' };
 
 export function actionSuccess<T>(data: T, message?: string): ActionState<T> {
-  return message === undefined
-    ? { status: 'success', data }
-    : { status: 'success', data, message };
+  return message === undefined ? { status: 'success', data } : { status: 'success', data, message };
 }
 
 export function actionError(

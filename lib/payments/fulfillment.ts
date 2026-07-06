@@ -44,7 +44,10 @@ export async function fulfillOrderPayment(service: SupabaseClient, transaction: 
   if (orderError) throw new Error(orderError.message);
 }
 
-export async function fulfillCreditPurchase(service: SupabaseClient, transaction: SettleTransaction) {
+export async function fulfillCreditPurchase(
+  service: SupabaseClient,
+  transaction: SettleTransaction,
+) {
   const creditAmount = Number(transaction.metadata?.creditAmount ?? 0);
   if (!transaction.user_id || !Number.isInteger(creditAmount) || creditAmount <= 0) {
     throw new Error('Credit purchase transaction is missing fulfillment metadata.');
@@ -87,7 +90,10 @@ export async function fulfillCreditPurchase(service: SupabaseClient, transaction
   if (error) throw new Error(error.message);
 }
 
-async function claimTransactionSuccess(service: SupabaseClient, transactionId: string): Promise<boolean> {
+async function claimTransactionSuccess(
+  service: SupabaseClient,
+  transactionId: string,
+): Promise<boolean> {
   // Claims from failed/cancelled too: this runs only after the bank confirmed
   // an amount-verified success, so bank truth heals an earlier mis-verdict.
   const { data, error } = await service
@@ -160,7 +166,11 @@ export async function settleAmeriaPayment(
         .eq('id', transaction.id)
         .eq('status', 'succeeded');
       if (rollbackError) {
-        console.error('[ameria-settle] failed to roll back claim', transaction.id, rollbackError.message);
+        console.error(
+          '[ameria-settle] failed to roll back claim',
+          transaction.id,
+          rollbackError.message,
+        );
       }
       throw error;
     }

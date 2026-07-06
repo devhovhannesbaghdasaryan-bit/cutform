@@ -11,7 +11,10 @@ import { getPublishedPersonalizationModel, listPublishedCatalogItems } from '@/l
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { getTranslations } from 'next-intl/server';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getBoilerplateName, type PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
+import {
+  getBoilerplateName,
+  type PersonalizationBoilerplate,
+} from '@/lib/personalization-boilerplates';
 import { resolvePublicStorageUrl } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
@@ -41,14 +44,16 @@ export default async function PersonalizedModelPage({
   ]);
   if (!model) notFound();
   const popularNightLights = await listPublishedCatalogItems('night-lights')
-    .then((items) => [...items]
-      .sort((a, b) => Number(b.is_popular) - Number(a.is_popular))
-      .slice(0, 10))
+    .then((items) =>
+      [...items].sort((a, b) => Number(b.is_popular) - Number(a.is_popular)).slice(0, 10),
+    )
     .catch(() => []);
   const user = await getCurrentUser();
   const { data: boilerplateRows } = await supabase
     .from('personalization_boilerplates')
-    .select('id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order')
+    .select(
+      'id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order',
+    )
     .eq('model_id', model.id)
     .eq('is_active', true)
     .order('sort_order')
@@ -60,12 +65,32 @@ export default async function PersonalizedModelPage({
   }));
   const tNight = await getTranslations('nightLight');
   // .raw: some entries are ICU templates ({count}) interpolated client-side.
-  const copy: Record<string, string> = Object.fromEntries(([
-    'chooseTemplates', 'chooseTemplatesHelp', 'image', 'upload', 'color', 'text',
-    'textOptional', 'textPlaceholder', 'charactersRemaining', 'creditPerStyle', 'creditTotal',
-    'generate', 'generatingTitle', 'generatingBody', 'selectAtLeastOne', 'notEnoughCredits',
-    'buyCredits', 'noTemplates', 'requiredCredits', 'availableCredits',
-  ] as const).map((key) => [key, tNight.raw(key)]));
+  const copy: Record<string, string> = Object.fromEntries(
+    (
+      [
+        'chooseTemplates',
+        'chooseTemplatesHelp',
+        'image',
+        'upload',
+        'color',
+        'text',
+        'textOptional',
+        'textPlaceholder',
+        'charactersRemaining',
+        'creditPerStyle',
+        'creditTotal',
+        'generate',
+        'generatingTitle',
+        'generatingBody',
+        'selectAtLeastOne',
+        'notEnoughCredits',
+        'buyCredits',
+        'noTemplates',
+        'requiredCredits',
+        'availableCredits',
+      ] as const
+    ).map((key) => [key, tNight.raw(key)]),
+  );
   copy.cancel = t('common.cancel');
 
   return (
@@ -81,9 +106,7 @@ export default async function PersonalizedModelPage({
             <div>
               <p className="text-sm text-muted-foreground">{t('nightLight.modelEyebrow')}</p>
               <h1 className="text-3xl font-bold tracking-tight">{t('nightLight.title')}</h1>
-              <p className="mt-2 max-w-2xl text-muted-foreground">
-                {t('nightLight.sectionIntro')}
-              </p>
+              <p className="mt-2 max-w-2xl text-muted-foreground">{t('nightLight.sectionIntro')}</p>
             </div>
             <div className="space-y-3" data-testid="popular-night-lights">
               <div className="flex items-end justify-between gap-4">
@@ -103,15 +126,17 @@ export default async function PersonalizedModelPage({
                     const media = primaryMedia
                       ? [primaryMedia]
                       : item.thumbnail_path
-                        ? [{
-                            id: `${item.id}-thumbnail`,
-                            media_type: 'image' as const,
-                            storage_path: item.thumbnail_path,
-                            alt_text: item.title,
-                            poster_path: null,
-                            sort_order: 0,
-                            is_primary: true,
-                          }]
+                        ? [
+                            {
+                              id: `${item.id}-thumbnail`,
+                              media_type: 'image' as const,
+                              storage_path: item.thumbnail_path,
+                              alt_text: item.title,
+                              poster_path: null,
+                              sort_order: 0,
+                              is_primary: true,
+                            },
+                          ]
                         : [];
 
                     return (
@@ -168,19 +193,23 @@ export default async function PersonalizedModelPage({
 
           <aside>
             {user ? (
-              <PersonalizedNightLightForm modelId={model.id} boilerplates={boilerplates} copy={copy} />
+              <PersonalizedNightLightForm
+                modelId={model.id}
+                boilerplates={boilerplates}
+                copy={copy}
+              />
             ) : (
               <div className="space-y-4 rounded-lg border p-5">
                 <h2 className="text-xl font-semibold">{t('nightLight.signInTitle')}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {t('nightLight.signInBody')}
-                </p>
+                <p className="text-sm text-muted-foreground">{t('nightLight.signInBody')}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Button asChild>
                     <Link href={`/login?next=/personalize/${model.slug}`}>{t('auth.login')}</Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link href={`/register?next=/personalize/${model.slug}`}>{t('auth.signup')}</Link>
+                    <Link href={`/register?next=/personalize/${model.slug}`}>
+                      {t('auth.signup')}
+                    </Link>
                   </Button>
                 </div>
               </div>

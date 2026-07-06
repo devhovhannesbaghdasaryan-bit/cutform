@@ -39,7 +39,8 @@ export async function updateOrderStatusAction(
     status: formData.get('status'),
     paymentStatus: formData.get('paymentStatus'),
   });
-  if (!parsed.success) return actionError(parsed.error.issues[0]?.message ?? 'Invalid order status.');
+  if (!parsed.success)
+    return actionError(parsed.error.issues[0]?.message ?? 'Invalid order status.');
 
   const { supabase } = await requireAdminPermission('orders_manage');
   const { orderId, status, paymentStatus } = parsed.data;
@@ -138,7 +139,10 @@ export async function generateBannerManufacturingInstructionAction(formData: For
     quantity: item.quantity,
     bannerSizeKey: item.banner_size_key,
     sourceImagePath,
-    selectedPreviewPath: requireStringPath(item.selected_preview_path, generated?.selected_preview_path),
+    selectedPreviewPath: requireStringPath(
+      item.selected_preview_path,
+      generated?.selected_preview_path,
+    ),
     prompt: generated?.prompt ?? null,
     customText: item.custom_text,
     itemSnapshot: item.item_snapshot ?? {},

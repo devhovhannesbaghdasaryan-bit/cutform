@@ -19,7 +19,11 @@ export default async function CreditsPage({
   searchParams: Promise<{ checkout?: string }>;
 }) {
   const { checkout: checkoutStatus } = await searchParams;
-  const [supabase, locale, t] = await Promise.all([getServerSupabase(), getRequestLocale(), getTranslations()]);
+  const [supabase, locale, t] = await Promise.all([
+    getServerSupabase(),
+    getRequestLocale(),
+    getTranslations(),
+  ]);
   const user = await getCurrentUser();
   if (!user) redirect('/login');
 
@@ -95,9 +99,7 @@ export default async function CreditsPage({
         ) : null}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">{t('credits.title')}</h1>
-          <p className="text-muted-foreground">
-            {t('credits.subtitle')}
-          </p>
+          <p className="text-muted-foreground">{t('credits.subtitle')}</p>
         </div>
 
         <section className="rounded-lg border p-6">
@@ -107,7 +109,9 @@ export default async function CreditsPage({
             </div>
             <div>
               <p className="text-sm text-muted-foreground">{t('credits.balance')}</p>
-              <p className="text-3xl font-bold">{account?.balance ?? 0} {t('credits.unit')}</p>
+              <p className="text-3xl font-bold">
+                {account?.balance ?? 0} {t('credits.unit')}
+              </p>
             </div>
           </div>
         </section>
@@ -124,13 +128,24 @@ export default async function CreditsPage({
                 <div key={entry.id} className="flex items-start justify-between gap-4 p-4 text-sm">
                   <div>
                     <p className="font-medium">{entry.reason}</p>
-                    <p className="text-xs text-muted-foreground">{entry.reference_type ?? t('credits.noReference')}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {entry.reference_type ?? t('credits.noReference')}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className={entry.delta >= 0 ? 'font-semibold text-success' : 'font-semibold text-destructive'}>
-                      {entry.delta >= 0 ? '+' : ''}{entry.delta}
+                    <p
+                      className={
+                        entry.delta >= 0
+                          ? 'font-semibold text-success'
+                          : 'font-semibold text-destructive'
+                      }
+                    >
+                      {entry.delta >= 0 ? '+' : ''}
+                      {entry.delta}
                     </p>
-                    <p className="text-xs text-muted-foreground">{formatLocalizedDate(locale, entry.created_at)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatLocalizedDate(locale, entry.created_at)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -141,9 +156,7 @@ export default async function CreditsPage({
         <section className="space-y-4 rounded-lg border p-6">
           <div>
             <h2 className="font-semibold">{t('credits.packs')}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t('credits.packsHelp')}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{t('credits.packsHelp')}</p>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {displayPacks.map((pack) => (
@@ -159,8 +172,12 @@ export default async function CreditsPage({
               >
                 <div>
                   <h3 className="font-medium">{pack.name}</h3>
-                  <p className="text-2xl font-bold">{pack.creditAmount} {t('credits.unit')}</p>
-                  <p className="text-sm text-muted-foreground">{formatLocalizedCurrency(locale, pack.displayPriceCents, pack.displayCurrency)}</p>
+                  <p className="text-2xl font-bold">
+                    {pack.creditAmount} {t('credits.unit')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {formatLocalizedCurrency(locale, pack.displayPriceCents, pack.displayCurrency)}
+                  </p>
                 </div>
                 <p className="min-h-10 text-xs text-muted-foreground">{pack.description}</p>
               </CreditPurchaseForm>
@@ -173,9 +190,12 @@ export default async function CreditsPage({
                 {pendingRequests.map((request) => (
                   <div key={request.id} className="flex justify-between gap-4 text-sm">
                     <span>
-                      {String(request.metadata.packName ?? t('credits.packFallback'))} - {String(request.metadata.creditAmount ?? '?')} {t('credits.unit')}
+                      {String(request.metadata.packName ?? t('credits.packFallback'))} -{' '}
+                      {String(request.metadata.creditAmount ?? '?')} {t('credits.unit')}
                     </span>
-                    <span className="text-muted-foreground">{formatLocalizedDate(locale, request.created_at)}</span>
+                    <span className="text-muted-foreground">
+                      {formatLocalizedDate(locale, request.created_at)}
+                    </span>
                   </div>
                 ))}
               </div>

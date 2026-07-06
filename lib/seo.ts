@@ -51,7 +51,10 @@ export function resolveCatalogMetadata({
   fallback: SeoFallbackSource;
 }): Metadata {
   const title = seo?.seo_title || fallback.title;
-  const description = seo?.seo_description || fallback.description || 'Custom wooden products and AI-assisted designs.';
+  const description =
+    seo?.seo_description ||
+    fallback.description ||
+    'Custom wooden products and AI-assisted designs.';
   const image = seo?.social_image_path || fallback.imagePath || undefined;
   const canonical = getCanonicalUrl(locale, path);
 

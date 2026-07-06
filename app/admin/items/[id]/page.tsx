@@ -18,11 +18,7 @@ type SeoMetadata = CatalogSeoMetadata &
 
 type CatalogMedia = Omit<CatalogItemMedia, 'poster_path'>;
 
-export default async function EditAdminItemPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditAdminItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase } = await requireAdmin();
 
@@ -54,7 +50,9 @@ export default async function EditAdminItemPage({
       .order('sort_order', { ascending: true }),
     supabase
       .from('catalog_item_seo_metadata')
-      .select('locale, seo_slug, seo_title, seo_description, keywords, og_title, og_description, social_image_path, noindex, generated_by_ai, reviewed_by_admin')
+      .select(
+        'locale, seo_slug, seo_title, seo_description, keywords, og_title, og_description, social_image_path, noindex, generated_by_ai, reviewed_by_admin',
+      )
       .eq('catalog_item_id', id)
       .order('locale', { ascending: true })
       .returns<SeoMetadata[]>(),
@@ -95,7 +93,10 @@ export default async function EditAdminItemPage({
         media={media ?? []}
         seoRecords={seoRecords ?? []}
         marketRegions={geography.regions}
-        marketCountries={geography.countries.map((country) => ({ ...country, label: getCountryDisplayName(country.code) }))}
+        marketCountries={geography.countries.map((country) => ({
+          ...country,
+          label: getCountryDisplayName(country.code),
+        }))}
         marketRules={marketRules ?? []}
       />
       <SeoMetadataManager catalogItemId={item.id} />

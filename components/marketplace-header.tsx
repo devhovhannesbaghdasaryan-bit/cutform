@@ -31,10 +31,17 @@ export async function MarketplaceHeader() {
     <header className="sticky top-0 z-40 border-b bg-background/90 shadow-[0_1px_0_hsl(var(--cyber-cyan)/0.16)] backdrop-blur supports-[backdrop-filter]:bg-background/75">
       <div className="container flex min-h-14 items-center justify-between gap-2 py-2">
         <nav className="flex min-w-0 items-center gap-3 sm:gap-5">
-          <Link href="/" aria-label="Uniqraft home" className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+          <Link
+            href="/"
+            aria-label="Uniqraft home"
+            className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
             <BrandLogo />
           </Link>
-          <Link href="/catalog" className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline">
+          <Link
+            href="/catalog"
+            className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline"
+          >
             {t('nav.catalog')}
           </Link>
         </nav>
@@ -72,7 +79,7 @@ export async function MarketplaceHeader() {
               )}
               <Button asChild variant="ghost" size="icon">
                 <Link href="/profile" aria-label={t('nav.profile')}>
-                    <UserCircle className="h-4 w-4" />
+                  <UserCircle className="h-4 w-4" />
                 </Link>
               </Button>
             </>

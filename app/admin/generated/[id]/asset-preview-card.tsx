@@ -12,7 +12,13 @@ interface AssetPreviewCardProps {
   isSvg?: boolean;
 }
 
-export function AssetPreviewCard({ title, path, url, downloadUrl, isSvg = false }: AssetPreviewCardProps) {
+export function AssetPreviewCard({
+  title,
+  path,
+  url,
+  downloadUrl,
+  isSvg = false,
+}: AssetPreviewCardProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   return (
@@ -34,13 +40,17 @@ export function AssetPreviewCard({ title, path, url, downloadUrl, isSvg = false 
               <Image src={url} alt="" fill unoptimized sizes="80px" className="object-cover" />
             )
           ) : (
-            <span className="grid h-full place-items-center px-2 text-xs text-muted-foreground">Unavailable</span>
+            <span className="grid h-full place-items-center px-2 text-xs text-muted-foreground">
+              Unavailable
+            </span>
           )}
         </button>
 
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium">{title}</p>
-          <p className="mt-1 truncate font-mono text-xs text-muted-foreground" title={path}>{path}</p>
+          <p className="mt-1 truncate font-mono text-xs text-muted-foreground" title={path}>
+            {path}
+          </p>
           {url ? (
             <div className="mt-3 grid grid-cols-2 gap-2 min-[420px]:flex min-[420px]:flex-wrap">
               <button
@@ -93,12 +103,22 @@ export function AssetPreviewCard({ title, path, url, downloadUrl, isSvg = false 
               // eslint-disable-next-line @next/next/no-img-element
               <img src={url} alt={title} className="max-h-[70vh] max-w-full object-contain" />
             ) : (
-              <Image src={url} alt={title} width={1600} height={1600} unoptimized className="max-h-[70vh] w-auto max-w-full object-contain" />
+              <Image
+                src={url}
+                alt={title}
+                width={1600}
+                height={1600}
+                unoptimized
+                className="max-h-[70vh] w-auto max-w-full object-contain"
+              />
             )}
           </div>
           <div className="flex justify-stretch border-t p-3 sm:justify-end">
             {downloadUrl ? (
-              <a href={downloadUrl} className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:w-auto">
+              <a
+                href={downloadUrl}
+                className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:w-auto"
+              >
                 <Download className="size-4" aria-hidden="true" />
                 Download
               </a>

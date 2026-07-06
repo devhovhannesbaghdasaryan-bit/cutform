@@ -158,13 +158,15 @@ describe('decideOutcome', () => {
 
   it('stays pending while the payment is only started', () => {
     expect(
-      decideOutcome({ ...paid, responseCode: '', paymentState: 'payment_started' }, expected).outcome,
+      decideOutcome({ ...paid, responseCode: '', paymentState: 'payment_started' }, expected)
+        .outcome,
     ).toBe('pending');
   });
 
   it('stays pending for an approved (authorized-only) payment until capture mode is confirmed', () => {
     expect(
-      decideOutcome({ ...paid, responseCode: '00', paymentState: 'payment_approved' }, expected).outcome,
+      decideOutcome({ ...paid, responseCode: '00', paymentState: 'payment_approved' }, expected)
+        .outcome,
     ).toBe('pending');
   });
 
@@ -176,7 +178,8 @@ describe('decideOutcome', () => {
 
   it('fails for declined payments', () => {
     expect(
-      decideOutcome({ ...paid, responseCode: '01', paymentState: 'payment_declined' }, expected).outcome,
+      decideOutcome({ ...paid, responseCode: '01', paymentState: 'payment_declined' }, expected)
+        .outcome,
     ).toBe('failed');
   });
 });

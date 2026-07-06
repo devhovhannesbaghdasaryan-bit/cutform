@@ -14,7 +14,9 @@ export default async function AdminOrdersPage({
 
   let query = supabase
     .from('orders')
-    .select('id, user_id, status, payment_status, subtotal_cents, currency, contact_email, created_at')
+    .select(
+      'id, user_id, status, payment_status, subtotal_cents, currency, contact_email, created_at',
+    )
     .order('created_at', { ascending: false });
 
   if (params.status) query = query.eq('status', params.status);
@@ -26,7 +28,9 @@ export default async function AdminOrdersPage({
     <main className="container space-y-6 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-        <p className="text-muted-foreground">See order queue, payment state, and production status.</p>
+        <p className="text-muted-foreground">
+          See order queue, payment state, and production status.
+        </p>
       </div>
 
       <form className="grid gap-3 rounded-lg border p-4 sm:grid-cols-[220px_220px_auto]">
@@ -86,7 +90,10 @@ export default async function AdminOrdersPage({
               {orders.map((order) => (
                 <tr key={order.id} className="border-t">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/orders/${order.id}`} className="font-medium hover:underline">
+                    <Link
+                      href={`/admin/orders/${order.id}`}
+                      className="font-medium hover:underline"
+                    >
                       {order.id.slice(0, 8)}
                     </Link>
                   </td>

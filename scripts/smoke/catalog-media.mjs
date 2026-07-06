@@ -9,7 +9,10 @@ function loadEnvFile(path) {
     if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
     const index = trimmed.indexOf('=');
     const key = trimmed.slice(0, index).trim();
-    const value = trimmed.slice(index + 1).trim().replace(/^['"]|['"]$/g, '');
+    const value = trimmed
+      .slice(index + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (!process.env[key]) process.env[key] = value;
   }
 }
@@ -21,7 +24,9 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for catalog media smoke.');
+  throw new Error(
+    'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required for catalog media smoke.',
+  );
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
@@ -32,9 +37,19 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const migrationSql = readFileSync('supabase/migrations/20260622094636_catalog_item_media.sql', 'utf8');
+const migrationSql = readFileSync(
+  'supabase/migrations/20260622094636_catalog_item_media.sql',
+  'utf8',
+);
 
-for (const mime of ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'video/mp4', 'video/webm']) {
+for (const mime of [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/svg+xml',
+  'video/mp4',
+  'video/webm',
+]) {
   assert(migrationSql.includes(`'${mime}'`), `catalog media migration is missing ${mime}`);
 }
 assert(migrationSql.includes('52428800'), 'catalog media migration should allow files up to 50 MB');

@@ -21,9 +21,13 @@ export function CountrySwitcherClient({
         className="h-8 max-w-32 rounded-md border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
         onChange={() => formRef.current?.requestSubmit()}
       >
-        <option value="" disabled>{placeholder}</option>
+        <option value="" disabled>
+          {placeholder}
+        </option>
         {countries.map((country) => (
-          <option key={country.code} value={country.code}>{country.label}</option>
+          <option key={country.code} value={country.code}>
+            {country.label}
+          </option>
         ))}
       </select>
     </form>

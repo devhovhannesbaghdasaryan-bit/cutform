@@ -28,14 +28,24 @@ export default async function VerifyEmailPage({
       <div className="w-full max-w-md space-y-6 text-center">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">{t('auth.checkEmail')}</h1>
-          <p className="text-muted-foreground">
-            {t('auth.verificationSentTo', { email })}
-          </p>
+          <p className="text-muted-foreground">{t('auth.verificationSentTo', { email })}</p>
         </div>
-        <VerifyEmailClient email={email} signedIn={!!user} copy={{ enterCode: t('auth.enterCode'), verifying: t('auth.verifying'), verify: t('auth.verify'), orClickLink: t('auth.orClickLink'), sending: t('auth.sending'), resend: t('auth.resend'), sent: t('auth.sent'), logout: t('auth.logout'), backLogin: t('auth.backLogin') }} />
-        <p className="text-xs text-muted-foreground">
-          {t('auth.spamNotice')}
-        </p>
+        <VerifyEmailClient
+          email={email}
+          signedIn={!!user}
+          copy={{
+            enterCode: t('auth.enterCode'),
+            verifying: t('auth.verifying'),
+            verify: t('auth.verify'),
+            orClickLink: t('auth.orClickLink'),
+            sending: t('auth.sending'),
+            resend: t('auth.resend'),
+            sent: t('auth.sent'),
+            logout: t('auth.logout'),
+            backLogin: t('auth.backLogin'),
+          }}
+        />
+        <p className="text-xs text-muted-foreground">{t('auth.spamNotice')}</p>
       </div>
     </main>
   );

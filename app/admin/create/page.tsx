@@ -33,17 +33,25 @@ export default async function AdminCreatePage() {
     <main className="container max-w-5xl space-y-8 py-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Create</h1>
-        <p className="text-muted-foreground">Choose the admin workflow for new marketplace content or generated assets.</p>
+        <p className="text-muted-foreground">
+          Choose the admin workflow for new marketplace content or generated assets.
+        </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {actions.map((action) => {
           const Icon = action.icon;
           return (
-            <Link key={action.href} href={action.href} className="rounded-lg border p-5 transition-colors hover:bg-muted/40">
+            <Link
+              key={action.href}
+              href={action.href}
+              className="rounded-lg border p-5 transition-colors hover:bg-muted/40"
+            >
               <Icon className="h-6 w-6" />
               <h2 className="mt-4 text-lg font-semibold">{action.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{action.description}</p>
-              <span className="mt-4 inline-flex rounded-md border px-3 py-2 text-sm font-medium">Open</span>
+              <span className="mt-4 inline-flex rounded-md border px-3 py-2 text-sm font-medium">
+                Open
+              </span>
             </Link>
           );
         })}
@@ -53,10 +61,14 @@ export default async function AdminCreatePage() {
         <div>
           <h2 className="text-lg font-semibold">Generate toy or decoration draft</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Create a draft catalog item with editable name, description, sizes, image, and admin-only characteristics.
+            Create a draft catalog item with editable name, description, sizes, image, and
+            admin-only characteristics.
           </p>
         </div>
-        <form action={generateToyDecorationDraftAction} className="mt-5 grid gap-4 md:grid-cols-[180px_1fr]">
+        <form
+          action={generateToyDecorationDraftAction}
+          className="mt-5 grid gap-4 md:grid-cols-[180px_1fr]"
+        >
           <div className="space-y-2">
             <label htmlFor="targetCategory" className="text-sm font-medium">
               Target
@@ -94,7 +106,8 @@ export default async function AdminCreatePage() {
               className="block w-full text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Uploading only an image generates editable metadata from the image path and marks uncertain materials/specs as review-required.
+              Uploading only an image generates editable metadata from the image path and marks
+              uncertain materials/specs as review-required.
             </p>
           </div>
           <div className="md:col-span-2">

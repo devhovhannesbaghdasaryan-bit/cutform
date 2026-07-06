@@ -51,13 +51,13 @@ export function buildInitPaymentBody(config: AmeriaConfig, input: InitPaymentFie
 export function parseInitPaymentResponse(json: unknown): { paymentId: string } {
   const record = (json ?? {}) as Record<string, unknown>;
   const responseCode = Number(record.ResponseCode);
-  const paymentId = typeof record.PaymentID === 'string' && record.PaymentID.length > 0
-    ? record.PaymentID
-    : null;
+  const paymentId =
+    typeof record.PaymentID === 'string' && record.PaymentID.length > 0 ? record.PaymentID : null;
   if (responseCode !== 1 || !paymentId) {
-    const message = typeof record.ResponseMessage === 'string'
-      ? record.ResponseMessage
-      : `response code ${String(record.ResponseCode)}`;
+    const message =
+      typeof record.ResponseMessage === 'string'
+        ? record.ResponseMessage
+        : `response code ${String(record.ResponseCode)}`;
     throw new Error(`Ameriabank InitPayment rejected: ${message}`);
   }
   return { paymentId };
@@ -103,9 +103,9 @@ export function decideOutcome(
 ): { outcome: PaymentOutcome; amountMatches: boolean } {
   const expectedCode = AMERIA_CURRENCY_CODES[expected.currency];
   const amountMatches =
-    Number.isFinite(details.amount)
-    && Math.round(details.amount * 100) === Math.round(expected.amountCents)
-    && (details.currencyCode === expectedCode || details.currencyCode === expected.currency);
+    Number.isFinite(details.amount) &&
+    Math.round(details.amount * 100) === Math.round(expected.amountCents) &&
+    (details.currencyCode === expectedCode || details.currencyCode === expected.currency);
 
   const state = details.paymentState;
   if (details.responseCode === '00' && state.includes('deposited')) {

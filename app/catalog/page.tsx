@@ -37,10 +37,13 @@ export async function generateMetadata({
     fallback: {
       title,
       slug: 'catalog',
-      description:
-        activeCategory
-          ? tDynamic(t, `category.${activeCategory.slug}.description`, activeCategory.description ?? '')
-          : t('catalog.meta_description'),
+      description: activeCategory
+        ? tDynamic(
+            t,
+            `category.${activeCategory.slug}.description`,
+            activeCategory.description ?? '',
+          )
+        : t('catalog.meta_description'),
     },
   });
 }
@@ -71,7 +74,11 @@ export default async function CatalogPage({
     ? tDynamic(t, `subcategory.${activeSubcategory.slug}.name`, activeSubcategory.name)
     : null;
   const activeSubcategoryDescription = activeSubcategory
-    ? tDynamic(t, `subcategory.${activeSubcategory.slug}.description`, activeSubcategory.description ?? '')
+    ? tDynamic(
+        t,
+        `subcategory.${activeSubcategory.slug}.description`,
+        activeSubcategory.description ?? '',
+      )
     : null;
 
   return (
@@ -81,9 +88,7 @@ export default async function CatalogPage({
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight">{t('catalog.title')}</h1>
-            <p className="max-w-2xl text-muted-foreground">
-              {t('catalog.subtitle')}
-            </p>
+            <p className="max-w-2xl text-muted-foreground">{t('catalog.subtitle')}</p>
           </div>
           <Button asChild className="w-full sm:w-auto">
             <Link href="/personalize/portrait-personalized-night-light">
@@ -162,7 +167,9 @@ function CategoryPill({
       href={href}
       className={cn(
         'rounded-full border px-3 py-1.5 text-sm transition-colors',
-        active ? 'border-primary bg-primary text-primary-foreground' : 'bg-background hover:bg-accent',
+        active
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'bg-background hover:bg-accent',
       )}
     >
       {children}

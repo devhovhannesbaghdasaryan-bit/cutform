@@ -51,10 +51,7 @@ export interface TransactionInput {
   createdBy?: string | null;
 }
 
-export async function createTransactionRecord(
-  supabase: SupabaseClient,
-  input: TransactionInput,
-) {
+export async function createTransactionRecord(supabase: SupabaseClient, input: TransactionInput) {
   if (input.idempotencyKey) {
     const { data: existing, error: existingError } = await supabase
       .from('transactions')

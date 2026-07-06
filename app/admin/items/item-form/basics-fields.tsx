@@ -108,7 +108,11 @@ export function DescriptionField({ item }: { item?: Pick<ItemFormValue, 'descrip
   );
 }
 
-export function FlagsFields({ item }: { item?: Pick<ItemFormValue, 'is_popular' | 'is_customizable'> }) {
+export function FlagsFields({
+  item,
+}: {
+  item?: Pick<ItemFormValue, 'is_popular' | 'is_customizable'>;
+}) {
   return (
     <div className="flex flex-wrap gap-6">
       <label className="flex items-center gap-2 text-sm">
