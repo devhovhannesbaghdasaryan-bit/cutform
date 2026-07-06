@@ -28,11 +28,12 @@ for (const contract of [
   'reference.generate_hidden_svg',
   'manufacturingFilePath: null',
   'manufacturingSvgStatus: "pending_admin_generation"',
+  'referenceFileId: reference.openai_file_id',
 ]) {
   if (!personalizedAction.includes(contract)) throw new Error(`Missing personalized generation contract: ${contract}`);
 }
 
-for (const removedContract of ['createPreviewSvg(', 'uploadGeneratedSvg(', 'hiddenSvgs:']) {
+for (const removedContract of ['createPreviewSvg(', 'uploadGeneratedSvg(', 'hiddenSvgs:', 'loadBoilerplate(']) {
   if (personalizedAction.includes(removedContract)) throw new Error(`Customer generation still creates manufacturing SVGs: ${removedContract}`);
 }
 

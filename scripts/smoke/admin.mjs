@@ -39,12 +39,17 @@ for (const removedRoute of [
 }
 
 const personalizationActions = readFileSync('app/personalization/night-lights/actions.ts', 'utf8');
-for (const action of ['savePersonalizationBoilerplateAction', 'removePersonalizationBoilerplateAction']) {
+for (const action of [
+  'savePersonalizationBoilerplateAction',
+  'removePersonalizationBoilerplateAction',
+  'uploadReferenceImage',
+  'deleteReferenceFile',
+]) {
   if (!personalizationActions.includes(action)) throw new Error(`Missing personalization admin action: ${action}`);
 }
 
 const personalizationPage = readFileSync('app/personalization/night-lights/page.tsx', 'utf8');
-for (const contract of ['ImageUploadField', 'mockImagePath', 'boilerplateImagePath', 'resolvePublicStorageUrl']) {
+for (const contract of ['ImageUploadField', 'mockImagePath', 'boilerplateImagePath', 'resolvePublicStorageUrl', 'openai_file_id']) {
   if (!personalizationPage.includes(contract)) throw new Error(`Missing personalization image contract: ${contract}`);
 }
 

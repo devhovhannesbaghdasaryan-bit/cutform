@@ -468,6 +468,7 @@
     "generationInstruction": "AI գեներացման հրահանգ",
     "displayOrder": "Ցուցադրման հերթականություն",
     "requiresSvg": "Պահանջվում է արտադրական ֆայլ",
+    "openaiFileId": "OpenAI ֆայլի ID",
     "updateBoilerplate": "Թարմացնել ձևանմուշը",
     "addBoilerplate": "Ավելացնել ձևանմուշ",
     "modelTitle": "Վերնագիր",
