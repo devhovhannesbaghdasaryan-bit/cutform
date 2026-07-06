@@ -361,10 +361,10 @@ export function getBoilerplateName(
 
 This drops `loadBoilerplate`, `readFile`, `path`, and `downloadFromBucket` — `loadBoilerplate` read boilerplate bytes from Supabase storage for the old per-request-download flow. After Task 8, the only remaining caller (`app/personalize/actions.ts`) no longer needs it (it now sends `openai_file_id` instead of bytes), and the admin save flow (Task 6) already holds the raw uploaded `File` directly from `formData`, so it never needed `loadBoilerplate` either.
 
-Expected compile errors until Task 6 and Task 8 land: `app/personalize/actions.ts` still imports `loadBoilerplate` at this point. This is expected — `pnpm typecheck` will show one error in that file until Task 8. Confirm it's *only* that one error before moving on.
+Expected compile errors until Task 6 and Task 8 land: `app/personalize/actions.ts` still imports `loadBoilerplate` at this point (unresolved until Task 8). Separately, `personalization_boilerplates`'s `Insert`/`Update` types now require `openai_file_id`, so `app/personalization/night-lights/actions.ts`'s existing insert/update payload (which doesn't set it yet) also fails to typecheck (unresolved until Task 6). Both are expected — `pnpm typecheck` should show **exactly two errors**, one per file. Confirm it's only those two before moving on.
 
 Run: `pnpm typecheck`
-Expected: exactly one error, in `app/personalize/actions.ts`, about `loadBoilerplate` no longer being exported from `@/lib/personalization-boilerplates`.
+Expected: two errors — one in `app/personalize/actions.ts` (`loadBoilerplate` no longer exported from `@/lib/personalization-boilerplates`), one in `app/personalization/night-lights/actions.ts` (insert/update payload missing the required `openai_file_id` property).
 
 - [ ] **Step 5: Commit**
 
@@ -590,7 +590,7 @@ Expected: PASS (4 tests)
 - [ ] **Step 6: Typecheck**
 
 Run: `pnpm typecheck`
-Expected: the same single pre-existing error in `app/personalize/actions.ts` from Task 3 (still unresolved until Task 8), plus a new error in the same file where it calls `generateOpenAiImage` with the old `{ prompt, images, size, quality }` shape. Confirm no errors anywhere else.
+Expected: the same two pre-existing errors from Task 3 (`app/personalize/actions.ts` missing `loadBoilerplate` export, and `app/personalization/night-lights/actions.ts` missing `openai_file_id` in its insert/update payload — both still unresolved until Tasks 8 and 6 respectively), plus a new error in `app/personalize/actions.ts` where it calls `generateOpenAiImage` with the old `{ prompt, images, size, quality }` shape. Confirm no errors anywhere else (three total).
 
 - [ ] **Step 7: Commit**
 
@@ -725,7 +725,7 @@ Expected: PASS (3 tests)
 - [ ] **Step 5: Typecheck**
 
 Run: `pnpm typecheck`
-Expected: same pre-existing errors in `app/personalize/actions.ts` as before (now also including a missing-second-argument error at its `buildPersonalizedNightLightOpenAiPayload(...)` call site). No new errors elsewhere.
+Expected: same pre-existing errors as before in `app/personalize/actions.ts` and `app/personalization/night-lights/actions.ts` (now also including a missing-second-argument error at the `buildPersonalizedNightLightOpenAiPayload(...)` call site in `app/personalize/actions.ts`). No new errors elsewhere (four total).
 
 - [ ] **Step 6: Commit**
 
@@ -912,7 +912,7 @@ Run: `pnpm smoke:admin`
 Expected: `Admin smoke passed` (or equivalent success output, no thrown error)
 
 Run: `pnpm typecheck`
-Expected: same pre-existing errors in `app/personalize/actions.ts` as before (unaffected by this task). No errors in `app/personalization/night-lights/actions.ts`.
+Expected: this task resolves the `app/personalization/night-lights/actions.ts` error from Task 3 (its insert/update payload now sets `openai_file_id`). The three remaining pre-existing errors in `app/personalize/actions.ts` (from Tasks 3-5) are unaffected by this task and still present until Task 8. Confirm exactly three errors remain, all in `app/personalize/actions.ts`.
 
 - [ ] **Step 6: Commit**
 
@@ -1004,7 +1004,7 @@ Expected: passes (confirms `openaiFileId` exists with matching keys across en/am
 - [ ] **Step 5: Typecheck**
 
 Run: `pnpm typecheck`
-Expected: same pre-existing errors in `app/personalize/actions.ts` as before (unaffected by this task).
+Expected: the same three pre-existing errors in `app/personalize/actions.ts` as before (unaffected by this task, resolved in Task 8).
 
 - [ ] **Step 6: Commit**
 
