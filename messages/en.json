@@ -381,7 +381,9 @@
     "select_destination": "Select destination",
     "resolve_issues": "Resolve cart issues before creating an order.",
     "create_order": "Create order",
-    "country": "Country"
+    "country": "Country",
+    "billing_country": "Billing country",
+    "polar_unavailable": "International payments are temporarily unavailable. Choose Armenia as the billing country or contact support."
   },
   "order": {
     "title": "Order",

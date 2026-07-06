@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createCheckoutOrderAction } from '@/app/checkout/actions';
+import { BillingCountryField } from '@/components/checkout/billing-country-field';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,7 @@ import { normalizeCurrency } from '@/lib/currency';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
+import { isPolarEnabled } from '@/lib/payments/polar';
 import { calculateOrderTotals } from '@/lib/shipping';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
@@ -18,7 +20,12 @@ import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
+  const { checkout: checkoutStatus } = await searchParams;
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
 
@@ -56,6 +63,11 @@ export default async function CheckoutPage() {
     <>
       <MarketplaceHeader />
       <main className="container max-w-5xl space-y-8 py-10">
+        {checkoutStatus === 'polar_unavailable' ? (
+          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            {t('checkout.polar_unavailable')}
+          </div>
+        ) : null}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('checkout.review')}</h1>
@@ -174,9 +186,15 @@ export default async function CheckoutPage() {
                   {t('checkout.resolve_issues')}
                 </div>
               ) : null}
-              <Button type="submit" className="w-full" disabled={issues.length > 0 || !market.countryCode || !totals}>
-                {t('checkout.create_order')}
-              </Button>
+              <BillingCountryField
+                countries={countries}
+                defaultCountry={market.countryCode ?? 'AM'}
+                polarEnabled={isPolarEnabled()}
+                baseDisabled={issues.length > 0 || !market.countryCode || !totals}
+                billingLabel={t('checkout.billing_country')}
+                unavailableLabel={t('checkout.polar_unavailable')}
+                submitLabel={t('checkout.create_order')}
+              />
             </form>
           </aside>
         </div>
