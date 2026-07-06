@@ -103,7 +103,16 @@ export default async function AdminCurrenciesPage() {
                           {currency.name}{currency.is_default ? ' · default' : ''}
                         </p>
                       </td>
-                      <td className="px-4 py-3">{currency.payment_route}</td>
+                      <td className="px-4 py-3">
+                        <select
+                          name={`paymentRoute:${currency.code}`}
+                          defaultValue={currency.payment_route === 'ameria' ? 'ameria' : 'bank_manual'}
+                          className="h-9 rounded-md border border-input bg-background px-2"
+                        >
+                          <option value="ameria">Ameriabank</option>
+                          <option value="bank_manual">Bank / manual</option>
+                        </select>
+                      </td>
                       <td className="px-4 py-3">
                         {rate ? (
                           <>
