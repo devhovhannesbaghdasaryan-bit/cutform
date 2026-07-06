@@ -20,7 +20,7 @@ export interface SettleTransaction {
 }
 
 export interface SettleResult {
-  outcome: PaymentOutcome | 'not_found' | 'already_succeeded';
+  outcome: PaymentOutcome | 'not_found' | 'already_succeeded' | 'needs_attention';
   redirectPath: string;
 }
 
@@ -88,11 +88,13 @@ export async function fulfillCreditPurchase(service: SupabaseClient, transaction
 }
 
 async function claimTransactionSuccess(service: SupabaseClient, transactionId: string): Promise<boolean> {
+  // Claims from failed/cancelled too: this runs only after the bank confirmed
+  // an amount-verified success, so bank truth heals an earlier mis-verdict.
   const { data, error } = await service
     .from('transactions')
     .update({ status: 'succeeded' })
     .eq('id', transactionId)
-    .eq('status', 'pending')
+    .in('status', ['pending', 'failed', 'cancelled'])
     .select('id');
   if (error) throw new Error(error.message);
   return (data ?? []).length > 0;
@@ -130,7 +132,18 @@ export async function settleAmeriaPayment(
   if (outcome === 'succeeded') {
     const claimed = await claimTransactionSuccess(service, transaction.id);
     if (!claimed) {
-      return { outcome: 'already_succeeded', redirectPath: `${base}?checkout=success` };
+      const { data: current, error: statusError } = await service
+        .from('transactions')
+        .select('status')
+        .eq('id', transaction.id)
+        .maybeSingle<{ status: string }>();
+      if (statusError) throw new Error(statusError.message);
+      if (current?.status === 'succeeded') {
+        return { outcome: 'already_succeeded', redirectPath: `${base}?checkout=success` };
+      }
+      // e.g. status 'reversed': bank says paid but the row was administratively
+      // closed — do not fulfill and do not claim success.
+      return { outcome: 'needs_attention', redirectPath: `${base}?checkout=pending` };
     }
     try {
       if (transaction.type === 'credit_purchase') {
