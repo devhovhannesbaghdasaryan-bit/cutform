@@ -68,6 +68,8 @@ for (const removedPath of [
   '/api/generate',
   '/admin/banner-samples',
   '/admin/personalization-models',
+  '/personalization',
+  '/personalization/night-lights',
 ]) {
   const { response } = await fetchPage(removedPath);
   assert(response.status === 404, `${removedPath} should return 404, received ${response.status}`);

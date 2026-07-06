@@ -229,8 +229,12 @@ otp_length = 6
 otp_expiry = 3600
 
 # Use a production-ready SMTP server
+# Temporarily disabled: local Resend key is sandboxed (can only send to the
+# account owner's own address) and its failed sends were still burning the
+# local auth.rate_limit.email_sent quota, blocking registration entirely.
+# Re-enable once a verified Resend domain is set up for non-sandbox sending.
 [auth.email.smtp]
-enabled = true
+enabled = false
 host = "smtp.resend.com"
 port = 465
 user = "resend"

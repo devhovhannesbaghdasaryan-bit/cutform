@@ -4,7 +4,7 @@ import {
   removePersonalizationBoilerplateAction,
   savePersonalizationBoilerplateAction,
   savePersonalizationModelAction,
-} from '@/app/personalization/night-lights/actions';
+} from '@/app/admin/personalization/night-lights/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -68,7 +68,7 @@ export default async function NightLightPersonalizationPage() {
     <main className="container max-w-5xl space-y-8 py-10">
       <div>
         <Button asChild variant="ghost" className="mb-3 px-0">
-          <Link href="/personalization">{t('personalization.back')}</Link>
+          <Link href="/admin/personalization">{t('personalization.back')}</Link>
         </Button>
         <h1 className="text-3xl font-bold tracking-tight">
           {t('personalization.nightLightsTitle')}

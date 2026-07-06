@@ -7,7 +7,7 @@ const categories = [
   { slug: 'toys', icon: Gift },
   { slug: 'constructors', icon: Puzzle },
   { slug: 'decorations', icon: Blocks },
-  { slug: 'nightLights', icon: Lamp, href: '/personalization/night-lights' },
+  { slug: 'nightLights', icon: Lamp, href: '/admin/personalization/night-lights' },
   { slug: 'banners', icon: Megaphone },
 ];
 
