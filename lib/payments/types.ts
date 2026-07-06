@@ -1,4 +1,4 @@
-export const PAYMENT_ROUTES = ['ameria', 'bank_manual'] as const;
+export const PAYMENT_ROUTES = ['ameria', 'bank_manual', 'polar'] as const;
 export type PaymentRoute = (typeof PAYMENT_ROUTES)[number];
 
 export type PaymentOutcome = 'succeeded' | 'failed' | 'cancelled' | 'pending';
