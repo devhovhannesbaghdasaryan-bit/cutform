@@ -12,6 +12,7 @@ import {
   createPersonalizedPreviewOptions,
 } from "@/lib/generated-items";
 import { PERSONALIZED_NIGHT_LIGHT } from "@/lib/marketplace-constants";
+import { getOpenAiClient } from "@/lib/openai-client";
 import { generateOpenAiImage } from "@/lib/openai-image";
 import {
   buildPersonalizedNightLightOpenAiPayload,
@@ -20,10 +21,7 @@ import {
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from "@/lib/storage";
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from "@/lib/supabase/server";
 import { debitCredits, getCreditBalance, refundCredits } from "@/lib/credits";
-import {
-  loadBoilerplate,
-  type PersonalizationBoilerplate,
-} from "@/lib/personalization-boilerplates";
+import type { PersonalizationBoilerplate } from "@/lib/personalization-boilerplates";
 import { getTranslations } from "next-intl/server";
 
 // Sanctioned exception to the ActionState convention (lib/action-state.ts):
@@ -119,7 +117,7 @@ export async function generatePersonalizedNightLightAction(
   if (!requestedBoilerplateIds.length) return errorState(t("selectAtLeastOne"));
   const { data: selectedBoilerplates, error: boilerplateError } = await supabase
     .from("personalization_boilerplates")
-    .select("id, model_id, admin_name, name_en, name_hy, name_ru, image_path, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order")
+    .select("id, model_id, admin_name, name_en, name_hy, name_ru, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order")
     .eq("model_id", model.id)
     .eq("is_active", true)
     .in("id", requestedBoilerplateIds)
@@ -178,20 +176,23 @@ export async function generatePersonalizedNightLightAction(
     for (const file of files)
       originalImagePaths.push(await uploadUserImage(supabase, user.id, file));
 
-    const requestPayload = buildPersonalizedNightLightOpenAiPayload({
-      modelId: model.id,
-      modelSlug: model.slug,
-      modelTitle: model.title,
-      boilerplateImagePath: model.boilerplate_image_path,
-      userImagePaths: originalImagePaths,
-      customText,
-      customTextFormatting,
-      ledColor,
-      multiColor,
-      comfortableColors: PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map(
-        (color) => ({ ...color }),
-      ),
-    });
+    const requestPayload = buildPersonalizedNightLightOpenAiPayload(
+      {
+        modelId: model.id,
+        modelSlug: model.slug,
+        modelTitle: model.title,
+        boilerplateImagePath: model.boilerplate_image_path,
+        userImagePaths: originalImagePaths,
+        customText,
+        customTextFormatting,
+        ledColor,
+        multiColor,
+        comfortableColors: PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map(
+          (color) => ({ ...color }),
+        ),
+      },
+      selectedBoilerplates,
+    );
 
     const generated = await createGeneratedItem(supabase, {
       userId: user.id,
@@ -219,14 +220,15 @@ export async function generatePersonalizedNightLightAction(
     });
     generatedId = generated.id;
 
+    const openAiClient = getOpenAiClient();
     const options = [];
     for (let offset = 0; offset < selectedBoilerplates.length; offset += 1) {
       const index = offset + 1;
       const reference = selectedBoilerplates[offset];
-      const boilerplate = await loadBoilerplate(supabase, reference);
-      const image = await generateOpenAiImage({
+      const image = await generateOpenAiImage(openAiClient, {
         prompt: `${requestPayload.prompt}\n\nCreate the selected ${reference.admin_name} preview using manufacturing process ${reference.manufacturing_process}. ${reference.generation_instruction} The final preview must show this boilerplate product customized with the user-submitted subject; do not return the blank boilerplate.`,
-        images: [...files, boilerplate],
+        userImages: files,
+        referenceFileId: reference.openai_file_id,
         size: "1024x1024",
         quality: "low",
       });
