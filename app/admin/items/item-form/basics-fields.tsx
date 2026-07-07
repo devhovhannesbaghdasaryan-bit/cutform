@@ -110,8 +110,10 @@ export function DescriptionField({ item }: { item?: Pick<ItemFormValue, 'descrip
 
 export function FlagsFields({
   item,
+  onCustomizableChange,
 }: {
   item?: Pick<ItemFormValue, 'is_popular' | 'is_customizable'>;
+  onCustomizableChange?: (checked: boolean) => void;
 }) {
   return (
     <div className="flex flex-wrap gap-6">
@@ -124,6 +126,7 @@ export function FlagsFields({
           type="checkbox"
           name="isCustomizable"
           defaultChecked={item?.is_customizable ?? false}
+          onChange={(event) => onCustomizableChange?.(event.target.checked)}
         />
         Customizable
       </label>
