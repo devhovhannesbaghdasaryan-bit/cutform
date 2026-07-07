@@ -10,7 +10,7 @@ with expected(tablename) as (
     ('personalized_preview_options'),
     ('banner_samples'),
     ('banner_manufacturing_instructions'),
-    ('personalization_models')
+    ('catalog_item_boilerplates')
 )
 select expected.tablename as missing_table
 from expected
@@ -35,7 +35,7 @@ where pg_namespace.nspname = 'public'
     'personalized_preview_options',
     'banner_samples',
     'banner_manufacturing_instructions',
-    'personalization_models'
+    'catalog_item_boilerplates'
   )
   and not relrowsecurity;
 

@@ -442,25 +442,14 @@ async function runGuestAndCustomerFlow(customerUser) {
     );
     assert(text.includes('5 credits'), 'Advanced banner generation did not record credit cost');
 
-    await navigate(browser, '/en/catalog/night-lights/personalized');
-    text = await waitForText(browser, 'Personalized night lights', 'personalized listing title');
-    assert(text.includes('Personalized'), 'Personalized model/subcategory content was not visible');
-
-    const personalizeHref = await evaluate(
-      browser,
-      `
-      const link = [...document.querySelectorAll('a')].find((node) => node.href.includes('/personalize/'));
-      return link?.pathname ?? null;
-    `,
-    );
-    assert(personalizeHref, 'Personalized model link was not visible');
-
-    await navigate(browser, personalizeHref);
-    text = await bodyText(browser);
-    assert(
-      text.includes('Upload') || text.includes('Generate') || text.includes('Personalization'),
-      'Authenticated personalized model page did not show a generation form',
-    );
+    // The old `/catalog/night-lights/personalized` global listing page was removed
+    // when personalization went generic (per-catalog-item, discovered via each
+    // item's own "Personalize with AI" button — see app/items/[slug]/page.tsx).
+    // There is no equivalent global listing to assert against, and no seed
+    // fixture in this smoke suite reliably marks a catalog item as
+    // `is_customizable` in every environment this script runs against, so the
+    // personalize click-through coverage was removed rather than pointed at a
+    // deleted route or an environment-dependent item.
   } finally {
     await browser.close();
   }
