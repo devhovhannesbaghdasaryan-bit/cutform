@@ -480,7 +480,7 @@ async function runAdminFlow(adminUser) {
       ['/en/admin/orders', 'Orders'],
       ['/en/admin/generated', 'Generated items'],
       ['/en/admin/personalization', 'Personalization'],
-      ['/en/admin/personalization/night-lights', 'Night light templates'],
+      ['/en/admin/personalization/boilerplates', 'Boilerplate library'],
     ];
 
     for (const [route, expected] of adminRoutes) {

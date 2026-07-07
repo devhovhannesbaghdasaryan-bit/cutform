@@ -1333,6 +1333,8 @@ git commit -m "feat: replace night-light-specific personalization engine with a 
 - Create: `app/admin/personalization/boilerplates/actions.ts`
 - Modify: `app/admin/personalization/page.tsx`
 - Modify: `app/admin/create/page.tsx`
+- Modify: `scripts/smoke/admin.mjs`
+- Modify: `scripts/smoke/ui-workflows.mjs` (admin-routes list only — see Step 6)
 - Modify: `messages/en.json`, `messages/ru.json`, `messages/am.json`
 - Delete: `app/admin/personalization/night-lights/page.tsx`
 - Delete: `app/admin/personalization/night-lights/actions.ts`
@@ -1769,14 +1771,42 @@ Modify `app/admin/create/page.tsx` — in the `actions` array, replace the `nigh
   },
 ```
 
-- [ ] **Step 7: Manual verification**
+- [ ] **Step 7: Fix `scripts/smoke/admin.mjs` and the admin-route list in `scripts/smoke/ui-workflows.mjs`**
+
+`scripts/smoke/admin.mjs` is part of the `pnpm smoke` aggregate (`package.json`'s `smoke` script chains `smoke:admin`) and directly asserts the existence and contents of the files this task deletes — left unfixed, `pnpm smoke` crashes with `ENOENT` the moment this task's deletions land.
+
+Modify `scripts/smoke/admin.mjs`:
+- In `requiredRoutes`, replace `'app/admin/personalization/night-lights/page.tsx'` with `'app/admin/personalization/boilerplates/page.tsx'`.
+- In the `removedRoute` list, add `'app/admin/personalization/night-lights/page.tsx'` and `'app/admin/personalization/night-lights/actions.ts'`.
+- Replace the `personalizationActions`/`personalizationPage` block (currently reading `app/admin/personalization/night-lights/{actions.ts,page.tsx}` and checking for `savePersonalizationBoilerplateAction`/`removePersonalizationBoilerplateAction`/`ImageUploadField`/`mockImagePath`/`boilerplateImagePath`) with:
+
+```js
+const personalizationActions = readFileSync('app/admin/personalization/boilerplates/actions.ts', 'utf8');
+for (const action of [
+  'saveBoilerplateAction',
+  'removeBoilerplateAction',
+  'uploadReferenceImage',
+  'deleteReferenceFile',
+]) {
+  if (!personalizationActions.includes(action)) throw new Error(`Missing personalization admin action: ${action}`);
+}
+
+const personalizationPage = readFileSync('app/admin/personalization/boilerplates/page.tsx', 'utf8');
+for (const contract of ['BoilerplateForm', 'saveBoilerplateAction', 'resolvePublicStorageUrl', 'openai_file_id']) {
+  if (!personalizationPage.includes(contract)) throw new Error(`Missing personalization image contract: ${contract}`);
+}
+```
+
+Modify `scripts/smoke/ui-workflows.mjs` — in the `adminRoutes` array inside `runAdminFlow`, replace `['/en/admin/personalization/night-lights', 'Night light templates']` with `['/en/admin/personalization/boilerplates', 'Boilerplate library']`. (The other stale reference in this file — the customer-facing personalize-listing block — is handled separately in Task 6 Step 2, since it depends on Task 5's not-yet-built storefront page.)
+
+- [ ] **Step 8: Manual verification**
 
 Run: `pnpm dev`, sign in as an admin, visit `/admin/personalization` → click through to `/admin/personalization/boilerplates`, add a boilerplate with a real image (requires `OPENAI_API_KEY` configured), confirm it saves and shows an OpenAI file ID, then edit and delete it. Also visit `/admin/create` and confirm the "Boilerplate library" tile links correctly.
 
 Run: `pnpm typecheck`
 Expected: no errors, anywhere in the repo (this is the task that resolves the last stale schema reference from Task 1/2).
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add -A
@@ -3164,10 +3194,19 @@ for (const contract of [
 }
 ```
 
-- [ ] **Step 2: Check `scripts/smoke/ui-workflows.mjs` and `scripts/smoke/catalog-media.mjs` for stale references**
+- [ ] **Step 2: Fix remaining stale references across all smoke scripts**
 
-Run: `grep -n "personalized-night-light-form\|personalize/\[slug\]\|night-lights/personalized\|personalization_models\|admin_name" scripts/smoke/ui-workflows.mjs scripts/smoke/catalog-media.mjs`
-Expected: no matches. If any are found, update them to reference the equivalent new file/contract (e.g. `components/personalize-item-form.tsx`, `app/personalize/[itemSlug]/page.tsx`) the same way Step 1 did, following that script's existing contract-check pattern.
+Run: `grep -rln "night-lights\|personalization_models\|admin_name\|savePersonalizationBoilerplateAction\|removePersonalizationBoilerplateAction\|personalize/\[slug\]" scripts/smoke/`
+
+`scripts/smoke/admin.mjs` was already fixed in Task 3 (it directly asserted the deleted night-lights admin files' existence/contracts, which is part of the `pnpm smoke` aggregate — that regression couldn't wait for this task). The remaining known references, none of which are part of the `pnpm smoke` aggregate (`package.json`'s `smoke` script only chains `smoke:i18n`, `smoke:seo`, `smoke:redesign`, `smoke:generation`, `smoke:credits`, `smoke:currency`, `smoke:markets`, `smoke:catalog-media`, `smoke:admin`) but should still be fixed for hygiene:
+
+1. **`scripts/smoke/ui-workflows.mjs`** — a block (search for `night-lights/personalized`) navigates to the deleted `/catalog/night-lights/personalized` listing page, then finds a link containing `/personalize/` and asserts it shows a generation form. Since there's no equivalent global listing page in the new system (personalization is discovered per-item, via each item's own "Personalize with AI" button — Task 5), replace this block with: navigate to a known customizable item's detail page (`/en/items/<slug>` — use whichever item you configured as customizable during Task 4/5 manual verification, or skip with a comment if none exists in smoke seed data), assert the `t('product.personalize')` button text ("Personalize with AI") is present, click through, and assert the new personalize page shows a generation form (`Upload`, `Generate`, or similar, matching the existing assertion's style). If no seeded catalog item is reliably customizable in the smoke environment, it's acceptable to delete this block entirely rather than leave it asserting a deleted page — note the removal in your report.
+
+2. **`scripts/smoke/runtime-local.mjs`** — `routeChecks` (search for `night-lights/personalized`) asserts `/catalog/night-lights/personalized` returns real content titled "Personalized night lights". Move this path out of `routeChecks` and into the `removedPath`/404 list further down in the same file (alongside `/personalization`, `/personalization/night-lights`, etc.), since the route is now deleted and should 404.
+
+3. **`scripts/smoke/database-rls-smoke.sql`** — both the `expected(tablename)` CTE and the `relname in (...)` RLS-check list include `personalization_models`, a dropped table. Remove that entry from both lists, and add `'catalog_item_boilerplates'` to both instead (the new join table from Task 1, which also has RLS enabled).
+
+- [ ] **Step 3: Run the full automated test suite**
 
 - [ ] **Step 3: Run the full automated test suite**
 
