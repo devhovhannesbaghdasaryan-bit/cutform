@@ -56,7 +56,7 @@ alter table "public"."generated_items" add constraint "generated_items_product_t
 -- Boilerplates become a shared library: drop per-model ownership and the
 -- localized-name columns that only made sense scoped to one model's UI.
 -- No backfill — existing rows (night-lights seed data) are discarded.
-truncate table public.personalization_boilerplates;
+delete from public.personalization_boilerplates;
 
 alter table "public"."personalization_boilerplates"
   drop constraint "personalization_boilerplates_model_id_fkey",
