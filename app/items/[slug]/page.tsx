@@ -12,8 +12,10 @@ import { sortCatalogMedia } from '@/lib/catalog-media';
 import { getCatalogItem, getCatalogItemSeoMetadata } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getTranslations } from 'next-intl/server';
+import { listCatalogItemBoilerplates } from '@/lib/personalization-boilerplates';
 import { createProductStructuredData, resolveCatalogMetadata } from '@/lib/seo';
 import { resolvePublicStorageUrl } from '@/lib/storage';
+import { getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -51,6 +53,11 @@ export default async function CatalogItemDetailPage({
   const { slug } = await params;
   const item = await getCatalogItem(slug).catch(() => null);
   if (!item) notFound();
+  const supabase = await getServerSupabase();
+  const hasUsablePersonalization =
+    item.is_customizable &&
+    (Boolean(item.system_prompt) ||
+      (await listCatalogItemBoilerplates(supabase, item.id).catch(() => [])).length > 0);
   const locale = await getRequestLocale();
   const t = await getTranslations();
   const activeCurrency = await getActiveCurrency();
@@ -142,6 +149,15 @@ export default async function CatalogItemDetailPage({
                 </p>
               ) : null}
             </div>
+
+            {hasUsablePersonalization && (
+              <Button asChild size="lg" variant="secondary">
+                <Link href={`/personalize/${item.slug}`}>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  {t('product.personalize')}
+                </Link>
+              </Button>
+            )}
 
             <div className="flex flex-wrap gap-3">
               <form action={addCatalogItemToCartAction}>
