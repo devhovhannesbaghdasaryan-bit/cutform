@@ -1332,6 +1332,7 @@ git commit -m "feat: replace night-light-specific personalization engine with a 
 - Create: `app/admin/personalization/boilerplates/page.tsx`
 - Create: `app/admin/personalization/boilerplates/actions.ts`
 - Modify: `app/admin/personalization/page.tsx`
+- Modify: `app/admin/create/page.tsx`
 - Modify: `messages/en.json`, `messages/ru.json`, `messages/am.json`
 - Delete: `app/admin/personalization/night-lights/page.tsx`
 - Delete: `app/admin/personalization/night-lights/actions.ts`
@@ -1753,14 +1754,29 @@ export default async function PersonalizationPage() {
 }
 ```
 
-- [ ] **Step 6: Manual verification**
+- [ ] **Step 6: Fix the remaining dead link on the admin "Create" hub**
 
-Run: `pnpm dev`, sign in as an admin, visit `/admin/personalization` → click through to `/admin/personalization/boilerplates`, add a boilerplate with a real image (requires `OPENAI_API_KEY` configured), confirm it saves and shows an OpenAI file ID, then edit and delete it.
+`app/admin/create/page.tsx` has a tile linking to `/admin/personalization/night-lights` (deleted in Step 1), unlike the app/page.tsx and app/catalog/page.tsx dead links removed in Task 2 (Step 19) — this one has a valid replacement, the new boilerplate library.
+
+Modify `app/admin/create/page.tsx` — in the `actions` array, replace the `night-lights` entry:
+
+```ts
+  {
+    href: '/admin/personalization/boilerplates',
+    title: 'Boilerplate library',
+    description: 'Manage the shared boilerplate images used for AI personalization.',
+    icon: Sparkles,
+  },
+```
+
+- [ ] **Step 7: Manual verification**
+
+Run: `pnpm dev`, sign in as an admin, visit `/admin/personalization` → click through to `/admin/personalization/boilerplates`, add a boilerplate with a real image (requires `OPENAI_API_KEY` configured), confirm it saves and shows an OpenAI file ID, then edit and delete it. Also visit `/admin/create` and confirm the "Boilerplate library" tile links correctly.
 
 Run: `pnpm typecheck`
-Expected: no errors.
+Expected: no errors, anywhere in the repo (this is the task that resolves the last stale schema reference from Task 1/2).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add -A
