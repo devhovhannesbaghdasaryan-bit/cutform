@@ -3208,8 +3208,6 @@ Run: `grep -rln "night-lights\|personalization_models\|admin_name\|savePersonali
 
 - [ ] **Step 3: Run the full automated test suite**
 
-- [ ] **Step 3: Run the full automated test suite**
-
 Run: `pnpm typecheck`
 Expected: no errors.
 
