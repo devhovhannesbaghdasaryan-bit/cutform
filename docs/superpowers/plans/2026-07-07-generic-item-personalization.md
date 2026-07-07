@@ -58,6 +58,13 @@ alter table "public"."generated_items" add constraint "generated_items_product_t
 -- No backfill — existing rows (night-lights seed data) are discarded.
 delete from public.personalization_boilerplates;
 
+-- Must drop this policy before dropping model_id: its USING clause
+-- references personalization_boilerplates.model_id, which blocks the
+-- column drop below otherwise. The replacement policy (readable whenever
+-- active, no model gating) is created further down, once
+-- personalization_models is gone.
+drop policy "customers read active personalization boilerplates" on "public"."personalization_boilerplates";
+
 alter table "public"."personalization_boilerplates"
   drop constraint "personalization_boilerplates_model_id_fkey",
   drop constraint "personalization_boilerplates_model_id_admin_name_key";
@@ -87,8 +94,6 @@ drop table "public"."personalization_models" cascade;
 
 -- Boilerplates are no longer gated by a model's published status; the shared
 -- library is readable whenever active, same as any other catalog asset.
-drop policy "customers read active personalization boilerplates" on "public"."personalization_boilerplates";
-
 create policy "customers read active personalization boilerplates"
   on "public"."personalization_boilerplates"
   as permissive
