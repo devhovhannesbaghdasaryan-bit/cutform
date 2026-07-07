@@ -2534,8 +2534,11 @@ In `CatalogItemDetailPage`, after `const item = await getCatalogItem(slug).catch
   const hasUsablePersonalization =
     item.is_customizable &&
     (Boolean(item.system_prompt) ||
+      Boolean(item.skill_id) ||
       (await listCatalogItemBoilerplates(supabase, item.id).catch(() => [])).length > 0);
 ```
+
+(Includes `item.skill_id` in the OR, not just `system_prompt`/boilerplates — per decision #1, skill-only items still show the button; the personalize page itself is what renders the "coming soon" message instead of the form for them.)
 
 Replace the action buttons block (currently the "Add to cart" form + disabled "Buy" tooltip) — insert a "Personalize with AI" button before the existing `<div className="flex flex-wrap gap-3">`:
 
@@ -3015,7 +3018,7 @@ export default async function PersonalizeItemPage({
   if (!item || !item.is_customizable) notFound();
 
   const supabase = await getServerSupabase();
-  const boilerplateRows = await listCatalogItemBoilerplates(supabase, item.id);
+  const boilerplateRows = await listCatalogItemBoilerplates(supabase, item.id).catch(() => []);
   const hasUsablePersonalization = Boolean(item.system_prompt) || boilerplateRows.length > 0;
   if (!hasUsablePersonalization && !item.skill_id) notFound();
 

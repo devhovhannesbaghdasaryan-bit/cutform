@@ -28,7 +28,7 @@ export default async function PersonalizeItemPage({
   if (!item || !item.is_customizable) notFound();
 
   const supabase = await getServerSupabase();
-  const boilerplateRows = await listCatalogItemBoilerplates(supabase, item.id);
+  const boilerplateRows = await listCatalogItemBoilerplates(supabase, item.id).catch(() => []);
   const hasUsablePersonalization = Boolean(item.system_prompt) || boilerplateRows.length > 0;
   if (!hasUsablePersonalization && !item.skill_id) notFound();
 

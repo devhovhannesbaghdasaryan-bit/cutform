@@ -57,6 +57,7 @@ export default async function CatalogItemDetailPage({
   const hasUsablePersonalization =
     item.is_customizable &&
     (Boolean(item.system_prompt) ||
+      Boolean(item.skill_id) ||
       (await listCatalogItemBoilerplates(supabase, item.id).catch(() => [])).length > 0);
   const locale = await getRequestLocale();
   const t = await getTranslations();
