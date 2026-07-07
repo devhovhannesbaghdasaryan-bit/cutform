@@ -1226,7 +1226,37 @@ Expected: PASS, no failures.
 Run: `pnpm typecheck`
 Expected: no errors. (`app/admin/personalization/night-lights/*` still references the pre-Task-1 `personalization_models`/`model_id` shape and will fail to typecheck until Task 3 deletes it — if `pnpm typecheck` surfaces errors only in that directory, they are expected here and resolved by Task 3, not a sign this task is broken. Errors anywhere else must be fixed before committing.)
 
-- [ ] **Step 19: Commit**
+- [ ] **Step 19: Remove dead links to the deleted `/personalize/[slug]` route**
+
+`app/page.tsx` and `app/catalog/page.tsx` both hardcode a CTA button linking to `/personalize/portrait-personalized-night-light` — the old model-slug route deleted in Step 1. The new system has no single global personalize target to replace it with (personalization is now discovered per-item via each item's own "Personalize with AI" button, added in Task 5) — remove the buttons rather than pointing them at a broken or arbitrary link.
+
+Modify `app/page.tsx` — remove the second `<Button>` (the "Generate custom" one) from this block, leaving only the "Browse catalog" button:
+
+```tsx
+              <div className="flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+                <Button asChild size="lg">
+                  <Link href="/catalog">
+                    {t('landing.browse_catalog')}
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+```
+
+Modify `app/catalog/page.tsx` — remove the `<Button>` wrapping the dead link entirely, leaving just the title/subtitle block:
+
+```tsx
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">{t('catalog.title')}</h1>
+            <p className="max-w-2xl text-muted-foreground">{t('catalog.subtitle')}</p>
+          </div>
+        </div>
+```
+
+The now-unused `landing.generate_custom` and `catalog.generate_custom` i18n keys can stay in `messages/*.json` — removing them isn't required and this codebase doesn't lint for unused translation keys.
+
+- [ ] **Step 20: Commit**
 
 ```bash
 git add -A
