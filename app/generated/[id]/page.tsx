@@ -92,9 +92,8 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
   const warnings = extractValidationWarnings(item.manufacturing_metadata);
   const bannerDetails =
     item.product_type === 'banner' ? extractBannerDetails(item.generation_options) : null;
-  const canOrder =
-    item.review_status !== 'rejected' &&
-    (item.product_type !== 'personalized_night_light' || previewOptions.length > 0);
+  const hasPreviewOptions = previewOptions.length > 0;
+  const canOrder = item.review_status !== 'rejected';
   const salePriceCents = item.catalog_item?.price_cents ?? 0;
   const saleCurrency = item.catalog_item?.currency ?? 'AMD';
   const localizedProductType = tDynamic(
@@ -167,7 +166,7 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
                 previewAlt: t.raw('generated.previewAlt'),
               }}
             />
-            {item.product_type !== 'personalized_night_light' && item.svg_content ? (
+            {!hasPreviewOptions && item.svg_content ? (
               <section className="space-y-3">
                 <h2 className="text-xl font-semibold tracking-tight">{t('generated.rawSvg')}</h2>
                 <pre className="max-h-96 overflow-auto rounded-lg border bg-muted p-4 text-xs">
@@ -220,7 +219,7 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
               </div>
             ) : null}
 
-            {item.product_type !== 'personalized_night_light' ? (
+            {!hasPreviewOptions ? (
               <form action={addGeneratedItemToCartAction} className="rounded-lg border p-5">
                 <input type="hidden" name="generatedItemId" value={item.id} />
                 {salePriceCents > 0 && (

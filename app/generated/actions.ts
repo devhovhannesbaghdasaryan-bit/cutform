@@ -41,7 +41,7 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
   const { data: item, error } = await supabase
     .from('generated_items')
     .select(
-      'id, title, product_type, review_status, selected_preview_path, manufacturing_file_path, generation_options, credit_cost',
+      'id, title, product_type, review_status, selected_preview_path, manufacturing_file_path, generation_options, credit_cost, catalog_item:catalog_items(price_cents, currency)',
     )
     .eq('id', parsed.data.generatedItemId)
     .eq('user_id', user.id)
@@ -54,13 +54,17 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
       manufacturing_file_path: string | null;
       generation_options: Record<string, unknown> | null;
       credit_cost: number;
+      catalog_item: { price_cents: number; currency: string } | null;
     }>();
 
   if (error || !item) throw new Error(error?.message ?? 'Generated item was not found.');
   if (item.review_status === 'rejected')
     throw new Error('Rejected generated items cannot be ordered.');
-  const sourcePriceCents = getGeneratedSalePriceCents(item.generation_options);
-  const sourceCurrency = getGeneratedSaleCurrency(item.generation_options);
+  const sourcePriceCents =
+    item.catalog_item?.price_cents ?? getGeneratedSalePriceCents(item.generation_options);
+  const sourceCurrency = item.catalog_item
+    ? (normalizeCurrency(item.catalog_item.currency) ?? 'AMD')
+    : getGeneratedSaleCurrency(item.generation_options);
   const activeCurrency = await getActiveCurrency();
   const converted = await convertMoney(
     sourcePriceCents,

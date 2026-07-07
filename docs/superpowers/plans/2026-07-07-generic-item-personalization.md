@@ -1256,7 +1256,68 @@ Modify `app/catalog/page.tsx` — remove the `<Button>` wrapping the dead link e
 
 The now-unused `landing.generate_custom` and `catalog.generate_custom` i18n keys can stay in `messages/*.json` — removing them isn't required and this codebase doesn't lint for unused translation keys.
 
-- [ ] **Step 20: Commit**
+- [ ] **Step 20: Fix cart pricing for generic personalized items in `app/generated/actions.ts`**
+
+`app/generated/actions.ts`'s `addGeneratedItemToCartAction` reads the price to charge exclusively from `generation_options.salePriceCents`/`.saleCurrency` (via `getGeneratedSalePriceCents`/`getGeneratedSaleCurrency`, lines 18-25). The old night-light action populated those jsonb keys from `resolveModelPriceCents(model.form_schema)`; Step 14's rewritten `generatePersonalizedItemAction` correctly stopped doing that (per this plan's design: price now comes from `catalog_items.price_cents` directly, not a jsonb duplicate) — but nothing was ever added here to read it from there instead, so every item added to cart through the new engine prices at 0. Banner generation (`app/banners/actions.ts`) never set those jsonb keys either and is unaffected by this fix (it has no `catalog_item_id`, so it keeps using the jsonb-fallback path exactly as before).
+
+Modify `app/generated/actions.ts` — extend the `generated_items` select and its inline type to include the joined catalog item's price/currency:
+
+```ts
+  const { data: item, error } = await supabase
+    .from('generated_items')
+    .select(
+      'id, title, product_type, review_status, selected_preview_path, manufacturing_file_path, generation_options, credit_cost, catalog_item:catalog_items(price_cents, currency)',
+    )
+    .eq('id', parsed.data.generatedItemId)
+    .eq('user_id', user.id)
+    .maybeSingle<{
+      id: string;
+      title: string | null;
+      product_type: string;
+      review_status: string;
+      selected_preview_path: string | null;
+      manufacturing_file_path: string | null;
+      generation_options: Record<string, unknown> | null;
+      credit_cost: number;
+      catalog_item: { price_cents: number; currency: string } | null;
+    }>();
+```
+
+Modify the price/currency resolution (currently `const sourcePriceCents = getGeneratedSalePriceCents(item.generation_options);` and `const sourceCurrency = getGeneratedSaleCurrency(item.generation_options);`) to prefer the joined catalog item when present:
+
+```ts
+  const sourcePriceCents =
+    item.catalog_item?.price_cents ?? getGeneratedSalePriceCents(item.generation_options);
+  const sourceCurrency = item.catalog_item
+    ? (normalizeCurrency(item.catalog_item.currency) ?? 'AMD')
+    : getGeneratedSaleCurrency(item.generation_options);
+```
+
+- [ ] **Step 21: Generalize the stale `product_type === 'personalized_night_light'` gates in `app/generated/[id]/page.tsx`**
+
+Three spots in this file still branch on the literal string `'personalized_night_light'` to decide "is this a personalized-preview-options item," but under the new system any catalog item can be personalized this way, not just night lights — `previewOptions.length > 0` is the actual signal (an item only has rows in `personalized_preview_options` when it went through the boilerplate-loop generation flow; banners and any future non-preview-option flow never do). Left unfixed, a generically-personalized non-night-light item would render the raw always-enabled "Add to cart" button *alongside* `GeneratedPreviewSelector`'s own selection-gated one, letting a customer skip picking a preview entirely.
+
+Modify the `canOrder` calculation (currently `const canOrder = item.review_status !== 'rejected' && (item.product_type !== 'personalized_night_light' || previewOptions.length > 0);`):
+
+```ts
+  const hasPreviewOptions = previewOptions.length > 0;
+  const canOrder = item.review_status !== 'rejected';
+```
+
+Modify the raw-SVG section condition (currently `item.product_type !== 'personalized_night_light' && item.svg_content ? (`):
+
+```tsx
+            {!hasPreviewOptions && item.svg_content ? (
+```
+
+Modify the plain add-to-cart form condition (currently `item.product_type !== 'personalized_night_light' ? (`, wrapping the `<form action={addGeneratedItemToCartAction} ...>` block):
+
+```tsx
+            {!hasPreviewOptions ? (
+              <form action={addGeneratedItemToCartAction} className="rounded-lg border p-5">
+```
+
+- [ ] **Step 22: Commit**
 
 ```bash
 git add -A
