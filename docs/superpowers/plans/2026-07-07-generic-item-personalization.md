@@ -24,6 +24,7 @@
 
 **Files:**
 - Create: `supabase/migrations/20260707140000_generic_item_personalization.sql`
+- Modify: `supabase/seed.sql`
 - Modify: `lib/supabase/database.types.ts` (regenerated, not hand-edited)
 
 **Interfaces:**
@@ -130,12 +131,64 @@ grant delete, insert, references, select, trigger, truncate, update
   on table "public"."catalog_item_boilerplates" to "service_role";
 ```
 
-- [ ] **Step 2: Apply the migration locally**
+- [ ] **Step 2: Update `supabase/seed.sql` to match the new boilerplate shape**
+
+`supabase/seed.sql` runs automatically after migrations on every `supabase db reset` (per `supabase/config.toml`'s `[db.seed] sql_paths`). It currently inserts a `personalization_models` row and three model-scoped `personalization_boilerplates` rows (with `model_id`, `admin_name`, `name_en`/`name_hy`/`name_ru`) — all incompatible with this migration's schema, so `supabase db reset` fails at the seed step otherwise. Rewrite it to seed the same three real, already-uploaded OpenAI file ids directly into the new shared-library shape (no `model_id`, `name` instead of `admin_name`, upsert on the new `personalization_boilerplates_name_key` unique constraint):
+
+Replace the entire contents of `supabase/seed.sql` with:
+
+```sql
+-- Local dev seed: personalization boilerplates wired to already-uploaded
+-- OpenAI file ids, so a fresh `supabase db reset` produces attachable
+-- boilerplates without a live OPENAI_API_KEY. Runs automatically per
+-- supabase/config.toml's [db.seed] sql_paths = ["./seed.sql"].
+-- Safe to re-run: upserts by name.
+--
+-- Boilerplates are a shared library (see catalog_item_boilerplates) —
+-- attach any of these to a customizable catalog item from the item form
+-- (/admin/items) once it has boilerplates selected there.
+
+insert into public.personalization_boilerplates (
+  name, image_path, openai_file_id, manufacturing_process, generation_instruction,
+  generate_hidden_svg, is_active, sort_order
+) values
+  (
+    'Rectangular UV print',
+    '/product-references/night-lights/rectangular-uv-print.jpg', 'file-SvvFVqDiSzBCNZVy8M96Dg',
+    'rectangular UV-printed acrylic',
+    'Preserve the rectangular panel and base and create an elegant full-color keepsake.',
+    false, true, 10
+  ),
+  (
+    'Round UV print',
+    '/product-references/night-lights/round-uv-print.jpg', 'file-HzYrHR6cyMgU1BukvkmMkw',
+    'round UV-printed acrylic',
+    'Preserve the circular panel and round base and balance the artwork inside the circle.',
+    false, true, 20
+  ),
+  (
+    'Contour laser engraved',
+    '/product-references/night-lights/contour-laser-engraved.jpg', 'file-H18ukJkpJx9SC5zLzFdXhL',
+    'contour-cut CO2-laser-engraved acrylic',
+    'Derive a simple outer silhouette and render the subject as monochrome engraved vector line art.',
+    true, true, 30
+  )
+on conflict (name) do update set
+  image_path = excluded.image_path,
+  openai_file_id = excluded.openai_file_id,
+  manufacturing_process = excluded.manufacturing_process,
+  generation_instruction = excluded.generation_instruction,
+  generate_hidden_svg = excluded.generate_hidden_svg,
+  is_active = excluded.is_active,
+  sort_order = excluded.sort_order;
+```
+
+- [ ] **Step 3: Apply the migration locally**
 
 Run: `supabase start` (if not already running), then `supabase db reset`
-Expected: output ends with `Finished supabase db reset` and no SQL errors. This re-applies `0001_init.sql` (whose `personalization_models` seed insert is harmless — the row is immediately dropped by this migration's `drop table ... cascade`) followed by the new migration.
+Expected: output ends with `Finished supabase db reset` and no SQL errors. This re-applies `0001_init.sql` (whose `personalization_models` seed insert is harmless — the row is immediately dropped by this migration's `drop table ... cascade`), then the new migration, then the updated `supabase/seed.sql`.
 
-- [ ] **Step 3: Verify the schema changes**
+- [ ] **Step 4: Verify the schema changes**
 
 Run: `docker exec supabase_db_uniqraft psql -U postgres -d postgres -c "\d catalog_items"`
 Expected: output includes `system_prompt`, `skill_id`, and `tags` rows.
@@ -149,15 +202,15 @@ Expected: `Did not find any relation named "personalization_models".`
 Run: `docker exec supabase_db_uniqraft psql -U postgres -d postgres -c "\d personalization_boilerplates"`
 Expected: output includes `name` (not `admin_name`/`name_en`/`name_hy`/`name_ru`/`model_id`).
 
-- [ ] **Step 4: Regenerate TypeScript types**
+- [ ] **Step 5: Regenerate TypeScript types**
 
 Run: `pnpm db:types`
 Expected: `lib/supabase/database.types.ts` is rewritten. Confirm with a search: it should contain `system_prompt` and `catalog_item_boilerplates` and should NOT contain `personalization_models`.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add supabase/migrations/20260707140000_generic_item_personalization.sql lib/supabase/database.types.ts
+git add supabase/migrations/20260707140000_generic_item_personalization.sql supabase/seed.sql lib/supabase/database.types.ts
 git commit -m "feat(db): add generic per-item personalization schema"
 ```
 
