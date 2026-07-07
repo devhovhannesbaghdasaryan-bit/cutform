@@ -48,6 +48,7 @@ export interface GeneratedItemInput {
   productType: ProductType;
   categoryId?: string | null;
   subcategoryId?: string | null;
+  catalogItemId?: string | null;
   title?: string | null;
   sourceImagePath?: string | null;
   prompt?: string | null;
@@ -83,6 +84,7 @@ export async function createGeneratedItem(supabase: SupabaseClient, input: Gener
       product_type: input.productType,
       category_id: input.categoryId ?? null,
       subcategory_id: input.subcategoryId ?? null,
+      catalog_item_id: input.catalogItemId ?? null,
       title: input.title ?? null,
       source_image_path: input.sourceImagePath ?? null,
       prompt: input.prompt ?? null,
