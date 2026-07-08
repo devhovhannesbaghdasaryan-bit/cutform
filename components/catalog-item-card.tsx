@@ -64,9 +64,14 @@ export async function CatalogItemCard({
             />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col items-stretch gap-3 p-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 space-y-1">
-            <p className="break-words font-medium leading-snug">{item.title}</p>
+        <CardFooter className="flex flex-col items-stretch gap-3 p-4">
+          <div className="min-w-0 space-y-1.5">
+            <p
+              className="line-clamp-2 min-h-[2.5rem] font-medium leading-snug"
+              title={item.title}
+            >
+              {item.title}
+            </p>
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span>{categoryName}</span>
               {subcategoryName && <span>{subcategoryName}</span>}
@@ -78,11 +83,11 @@ export async function CatalogItemCard({
               )}
             </div>
           </div>
-          <div className="relative z-20 flex shrink-0 items-center justify-between gap-3 sm:block sm:space-y-2 sm:text-right">
-            <p className="font-semibold">
+          <div className="relative z-20 flex items-center justify-between gap-3 border-t pt-3">
+            <p className="truncate font-semibold">
               {formatLocalizedCurrency(locale, convertedPrice.amountCents, convertedPrice.currency)}
             </p>
-            <form action={addCatalogItemToCartAction}>
+            <form action={addCatalogItemToCartAction} className="shrink-0">
               <input type="hidden" name="itemId" value={item.id} />
               <Button
                 type="submit"
