@@ -4,11 +4,21 @@ const requiredFiles = [
   'lib/sanitize.ts',
   'components/personalized-night-light-form.tsx',
   'lib/personalization-boilerplates.ts',
-  'supabase/migrations/20260701104320_personalized_night_light_boilerplates.sql',
+  'supabase/migrations/0001_init.sql',
 ];
 
 for (const file of requiredFiles) {
   if (!existsSync(file)) throw new Error(`Missing generation file: ${file}`);
+}
+
+const baselineMigration = readFileSync('supabase/migrations/0001_init.sql', 'utf8');
+for (const contract of [
+  'create table "public"."personalization_boilerplates"',
+  '"openai_file_id" text not null',
+]) {
+  if (!baselineMigration.includes(contract)) {
+    throw new Error(`Baseline migration is missing personalization boilerplates contract: ${contract}`);
+  }
 }
 
 for (const retiredFile of [
@@ -23,11 +33,11 @@ for (const retiredFile of [
 
 const personalizedAction = readFileSync('app/personalize/actions.ts', 'utf8');
 for (const contract of [
-  'formData.getAll("boilerplateIds")',
+  "formData.getAll('boilerplateIds')",
   'const creditCost = selectedBoilerplates.length',
   'reference.generate_hidden_svg',
   'manufacturingFilePath: null',
-  'manufacturingSvgStatus: "pending_admin_generation"',
+  "manufacturingSvgStatus: 'pending_admin_generation'",
   'referenceFileId: reference.openai_file_id',
 ]) {
   if (!personalizedAction.includes(contract)) throw new Error(`Missing personalized generation contract: ${contract}`);

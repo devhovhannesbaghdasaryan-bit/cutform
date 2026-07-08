@@ -256,7 +256,8 @@ async function submitCurrentForm(browser) {
   const submitted = await evaluate(
     browser,
     `
-    const button = document.querySelector('button[type="submit"]');
+    const form = document.querySelector('form:has(input[type="password"])') ?? document.querySelector('form');
+    const button = form?.querySelector('button[type="submit"]');
     if (!button) return false;
     button.click();
     return true;
@@ -364,7 +365,7 @@ async function runGuestAndCustomerFlow(customerUser) {
         ? current
         : null;
     }, 'merged customer cart after login');
-    assert(text.includes('Checkout review'), 'Logged-in cart did not show checkout review');
+    assert(text.includes('Review checkout'), 'Logged-in cart did not show checkout review');
 
     await navigate(browser, '/en/dashboard');
     text = await waitForText(browser, 'Your products', 'customer dashboard');
@@ -413,10 +414,10 @@ async function runGuestAndCustomerFlow(customerUser) {
 
     await fillInput(browser, 'bannerText', `${runId} launch sale`);
     await clickByText(browser, 'Review customized banner');
-    text = await waitForText(browser, 'Add selected result to cart', 'customized banner detail');
-    assert(text.includes('banner'), 'Customized banner detail did not render banner configuration');
+    text = await waitForText(browser, 'Add to cart', 'customized banner detail');
+    assert(text.includes('Banner'), 'Customized banner detail did not render banner configuration');
 
-    await clickByText(browser, 'Add selected result to cart');
+    await clickByText(browser, 'Add to cart');
     text = await waitForText(browser, 'Shopping cart', 'cart after customized banner');
     assert(
       text.includes('Generated item'),
@@ -437,10 +438,13 @@ async function runGuestAndCustomerFlow(customerUser) {
     await clickByText(browser, 'Generate with credits');
     text = await waitForText(
       browser,
-      'Add selected result to cart',
+      'Add to cart',
       'advanced generated banner detail',
     );
-    assert(text.includes('5 credits'), 'Advanced banner generation did not record credit cost');
+    assert(
+      text.includes('Credits used: 5'),
+      'Advanced banner generation did not record credit cost',
+    );
 
     await navigate(browser, '/en/catalog/night-lights/personalized');
     text = await waitForText(browser, 'Personalized night lights', 'personalized listing title');
