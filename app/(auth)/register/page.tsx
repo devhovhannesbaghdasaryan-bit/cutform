@@ -2,7 +2,12 @@ import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { RegisterForm } from './register-form';
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
+  const { next } = await searchParams;
   const t = await getTranslations();
   return (
     <main className="container flex min-h-screen items-center justify-center py-16">
@@ -12,7 +17,11 @@ export default async function RegisterPage() {
           <p className="text-sm text-muted-foreground">{t('auth.verificationNotice')}</p>
         </div>
         <RegisterForm
+          next={next ?? '/dashboard'}
           copy={{
+            socialOptions: t('auth.socialOptions'),
+            google: t('auth.continueGoogle'),
+            useEmail: t('auth.useEmail'),
             email: t('auth.email'),
             password: t('auth.password'),
             minPassword: t('auth.minPassword'),
