@@ -1,9 +1,4 @@
 {
-  ".claude/settings.json": {
-    "mtime": 1783355289.5868309,
-    "ast_hash": "edad1cece13e853bdb3413dffd3b0341",
-    "semantic_hash": ""
-  },
   ".vscode/settings.json": {
     "mtime": 1783326810.091941,
     "ast_hash": "dd022c63a4beadf12a60b87dae438457",
@@ -15,8 +10,8 @@
     "semantic_hash": ""
   },
   "app/(auth)/login/login-form.tsx": {
-    "mtime": 1783507035.111611,
-    "ast_hash": "ebb5b9d1849567aeda2ab3b097e4516a",
+    "mtime": 1783517580.1200347,
+    "ast_hash": "ecf080d5b85ed83d4c2aa3cf5c14cb08",
     "semantic_hash": ""
   },
   "app/(auth)/login/page.tsx": {
@@ -25,13 +20,13 @@
     "semantic_hash": ""
   },
   "app/(auth)/register/page.tsx": {
-    "mtime": 1783349596.4141884,
-    "ast_hash": "144297aa61895f2c0a6ed0c8dca36083",
+    "mtime": 1783517614.6817007,
+    "ast_hash": "8386128a6ad7ab570899e5d36314a1f0",
     "semantic_hash": ""
   },
   "app/(auth)/register/register-form.tsx": {
-    "mtime": 1783349596.4151876,
-    "ast_hash": "b9e2492fb96e0ad94a94977912b87985",
+    "mtime": 1783517597.8852067,
+    "ast_hash": "2643f95902184f55fdc059b40fb3a52f",
     "semantic_hash": ""
   },
   "app/admin/admin-nav.tsx": {
@@ -410,12 +405,12 @@
     "semantic_hash": ""
   },
   "components/catalog-item-card.tsx": {
-    "mtime": 1783508061.6035366,
+    "mtime": 1783510300.654279,
     "ast_hash": "ec7287e32a168499add855c8a54ef70c",
     "semantic_hash": ""
   },
   "components/catalog-media-slider.tsx": {
-    "mtime": 1783508030.460035,
+    "mtime": 1783510300.6553285,
     "ast_hash": "1726791e58fe6804d2c957d8f6a42e2e",
     "semantic_hash": ""
   },
@@ -500,7 +495,7 @@
     "semantic_hash": ""
   },
   "components/ui/button.tsx": {
-    "mtime": 1783507043.9216995,
+    "mtime": 1783510300.6553285,
     "ast_hash": "2dce676d6319531ce51108aacf03d729",
     "semantic_hash": ""
   },
@@ -795,7 +790,7 @@
     "semantic_hash": ""
   },
   "next.config.mjs": {
-    "mtime": 1783506027.5790877,
+    "mtime": 1783510300.6712801,
     "ast_hash": "5bb40b59feb964d9d0662fbc7b188e2b",
     "semantic_hash": ""
   },
@@ -815,8 +810,8 @@
     "semantic_hash": ""
   },
   "scripts/generate-products-seed.mjs": {
-    "mtime": 1783502159.1085556,
-    "ast_hash": "60d2d8b867f5318db4d2c37006246a5c",
+    "mtime": 1783518831.7552483,
+    "ast_hash": "f04b5a2e3c9fa7fb8188cbd1bac50bf6",
     "semantic_hash": ""
   },
   "scripts/smoke/admin.mjs": {
@@ -910,12 +905,12 @@
     "semantic_hash": ""
   },
   "supabase/seed-products.sql": {
-    "mtime": 1783502159.1430988,
-    "ast_hash": "d2da051390ab575d7df1eadf6f7baeb6",
+    "mtime": 1783518831.7562501,
+    "ast_hash": "5da454ddc9b443a8face9b9af8cc8a73",
     "semantic_hash": ""
   },
   "supabase/seed.sql": {
-    "mtime": 1783502159.1724174,
+    "mtime": 1783510300.67428,
     "ast_hash": "8552e80eb8fff2067b7be165f95670c9",
     "semantic_hash": ""
   },
@@ -1605,8 +1600,13 @@
     "semantic_hash": ""
   },
   "components/catalog-card-hover.tsx": {
-    "mtime": 1783508085.0639634,
+    "mtime": 1783510300.654279,
     "ast_hash": "a15d634711681054a9b258dd059c7a5c",
+    "semantic_hash": ""
+  },
+  "app/(auth)/social-login-buttons.tsx": {
+    "mtime": 1783517557.7101214,
+    "ast_hash": "4361531baa9867c552481b468b180225",
     "semantic_hash": ""
   }
 }

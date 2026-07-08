@@ -121,4 +121,16 @@ join public.personalization_boilerplates b on b.name = boilerplate.name
 on conflict (catalog_item_id, boilerplate_id) do update set
   sort_order = excluded.sort_order;
 
+delete from public.catalog_item_market_rules link
+using public.catalog_items i, seed_products p
+where link.catalog_item_id = i.id and i.slug = p.data->>'slug';
+
+insert into public.catalog_item_market_rules (
+  catalog_item_id, region_id, visibility_override, shipping_rate_cents, shipping_currency
+)
+select i.id, r.id, true, 300000, 'AMD'
+from seed_products p
+join public.catalog_items i on i.slug = p.data->>'slug'
+cross join public.market_regions r;
+
 commit;
