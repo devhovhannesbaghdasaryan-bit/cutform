@@ -180,16 +180,6 @@
     hsl(var(--muted));
 }
 
-@utility hero-product-card {
-  position: relative;
-  min-width: 0;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--card) / 0.86);
-  box-shadow: 0 10px 30px hsl(228 35% 5% / 0.12);
-}
-
 @utility cyber-grid-surface {
   background-color: hsl(var(--background));
   background-image:
