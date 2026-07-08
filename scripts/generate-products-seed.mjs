@@ -3,6 +3,18 @@ import { join, relative, resolve, sep } from 'node:path';
 
 const root = resolve('products');
 const output = resolve('supabase/seed-products.sql');
+const PERSONALIZATION_TAGS = ['personal_color', 'personal_text', 'personal_photo'];
+const NIGHT_LIGHT_BOILERPLATE_NAMES = [
+  'Rectangular UV print',
+  'Round UV print',
+  'Contour laser engraved',
+];
+const DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT = [
+  'Create a personalized acrylic LED night light product preview.',
+  'Preserve the selected boilerplate shape, base, and manufacturing process.',
+  'Use customer text, photo, and color selections only when provided.',
+  'Keep the result suitable for UV printing or CO2 laser engraving on clear acrylic.',
+].join(' ');
 
 function findItems(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -13,9 +25,10 @@ function findItems(directory) {
 }
 
 function scalar(frontmatter, key) {
-  const match = frontmatter.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'));
+  const match = frontmatter.match(new RegExp(`^${key}:[ \\t]*(.*)$`, 'm'));
   if (!match) return null;
   const value = match[1].trim();
+  if (value === '') return null;
   if (value === 'true') return true;
   if (value === 'false') return false;
   if (value === 'null') return null;
@@ -36,6 +49,20 @@ function inlineJson(frontmatter, key, fallback) {
 function indentedList(frontmatter, key) {
   const block = frontmatter.match(new RegExp(`^${key}:\\s*\\r?\\n((?:  .*(?:\\r?\\n|$))*)`, 'm'))?.[1] ?? '';
   return [...block.matchAll(/^\s+-\s+"([^"]*)"/gm)].map((match) => match[1]);
+}
+
+function inlineOrIndentedList(frontmatter, key, fallback = []) {
+  const inline = scalar(frontmatter, key);
+  if (inline !== null) {
+    try {
+      const parsed = JSON.parse(String(inline));
+      if (Array.isArray(parsed)) return parsed.map(String);
+    } catch {
+      throw new Error(`Invalid inline JSON list for ${key}: ${inline}`);
+    }
+  }
+  const list = indentedList(frontmatter, key);
+  return list.length ? list : fallback;
 }
 
 function nestedScalar(frontmatter, blockKey, key) {
@@ -82,10 +109,12 @@ function parseItem(path) {
   const [, frontmatter, body] = match;
   const itemMedia = media(frontmatter);
   const title = scalar(frontmatter, 'title');
+  const category = scalar(frontmatter, 'category');
   const description = nestedScalar(frontmatter, 'seo', 'description') ?? body.match(/^#[^\n]*\n+([^#\n][^\n]*)/m)?.[1] ?? null;
   const materials = indentedList(frontmatter, 'materials');
   const fields = indentedList(frontmatter, 'personalization_fields');
   const tools = indentedList(frontmatter, 'manufacturing_tools');
+  const isNightLight = category === 'night-lights';
   const keywords = (() => {
     const value = nestedScalar(frontmatter, 'seo', 'keywords');
     if (!value) return [];
@@ -98,7 +127,7 @@ function parseItem(path) {
     titleAm: cleanTranslation(scalar(frontmatter, 'title_am')),
     slug: scalar(frontmatter, 'slug'),
     status: scalar(frontmatter, 'status') ?? 'draft',
-    category: scalar(frontmatter, 'category'),
+    category,
     subcategory: scalar(frontmatter, 'subcategory'),
     itemType: scalar(frontmatter, 'item_type') ?? 'standard',
     currency: scalar(frontmatter, 'currency') ?? 'USD',
@@ -106,6 +135,10 @@ function parseItem(path) {
     isPopular: scalar(frontmatter, 'is_popular') ?? false,
     isCustomizable: scalar(frontmatter, 'is_customizable') ?? false,
     thumbnailPath: toBucketPath(scalar(frontmatter, 'thumbnail_path')),
+    systemPrompt: scalar(frontmatter, 'system_prompt') ?? (isNightLight ? DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT : null),
+    skillId: scalar(frontmatter, 'skill_id'),
+    tags: inlineOrIndentedList(frontmatter, 'tags', isNightLight ? PERSONALIZATION_TAGS : []),
+    boilerplateNames: inlineOrIndentedList(frontmatter, 'boilerplate_names', isNightLight ? NIGHT_LIGHT_BOILERPLATE_NAMES : []),
     media: itemMedia,
     galleryPaths: itemMedia.map((entry) => entry.path),
     sizes: inlineJson(frontmatter, 'sizes', []),
@@ -138,13 +171,27 @@ for (const product of products) {
   if (!['standard', 'toy', 'decoration', 'night_light', 'personalized_night_light', 'banner'].includes(product.itemType)) {
     throw new Error(`${product.sourceFile} has invalid item_type: ${product.itemType}`);
   }
+  const invalidTags = product.tags.filter((tag) => !PERSONALIZATION_TAGS.includes(tag));
+  if (invalidTags.length) {
+    throw new Error(`${product.sourceFile} has invalid personalization tags: ${invalidTags.join(', ')}`);
+  }
 }
 const duplicateSlugs = products.map((product) => product.slug).filter((slug, index, all) => all.indexOf(slug) !== index);
 if (duplicateSlugs.length) throw new Error(`Duplicate product slugs: ${[...new Set(duplicateSlugs)].join(', ')}`);
+const nightLightProducts = products.filter((product) => product.category === 'night-lights');
+if (nightLightProducts.length !== 3) {
+  throw new Error(`Night lights category must have exactly 3 products; found ${nightLightProducts.length}`);
+}
+for (const product of nightLightProducts) {
+  const missingTags = PERSONALIZATION_TAGS.filter((tag) => !product.tags.includes(tag));
+  const missingBoilerplates = NIGHT_LIGHT_BOILERPLATE_NAMES.filter((name) => !product.boilerplateNames.includes(name));
+  if (missingTags.length) throw new Error(`${product.sourceFile} is missing tags: ${missingTags.join(', ')}`);
+  if (missingBoilerplates.length) throw new Error(`${product.sourceFile} is missing boilerplates: ${missingBoilerplates.join(', ')}`);
+}
 const json = JSON.stringify(products).replaceAll("'", "''");
 const sql = `-- GENERATED FILE. Run: pnpm seed:products:generate
 -- Source: products/**/item.md (${products.length} products)
--- Idempotently upserts catalog data and replaces media for these product slugs.
+-- Idempotently upserts catalog data and replaces media/boilerplate links for these product slugs.
 
 begin;
 
@@ -172,7 +219,8 @@ on conflict (category_id, slug) do nothing;
 insert into public.catalog_items (
   category_id, subcategory_id, title, slug, description, price_cents, currency,
   status, is_popular, is_customizable, product_source, thumbnail_path,
-  gallery_paths, manufacturing_notes, item_type, sizes, characteristics
+  gallery_paths, manufacturing_notes, item_type, sizes, characteristics,
+  system_prompt, skill_id, tags
 )
 select c.id, s.id, p.data->>'title', p.data->>'slug', p.data->>'description',
   (p.data->>'priceCents')::integer, p.data->>'currency', p.data->>'status',
@@ -180,7 +228,9 @@ select c.id, s.id, p.data->>'title', p.data->>'slug', p.data->>'description',
   'catalog', p.data->>'thumbnailPath',
   coalesce(array(select jsonb_array_elements_text(p.data->'galleryPaths')), '{}'),
   p.data->>'manufacturingNotes', p.data->>'itemType',
-  coalesce(p.data->'sizes', '[]'::jsonb), p.data->>'characteristics'
+  coalesce(p.data->'sizes', '[]'::jsonb), p.data->>'characteristics',
+  nullif(p.data->>'systemPrompt', ''), nullif(p.data->>'skillId', ''),
+  coalesce(array(select jsonb_array_elements_text(p.data->'tags')), '{}')
 from seed_products p
 join public.categories c on c.slug = p.data->>'category'
 left join public.subcategories s on s.category_id = c.id and s.slug = p.data->>'subcategory'
@@ -192,7 +242,8 @@ on conflict (slug) do update set
   is_customizable = excluded.is_customizable, thumbnail_path = excluded.thumbnail_path,
   gallery_paths = excluded.gallery_paths, manufacturing_notes = excluded.manufacturing_notes,
   item_type = excluded.item_type, sizes = excluded.sizes,
-  characteristics = excluded.characteristics, updated_at = now();
+  characteristics = excluded.characteristics, system_prompt = excluded.system_prompt,
+  skill_id = excluded.skill_id, tags = excluded.tags, updated_at = now();
 
 insert into public.catalog_item_translations (catalog_item_id, locale, title, description)
 select i.id, translation.locale, translation.title, translation.description
@@ -246,6 +297,20 @@ select i.id, coalesce(asset.value->>'type', 'image'), asset.value->>'path',
 from seed_products p
 join public.catalog_items i on i.slug = p.data->>'slug'
 cross join lateral jsonb_array_elements(p.data->'media') with ordinality asset(value, ordinality);
+
+delete from public.catalog_item_boilerplates link
+using public.catalog_items i, seed_products p
+where link.catalog_item_id = i.id and i.slug = p.data->>'slug';
+
+insert into public.catalog_item_boilerplates (catalog_item_id, boilerplate_id, sort_order)
+select i.id, b.id, boilerplate.ordinality::integer - 1
+from seed_products p
+join public.catalog_items i on i.slug = p.data->>'slug'
+cross join lateral jsonb_array_elements_text(coalesce(p.data->'boilerplateNames', '[]'::jsonb))
+  with ordinality boilerplate(name, ordinality)
+join public.personalization_boilerplates b on b.name = boilerplate.name
+on conflict (catalog_item_id, boilerplate_id) do update set
+  sort_order = excluded.sort_order;
 
 commit;
 `;

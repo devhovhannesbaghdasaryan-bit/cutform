@@ -6,10 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginAction, socialLoginAction } from '@/app/(auth)/actions';
 import { errorOf, idleState } from '@/lib/action-state';
-const providers = [
-  { id: 'facebook', copyKey: 'facebook', mark: 'f' },
-  { id: 'google', copyKey: 'google', mark: 'G' },
-] as const;
+// Facebook temporarily disabled - keep the copy/action wiring intact for re-enabling later.
+const providers = [{ id: 'google', copyKey: 'google', mark: 'G' }] as const;
 
 type LoginCopy = {
   socialOptions: string;

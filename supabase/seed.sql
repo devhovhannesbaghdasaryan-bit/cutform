@@ -4,9 +4,8 @@
 -- supabase/config.toml's [db.seed] sql_paths = ["./seed.sql"].
 -- Safe to re-run: upserts by name.
 --
--- Boilerplates are a shared library (see catalog_item_boilerplates) —
--- attach any of these to a customizable catalog item from the item form
--- (/admin/items) once it has boilerplates selected there.
+-- Boilerplates are a shared library (see catalog_item_boilerplates).
+-- The generated product seed attaches all three to every seeded night-light item.
 
 insert into public.personalization_boilerplates (
   name, image_path, openai_file_id, manufacturing_process, generation_instruction,
