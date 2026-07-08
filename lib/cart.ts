@@ -394,16 +394,17 @@ export async function validateCartBeforeCheckout(
         });
       }
 
-      if (
-        generatedItem?.product_type === 'personalized_night_light' &&
-        !getStringConfigurationValue(item.configuration, 'personalizedPreviewOptionId')
-      ) {
-        issues.push({
-          cartItemId: item.id,
-          code: 'missing_production_asset',
-          message: 'This personalized item is missing its generated option.',
-        });
-      } else if (generatedItem?.product_type === 'personalized_night_light') {
+      // A product_type literal can't identify "requires a selected preview
+      // option" across arbitrary personalized product types (see the fix in
+      // app/generated/actions.ts for the same class of bug on the add-to-cart
+      // path) — check whether real personalized_preview_options rows exist
+      // for this generated item instead of gating on 'personalized_night_light'.
+      const { count: previewOptionCount } = await supabase
+        .from('personalized_preview_options')
+        .select('id', { count: 'exact', head: true })
+        .eq('generated_item_id', item.generated_item_id);
+
+      if ((previewOptionCount ?? 0) > 0) {
         const optionId = getStringConfigurationValue(
           item.configuration,
           'personalizedPreviewOptionId',
@@ -416,11 +417,13 @@ export async function validateCartBeforeCheckout(
               .eq('generated_item_id', item.generated_item_id)
               .maybeSingle()
           : { data: null, error: null };
-        if (optionError || !option) {
+        if (!optionId || optionError || !option) {
           issues.push({
             cartItemId: item.id,
             code: 'missing_production_asset',
-            message: 'This personalized option is no longer available.',
+            message: optionId
+              ? 'This personalized option is no longer available.'
+              : 'This personalized item is missing its generated option.',
           });
         }
       }
