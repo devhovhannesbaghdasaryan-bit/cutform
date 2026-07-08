@@ -47,12 +47,14 @@ export async function CategoryNavigation({
               <Link
                 key={category.id}
                 href={`/catalog?category=${category.slug}`}
-                className="group rounded-lg border bg-card p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyber-cyan/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="group min-w-0 rounded-lg border bg-card p-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-cyber-cyan/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-md bg-secondary text-secondary-foreground transition group-hover:bg-primary group-hover:text-primary-foreground">
                   <Icon className="h-7 w-7" />
                 </div>
-                <h3 className="mt-4 text-lg font-semibold">{categoryName}</h3>
+                <h3 className="mt-4 break-words text-base font-semibold leading-snug [overflow-wrap:anywhere] xl:text-lg">
+                  {categoryName}
+                </h3>
                 {categoryDescription ? (
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                     {categoryDescription}

@@ -101,6 +101,7 @@
     border-color: hsl(var(--border));
   }
   body {
+    font-family: "Segoe UI", "Noto Sans Armenian", Arial, sans-serif;
     background-color: hsl(var(--background));
     background-image:
       radial-gradient(circle at 8% -8%, hsl(var(--cyber-cyan) / 0.07), transparent 28rem),
