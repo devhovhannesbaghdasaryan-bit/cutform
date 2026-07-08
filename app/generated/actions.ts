@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { addItemToCart } from '@/lib/cart';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
+import { planGeneratedItemCartAdd } from '@/lib/generated-items';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 async function requireUser(next = '/dashboard') {
@@ -73,9 +74,15 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
     getServiceSupabase(),
   );
 
-  if (item.product_type === 'personalized_night_light') {
-    const optionIds = [...new Set(parsed.data.optionIds ?? [])];
-    if (!optionIds.length) throw new Error('Select at least one generated option.');
+  const optionIds = [...new Set(parsed.data.optionIds ?? [])];
+  let fetchedOptions: {
+    id: string;
+    preview_image_path: string;
+    manufacturing_file_path: string | null;
+    metadata: Record<string, unknown>;
+  }[] = [];
+
+  if (optionIds.length > 0) {
     const { data: options, error: optionsError } = await supabase
       .from('personalized_preview_options')
       .select('id, preview_image_path, manufacturing_file_path, metadata')
@@ -89,57 +96,35 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
           metadata: Record<string, unknown>;
         }[]
       >();
-    if (optionsError || !options || options.length !== optionIds.length)
-      throw new Error('One or more generated options are unavailable.');
-    for (const option of options) {
-      await addItemToCart(
-        supabase,
-        { userId: user.id },
-        {
-          generatedItemId: item.id,
-          title:
-            typeof option.metadata.boilerplateName === 'string'
-              ? option.metadata.boilerplateName
-              : (item.title ?? 'Personalized night light'),
-          quantity: 1,
-          unitPriceCents: converted.amountCents,
-          currency: converted.currency,
-          configuration: {
-            productType: item.product_type,
-            personalizedPreviewOptionId: option.id,
-            selectedPreviewPath: option.preview_image_path,
-            // NOTE: 'hiddenSvgPath' is a stored jsonb key inside cart_items.configuration
-            // (snapshotted into order_items.item_snapshot). Existing rows carry it, so the
-            // key is intentionally NOT renamed; it holds the manufacturing file path.
-            hiddenSvgPath: option.manufacturing_file_path,
-            boilerplateSnapshot: option.metadata,
-            creditCost: 1,
-            sourcePriceCents,
-            sourceCurrency,
-            exchangeRateContext: converted.exchangeRateContext,
-          },
-        },
-      );
-    }
-  } else {
-    await addItemToCart(
-      supabase,
-      { userId: user.id },
-      {
-        generatedItemId: item.id,
-        title: item.title ?? `${item.product_type} ${item.id.slice(0, 8)}`,
-        quantity: 1,
-        unitPriceCents: converted.amountCents,
-        currency: converted.currency,
-        configuration: {
-          productType: item.product_type,
-          creditCost: item.credit_cost,
-          sourcePriceCents,
-          sourceCurrency,
-          exchangeRateContext: converted.exchangeRateContext,
-        },
-      },
-    );
+    if (optionsError) throw new Error('One or more generated options are unavailable.');
+    fetchedOptions = options ?? [];
+  }
+
+  const cartAddCalls = planGeneratedItemCartAdd({
+    item: {
+      id: item.id,
+      title: item.title,
+      productType: item.product_type,
+      creditCost: item.credit_cost,
+    },
+    optionIds,
+    fetchedOptions: fetchedOptions.map((option) => ({
+      id: option.id,
+      previewImagePath: option.preview_image_path,
+      manufacturingFilePath: option.manufacturing_file_path,
+      metadata: option.metadata,
+    })),
+    pricing: {
+      unitPriceCents: converted.amountCents,
+      currency: converted.currency,
+      sourcePriceCents,
+      sourceCurrency,
+      exchangeRateContext: converted.exchangeRateContext,
+    },
+  });
+
+  for (const call of cartAddCalls) {
+    await addItemToCart(supabase, { userId: user.id }, call);
   }
 
   revalidatePath('/cart');

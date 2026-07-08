@@ -275,6 +275,109 @@ function fileName(path: string) {
   return path.split('/').at(-1) ?? 'asset';
 }
 
+/** Minimal generated-item fields needed to decide what to add to the cart. */
+export interface GeneratedItemForCartAdd {
+  id: string;
+  title: string | null;
+  productType: string;
+  creditCost: number;
+}
+
+/** A `personalized_preview_options` row already fetched and matched by id. */
+export interface FetchedPreviewOptionForCartAdd {
+  id: string;
+  previewImagePath: string;
+  manufacturingFilePath: string | null;
+  metadata: Record<string, unknown>;
+}
+
+export interface GeneratedItemCartAddPricing {
+  unitPriceCents: number;
+  currency: string;
+  sourcePriceCents: number;
+  sourceCurrency: string;
+  exchangeRateContext: unknown;
+}
+
+/** The plain arguments `addItemToCart` should be called with. */
+export interface GeneratedItemCartAddCall {
+  generatedItemId: string;
+  title: string;
+  quantity: number;
+  unitPriceCents: number;
+  currency: string;
+  configuration: Record<string, unknown>;
+}
+
+/**
+ * Pure decision logic for what `addGeneratedItemToCartAction` should add to
+ * the cart. The caller-visible signal for "which cart-add shape to use" is
+ * `optionIds` being non-empty — not `productType`. `GeneratedPreviewSelector`
+ * is the only form that submits `optionIds`, and it only renders (and only
+ * submits) when `personalized_preview_options` rows exist for the item, so a
+ * non-empty `optionIds` here always means real, fetchable preview options.
+ *
+ * - Non-empty `optionIds`: one call per fetched option, each carrying that
+ *   option's `personalizedPreviewOptionId`/`selectedPreviewPath` so the
+ *   customer's actual selection survives into the cart line.
+ * - Empty `optionIds`: a single generic call for the item as a whole.
+ */
+export function planGeneratedItemCartAdd(input: {
+  item: GeneratedItemForCartAdd;
+  optionIds: string[];
+  fetchedOptions: FetchedPreviewOptionForCartAdd[];
+  pricing: GeneratedItemCartAddPricing;
+}): GeneratedItemCartAddCall[] {
+  const { item, optionIds, fetchedOptions, pricing } = input;
+
+  if (optionIds.length > 0) {
+    if (fetchedOptions.length !== optionIds.length) {
+      throw new Error('One or more generated options are unavailable.');
+    }
+    return fetchedOptions.map((option) => ({
+      generatedItemId: item.id,
+      title:
+        typeof option.metadata.boilerplateName === 'string'
+          ? option.metadata.boilerplateName
+          : (item.title ?? 'Personalized night light'),
+      quantity: 1,
+      unitPriceCents: pricing.unitPriceCents,
+      currency: pricing.currency,
+      configuration: {
+        productType: item.productType,
+        personalizedPreviewOptionId: option.id,
+        selectedPreviewPath: option.previewImagePath,
+        // NOTE: 'hiddenSvgPath' is a stored jsonb key inside cart_items.configuration
+        // (snapshotted into order_items.item_snapshot). Existing rows carry it, so the
+        // key is intentionally NOT renamed; it holds the manufacturing file path.
+        hiddenSvgPath: option.manufacturingFilePath,
+        boilerplateSnapshot: option.metadata,
+        creditCost: 1,
+        sourcePriceCents: pricing.sourcePriceCents,
+        sourceCurrency: pricing.sourceCurrency,
+        exchangeRateContext: pricing.exchangeRateContext,
+      },
+    }));
+  }
+
+  return [
+    {
+      generatedItemId: item.id,
+      title: item.title ?? `${item.productType} ${item.id.slice(0, 8)}`,
+      quantity: 1,
+      unitPriceCents: pricing.unitPriceCents,
+      currency: pricing.currency,
+      configuration: {
+        productType: item.productType,
+        creditCost: item.creditCost,
+        sourcePriceCents: pricing.sourcePriceCents,
+        sourceCurrency: pricing.sourceCurrency,
+        exchangeRateContext: pricing.exchangeRateContext,
+      },
+    },
+  ];
+}
+
 export async function updateGeneratedReviewStatus(
   supabase: SupabaseClient,
   generatedItemId: string,
