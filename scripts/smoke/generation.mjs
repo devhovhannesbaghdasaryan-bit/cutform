@@ -2,8 +2,9 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const requiredFiles = [
   'lib/sanitize.ts',
-  'components/personalized-night-light-form.tsx',
+  'components/personalize-item-form.tsx',
   'lib/personalization-boilerplates.ts',
+  'lib/personalization-ai.ts',
   'supabase/migrations/0001_init.sql',
 ];
 
@@ -31,14 +32,29 @@ for (const retiredFile of [
   if (existsSync(retiredFile)) throw new Error(`Retired generator file still exists: ${retiredFile}`);
 }
 
+const personalizationMigration = readFileSync(
+  'supabase/migrations/20260707140000_generic_item_personalization.sql',
+  'utf8',
+);
+for (const contract of [
+  'create table "public"."catalog_item_boilerplates"',
+  'add column "system_prompt" text',
+  'add column "skill_id" text',
+  'add column "tags" text[]',
+]) {
+  if (!personalizationMigration.includes(contract)) {
+    throw new Error(`Personalization migration is missing contract: ${contract}`);
+  }
+}
+
 const personalizedAction = readFileSync('app/personalize/actions.ts', 'utf8');
 for (const contract of [
   "formData.getAll('boilerplateIds')",
-  'const creditCost = selectedBoilerplates.length',
-  'reference.generate_hidden_svg',
+  'const creditCost = Math.max(selectedBoilerplates.length, 1)',
+  'reference?.generate_hidden_svg',
   'manufacturingFilePath: null',
   "manufacturingSvgStatus: 'pending_admin_generation'",
-  'referenceFileId: reference.openai_file_id',
+  'reference?.openai_file_id',
 ]) {
   if (!personalizedAction.includes(contract)) throw new Error(`Missing personalized generation contract: ${contract}`);
 }

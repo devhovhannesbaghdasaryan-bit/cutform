@@ -6,21 +6,28 @@ export const dynamic = 'force-dynamic';
 
 export default async function NewAdminItemPage() {
   const { supabase } = await requireAdmin();
-  const [{ data: categories, error }, { data: subcategories }, geography] = await Promise.all([
-    supabase
-      .from('categories')
-      .select('id, name')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .returns<{ id: string; name: string }[]>(),
-    supabase
-      .from('subcategories')
-      .select('id, name, category_id')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .returns<{ id: string; name: string; category_id: string }[]>(),
-    listMarketGeography(supabase),
-  ]);
+  const [{ data: categories, error }, { data: subcategories }, geography, { data: boilerplateOptions }] =
+    await Promise.all([
+      supabase
+        .from('categories')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .returns<{ id: string; name: string }[]>(),
+      supabase
+        .from('subcategories')
+        .select('id, name, category_id')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .returns<{ id: string; name: string; category_id: string }[]>(),
+      listMarketGeography(supabase),
+      supabase
+        .from('personalization_boilerplates')
+        .select('id, name')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .returns<{ id: string; name: string }[]>(),
+    ]);
 
   return (
     <main className="container max-w-4xl space-y-6 py-10">
@@ -39,6 +46,7 @@ export default async function NewAdminItemPage() {
             ...country,
             label: getCountryDisplayName(country.code),
           }))}
+          boilerplateOptions={boilerplateOptions ?? []}
         />
       )}
     </main>

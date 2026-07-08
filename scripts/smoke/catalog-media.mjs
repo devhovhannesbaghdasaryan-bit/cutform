@@ -37,6 +37,9 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+// The standalone catalog-item-media migration was squashed into the single
+// baseline migration (see supabase/migrations/0001_init.sql) by the
+// "refactor(db): squash migrations into a single baseline" commit.
 const migrationSql = readFileSync('supabase/migrations/0001_init.sql', 'utf8');
 
 for (const mime of [

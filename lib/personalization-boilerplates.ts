@@ -1,12 +1,8 @@
-import type { AppLocale } from '@/lib/i18n';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export interface PersonalizationBoilerplate {
   id: string;
-  model_id: string;
-  admin_name: string;
-  name_en: string | null;
-  name_hy: string | null;
-  name_ru: string | null;
+  name: string;
   image_path: string;
   openai_file_id: string;
   manufacturing_process: string;
@@ -16,15 +12,29 @@ export interface PersonalizationBoilerplate {
   sort_order: number;
 }
 
-export function getBoilerplateName(
-  boilerplate: Pick<PersonalizationBoilerplate, 'admin_name' | 'name_en' | 'name_hy' | 'name_ru'>,
-  locale: AppLocale,
-) {
-  const localized =
-    locale === 'am'
-      ? boilerplate.name_hy
-      : locale === 'ru'
-        ? boilerplate.name_ru
-        : boilerplate.name_en;
-  return localized?.trim() || boilerplate.name_en?.trim() || boilerplate.admin_name;
+interface CatalogItemBoilerplateRow {
+  sort_order: number;
+  boilerplate: PersonalizationBoilerplate | null;
+}
+
+/** Active boilerplates attached to a catalog item, in admin-configured order. */
+export async function listCatalogItemBoilerplates(
+  supabase: SupabaseClient,
+  catalogItemId: string,
+): Promise<PersonalizationBoilerplate[]> {
+  const { data, error } = await supabase
+    .from('catalog_item_boilerplates')
+    .select(
+      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order)',
+    )
+    .eq('catalog_item_id', catalogItemId)
+    .order('sort_order', { ascending: true })
+    .returns<CatalogItemBoilerplateRow[]>();
+
+  if (error) throw new Error(error.message);
+  return (data ?? [])
+    .map((row) => row.boilerplate)
+    .filter((boilerplate): boilerplate is PersonalizationBoilerplate =>
+      Boolean(boilerplate?.is_active),
+    );
 }

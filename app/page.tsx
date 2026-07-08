@@ -71,11 +71,6 @@ export default async function LandingPage() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/personalize/portrait-personalized-night-light">
-                    {t('landing.generate_custom')}
-                  </Link>
-                </Button>
               </div>
               <div className="grid gap-3 text-left sm:grid-cols-2 lg:max-w-xl">
                 <div className="flex items-start gap-3 rounded-lg border bg-card/75 p-3 shadow-sm">

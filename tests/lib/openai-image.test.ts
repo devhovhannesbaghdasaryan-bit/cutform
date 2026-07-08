@@ -63,4 +63,29 @@ describe('generateOpenAiImage', () => {
       file_id: 'file-boilerplate-1',
     });
   });
+
+  it('omits the reference file_id content part when none is given', async () => {
+    const base64 = Buffer.from('generated-bytes').toString('base64');
+    const create = vi.fn(async () => ({
+      output: [{ type: 'image_generation_call', result: base64 }],
+    }));
+    const client = { responses: { create } } as unknown as Parameters<
+      typeof generateOpenAiImage
+    >[0];
+    const userImage = new File([new Uint8Array([9, 9])], 'user.jpg', { type: 'image/jpeg' });
+
+    await generateOpenAiImage(client, {
+      prompt: 'Generate a preview',
+      userImages: [userImage],
+      referenceFileId: null,
+      size: '1024x1024',
+      quality: 'low',
+    });
+
+    // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
+    const requestBody = (create.mock.calls[0] as any[])[0];
+    const [message] = requestBody.input;
+    expect(message.content).toHaveLength(2);
+    expect(message.content.some((part: { type: string }) => part.type === 'input_image' && 'file_id' in part)).toBe(false);
+  });
 });

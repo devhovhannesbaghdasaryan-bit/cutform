@@ -351,6 +351,39 @@ export type Database = {
           },
         ]
       }
+      catalog_item_boilerplates: {
+        Row: {
+          boilerplate_id: string
+          catalog_item_id: string
+          sort_order: number
+        }
+        Insert: {
+          boilerplate_id: string
+          catalog_item_id: string
+          sort_order?: number
+        }
+        Update: {
+          boilerplate_id?: string
+          catalog_item_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "catalog_item_boilerplates_boilerplate_id_fkey"
+            columns: ["boilerplate_id"]
+            isOneToOne: false
+            referencedRelation: "personalization_boilerplates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "catalog_item_boilerplates_catalog_item_id_fkey"
+            columns: ["catalog_item_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       catalog_item_market_rules: {
         Row: {
           catalog_item_id: string
@@ -583,9 +616,12 @@ export type Database = {
           price_cents: number
           product_source: string
           sizes: Json
+          skill_id: string | null
           slug: string
           status: string
           subcategory_id: string | null
+          system_prompt: string | null
+          tags: string[]
           thumbnail_path: string | null
           title: string
           updated_at: string
@@ -606,9 +642,12 @@ export type Database = {
           price_cents: number
           product_source?: string
           sizes?: Json
+          skill_id?: string | null
           slug: string
           status?: string
           subcategory_id?: string | null
+          system_prompt?: string | null
+          tags?: string[]
           thumbnail_path?: string | null
           title: string
           updated_at?: string
@@ -629,9 +668,12 @@ export type Database = {
           price_cents?: number
           product_source?: string
           sizes?: Json
+          skill_id?: string | null
           slug?: string
           status?: string
           subcategory_id?: string | null
+          system_prompt?: string | null
+          tags?: string[]
           thumbnail_path?: string | null
           title?: string
           updated_at?: string
@@ -906,6 +948,7 @@ export type Database = {
       }
       generated_items: {
         Row: {
+          catalog_item_id: string | null
           category_id: string | null
           color: string | null
           created_at: string
@@ -931,6 +974,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          catalog_item_id?: string | null
           category_id?: string | null
           color?: string | null
           created_at?: string
@@ -956,6 +1000,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          catalog_item_id?: string | null
           category_id?: string | null
           color?: string | null
           created_at?: string
@@ -981,6 +1026,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "generated_items_catalog_item_id_fkey"
+            columns: ["catalog_item_id"]
+            isOneToOne: false
+            referencedRelation: "catalog_items"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "generated_items_category_id_fkey"
             columns: ["category_id"]
@@ -1277,7 +1329,6 @@ export type Database = {
       }
       personalization_boilerplates: {
         Row: {
-          admin_name: string
           created_at: string
           generate_hidden_svg: boolean
           generation_instruction: string
@@ -1285,16 +1336,12 @@ export type Database = {
           image_path: string
           is_active: boolean
           manufacturing_process: string
-          model_id: string
-          name_en: string | null
-          name_hy: string | null
-          name_ru: string | null
+          name: string
           openai_file_id: string
           sort_order: number
           updated_at: string
         }
         Insert: {
-          admin_name: string
           created_at?: string
           generate_hidden_svg?: boolean
           generation_instruction?: string
@@ -1302,16 +1349,12 @@ export type Database = {
           image_path: string
           is_active?: boolean
           manufacturing_process?: string
-          model_id: string
-          name_en?: string | null
-          name_hy?: string | null
-          name_ru?: string | null
+          name: string
           openai_file_id: string
           sort_order?: number
           updated_at?: string
         }
         Update: {
-          admin_name?: string
           created_at?: string
           generate_hidden_svg?: boolean
           generation_instruction?: string
@@ -1319,83 +1362,12 @@ export type Database = {
           image_path?: string
           is_active?: boolean
           manufacturing_process?: string
-          model_id?: string
-          name_en?: string | null
-          name_hy?: string | null
-          name_ru?: string | null
+          name?: string
           openai_file_id?: string
           sort_order?: number
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "personalization_boilerplates_model_id_fkey"
-            columns: ["model_id"]
-            isOneToOne: false
-            referencedRelation: "personalization_models"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      personalization_models: {
-        Row: {
-          boilerplate_image_path: string | null
-          category_id: string
-          created_at: string
-          form_schema: Json
-          id: string
-          mock_image_path: string | null
-          slug: string
-          sort_order: number
-          status: string
-          subcategory_id: string | null
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          boilerplate_image_path?: string | null
-          category_id: string
-          created_at?: string
-          form_schema?: Json
-          id?: string
-          mock_image_path?: string | null
-          slug: string
-          sort_order?: number
-          status?: string
-          subcategory_id?: string | null
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          boilerplate_image_path?: string | null
-          category_id?: string
-          created_at?: string
-          form_schema?: Json
-          id?: string
-          mock_image_path?: string | null
-          slug?: string
-          sort_order?: number
-          status?: string
-          subcategory_id?: string | null
-          title?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "personalization_models_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "personalization_models_subcategory_id_fkey"
-            columns: ["subcategory_id"]
-            isOneToOne: false
-            referencedRelation: "subcategories"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       personalized_preview_options: {
         Row: {

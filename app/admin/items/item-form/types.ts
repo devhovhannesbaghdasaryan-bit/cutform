@@ -35,8 +35,13 @@ export type ItemFormValue = Partial<
     | 'manufacturing_notes'
     | 'sizes'
     | 'characteristics'
+    | 'system_prompt'
+    | 'skill_id'
+    | 'tags'
   >
 >;
+
+export type BoilerplateOption = Pick<Tables<'personalization_boilerplates'>, 'id' | 'name'>;
 
 export type CatalogMediaFormValue = Omit<CatalogItemMedia, 'poster_path'>;
 

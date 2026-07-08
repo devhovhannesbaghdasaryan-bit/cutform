@@ -30,11 +30,13 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
     { data: media },
     geography,
     { data: marketRules },
+    { data: boilerplateOptions },
+    { data: itemBoilerplates },
   ] = await Promise.all([
     supabase
       .from('catalog_items')
       .select(
-        'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics',
+        'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics, system_prompt, skill_id, tags',
       )
       .eq('id', id)
       .maybeSingle(),
@@ -67,6 +69,17 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
       .from('catalog_item_market_rules')
       .select('id, region_id, country_code, visibility_override, shipping_rate_cents')
       .eq('catalog_item_id', id),
+    supabase
+      .from('personalization_boilerplates')
+      .select('id, name')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .returns<{ id: string; name: string }[]>(),
+    supabase
+      .from('catalog_item_boilerplates')
+      .select('boilerplate_id')
+      .eq('catalog_item_id', id)
+      .returns<{ boilerplate_id: string }[]>(),
   ]);
 
   if (error || !item) notFound();
@@ -98,6 +111,8 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
           label: getCountryDisplayName(country.code),
         }))}
         marketRules={marketRules ?? []}
+        boilerplateOptions={boilerplateOptions ?? []}
+        selectedBoilerplateIds={(itemBoilerplates ?? []).map((row) => row.boilerplate_id)}
       />
       <SeoMetadataManager catalogItemId={item.id} />
     </main>

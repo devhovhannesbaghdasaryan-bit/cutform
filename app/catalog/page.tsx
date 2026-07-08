@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { CatalogItemCard } from '@/components/catalog-item-card';
 import { MarketplaceHeader } from '@/components/marketplace-header';
-import { Button } from '@/components/ui/button';
 import { getTranslations } from 'next-intl/server';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { listCategories, listPublishedCatalogItems, listSubcategories } from '@/lib/marketplace';
@@ -96,11 +95,6 @@ export default async function CatalogPage({
             <h1 className="text-3xl font-bold tracking-tight">{t('catalog.title')}</h1>
             <p className="max-w-2xl text-muted-foreground">{t('catalog.subtitle')}</p>
           </div>
-          <Button asChild className="w-full sm:w-auto">
-            <Link href="/personalize/portrait-personalized-night-light">
-              {t('catalog.generate_custom')}
-            </Link>
-          </Button>
         </div>
 
         <div className="flex flex-wrap gap-2">
