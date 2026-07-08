@@ -64,6 +64,10 @@ export const itemSchema = z.object({
   manufacturingNotes: z.string().trim().optional(),
   sizesJson: z.string().trim().optional(),
   characteristics: z.string().trim().optional(),
+  systemPrompt: z.string().trim().optional(),
+  skillId: z.string().trim().optional(),
+  tags: z.array(z.enum(['personal_color', 'personal_text', 'personal_photo'])),
+  boilerplateIds: z.array(z.uuid()),
   seo: z.object({
     en: seoLocaleSchema,
     ru: seoLocaleSchema,
@@ -101,6 +105,10 @@ export function parseItemForm(formData: FormData) {
     manufacturingNotes: formData.get('manufacturingNotes') || undefined,
     sizesJson: formData.get('sizesJson') || undefined,
     characteristics: formData.get('characteristics') || undefined,
+    systemPrompt: formData.get('systemPrompt') || undefined,
+    skillId: formData.get('skillId') || undefined,
+    tags: formData.getAll('tags').map(String),
+    boilerplateIds: formData.getAll('boilerplateIds').map(String),
     seo: {
       en: readSeoLocale(formData, 'en'),
       ru: readSeoLocale(formData, 'ru'),
@@ -288,4 +296,36 @@ export async function syncCatalogItemMedia(
       .eq('catalog_item_id', catalogItemId);
     if (primaryError) throw new Error(primaryError.message);
   }
+}
+
+/** True unless the item is customizable with no System Prompt, Skill ID, or boilerplate selected. */
+export function validatePersonalizationConfig(item: {
+  isCustomizable: boolean;
+  systemPrompt?: string;
+  skillId?: string;
+  boilerplateIds: string[];
+}) {
+  if (!item.isCustomizable) return true;
+  return Boolean(item.systemPrompt) || Boolean(item.skillId) || item.boilerplateIds.length > 0;
+}
+
+export async function syncCatalogItemBoilerplates(
+  supabase: AdminSupabase,
+  catalogItemId: string,
+  boilerplateIds: string[],
+) {
+  const { error: deleteError } = await supabase
+    .from('catalog_item_boilerplates')
+    .delete()
+    .eq('catalog_item_id', catalogItemId);
+  if (deleteError) throw new Error(deleteError.message);
+  if (!boilerplateIds.length) return;
+  const { error } = await supabase.from('catalog_item_boilerplates').insert(
+    boilerplateIds.map((boilerplateId, index) => ({
+      catalog_item_id: catalogItemId,
+      boilerplate_id: boilerplateId,
+      sort_order: index,
+    })),
+  );
+  if (error) throw new Error(error.message);
 }

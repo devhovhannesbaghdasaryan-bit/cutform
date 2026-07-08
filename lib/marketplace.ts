@@ -35,6 +35,9 @@ export interface CatalogItem {
   currency: string;
   is_popular: boolean;
   is_customizable: boolean;
+  system_prompt: string | null;
+  skill_id: string | null;
+  tags: string[];
   thumbnail_path: string | null;
   manufacturing_notes: string | null;
   created_at: string;
@@ -61,25 +64,6 @@ export interface CatalogItemMedia {
   is_primary: boolean;
 }
 
-export interface PersonalizationModel {
-  id: string;
-  title: string;
-  slug: string;
-  mock_image_path: string | null;
-  boilerplate_image_path: string | null;
-  form_schema: Record<string, unknown>;
-  status: string;
-  sort_order: number;
-  category: {
-    slug: string;
-    name: string;
-  } | null;
-  subcategory: {
-    slug: string;
-    name: string;
-  } | null;
-}
-
 const CATALOG_SELECT = `
   id,
   title,
@@ -89,6 +73,9 @@ const CATALOG_SELECT = `
   currency,
   is_popular,
   is_customizable,
+  system_prompt,
+  skill_id,
+  tags,
   thumbnail_path,
   manufacturing_notes,
   created_at,
@@ -245,87 +232,6 @@ export async function getCatalogItemSeoMetadata(catalogItemId: string, locale: A
     .eq('catalog_item_id', catalogItemId)
     .eq('locale', locale)
     .maybeSingle<CatalogSeoMetadata>();
-
-  if (error) throw new Error(error.message);
-  return data;
-}
-
-export async function listPublishedPersonalizationModels({
-  categorySlug,
-  subcategorySlug,
-}: {
-  categorySlug?: string;
-  subcategorySlug?: string;
-} = {}) {
-  noStore();
-  const supabase = await getServerSupabase();
-
-  let query = supabase
-    .from('personalization_models')
-    .select(
-      `
-        id,
-        title,
-        slug,
-        mock_image_path,
-        boilerplate_image_path,
-        form_schema,
-        status,
-        sort_order,
-        category:categories (
-          slug,
-          name
-        ),
-        subcategory:subcategories (
-          slug,
-          name
-        )
-      `,
-    )
-    .eq('status', 'published')
-    .order('sort_order', { ascending: true });
-
-  if (categorySlug) query = query.eq('categories.slug', categorySlug);
-  if (subcategorySlug) query = query.eq('subcategories.slug', subcategorySlug);
-
-  const { data, error } = await query.returns<PersonalizationModel[]>();
-  if (error) throw new Error(error.message);
-
-  return (data ?? []).filter((item) => {
-    const matchesCategory = !categorySlug || item.category?.slug === categorySlug;
-    const matchesSubcategory = !subcategorySlug || item.subcategory?.slug === subcategorySlug;
-    return matchesCategory && matchesSubcategory;
-  });
-}
-
-export async function getPublishedPersonalizationModel(slug: string) {
-  noStore();
-  const supabase = await getServerSupabase();
-  const { data, error } = await supabase
-    .from('personalization_models')
-    .select(
-      `
-        id,
-        title,
-        slug,
-        mock_image_path,
-        boilerplate_image_path,
-        form_schema,
-        status,
-        sort_order,
-        category:categories (
-          slug,
-          name
-        ),
-        subcategory:subcategories (
-          slug,
-          name
-        )
-      `,
-    )
-    .eq('slug', slug)
-    .eq('status', 'published')
-    .maybeSingle<PersonalizationModel>();
 
   if (error) throw new Error(error.message);
   return data;

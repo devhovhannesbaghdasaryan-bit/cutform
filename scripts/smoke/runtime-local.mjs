@@ -49,7 +49,6 @@ const routeChecks = [
   ['/', 'Wooden gifts'],
   ['/catalog', 'Marketplace catalog'],
   ['/banners', 'Banners for stores'],
-  ['/catalog/night-lights/personalized', 'Personalized night lights'],
   ['/cart', 'Shopping cart'],
   ['/credits', 'Buy'],
   ['/robots.txt', 'Disallow: /admin'],
@@ -70,6 +69,7 @@ for (const removedPath of [
   '/admin/personalization-models',
   '/personalization',
   '/personalization/night-lights',
+  '/catalog/night-lights/personalized',
 ]) {
   const { response } = await fetchPage(removedPath);
   assert(response.status === 404, `${removedPath} should return 404, received ${response.status}`);

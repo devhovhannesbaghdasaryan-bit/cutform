@@ -13,9 +13,9 @@ const actions = [
     icon: Boxes,
   },
   {
-    href: '/admin/personalization/night-lights',
-    title: 'Personalized model',
-    description: 'Publish or replace Night lights > Personalized model templates.',
+    href: '/admin/personalization/boilerplates',
+    title: 'Boilerplate library',
+    description: 'Manage the shared boilerplate images used for AI personalization.',
     icon: Sparkles,
   },
   {

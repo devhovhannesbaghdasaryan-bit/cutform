@@ -6,7 +6,7 @@ import { getServerEnv } from '@/lib/env';
 export interface OpenAiImageInput {
   prompt: string;
   userImages: File[];
-  referenceFileId: string;
+  referenceFileId?: string | null;
   size?: '1024x1024' | '1536x1024' | '1024x1536' | 'auto';
   quality?: 'low' | 'medium' | 'high' | 'auto';
 }
@@ -66,7 +66,9 @@ export async function generateOpenAiImage(
         content: [
           { type: 'input_text', text: input.prompt },
           ...userImageParts,
-          { type: 'input_image', detail: 'auto', file_id: input.referenceFileId },
+          ...(input.referenceFileId
+            ? [{ type: 'input_image' as const, detail: 'auto' as const, file_id: input.referenceFileId }]
+            : []),
         ],
       },
     ],

@@ -1,33 +1,23 @@
 // Plain module (no "use server"): server-action files may only export async
 // functions, so the form schema and sync parsing helpers live here instead.
 import { z } from 'zod';
-import { PERSONALIZED_NIGHT_LIGHT } from '@/lib/marketplace-constants';
-import type { Json } from '@/lib/supabase/types';
+import { COMFORTABLE_COLORS, DEFAULT_COLOR_VALUE, MAX_PERSONALIZED_PHOTOS, MAX_PERSONALIZED_TEXT_LENGTH } from '@/lib/personalization-constants';
 
 /**
- * Structural parse of the personalized night-light generation form.
- * The schema's job is shape/narrowing only — the localized error-message
- * selection (t('errorUpload') / t('errorText') / ...) stays in the server
- * action because those messages depend on the request locale.
+ * Structural parse of the generic personalize-item generation form. The
+ * schema's job is shape/narrowing only — localized error-message selection
+ * stays in the server action.
  */
 export const generationFormSchema = z.object({
-  modelId: z.string().trim().min(1),
-  // Over-limit text fails the parse; the action maps it to t('errorText').
-  customText: z.string().trim().max(PERSONALIZED_NIGHT_LIGHT.maxTextLength),
-  // Anything that is not a known comfortable LED color falls back to the
-  // default instead of failing (replaces the previous `as` cast + Set check).
-  ledColor: z
+  catalogItemId: z.string().trim().min(1),
+  customText: z.string().trim().max(MAX_PERSONALIZED_TEXT_LENGTH),
+  color: z
     .string()
-    .catch(PERSONALIZED_NIGHT_LIGHT.defaultLedColor)
+    .catch(DEFAULT_COLOR_VALUE)
     .transform((value) =>
-      PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.some((color) => color.value === value)
-        ? value
-        : PERSONALIZED_NIGHT_LIGHT.defaultLedColor,
+      COMFORTABLE_COLORS.some((color) => color.value === value) ? value : DEFAULT_COLOR_VALUE,
     ),
-  // Wrong count fails the parse; the action maps it to t('errorUpload').
-  images: z.array(z.instanceof(File)).length(PERSONALIZED_NIGHT_LIGHT.maxImages),
-  // Non-string entries are dropped and duplicates removed; emptiness is
-  // checked in the action (t('selectAtLeastOne')) after the model lookup.
+  images: z.array(z.instanceof(File)).max(MAX_PERSONALIZED_PHOTOS),
   boilerplateIds: z
     .array(z.union([z.string(), z.instanceof(File)]))
     .transform((values) => [
@@ -49,14 +39,4 @@ export function summarizeTextFormatting(value: FormDataEntryValue | null) {
     /text-align\s*:\s*center|align=["']?center/i.test(html) ? 'center aligned' : 'left aligned',
   ].filter(Boolean);
   return styles.join(', ');
-}
-
-export function resolveModelPriceCents(formSchema: Json) {
-  const configured =
-    formSchema && typeof formSchema === 'object' && !Array.isArray(formSchema)
-      ? Number(formSchema.basePriceCents)
-      : Number.NaN;
-  return Number.isFinite(configured) && configured >= 0
-    ? Math.round(configured)
-    : PERSONALIZED_NIGHT_LIGHT.defaultPriceCents;
 }

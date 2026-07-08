@@ -14,29 +14,43 @@ import {
   X,
 } from 'lucide-react';
 import {
-  generatePersonalizedNightLightAction,
+  generatePersonalizedItemAction,
   type PersonalizedGenerationState,
 } from '@/app/personalize/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { PERSONALIZED_NIGHT_LIGHT } from '@/lib/marketplace-constants';
+import { DEFAULT_COLOR_VALUE, MAX_PERSONALIZED_TEXT_LENGTH } from '@/lib/personalization-constants';
 
 const initialState: PersonalizedGenerationState = { code: 'idle', message: null };
 
-export interface NightLightBoilerplateOption {
+export interface PersonalizeBoilerplateOption {
   id: string;
   name: string;
   imageUrl: string;
 }
 
-export function PersonalizedNightLightForm({
-  modelId,
+export interface PersonalizeColorOption {
+  value: string;
+  label: string;
+  hex: string;
+}
+
+export function PersonalizeItemForm({
+  catalogItemId,
   boilerplates,
+  colors,
+  showColor,
+  showText,
+  showPhoto,
   copy,
 }: {
-  modelId: string;
-  boilerplates: NightLightBoilerplateOption[];
+  catalogItemId: string;
+  boilerplates: PersonalizeBoilerplateOption[];
+  colors: PersonalizeColorOption[];
+  showColor: boolean;
+  showText: boolean;
+  showPhoto: boolean;
   copy: Record<string, string>;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -48,12 +62,12 @@ export function PersonalizedNightLightForm({
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [creditDialogDismissed, setCreditDialogDismissed] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    generatePersonalizedNightLightAction,
-    initialState,
-  );
-  const remaining = PERSONALIZED_NIGHT_LIGHT.maxTextLength - text.length;
+  const [state, formAction, pending] = useActionState(generatePersonalizedItemAction, initialState);
+  const remaining = MAX_PERSONALIZED_TEXT_LENGTH - text.length;
   const selectedCount = selected.length;
+  const requiresBoilerplateSelection = boilerplates.length > 0;
+  const canSubmit =
+    (!requiresBoilerplateSelection || selectedCount > 0) && (!showPhoto || Boolean(fileName));
 
   useEffect(
     () => () => {
@@ -62,15 +76,11 @@ export function PersonalizedNightLightForm({
     [filePreview],
   );
 
-  const selectedNames = boilerplates
-    .filter((item) => selected.includes(item.id))
-    .map((item) => item.name);
-
   function syncEditor() {
     const editor = editorRef.current;
     if (!editor) return;
     const nextText = (editor.innerText ?? '').replace(/\r/g, '');
-    if (nextText.length > PERSONALIZED_NIGHT_LIGHT.maxTextLength) {
+    if (nextText.length > MAX_PERSONALIZED_TEXT_LENGTH) {
       editor.innerHTML = lastValidHtml.current;
       return;
     }
@@ -102,20 +112,21 @@ export function PersonalizedNightLightForm({
       action={formAction}
       onSubmit={(event) => {
         setCreditDialogDismissed(false);
-        if (!selectedCount) event.preventDefault();
+        if (!canSubmit) event.preventDefault();
       }}
       className="space-y-6 rounded-xl border bg-card p-5 shadow-sm"
     >
-      <input type="hidden" name="modelId" value={modelId} />
-      <input type="hidden" name="customText" value={text} />
-      <input type="hidden" name="customTextHtml" value={html} />
+      <input type="hidden" name="catalogItemId" value={catalogItemId} />
+      <input type="hidden" name="customText" value={showText ? text : ''} />
+      <input type="hidden" name="customTextHtml" value={showText ? html : ''} />
+      {!showColor ? <input type="hidden" name="color" value={DEFAULT_COLOR_VALUE} /> : null}
 
-      <section className="space-y-3">
-        <div>
-          <Label>{copy.chooseTemplates}</Label>
-          <p className="mt-1 text-sm text-muted-foreground">{copy.chooseTemplatesHelp}</p>
-        </div>
-        {boilerplates.length ? (
+      {requiresBoilerplateSelection ? (
+        <section className="space-y-3">
+          <div>
+            <Label>{copy.chooseTemplates}</Label>
+            <p className="mt-1 text-sm text-muted-foreground">{copy.chooseTemplatesHelp}</p>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {boilerplates.map((option) => {
               const checked = selected.includes(option.id);
@@ -150,134 +161,136 @@ export function PersonalizedNightLightForm({
               );
             })}
           </div>
-        ) : (
-          <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            {copy.noTemplates}
-          </div>
-        )}
-        {!selectedCount && boilerplates.length > 0 ? (
-          <p className="text-sm text-muted-foreground">{copy.selectAtLeastOne}</p>
-        ) : null}
-      </section>
-
-      <section className="space-y-2">
-        <Label htmlFor="images">{copy.image}</Label>
-        {/* biome-ignore lint/a11y/noLabelWithoutControl: label wraps the file input control */}
-        <label className="relative flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-dashed bg-muted/30 p-5 text-center text-sm text-muted-foreground transition hover:bg-muted/50">
-          {filePreview ? (
-            // biome-ignore lint/performance/noImgElement: local FileReader data-URL preview
-            <img
-              src={filePreview}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover opacity-25"
-            />
+          {!selectedCount ? (
+            <p className="text-sm text-muted-foreground">{copy.selectAtLeastOne}</p>
           ) : null}
-          <ImagePlus className="relative h-8 w-8" />
-          <span className="relative font-medium text-foreground">{fileName || copy.upload}</span>
-          <Input
-            ref={fileInputRef}
-            id="images"
-            name="images"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            required
-            className="sr-only"
-            onChange={(event) => updateFile(event.target.files?.[0])}
-          />
-          {fileName ? (
-            <Button
-              type="button"
-              size="icon"
-              variant="secondary"
-              className="absolute right-2 top-2 h-8 w-8"
-              aria-label="Remove image"
-              onClick={(event) => {
-                event.preventDefault();
-                if (fileInputRef.current) fileInputRef.current.value = '';
-                updateFile();
-              }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          ) : null}
-        </label>
-      </section>
+        </section>
+      ) : null}
 
-      <section className="space-y-3">
-        <Label htmlFor="ledColor">{copy.color}</Label>
-        <div className="grid grid-cols-3 gap-2">
-          {PERSONALIZED_NIGHT_LIGHT.comfortableLedColors.map((color) => (
-            <label
-              key={color.value}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5"
-            >
-              <input
-                type="radio"
-                name="ledColor"
-                value={color.value}
-                defaultChecked={color.value === PERSONALIZED_NIGHT_LIGHT.defaultLedColor}
+      {showPhoto ? (
+        <section className="space-y-2">
+          <Label htmlFor="images">{copy.image}</Label>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: label wraps the file input control */}
+          <label className="relative flex min-h-36 cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border border-dashed bg-muted/30 p-5 text-center text-sm text-muted-foreground transition hover:bg-muted/50">
+            {filePreview ? (
+              // biome-ignore lint/performance/noImgElement: local FileReader data-URL preview
+              <img
+                src={filePreview}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover opacity-25"
               />
-              <span
-                className="h-4 w-4 rounded-full border shadow-inner"
-                style={{ backgroundColor: color.hex }}
-              />
-              {color.label}
-            </label>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-2">
-        <div className="flex items-center justify-between gap-4">
-          <Label htmlFor="customTextEditor">
-            {copy.text}{' '}
-            <span className="font-normal text-muted-foreground">({copy.textOptional})</span>
-          </Label>
-          <span className="text-xs text-muted-foreground">
-            {copy.charactersRemaining.replace('{count}', String(remaining))}
-          </span>
-        </div>
-        <div className="overflow-hidden rounded-md border bg-background">
-          <div
-            className="flex gap-1 border-b bg-muted/40 p-1"
-            role="toolbar"
-            aria-label="Text formatting"
-          >
-            <EditorButton label="Bold" onClick={() => format('bold')}>
-              <Bold className="h-4 w-4" />
-            </EditorButton>
-            <EditorButton label="Italic" onClick={() => format('italic')}>
-              <Italic className="h-4 w-4" />
-            </EditorButton>
-            <EditorButton label="Align left" onClick={() => format('justifyLeft')}>
-              <AlignLeft className="h-4 w-4" />
-            </EditorButton>
-            <EditorButton label="Align center" onClick={() => format('justifyCenter')}>
-              <AlignCenter className="h-4 w-4" />
-            </EditorButton>
-          </div>
-          <div className="relative">
-            {!text ? (
-              <span className="pointer-events-none absolute left-3 top-3 text-sm text-muted-foreground">
-                {copy.textPlaceholder}
-              </span>
             ) : null}
-            {/* biome-ignore lint/a11y/useSemanticElements: rich contentEditable editor; textarea/input cannot hold formatted content */}
-            <div
-              ref={editorRef}
-              id="customTextEditor"
-              contentEditable
-              tabIndex={0}
-              role="textbox"
-              aria-multiline="true"
-              className="min-h-24 px-3 py-2 text-sm outline-none"
-              onInput={syncEditor}
-              onBlur={syncEditor}
-              suppressContentEditableWarning
+            <ImagePlus className="relative h-8 w-8" />
+            <span className="relative font-medium text-foreground">{fileName || copy.upload}</span>
+            <Input
+              ref={fileInputRef}
+              id="images"
+              name="images"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              required
+              className="sr-only"
+              onChange={(event) => updateFile(event.target.files?.[0])}
             />
+            {fileName ? (
+              <Button
+                type="button"
+                size="icon"
+                variant="secondary"
+                className="absolute right-2 top-2 h-8 w-8"
+                aria-label="Remove image"
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                  updateFile();
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            ) : null}
+          </label>
+        </section>
+      ) : null}
+
+      {showColor ? (
+        <section className="space-y-3">
+          <Label htmlFor="color">{copy.color}</Label>
+          <div className="grid grid-cols-3 gap-2">
+            {colors.map((color) => (
+              <label
+                key={color.value}
+                className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+              >
+                <input
+                  type="radio"
+                  name="color"
+                  value={color.value}
+                  defaultChecked={color.value === DEFAULT_COLOR_VALUE}
+                />
+                <span
+                  className="h-4 w-4 rounded-full border shadow-inner"
+                  style={{ backgroundColor: color.hex }}
+                />
+                {color.label}
+              </label>
+            ))}
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
+
+      {showText ? (
+        <section className="space-y-2">
+          <div className="flex items-center justify-between gap-4">
+            <Label htmlFor="customTextEditor">
+              {copy.text}{' '}
+              <span className="font-normal text-muted-foreground">({copy.textOptional})</span>
+            </Label>
+            <span className="text-xs text-muted-foreground">
+              {copy.charactersRemaining.replace('{count}', String(remaining))}
+            </span>
+          </div>
+          <div className="overflow-hidden rounded-md border bg-background">
+            <div
+              className="flex gap-1 border-b bg-muted/40 p-1"
+              role="toolbar"
+              aria-label="Text formatting"
+            >
+              <EditorButton label="Bold" onClick={() => format('bold')}>
+                <Bold className="h-4 w-4" />
+              </EditorButton>
+              <EditorButton label="Italic" onClick={() => format('italic')}>
+                <Italic className="h-4 w-4" />
+              </EditorButton>
+              <EditorButton label="Align left" onClick={() => format('justifyLeft')}>
+                <AlignLeft className="h-4 w-4" />
+              </EditorButton>
+              <EditorButton label="Align center" onClick={() => format('justifyCenter')}>
+                <AlignCenter className="h-4 w-4" />
+              </EditorButton>
+            </div>
+            <div className="relative">
+              {!text ? (
+                <span className="pointer-events-none absolute left-3 top-3 text-sm text-muted-foreground">
+                  {copy.textPlaceholder}
+                </span>
+              ) : null}
+              {/* biome-ignore lint/a11y/useSemanticElements: rich contentEditable editor; textarea/input cannot hold formatted content */}
+              <div
+                ref={editorRef}
+                id="customTextEditor"
+                contentEditable
+                tabIndex={0}
+                role="textbox"
+                aria-multiline="true"
+                className="min-h-24 px-3 py-2 text-sm outline-none"
+                onInput={syncEditor}
+                onBlur={syncEditor}
+                suppressContentEditableWarning
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {state.code === 'error' && state.message ? (
         <div
@@ -291,21 +304,18 @@ export function PersonalizedNightLightForm({
       <div className="sticky bottom-3 rounded-xl border bg-background/95 p-3 shadow-lg backdrop-blur">
         <div className="mb-3 flex items-center justify-between gap-4 text-sm">
           <span className="text-muted-foreground">{copy.creditPerStyle}</span>
-          <strong>{copy.creditTotal.replace('{count}', String(selectedCount))}</strong>
+          <strong>{copy.creditTotal.replace('{count}', String(Math.max(selectedCount, 1)))}</strong>
         </div>
-        <Button type="submit" className="w-full" disabled={pending || !selectedCount || !fileName}>
+        <Button type="submit" className="w-full" disabled={pending || !canSubmit}>
           {pending ? (
             <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <WandSparkles className="mr-2 h-4 w-4" />
           )}
-          {pending ? copy.generatingTitle : copy.generate.replace('{count}', String(selectedCount))}
+          {pending
+            ? copy.generatingTitle
+            : copy.generate.replace('{count}', String(Math.max(selectedCount, 1)))}
         </Button>
-        {selectedNames.length ? (
-          <p className="mt-2 truncate text-center text-xs text-muted-foreground">
-            {selectedNames.join(' · ')}
-          </p>
-        ) : null}
       </div>
 
       {pending ? (

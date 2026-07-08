@@ -15,8 +15,10 @@ import {
   parseKeywords,
   parseSizesJson,
   ensureCatalogSlugIsAvailable,
+  syncCatalogItemBoilerplates,
   syncCatalogItemMedia,
   uploadAdminCatalogAsset,
+  validatePersonalizationConfig,
 } from './item-form-parsing';
 
 async function uploadCatalogFormAssets(
@@ -183,6 +185,11 @@ export async function createCatalogItemAction(
     item.categoryId,
   );
   if (!validSubcategory) return actionError('Selected subcategory does not belong to category.');
+  if (!validatePersonalizationConfig(item)) {
+    return actionError(
+      'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
+    );
+  }
   let sizes: Json[];
   try {
     sizes = parseSizesJson(item.sizesJson);
@@ -213,6 +220,9 @@ export async function createCatalogItemAction(
       manufacturing_notes: item.manufacturingNotes ?? null,
       sizes,
       characteristics: item.characteristics ?? null,
+      system_prompt: item.systemPrompt ?? null,
+      skill_id: item.skillId ?? null,
+      tags: item.tags,
       created_by: user.id,
     })
     .select('id')
@@ -226,6 +236,7 @@ export async function createCatalogItemAction(
     formData,
     uploadedAssets.thumbnailPath ?? item.thumbnailPath ?? null,
   );
+  await syncCatalogItemBoilerplates(supabase, data.id, item.boilerplateIds);
   await upsertSeoMetadata(supabase, data.id, item, user.id);
   await syncCatalogItemMarketRules(supabase, data.id, formData);
 
@@ -258,6 +269,11 @@ export async function updateCatalogItemAction(
     item.categoryId,
   );
   if (!validSubcategory) return actionError('Selected subcategory does not belong to category.');
+  if (!validatePersonalizationConfig(item)) {
+    return actionError(
+      'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
+    );
+  }
   let sizes: Json[];
   try {
     sizes = parseSizesJson(item.sizesJson);
@@ -288,6 +304,9 @@ export async function updateCatalogItemAction(
       manufacturing_notes: item.manufacturingNotes ?? null,
       sizes,
       characteristics: item.characteristics ?? null,
+      system_prompt: item.systemPrompt ?? null,
+      skill_id: item.skillId ?? null,
+      tags: item.tags,
     })
     .eq('id', id);
 
@@ -299,6 +318,7 @@ export async function updateCatalogItemAction(
     formData,
     uploadedAssets.thumbnailPath ?? item.thumbnailPath ?? null,
   );
+  await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
   await upsertSeoMetadata(supabase, id, item, user.id);
   await syncCatalogItemMarketRules(supabase, id, formData);
 

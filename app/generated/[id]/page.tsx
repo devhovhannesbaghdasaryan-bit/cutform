@@ -10,10 +10,8 @@ import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import type { GeneratedItemRow, PersonalizedPreviewOptionRow } from '@/lib/generated-items';
-import {
-  getBoilerplateName,
-  type PersonalizationBoilerplate,
-} from '@/lib/personalization-boilerplates';
+import type { PersonalizationBoilerplate } from '@/lib/personalization-boilerplates';
+import type { Tables } from '@/lib/supabase/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,16 +31,15 @@ type GeneratedItemDetail = Pick<
   | 'manufacturing_metadata'
   | 'generation_options'
   | 'created_at'
->;
+> & {
+  catalog_item: Pick<Tables<'catalog_items'>, 'title' | 'slug' | 'price_cents' | 'currency'> | null;
+};
 
 type PreviewOption = Pick<
   PersonalizedPreviewOptionRow,
   'id' | 'option_index' | 'preview_image_path' | 'status' | 'metadata'
 > & {
-  boilerplate: Pick<
-    PersonalizationBoilerplate,
-    'admin_name' | 'name_en' | 'name_hy' | 'name_ru'
-  > | null;
+  boilerplate: Pick<PersonalizationBoilerplate, 'name'> | null;
 };
 
 export default async function GeneratedItemPage({ params }: { params: Promise<{ id: string }> }) {
@@ -56,7 +53,7 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
     supabase
       .from('generated_items')
       .select(
-        'id, title, product_type, review_status, credit_cost, preview_path, selected_preview_path, custom_text, color, multi_color, svg_content, manufacturing_metadata, generation_options, created_at',
+        'id, title, product_type, review_status, credit_cost, preview_path, selected_preview_path, custom_text, color, multi_color, svg_content, manufacturing_metadata, generation_options, created_at, catalog_item:catalog_items(title, slug, price_cents, currency)',
       )
       .eq('id', id)
       .eq('user_id', user.id)
@@ -64,7 +61,7 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
     supabase
       .from('personalized_preview_options')
       .select(
-        'id, option_index, preview_image_path, status, metadata, boilerplate:personalization_boilerplates(admin_name, name_en, name_hy, name_ru)',
+        'id, option_index, preview_image_path, status, metadata, boilerplate:personalization_boilerplates(name)',
       )
       .eq('generated_item_id', id)
       .order('option_index', { ascending: true })
@@ -95,10 +92,10 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
   const warnings = extractValidationWarnings(item.manufacturing_metadata);
   const bannerDetails =
     item.product_type === 'banner' ? extractBannerDetails(item.generation_options) : null;
-  const canOrder =
-    item.review_status !== 'rejected' &&
-    (item.product_type !== 'personalized_night_light' || previewOptions.length > 0);
-  const salePriceCents = Number(item.generation_options.salePriceCents ?? 0);
+  const hasPreviewOptions = previewOptions.length > 0;
+  const canOrder = item.review_status !== 'rejected';
+  const salePriceCents = item.catalog_item?.price_cents ?? 0;
+  const saleCurrency = item.catalog_item?.currency ?? 'AMD';
   const localizedProductType = tDynamic(
     t,
     `generated.productType.${item.product_type}`,
@@ -146,7 +143,7 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
                 id: option.id,
                 previewUrl: option.previewUrl,
                 label: option.boilerplate
-                  ? getBoilerplateName(option.boilerplate, locale)
+                  ? option.boilerplate.name
                   : typeof option.metadata.boilerplateName === 'string'
                     ? option.metadata.boilerplateName
                     : t('generated.option', { number: String(option.option_index) }),
@@ -155,21 +152,21 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
               priceLabel={
                 salePriceCents > 0
                   ? t('generated.priceEach', {
-                      price: formatLocalizedCurrency(locale, salePriceCents, 'AMD'),
+                      price: formatLocalizedCurrency(locale, salePriceCents, saleCurrency),
                     })
                   : null
               }
               copy={{
-                resultsTitle: t('nightLight.results'),
-                resultsHelp: t('nightLight.resultsHelp'),
-                addSelected: t('nightLight.addSelected'),
+                resultsTitle: t('personalize.results'),
+                resultsHelp: t('personalize.resultsHelp'),
+                addSelected: t('personalize.addSelected'),
                 previewUnavailable: t('generated.previewUnavailable'),
                 noPreview: t('generated.noPreview'),
                 // Raw template ({name}) — the client component interpolates it.
                 previewAlt: t.raw('generated.previewAlt'),
               }}
             />
-            {item.product_type !== 'personalized_night_light' && item.svg_content ? (
+            {!hasPreviewOptions && item.svg_content ? (
               <section className="space-y-3">
                 <h2 className="text-xl font-semibold tracking-tight">{t('generated.rawSvg')}</h2>
                 <pre className="max-h-96 overflow-auto rounded-lg border bg-muted p-4 text-xs">
@@ -222,12 +219,12 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
               </div>
             ) : null}
 
-            {item.product_type !== 'personalized_night_light' ? (
+            {!hasPreviewOptions ? (
               <form action={addGeneratedItemToCartAction} className="rounded-lg border p-5">
                 <input type="hidden" name="generatedItemId" value={item.id} />
                 {salePriceCents > 0 && (
                   <p className="mb-3 text-center text-lg font-semibold">
-                    {formatLocalizedCurrency(locale, salePriceCents, 'AMD')}
+                    {formatLocalizedCurrency(locale, salePriceCents, saleCurrency)}
                   </p>
                 )}
                 <Button type="submit" className="w-full" disabled={!canOrder}>

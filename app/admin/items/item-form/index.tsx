@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { createCatalogItemAction, updateCatalogItemAction } from '@/app/admin/items/actions';
 import { errorOf, idleState } from '@/lib/action-state';
@@ -13,6 +13,7 @@ import {
 } from './basics-fields';
 import { MarketRulesSection } from './market-rules-fields';
 import { MediaSection, ThumbnailFields } from './media-fields';
+import { PersonalizationFields } from './personalization-fields';
 import {
   ManufacturingNotesField,
   PriceField,
@@ -20,6 +21,7 @@ import {
 } from './pricing-size-fields';
 import { SeoSection } from './seo-section';
 import type {
+  BoilerplateOption,
   CatalogMediaFormValue,
   CategoryOption,
   ItemFormValue,
@@ -40,6 +42,8 @@ export function ItemForm({
   marketRegions = [],
   marketCountries = [],
   marketRules = [],
+  boilerplateOptions = [],
+  selectedBoilerplateIds = [],
 }: {
   categories: CategoryOption[];
   subcategories: SubcategoryOption[];
@@ -50,10 +54,13 @@ export function ItemForm({
   marketRegions?: MarketRegionFormValue[];
   marketCountries?: MarketCountryFormValue[];
   marketRules?: MarketRuleFormValue[];
+  boilerplateOptions?: BoilerplateOption[];
+  selectedBoilerplateIds?: string[];
 }) {
   const actionFn = item?.id ? updateCatalogItemAction : createCatalogItemAction;
   const [state, action, pending] = useActionState(actionFn, idleState);
   const error = errorOf(state);
+  const [isCustomizable, setIsCustomizable] = useState(item?.is_customizable ?? false);
 
   return (
     <form action={action} className="space-y-6">
@@ -88,7 +95,15 @@ export function ItemForm({
 
       <SeoSection item={item} seo={seo} seoRecords={seoRecords} />
 
-      <FlagsFields item={item} />
+      <FlagsFields item={item} onCustomizableChange={setIsCustomizable} />
+
+      {isCustomizable && (
+        <PersonalizationFields
+          item={item}
+          boilerplateOptions={boilerplateOptions}
+          selectedBoilerplateIds={selectedBoilerplateIds}
+        />
+      )}
 
       {error && (
         <p role="alert" className="text-sm text-destructive">

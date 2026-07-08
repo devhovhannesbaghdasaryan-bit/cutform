@@ -15,24 +15,23 @@ export const PRODUCT_TYPES = [
   'laser_cut_2d_decoration',
   'laser_cut_2d_constructor',
   'banner',
+  'standard',
 ] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
 
-export const PERSONALIZED_NIGHT_LIGHT = {
-  maxImages: 1,
-  maxTextLength: 80,
-  defaultPriceCents: 2_500_000,
-  defaultLedColor: 'warm_white',
-  modelSlug: 'portrait-personalized-night-light',
-  multiColorValue: 'multi_color',
-  comfortableLedColors: [
-    { value: 'warm_white', label: 'Warm white', hex: '#f7d7a1' },
-    { value: 'soft_amber', label: 'Soft amber', hex: '#f4bf73' },
-    { value: 'soft_peach', label: 'Soft peach', hex: '#f5b49f' },
-    { value: 'mint', label: 'Mint', hex: '#a8dbc2' },
-    { value: 'sky_blue', label: 'Sky blue', hex: '#9fcaea' },
-  ],
-} as const;
+const ITEM_TYPE_TO_PRODUCT_TYPE: Record<string, ProductType> = {
+  standard: 'standard',
+  toy: 'laser_cut_2d_toy',
+  decoration: 'laser_cut_2d_decoration',
+  night_light: 'night_light',
+  personalized_night_light: 'personalized_night_light',
+  banner: 'banner',
+};
+
+/** Maps a `catalog_items.item_type` value to the `generated_items.product_type` it should carry. */
+export function mapCatalogItemTypeToProductType(itemType: string): ProductType {
+  return ITEM_TYPE_TO_PRODUCT_TYPE[itemType] ?? 'standard';
+}
 
 export const BANNER_PRESETS = [
   {

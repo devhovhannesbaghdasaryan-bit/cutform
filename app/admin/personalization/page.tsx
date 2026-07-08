@@ -1,15 +1,5 @@
 import Link from 'next/link';
-import { Blocks, Gift, Lamp, Megaphone, Puzzle } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
-import { tDynamic } from '@/lib/i18n-dynamic';
-
-const categories = [
-  { slug: 'toys', icon: Gift },
-  { slug: 'constructors', icon: Puzzle },
-  { slug: 'decorations', icon: Blocks },
-  { slug: 'nightLights', icon: Lamp, href: '/admin/personalization/night-lights' },
-  { slug: 'banners', icon: Megaphone },
-];
 
 export default async function PersonalizationPage() {
   const t = await getTranslations();
@@ -20,47 +10,13 @@ export default async function PersonalizationPage() {
         <p className="mt-2 text-muted-foreground">{t('personalization.subtitle')}</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {categories.map((category) => {
-          const Icon = category.icon;
-          const content = (
-            <>
-              <div className="flex items-start justify-between gap-4">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <span className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">
-                  {t(category.href ? 'personalization.available' : 'personalization.comingSoon')}
-                </span>
-              </div>
-              <h2 className="mt-5 text-lg font-semibold">
-                {tDynamic(t, `personalization.${category.slug}`)}
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t(category.href ? 'personalization.manage' : 'personalization.unavailable')}
-              </p>
-            </>
-          );
-
-          return category.href ? (
-            <Link
-              key={category.slug}
-              href={category.href}
-              className="rounded-lg border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              {content}
-            </Link>
-          ) : (
-            <div
-              key={category.slug}
-              aria-disabled="true"
-              className="cursor-not-allowed rounded-lg border bg-muted/20 p-5 opacity-60"
-            >
-              {content}
-            </div>
-          );
-        })}
-      </div>
+      <Link
+        href="/admin/personalization/boilerplates"
+        className="block max-w-sm rounded-lg border bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <h2 className="text-lg font-semibold">{t('personalization.libraryCard')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('personalization.libraryCardHelp')}</p>
+      </Link>
     </main>
   );
 }

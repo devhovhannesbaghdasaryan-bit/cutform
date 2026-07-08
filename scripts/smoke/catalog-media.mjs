@@ -37,10 +37,10 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const migrationSql = readFileSync(
-  'supabase/migrations/20260622094636_catalog_item_media.sql',
-  'utf8',
-);
+// The standalone catalog-item-media migration was squashed into the single
+// baseline migration (see supabase/migrations/0001_init.sql) by the
+// "refactor(db): squash migrations into a single baseline" commit.
+const migrationSql = readFileSync('supabase/migrations/0001_init.sql', 'utf8');
 
 for (const mime of [
   'image/png',
@@ -50,7 +50,7 @@ for (const mime of [
   'video/mp4',
   'video/webm',
 ]) {
-  assert(migrationSql.includes(`'${mime}'`), `catalog media migration is missing ${mime}`);
+  assert(migrationSql.includes(mime), `catalog media migration is missing ${mime}`);
 }
 assert(migrationSql.includes('52428800'), 'catalog media migration should allow files up to 50 MB');
 
