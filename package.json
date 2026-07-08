@@ -12,6 +12,8 @@
     "format:check": "biome format .",
     "test": "vitest run",
     "db:types": "supabase gen types typescript --local --schema public > lib/supabase/database.types.ts",
+    "seed:products:generate": "node scripts/generate-products-seed.mjs",
+    "seed:products:upload-media": "node scripts/upload-products-media.mjs",
     "smoke:i18n": "node scripts/smoke/i18n.mjs",
     "smoke:seo": "node scripts/smoke/seo.mjs",
     "smoke:redesign": "node scripts/smoke/redesign.mjs",
