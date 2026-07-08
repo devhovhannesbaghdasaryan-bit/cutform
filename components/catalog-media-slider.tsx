@@ -2,6 +2,7 @@
 
 import { Play } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCardHover } from '@/components/catalog-card-hover';
 import type { CatalogItemMedia } from '@/lib/marketplace';
 import { resolvePublicStorageUrl } from '@/lib/storage';
 
@@ -19,7 +20,9 @@ export function CatalogMediaSlider({
   compact?: boolean;
 }) {
   const [index, setIndex] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
+  const [isHoveringSelf, setIsHoveringSelf] = useState(false);
+  const isHoveringCard = useCardHover();
+  const isHovering = isHoveringSelf || isHoveringCard;
   const [videoProgress, setVideoProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -75,8 +78,8 @@ export function CatalogMediaSlider({
     // biome-ignore lint/a11y/noStaticElementInteractions: hover slideshow is a non-essential enhancement; every media is still reachable via the progress controls
     <div
       className="group/media relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border border-black/10 bg-white/35 text-center shadow-inner"
-      onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={() => setIsHovering(false)}
+      onMouseEnter={() => setIsHoveringSelf(true)}
+      onMouseLeave={() => setIsHoveringSelf(false)}
     >
       {sourceUrl && current?.media_type === 'image' ? (
         // biome-ignore lint/performance/noImgElement: admin-managed storage URLs can be SVG; next/image cannot render SVG markup
@@ -133,7 +136,7 @@ export function CatalogMediaSlider({
       )}
 
       {hasMultiple ? (
-        <div className="pointer-events-none absolute inset-x-2 top-2 flex gap-1">
+        <div className="pointer-events-none absolute inset-x-2 top-2 z-20 flex gap-1">
           {media.map((item, itemIndex) => {
             const isPast = itemIndex < index;
             const isActive = itemIndex === index;
@@ -149,7 +152,7 @@ export function CatalogMediaSlider({
               <button
                 key={item.id}
                 type="button"
-                className="pointer-events-auto h-1 flex-1 overflow-hidden rounded-full bg-background/40 shadow-sm backdrop-blur-sm transition-colors hover:bg-background/60"
+                className="pointer-events-auto h-1 flex-1 cursor-pointer overflow-hidden rounded-full bg-background/40 shadow-sm backdrop-blur-sm transition-colors hover:bg-background/60"
                 onClick={(event) => {
                   event.preventDefault();
                   setIndex(itemIndex);
