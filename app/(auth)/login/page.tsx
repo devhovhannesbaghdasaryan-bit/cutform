@@ -23,8 +23,6 @@ export default async function LoginPage({
             socialOptions: t('auth.socialOptions'),
             facebook: t('auth.continueFacebook'),
             google: t('auth.continueGoogle'),
-            x: t('auth.continueX'),
-            telegram: t('auth.continueTelegram'),
             useEmail: t('auth.useEmail'),
             email: t('auth.email'),
             password: t('auth.password'),

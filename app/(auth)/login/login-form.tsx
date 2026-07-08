@@ -9,16 +9,12 @@ import { errorOf, idleState } from '@/lib/action-state';
 const providers = [
   { id: 'facebook', copyKey: 'facebook', mark: 'f' },
   { id: 'google', copyKey: 'google', mark: 'G' },
-  { id: 'x', copyKey: 'x', mark: 'X' },
-  { id: 'telegram', copyKey: 'telegram', mark: 'T' },
 ] as const;
 
 type LoginCopy = {
   socialOptions: string;
   facebook: string;
   google: string;
-  x: string;
-  telegram: string;
   useEmail: string;
   email: string;
   password: string;

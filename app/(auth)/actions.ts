@@ -14,8 +14,6 @@ export type AuthActionState = ActionState<null>;
 const socialProviders = {
   facebook: 'facebook',
   google: 'google',
-  x: 'x',
-  telegram: 'custom:telegram',
 } as const;
 
 const safeNextPath = z
@@ -52,7 +50,7 @@ const otpSchema = emailSchema.extend({
 });
 
 const socialSchema = z.object({
-  provider: z.enum(['facebook', 'google', 'x', 'telegram']),
+  provider: z.enum(['facebook', 'google']),
   next: safeNextPath,
 });
 

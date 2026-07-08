@@ -2,9 +2,11 @@
 
 Date: 2026-07-01
 
+> **Updated (2026-07-08):** Scope reduced to Facebook and Google only. X and Telegram were never configured as Supabase providers and are no longer planned.
+
 ## Application — completed
 
-- [x] Add Facebook, Google, X, and Telegram login actions using Supabase PKCE.
+- [x] Add Facebook and Google login actions using Supabase PKCE.
 - [x] Add accessible provider buttons while retaining email/password login.
 - [x] Preserve and validate the post-login `next` destination.
 - [x] Surface OAuth startup and callback errors on the login page.
@@ -13,11 +15,9 @@ Date: 2026-07-01
 
 ## Provider configuration — deployment owner
 
-- [ ] Create web OAuth applications in Meta, Google, and X developer consoles.
+- [ ] Create web OAuth applications in Google Cloud Console and Meta for Developers.
 - [ ] Register the Supabase Auth callback URL with each provider.
-- [ ] Enable the Facebook, Google, and X providers in Supabase and add their client credentials.
-- [ ] Create a Telegram bot/client in BotFather and register the production callback/domain.
-- [ ] Create and enable Supabase custom OIDC provider `custom:telegram` using issuer `https://oauth.telegram.org`, scopes `openid profile`, and `email_optional: true`.
+- [ ] Enable the Facebook and Google providers in Supabase and add their client credentials.
 - [ ] Allow-list local, preview, and production `/auth/callback` URLs in Supabase.
 - [ ] Complete provider branding, consent-screen, and privacy-policy requirements.
 
@@ -26,5 +26,5 @@ Date: 2026-07-01
 - [ ] Test first-time and returning login for every provider in a production-like preview.
 - [ ] Test cancellation, disabled provider, bad callback, and missing-email cases.
 - [ ] Verify duplicate-email and account-linking behavior against product policy.
-- [ ] Verify `next` routing and guest-cart merge for all four providers.
+- [ ] Verify `next` routing and guest-cart merge for both providers.
 - [ ] Confirm provider secrets are absent from client bundles, logs, and source control.
