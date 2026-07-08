@@ -30,26 +30,17 @@ export function LanguageSwitcher({ activeLocale = 'en' }: { activeLocale?: AppLo
   }
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: div+role="group" preserves existing markup; a native fieldset's default browser chrome is not desired here
-    <div
-      className="inline-flex rounded-md border bg-background p-0.5"
-      role="group"
+    <select
       aria-label="Language"
+      value={activeLocale}
+      onChange={(event) => changeLocale(event.target.value as AppLocale)}
+      className="h-8 rounded-md border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
     >
       {APP_LOCALES.map((locale) => (
-        <button
-          key={locale}
-          type="button"
-          onClick={() => changeLocale(locale)}
-          className={
-            locale === activeLocale
-              ? 'rounded-sm bg-primary px-2 py-1 text-xs font-medium text-primary-foreground'
-              : 'rounded-sm px-2 py-1 text-xs font-medium text-muted-foreground hover:text-foreground'
-          }
-        >
+        <option key={locale} value={locale}>
           {LABELS[locale]}
-        </button>
+        </option>
       ))}
-    </div>
+    </select>
   );
 }
