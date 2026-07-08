@@ -410,13 +410,13 @@
     "semantic_hash": ""
   },
   "components/catalog-item-card.tsx": {
-    "mtime": 1783507218.656396,
-    "ast_hash": "2d109067968f1a075374fb5c12b063ba",
+    "mtime": 1783508061.6035366,
+    "ast_hash": "ec7287e32a168499add855c8a54ef70c",
     "semantic_hash": ""
   },
   "components/catalog-media-slider.tsx": {
-    "mtime": 1783507227.2418816,
-    "ast_hash": "b775a0f3bced44ffb24ad5250c0863ec",
+    "mtime": 1783508030.460035,
+    "ast_hash": "1726791e58fe6804d2c957d8f6a42e2e",
     "semantic_hash": ""
   },
   "components/category-navigation.tsx": {
@@ -1602,6 +1602,11 @@
   "public/product-references/night-lights/round-uv-print.jpg": {
     "mtime": 1783187576.111843,
     "ast_hash": "6bf6edcf07807dd72067881d2ded33db",
+    "semantic_hash": ""
+  },
+  "components/catalog-card-hover.tsx": {
+    "mtime": 1783508085.0639634,
+    "ast_hash": "a15d634711681054a9b258dd059c7a5c",
     "semantic_hash": ""
   }
 }

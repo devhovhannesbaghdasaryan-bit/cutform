@@ -15,6 +15,11 @@ const DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT = [
   'Use customer text, photo, and color selections only when provided.',
   'Keep the result suitable for UV printing or CO2 laser engraving on clear acrylic.',
 ].join(' ');
+// Without a market rule, resolveCatalogMarkets() treats an item as unavailable
+// once a visitor's region resolves (no shipping rate to quote) — items silently
+// vanish from /catalog in prod. Seed a flat rate for every region so nothing
+// ships invisible; tune per-item/per-region rates later in admin.
+const DEFAULT_SHIPPING_RATE_CENTS = 300_000; // 3,000 AMD
 
 function findItems(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
@@ -311,6 +316,18 @@ cross join lateral jsonb_array_elements_text(coalesce(p.data->'boilerplateNames'
 join public.personalization_boilerplates b on b.name = boilerplate.name
 on conflict (catalog_item_id, boilerplate_id) do update set
   sort_order = excluded.sort_order;
+
+delete from public.catalog_item_market_rules link
+using public.catalog_items i, seed_products p
+where link.catalog_item_id = i.id and i.slug = p.data->>'slug';
+
+insert into public.catalog_item_market_rules (
+  catalog_item_id, region_id, visibility_override, shipping_rate_cents, shipping_currency
+)
+select i.id, r.id, true, ${DEFAULT_SHIPPING_RATE_CENTS}, 'AMD'
+from seed_products p
+join public.catalog_items i on i.slug = p.data->>'slug'
+cross join public.market_regions r;
 
 commit;
 `;
