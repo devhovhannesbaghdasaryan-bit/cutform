@@ -18,17 +18,30 @@ export function BrandLogo({ className }: { className?: string }) {
   }, []);
 
   return (
-    <span className={cn('relative block h-8 w-[132px] shrink-0', className)}>
-      <Image
-        key={theme}
-        src={`/brand/uniqraft-logo-${theme}.png?v=20260704`}
-        alt="Uniqraft"
-        fill
-        priority
-        unoptimized
-        sizes="132px"
-        className="object-contain"
-      />
+    <span className={cn('relative block shrink-0', className)}>
+      <span className="relative block h-8 w-8 sm:hidden">
+        <Image
+          src="/brand/uniqraft-mark.png?v=20260704"
+          alt="Uniqraft"
+          fill
+          priority
+          unoptimized
+          sizes="32px"
+          className="object-contain"
+        />
+      </span>
+      <span className="relative hidden h-8 w-[132px] sm:block">
+        <Image
+          key={theme}
+          src={`/brand/uniqraft-logo-${theme}.png?v=20260704`}
+          alt="Uniqraft"
+          fill
+          priority
+          unoptimized
+          sizes="132px"
+          className="object-contain"
+        />
+      </span>
     </span>
   );
 }
