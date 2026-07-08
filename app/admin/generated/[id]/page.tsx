@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { reviewGeneratedItemAction } from '@/app/admin/generated/actions';
 import { AssetPreviewCard } from './asset-preview-card';
 import { ManufacturingFileForm } from './manufacturing-file-form';
+import { ManufacturingSvgForm } from './manufacturing-svg-form';
 import { requireAdmin } from '@/lib/admin';
 import {
   getGeneratedItemAdminDetail,
@@ -117,6 +118,24 @@ export default async function AdminGeneratedDetailPage({
                       defaultPrompt={buildManufacturingPrompt(item, option)}
                       hasExistingFile={Boolean(option.manufacturing_file_path)}
                     />
+                    {option.manufacturing_file_path ? (
+                      <div className="min-w-0 space-y-3 rounded-lg border border-dashed bg-muted/20 p-3 sm:p-4">
+                        {option.manufacturingSvgUrl && option.manufacturingSvgPath ? (
+                          <AssetPreviewCard
+                            title="Manufacturing SVG"
+                            path={option.manufacturingSvgPath}
+                            url={option.manufacturingSvgUrl}
+                            downloadUrl={option.manufacturingSvgDownloadUrl}
+                            isSvg
+                          />
+                        ) : null}
+                        <ManufacturingSvgForm
+                          generatedItemId={item.id}
+                          optionId={option.id}
+                          hasExistingSvg={Boolean(option.metadata.manufacturingSvgPath)}
+                        />
+                      </div>
+                    ) : null}
                     <Snapshot title="Option metadata" value={option.metadata} />
                   </article>
                 ))}

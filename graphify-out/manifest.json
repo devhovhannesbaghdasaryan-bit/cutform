@@ -60,13 +60,13 @@
     "semantic_hash": ""
   },
   "app/admin/generated/[id]/page.tsx": {
-    "mtime": 1783349596.4189942,
-    "ast_hash": "51ee99e838027ee50162d92faff7b524",
+    "mtime": 1783533035.9333777,
+    "ast_hash": "86f84220f5e4e1dc5c2723e80da9998a",
     "semantic_hash": ""
   },
   "app/admin/generated/actions.ts": {
-    "mtime": 1783349596.4189942,
-    "ast_hash": "493d2650c92ab7b74fd3ce99023e64ff",
+    "mtime": 1783533068.5634737,
+    "ast_hash": "241a5562517f5d23c54ec488a0dc7f0e",
     "semantic_hash": ""
   },
   "app/admin/generated/page.tsx": {
@@ -350,7 +350,7 @@
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1783521434.8673477,
+    "mtime": 1783521819.50054,
     "ast_hash": "3260d12e7fe4388b5bbbae63120a4237",
     "semantic_hash": ""
   },
@@ -605,8 +605,8 @@
     "semantic_hash": ""
   },
   "lib/generated-items.ts": {
-    "mtime": 1783494153.6296768,
-    "ast_hash": "780cae70bfc135d81f609f39dde4d981",
+    "mtime": 1783533024.6602688,
+    "ast_hash": "bd4c9ba3bdc23895fdeed6150700b7c9",
     "semantic_hash": ""
   },
   "lib/i18n-config.ts": {
@@ -795,8 +795,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1783361604.6162796,
-    "ast_hash": "197554c6e31be5300b9ebe08003c3cd1",
+    "mtime": 1783532836.0825717,
+    "ast_hash": "268e71d80106353c24e1cf4148c889c3",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -910,7 +910,7 @@
     "semantic_hash": ""
   },
   "supabase/seed.sql": {
-    "mtime": 1783510300.67428,
+    "mtime": 1783533272.856683,
     "ast_hash": "8552e80eb8fff2067b7be165f95670c9",
     "semantic_hash": ""
   },
@@ -1609,14 +1609,19 @@
     "ast_hash": "4361531baa9867c552481b468b180225",
     "semantic_hash": ""
   },
-  "public/brand/uniqraft-product-art-frame.png": {
-    "mtime": 1783520059.2618377,
-    "ast_hash": "42e548db0b6e0f851455e5a6995a4c24",
+  "public/landing/landing.jpg": {
+    "mtime": 1783521819.5171528,
+    "ast_hash": "5935b23ab82e4d0f9bdf8177114cc09f",
     "semantic_hash": ""
   },
-  "public/landing/landing.jpg": {
-    "mtime": 1783520898.8696377,
-    "ast_hash": "7677f0c1227f1201ce100378223a74fe",
+  "app/admin/generated/[id]/manufacturing-svg-form.tsx": {
+    "mtime": 1783532975.327507,
+    "ast_hash": "8355f21096220491f5ddd7310d847fb6",
+    "semantic_hash": ""
+  },
+  "lib/svg-trace.ts": {
+    "mtime": 1783532848.7300537,
+    "ast_hash": "a5b440a40e5fc5add84d98674c7972fe",
     "semantic_hash": ""
   }
 }

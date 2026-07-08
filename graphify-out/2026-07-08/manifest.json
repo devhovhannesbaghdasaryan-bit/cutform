@@ -10,7 +10,7 @@
     "semantic_hash": ""
   },
   "app/(auth)/login/login-form.tsx": {
-    "mtime": 1783517580.1200347,
+    "mtime": 1783518978.6755042,
     "ast_hash": "ecf080d5b85ed83d4c2aa3cf5c14cb08",
     "semantic_hash": ""
   },
@@ -20,12 +20,12 @@
     "semantic_hash": ""
   },
   "app/(auth)/register/page.tsx": {
-    "mtime": 1783517614.6817007,
+    "mtime": 1783518978.676504,
     "ast_hash": "8386128a6ad7ab570899e5d36314a1f0",
     "semantic_hash": ""
   },
   "app/(auth)/register/register-form.tsx": {
-    "mtime": 1783517597.8852067,
+    "mtime": 1783518978.676504,
     "ast_hash": "2643f95902184f55fdc059b40fb3a52f",
     "semantic_hash": ""
   },
@@ -350,8 +350,8 @@
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1783494153.6256769,
-    "ast_hash": "a811d168d0960a27df16367c35fdea48",
+    "mtime": 1783521434.8673477,
+    "ast_hash": "3260d12e7fe4388b5bbbae63120a4237",
     "semantic_hash": ""
   },
   "app/personalize/[itemSlug]/page.tsx": {
@@ -405,8 +405,8 @@
     "semantic_hash": ""
   },
   "components/catalog-item-card.tsx": {
-    "mtime": 1783510300.654279,
-    "ast_hash": "ec7287e32a168499add855c8a54ef70c",
+    "mtime": 1783519700.1007173,
+    "ast_hash": "d445a2e32a9087152d338483d16fe07d",
     "semantic_hash": ""
   },
   "components/catalog-media-slider.tsx": {
@@ -810,7 +810,7 @@
     "semantic_hash": ""
   },
   "scripts/generate-products-seed.mjs": {
-    "mtime": 1783518831.7552483,
+    "mtime": 1783519700.1154885,
     "ast_hash": "f04b5a2e3c9fa7fb8188cbd1bac50bf6",
     "semantic_hash": ""
   },
@@ -905,7 +905,7 @@
     "semantic_hash": ""
   },
   "supabase/seed-products.sql": {
-    "mtime": 1783518831.7562501,
+    "mtime": 1783519700.116485,
     "ast_hash": "5da454ddc9b443a8face9b9af8cc8a73",
     "semantic_hash": ""
   },
@@ -1605,8 +1605,18 @@
     "semantic_hash": ""
   },
   "app/(auth)/social-login-buttons.tsx": {
-    "mtime": 1783517557.7101214,
+    "mtime": 1783518978.676504,
     "ast_hash": "4361531baa9867c552481b468b180225",
+    "semantic_hash": ""
+  },
+  "public/brand/uniqraft-product-art-frame.png": {
+    "mtime": 1783520059.2618377,
+    "ast_hash": "42e548db0b6e0f851455e5a6995a4c24",
+    "semantic_hash": ""
+  },
+  "public/landing/landing.jpg": {
+    "mtime": 1783520898.8696377,
+    "ast_hash": "7677f0c1227f1201ce100378223a74fe",
     "semantic_hash": ""
   }
 }
