@@ -445,5 +445,43 @@
     "currentImageAlt": "Current {label}",
     "replaceImageHelp": "Choose a file to replace the current image.",
     "uploadHelp": "Upload PNG, JPG, WEBP, or SVG up to 10 MB."
+  },
+  "legal": {
+    "privacy": {
+      "meta_title": "Privacy Policy — Uniqraft",
+      "meta_description": "How Uniqraft collects, uses, and protects your personal information.",
+      "title": "Privacy Policy",
+      "updated": "Last updated: July 8, 2026",
+      "intro": "Uniqraft (\"we\", \"us\") operates uniqraft.org, a marketplace for personalized, made-to-order products. This policy explains what personal information we collect, how we use it, and who we share it with.",
+      "collect_title": "Information We Collect",
+      "collect_account": "Account information: your email address and password, or — if you sign in with Google, Facebook, X, or Telegram — the name, email address, and profile photo that provider shares with us.",
+      "collect_order": "Order and profile information: your display name, shipping and billing address, contact email, and country and currency preferences.",
+      "collect_content": "Content you upload: photos and text you provide to personalize a product. These are sent to our AI provider (OpenAI) to generate your preview and final artwork.",
+      "collect_payment": "Payment information: payments are handled directly by our payment provider (Ameriabank). We do not receive or store your card details — only the resulting transaction reference and status.",
+      "collect_technical": "Technical information: cookies that keep you signed in, remember your language and currency, and hold your shopping cart before you create an account.",
+      "use_title": "How We Use Your Information",
+      "use_body": "We use your information to create and secure your account, generate your personalized product previews and artwork, process and fulfil orders and payments, communicate with you about your account or orders, remember your preferences, and meet our legal and accounting obligations.",
+      "share_title": "Who We Share It With",
+      "share_intro": "We share personal information only with service providers who process it on our behalf, and only for the purposes above:",
+      "share_supabase": "Supabase — authentication, database, and file storage.",
+      "share_openai": "OpenAI — generates your personalized image previews and artwork from the photos and text you upload.",
+      "share_ameria": "Ameriabank — processes your payment.",
+      "share_social": "Google, Meta (Facebook), X, and Telegram — only if you choose to sign in with that provider; they process your login under their own privacy policies.",
+      "share_outro": "We do not sell your personal information.",
+      "cookies_title": "Cookies",
+      "cookies_body": "We use cookies to keep you signed in, remember your chosen language and currency, and hold guest shopping cart contents. We do not currently use advertising or analytics cookies.",
+      "retention_title": "Data Retention",
+      "retention_body": "We keep your information for as long as your account is active, and afterwards for as long as needed to meet our legal, tax, and accounting obligations.",
+      "rights_title": "Your Rights",
+      "rights_body": "You can ask us to access, correct, or delete your personal information at any time by contacting us at the email address below.",
+      "children_title": "Children's Privacy",
+      "children_body": "Uniqraft is not directed at children under 16, and we do not knowingly collect personal information from them.",
+      "transfers_title": "International Data Transfers",
+      "transfers_body": "Our service providers may process your information in countries other than your own. Where this happens, we rely on the safeguards those providers offer under their own privacy policies.",
+      "changes_title": "Changes to This Policy",
+      "changes_body": "We may update this policy from time to time. We will revise the date at the top of this page when we do.",
+      "contact_title": "Contact Us",
+      "contact_body": "Questions about this policy or your personal information? Email us at support@uniqraft.com."
+    }
   }
 }
