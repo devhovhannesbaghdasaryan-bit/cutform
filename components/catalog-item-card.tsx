@@ -5,7 +5,7 @@ import { CatalogMediaSlider } from '@/components/catalog-media-slider';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { sortCatalogMedia } from '@/lib/catalog-media';
-import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
+import type { ConvertedMoney } from '@/lib/currency';
 import { getTranslations } from 'next-intl/server';
 import type { AppLocale } from '@/lib/i18n';
 import { formatLocalizedCurrency } from '@/lib/i18n';
@@ -15,9 +15,11 @@ import type { CatalogItem } from '@/lib/marketplace';
 export async function CatalogItemCard({
   item,
   locale = 'en',
+  convertedPrice,
 }: {
   item: CatalogItem;
   locale?: AppLocale;
+  convertedPrice: ConvertedMoney;
 }) {
   const t = await getTranslations();
   const media = sortCatalogMedia(item.media ?? []);
@@ -36,12 +38,6 @@ export async function CatalogItemCard({
           },
         ]
       : [];
-  const activeCurrency = await getActiveCurrency();
-  const convertedPrice = await convertMoney(
-    item.price_cents,
-    normalizeCurrency(item.currency) ?? 'AMD',
-    activeCurrency,
-  );
   const categoryName = item.category
     ? tDynamic(t, `category.${item.category.slug}.name`, item.category.name)
     : t('product.uncategorized');

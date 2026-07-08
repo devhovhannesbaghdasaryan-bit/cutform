@@ -10,6 +10,7 @@ import { listCategories, listPublishedCatalogItems, listSubcategories } from '@/
 import { getRequestLocale } from '@/lib/i18n-server';
 import { resolveCatalogMetadata } from '@/lib/seo';
 import { cn } from '@/lib/utils';
+import { applyExchangeRate, getActiveCurrency, getExchangeRates, normalizeCurrency } from '@/lib/currency';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,11 @@ export default async function CatalogPage({
     listPublishedCatalogItems(category, subcategory).catch(() => []),
     getTranslations(),
   ]);
+  const activeCurrency = await getActiveCurrency();
+  const exchangeRates = await getExchangeRates(
+    items.map((item) => normalizeCurrency(item.currency) ?? 'AMD'),
+    activeCurrency,
+  );
 
   const activeCategory = categories.find((item) => item.slug === category);
   const activeSubcategory = subcategories.find((item) => item.slug === subcategory);
@@ -143,9 +149,19 @@ export default async function CatalogPage({
           </div>
         ) : (
           <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {items.map((item) => (
-              <CatalogItemCard key={item.id} item={item} locale={locale} />
-            ))}
+            {items.map((item) => {
+              const fromCurrency = normalizeCurrency(item.currency) ?? 'AMD';
+              // biome-ignore lint/style/noNonNullAssertion: exchangeRates was built from these same items' currencies
+              const rate = exchangeRates.get(fromCurrency)!;
+              return (
+                <CatalogItemCard
+                  key={item.id}
+                  item={item}
+                  locale={locale}
+                  convertedPrice={applyExchangeRate(item.price_cents, rate)}
+                />
+              );
+            })}
           </div>
         )}
       </main>

@@ -12,6 +12,7 @@ import { getTranslations } from 'next-intl/server';
 import { listCategories, listPopularCatalogItems, listSubcategories } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { resolveCatalogMetadata } from '@/lib/seo';
+import { applyExchangeRate, getActiveCurrency, getExchangeRates, normalizeCurrency } from '@/lib/currency';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,11 @@ export default async function LandingPage() {
     getTranslations(),
   ]);
   const heroProducts = await loadHeroProducts();
+  const activeCurrency = await getActiveCurrency();
+  const exchangeRates = await getExchangeRates(
+    popularItems.map((item) => normalizeCurrency(item.currency) ?? 'AMD'),
+    activeCurrency,
+  );
 
   return (
     <>
@@ -128,9 +134,19 @@ export default async function LandingPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {popularItems.map((item) => (
-                  <CatalogItemCard key={item.id} item={item} locale={locale} />
-                ))}
+                {popularItems.map((item) => {
+                  const fromCurrency = normalizeCurrency(item.currency) ?? 'AMD';
+                  // biome-ignore lint/style/noNonNullAssertion: exchangeRates was built from these same items' currencies
+                  const rate = exchangeRates.get(fromCurrency)!;
+                  return (
+                    <CatalogItemCard
+                      key={item.id}
+                      item={item}
+                      locale={locale}
+                      convertedPrice={applyExchangeRate(item.price_cents, rate)}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>

@@ -290,6 +290,17 @@ export async function getExchangeRate(
   }
 }
 
+export function applyExchangeRate(
+  amountCents: number,
+  exchangeRateContext: ExchangeRateContext,
+): ConvertedMoney {
+  return {
+    amountCents: Math.round(amountCents * exchangeRateContext.rate),
+    currency: exchangeRateContext.targetCurrency,
+    exchangeRateContext,
+  };
+}
+
 export async function convertMoney(
   amountCents: number,
   fromCurrency: AppCurrency,
@@ -297,9 +308,21 @@ export async function convertMoney(
   supabase: SupabaseClient = getServiceSupabase(),
 ): Promise<ConvertedMoney> {
   const exchangeRateContext = await getExchangeRate(fromCurrency, toCurrency, supabase);
-  return {
-    amountCents: Math.round(amountCents * exchangeRateContext.rate),
-    currency: toCurrency,
-    exchangeRateContext,
-  };
+  return applyExchangeRate(amountCents, exchangeRateContext);
+}
+
+/** Fetches one rate per distinct source currency instead of once per caller, for batch price conversion (e.g. catalog grids). */
+export async function getExchangeRates(
+  fromCurrencies: AppCurrency[],
+  toCurrency: AppCurrency,
+  supabase: SupabaseClient = getServiceSupabase(),
+): Promise<Map<AppCurrency, ExchangeRateContext>> {
+  const uniqueFromCurrencies = [...new Set(fromCurrencies)];
+  const entries = await Promise.all(
+    uniqueFromCurrencies.map(
+      async (fromCurrency) =>
+        [fromCurrency, await getExchangeRate(fromCurrency, toCurrency, supabase)] as const,
+    ),
+  );
+  return new Map(entries);
 }
