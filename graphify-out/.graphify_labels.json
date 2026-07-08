@@ -359,5 +359,11 @@
   "357": "db-workflows.mjs",
   "358": "login-form.tsx",
   "359": "personalization-ai.ts",
-  "360": "2. Գործադիր եզրակացություն"
+  "360": "2. Գործադիր եզրակացություն",
+  "361": "storage.ts",
+  "362": "manufacturing-schema.ts",
+  "363": "transactions.ts",
+  "364": "page.tsx",
+  "365": "9. Պրոդուկտի և բիզնես մոդելի առաջարկ",
+  "366": "personalization-boilerplates.ts"
 }

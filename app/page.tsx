@@ -1,13 +1,11 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
 import { ArrowRight, BadgeCheck, PackageCheck, Sparkles } from 'lucide-react';
 import { CategoryNavigation } from '@/components/category-navigation';
 import { Button } from '@/components/ui/button';
 import { CatalogItemCard } from '@/components/catalog-item-card';
 import { MarketplaceHeader } from '@/components/marketplace-header';
-import { SvgRender } from '@/components/svg-render';
 import { getTranslations } from 'next-intl/server';
 import { listCategories, listPopularCatalogItems, listSubcategories } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
@@ -38,7 +36,6 @@ export default async function LandingPage() {
     listSubcategories().catch(() => []),
     getTranslations(),
   ]);
-  const heroProducts = await loadHeroProducts();
   const activeCurrency = await getActiveCurrency();
   const exchangeRates = await getExchangeRates(
     popularItems.map((item) => normalizeCurrency(item.currency) ?? 'AMD'),
@@ -85,27 +82,15 @@ export default async function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="relative mx-auto w-full max-w-[560px]">
-              <div className="product-art-frame grid gap-3 p-3 shadow-xl shadow-cyber-cyan/10 sm:grid-cols-[1.15fr_0.85fr] sm:p-4">
-                {heroProducts.map((product, index) => (
-                  <article
-                    key={product.title}
-                    className={
-                      index === 0 ? 'hero-product-card sm:row-span-2' : 'hero-product-card'
-                    }
-                  >
-                    <div className={index === 0 ? 'h-full min-h-64' : 'h-36 sm:h-full'}>
-                      <SvgRender svg={product.svg} className="h-full w-full p-5" />
-                    </div>
-                    <div className="absolute inset-x-3 bottom-3 rounded-md border bg-card/90 px-3 py-2 shadow-sm backdrop-blur">
-                      <p className="text-xs font-medium uppercase text-muted-foreground">
-                        {product.category}
-                      </p>
-                      <p className="truncate text-sm font-semibold">{product.title}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
+            <div className="relative mx-auto aspect-square w-full max-w-[560px] overflow-hidden rounded-lg border shadow-xl shadow-cyber-cyan/10">
+              <Image
+                src="/landing/landing.jpg"
+                alt={t('landing.title')}
+                fill
+                priority
+                sizes="(min-width: 1024px) 560px, 100vw"
+                className="object-contain"
+              />
             </div>
           </div>
         </section>
@@ -149,49 +134,4 @@ export default async function LandingPage() {
       </main>
     </>
   );
-}
-
-async function loadHeroProducts() {
-  const productRoot = path.join(process.cwd(), 'products');
-  const loaded = await Promise.all([
-    readHeroProduct(
-      productRoot,
-      'Modular plywood shelving',
-      'CNC routed decor',
-      'cnc-routed-wood-furniture-decor-fixtures',
-      '01-modular-plywood-shelving',
-    ),
-    readHeroProduct(
-      productRoot,
-      'Personalized lithophane lamp',
-      'Night lights',
-      '3d-printed-products-parts-fixtures-custom-devices',
-      '07-personalized-lithophane-lamps',
-    ),
-    readHeroProduct(
-      productRoot,
-      'Flat-pack laptop stand',
-      'Desk gifts',
-      'cnc-routed-wood-furniture-decor-fixtures',
-      '04-flat-pack-laptop-stand',
-    ),
-  ]);
-
-  return loaded.filter((item) => item.svg);
-}
-
-async function readHeroProduct(
-  productRoot: string,
-  title: string,
-  category: string,
-  group: string,
-  slug: string,
-) {
-  return {
-    title,
-    category,
-    svg: await readFile(path.join(productRoot, group, slug, 'assets', 'hero.svg'), 'utf8').catch(
-      () => '',
-    ),
-  };
 }
