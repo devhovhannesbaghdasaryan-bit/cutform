@@ -4,7 +4,7 @@ Date: 2026-07-01
 
 ## Scope
 
-Snip must let a user authenticate with Facebook (Meta), Google, X, or Telegram from the existing login page while retaining email/password login.
+Uniqraft must let a user authenticate with Facebook (Meta), Google, X, or Telegram from the existing login page while retaining email/password login.
 
 Instagram is not a separate login identity in this scope: Meta authentication is provided through Facebook Login. Instagram API access, permissions, and account linking are separate product capabilities.
 

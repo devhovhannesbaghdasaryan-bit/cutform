@@ -6,7 +6,7 @@ Date: 2026-06-10
 
 ## Summary
 
-Snip should become a marketplace for laser-cut and crafted products. Users can buy ready-made items from an existing catalog, and can also generate custom products in supported categories by spending purchased credits.
+Uniqraft should become a marketplace for laser-cut and crafted products. Users can buy ready-made items from an existing catalog, and can also generate custom products in supported categories by spending purchased credits.
 
 The MVP should focus on two revenue paths:
 
@@ -15,7 +15,7 @@ The MVP should focus on two revenue paths:
 
 ## Product Goals
 
-- Present Snip as a commerce product, not only a generation tool.
+- Present Uniqraft as a commerce product, not only a generation tool.
 - Let users buy existing products from a managed catalog.
 - Let users generate custom night lights and 2D laser-cut items from uploaded images.
 - Let users personalize supported night light models from the `Night lights > Personalized` subcategory.
@@ -383,7 +383,7 @@ Layout requirements:
 
 Marketplace-specific adaptation requirements:
 
-- Replace the reference app's software/SaaS copy patterns with crafted-product marketplace patterns suited to Snip.
+- Replace the reference app's software/SaaS copy patterns with crafted-product marketplace patterns suited to Uniqraft.
 - Preserve the reference app's simplicity and section rhythm, but adapt content blocks to products, categories, personalized items, banners, and generated items.
 - Keep category discovery prominent.
 - Keep product cards, price visibility, and add-to-cart behavior obvious.

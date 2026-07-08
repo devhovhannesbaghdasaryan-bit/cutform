@@ -2,7 +2,7 @@
 
 Date: 2026-07-02
 
-Goal: give Snip accessible light and dark themes inspired by Cyberpunk 2077 while preserving the marketplace's product-first layout and behavior.
+Goal: give Uniqraft accessible light and dark themes inspired by Cyberpunk 2077 while preserving the marketplace's product-first layout and behavior.
 
 ## Foundation
 

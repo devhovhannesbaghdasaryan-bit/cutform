@@ -489,7 +489,7 @@ These tasks unblock implementation details that affect schema, UI copy, pricing,
   - Provide links to catalog and generation.
   - Render localized copy and preserve active locale in links.
   - Render localized SEO metadata.
-  - Match the reference app's clean hero-first, sectioned marketplace rhythm while adapting content to Snip.
+  - Match the reference app's clean hero-first, sectioned marketplace rhythm while adapting content to Uniqraft.
   - Acceptance: guest can understand the store and reach main flows from first screen, and the page visually aligns with the redesign target.
 
 - [x] Add popular item section.

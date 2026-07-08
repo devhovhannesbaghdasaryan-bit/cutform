@@ -213,7 +213,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     "smtp_port": 465,
     "smtp_user": "resend",
     "smtp_pass": "your-resend-api-key",
-    "smtp_sender_name": "Snip"
+    "smtp_sender_name": "Uniqraft"
   }'
 ```
 
