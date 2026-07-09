@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { type requireAdmin, requireAdminPermission } from '@/lib/admin';
 import { updateGeneratedReviewStatus } from '@/lib/generated-items';
 import { downloadFromBucket, uploadToBucket } from '@/lib/storage';
+import { tracePngToSvg } from '@/lib/svg-trace';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 const reviewSchema = z.object({
@@ -22,7 +23,17 @@ const generateManufacturingFileSchema = z.object({
   model: z.enum(['gpt-image-2', 'gpt-image-1.5', 'gpt-image-1', 'gpt-image-1-mini']),
 });
 
+const generateManufacturingSvgSchema = z.object({
+  generatedItemId: z.string().uuid(),
+  optionId: z.string().uuid(),
+});
+
 export type ManufacturingFileGenerationState = {
+  status: 'idle' | 'success' | 'error';
+  message: string | null;
+};
+
+export type ManufacturingSvgGenerationState = {
   status: 'idle' | 'success' | 'error';
   message: string | null;
 };
@@ -195,6 +206,103 @@ export async function generateManufacturingFileAction(
     return {
       status: 'error',
       message: error instanceof Error ? error.message : 'Unable to generate the manufacturing PNG.',
+    };
+  }
+}
+
+export async function generateManufacturingSvgAction(
+  _previousState: ManufacturingSvgGenerationState,
+  formData: FormData,
+): Promise<ManufacturingSvgGenerationState> {
+  const parsed = generateManufacturingSvgSchema.safeParse({
+    generatedItemId: formData.get('generatedItemId'),
+    optionId: formData.get('optionId'),
+  });
+  if (!parsed.success) {
+    return {
+      status: 'error',
+      message: parsed.error.issues[0]?.message ?? 'Invalid request.',
+    };
+  }
+
+  const { supabase, user } = await requireAdminPermission('generated_review');
+  const settings = parsed.data;
+
+  try {
+    const [{ data: item, error: itemError }, { data: option, error: optionError }] =
+      await Promise.all([
+        supabase
+          .from('generated_items')
+          .select('id, user_id')
+          .eq('id', settings.generatedItemId)
+          .maybeSingle<{ id: string; user_id: string }>(),
+        supabase
+          .from('personalized_preview_options')
+          .select('id, generated_item_id, manufacturing_file_path, metadata')
+          .eq('id', settings.optionId)
+          .eq('generated_item_id', settings.generatedItemId)
+          .maybeSingle<{
+            id: string;
+            generated_item_id: string;
+            manufacturing_file_path: string | null;
+            metadata: Record<string, unknown>;
+          }>(),
+      ]);
+    if (itemError || !item) throw new Error(itemError?.message ?? 'Generated item was not found.');
+    if (optionError || !option)
+      throw new Error(optionError?.message ?? 'Preview option was not found.');
+    if (!option.manufacturing_file_path) {
+      throw new Error('Generate the manufacturing PNG for this option first.');
+    }
+
+    const pngBlob = await downloadFromBucket(
+      supabase,
+      'generated-assets',
+      option.manufacturing_file_path,
+      'Unable to load the manufacturing PNG.',
+    );
+    const svg = await tracePngToSvg(Buffer.from(await pngBlob.arrayBuffer()));
+
+    const storagePath = `${item.user_id}/personalized-night-lights/manufacturing-svg/${crypto.randomUUID()}.svg`;
+    await uploadToBucket(supabase, {
+      bucket: 'generated-assets',
+      path: storagePath,
+      body: Buffer.from(svg, 'utf8'),
+      contentType: 'image/svg+xml',
+    });
+
+    const { error: updateOptionError } = await supabase
+      .from('personalized_preview_options')
+      .update({
+        metadata: {
+          ...option.metadata,
+          manufacturingSvgPath: storagePath,
+          manufacturingSvgGeneratedAt: new Date().toISOString(),
+        },
+      })
+      .eq('id', option.id);
+    if (updateOptionError) throw new Error(updateOptionError.message);
+
+    await writeAdminAuditLog(supabase, {
+      actorUserId: user.id,
+      targetUserId: item.user_id,
+      action: option.metadata.manufacturingSvgPath
+        ? 'manufacturing_svg_regenerated'
+        : 'manufacturing_svg_generated',
+      entityType: 'personalized_preview_option',
+      entityId: option.id,
+      metadata: { storagePath, tracedFrom: option.manufacturing_file_path },
+    });
+
+    revalidatePath(`/admin/generated/${settings.generatedItemId}`);
+    return {
+      status: 'success',
+      message: 'Manufacturing SVG generated and attached to this option.',
+    };
+  } catch (error) {
+    return {
+      status: 'error',
+      message: error instanceof Error ? error.message : 'Unable to generate the manufacturing SVG.',
     };
   }
 }
