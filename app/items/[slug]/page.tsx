@@ -115,6 +115,7 @@ export default async function CatalogItemDetailPage({
               media={sliderMedia}
               fallbackTitle={item.title}
               fallbackCategory={item.category?.name}
+              sizes="(min-width: 1024px) 55vw, 100vw"
             />
           </div>
 

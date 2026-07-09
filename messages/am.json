@@ -254,7 +254,9 @@
     "empty_in": "{name} բաժնում հրապարակված ապրանքներ չեն գտնվել։",
     "all_items": "Բոլոր ապրանքները",
     "all_category": "Բոլորը՝ {name}",
-    "generate_custom": "Ստեղծել անհատական դիզայն"
+    "generate_custom": "Ստեղծել անհատական դիզայն",
+    "previous_page": "Նախորդ",
+    "next_page": "Հաջորդ"
   },
   "categories": {
     "title": "Բաժիններ",

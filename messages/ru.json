@@ -254,7 +254,9 @@
     "empty_in": "Опубликованные товары не найдены в разделе {name}.",
     "all_items": "Все товары",
     "all_category": "Все: {name}",
-    "generate_custom": "Создать свой дизайн"
+    "generate_custom": "Создать свой дизайн",
+    "previous_page": "Назад",
+    "next_page": "Далее"
   },
   "categories": {
     "title": "Категории",

@@ -1,5 +1,5 @@
-import { unstable_noStore as noStore } from 'next/cache';
-import { getServerSupabase } from '@/lib/supabase/server';
+import { unstable_cache, unstable_noStore as noStore } from 'next/cache';
+import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import type { AppLocale } from '@/lib/i18n';
 import type { CatalogSeoMetadata } from '@/lib/seo';
 import { resolveCatalogMarkets, resolveMarket } from '@/lib/market';
@@ -100,28 +100,39 @@ const CATALOG_SELECT = `
   )
 `;
 
-export async function listCategories() {
-  noStore();
-  const supabase = await getServerSupabase();
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id, slug, name, description, sort_order')
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true })
-    .returns<MarketplaceCategory[]>();
+// Categories/subcategories are admin-managed (via migrations, not a runtime
+// admin UI) and change rarely, so a long revalidate window is fine. They use
+// the service client (not getServerSupabase()) because unstable_cache
+// callbacks cannot call the cookie-dependent dynamic APIs the request-scoped
+// client relies on.
+const getCachedCategories = unstable_cache(
+  async () => {
+    const supabase = getServiceSupabase();
+    const { data, error } = await supabase
+      .from('categories')
+      .select('id, slug, name, description, sort_order')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .returns<MarketplaceCategory[]>();
 
-  if (error) throw new Error(error.message);
-  return data ?? [];
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+  ['catalog-categories'],
+  { revalidate: 3600, tags: ['categories'] },
+);
+
+export async function listCategories() {
+  return getCachedCategories();
 }
 
-export async function listSubcategories(categorySlug?: string) {
-  noStore();
-  const supabase = await getServerSupabase();
-
-  let query = supabase
-    .from('subcategories')
-    .select(
-      `
+const getCachedSubcategories = unstable_cache(
+  async (categorySlug: string | undefined) => {
+    const supabase = getServiceSupabase();
+    let query = supabase
+      .from('subcategories')
+      .select(
+        `
         id,
         category_id,
         slug,
@@ -133,52 +144,108 @@ export async function listSubcategories(categorySlug?: string) {
           name
         )
       `,
-    )
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true });
+      )
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
 
-  if (categorySlug) {
-    query = query.eq('categories.slug', categorySlug);
-  }
+    if (categorySlug) {
+      query = query.eq('categories.slug', categorySlug);
+    }
 
-  const { data, error } = await query.returns<MarketplaceSubcategory[]>();
-  if (error) throw new Error(error.message);
+    const { data, error } = await query.returns<MarketplaceSubcategory[]>();
+    if (error) throw new Error(error.message);
 
-  return (data ?? []).filter((item) => !categorySlug || item.category?.slug === categorySlug);
+    return (data ?? []).filter((item) => !categorySlug || item.category?.slug === categorySlug);
+  },
+  ['catalog-subcategories'],
+  { revalidate: 3600, tags: ['subcategories'] },
+);
+
+export async function listSubcategories(categorySlug?: string) {
+  return getCachedSubcategories(categorySlug);
 }
 
-export async function listPublishedCatalogItems(categorySlug?: string, subcategorySlug?: string) {
-  noStore();
-  const supabase = await getServerSupabase();
+export const CATALOG_PAGE_SIZE = 24;
 
-  let query = supabase
-    .from('catalog_items')
-    .select(CATALOG_SELECT)
-    .eq('status', 'published')
-    .order('created_at', { ascending: false });
+// Cached, market-agnostic page of published items. Deliberately filters by
+// category_id/subcategory_id (plain columns, using the existing
+// catalog_items_published_category_idx / catalog_items_subcategory_idx
+// indexes) rather than the embedded category/subcategory slug — PostgREST
+// only applies a filter on an embedded resource to the parent rows with an
+// `!inner` join, which the previous version didn't use, so that filter was
+// silently a no-op and the whole (unfiltered, unpaginated) published catalog
+// was fetched and filtered in JS on every request instead.
+const getCachedPublishedCatalogItemsPage = unstable_cache(
+  async (categoryId: string | undefined, subcategoryId: string | undefined, offset: number) => {
+    const supabase = getServiceSupabase();
+    let query = supabase
+      .from('catalog_items')
+      .select(CATALOG_SELECT)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      // Fetch one extra row so the caller can tell whether another page
+      // exists without a separate COUNT(*) query.
+      .range(offset, offset + CATALOG_PAGE_SIZE);
 
-  if (categorySlug) {
-    query = query.eq('categories.slug', categorySlug);
-  }
+    if (categoryId) query = query.eq('category_id', categoryId);
+    if (subcategoryId) query = query.eq('subcategory_id', subcategoryId);
 
-  if (subcategorySlug) {
-    query = query.eq('subcategories.slug', subcategorySlug);
-  }
+    const { data, error } = await query.returns<CatalogItem[]>();
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+  ['catalog-items-page'],
+  { revalidate: 300, tags: ['catalog-items'] },
+);
 
-  const { data, error } = await query.returns<CatalogItem[]>();
-  if (error) throw new Error(error.message);
+/**
+ * A page of published catalog items, filtered by category/subcategory id and
+ * the visitor's resolved market (country/region availability + shipping).
+ * The DB fetch is cached and shared across visitors; market resolution reads
+ * cookies so it stays per-request and runs after the cached fetch.
+ */
+export async function listPublishedCatalogItems(
+  categoryId?: string,
+  subcategoryId?: string,
+  page = 1,
+) {
+  const safePage = Number.isInteger(page) && page > 0 ? page : 1;
+  const offset = (safePage - 1) * CATALOG_PAGE_SIZE;
 
-  const categoryMatches = (data ?? []).filter((item) => {
-    const matchesCategory = !categorySlug || item.category?.slug === categorySlug;
-    const matchesSubcategory = !subcategorySlug || item.subcategory?.slug === subcategorySlug;
-    return matchesCategory && matchesSubcategory;
-  });
+  const rows = await getCachedPublishedCatalogItemsPage(categoryId, subcategoryId, offset);
+  const hasMore = rows.length > CATALOG_PAGE_SIZE;
+  const pageItems = hasMore ? rows.slice(0, CATALOG_PAGE_SIZE) : rows;
+
   const market = await resolveMarket();
   const resolutions = await resolveCatalogMarkets(
-    categoryMatches.map((item) => item.id),
+    pageItems.map((item) => item.id),
     market,
   );
-  return categoryMatches.filter((item) => resolutions.get(item.id)?.availability.available ?? true);
+  const items = pageItems.filter(
+    (item) => resolutions.get(item.id)?.availability.available ?? true,
+  );
+
+  return { items, page: safePage, hasMore };
+}
+
+const getCachedPublishedCatalogSlugs = unstable_cache(
+  async () => {
+    const supabase = getServiceSupabase();
+    const { data, error } = await supabase
+      .from('catalog_items')
+      .select('slug')
+      .eq('status', 'published')
+      .returns<{ slug: string }[]>();
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  },
+  ['catalog-item-slugs'],
+  { revalidate: 300, tags: ['catalog-items'] },
+);
+
+/** Every published item's slug, unpaginated — for the sitemap, not for rendering a page. */
+export async function listPublishedCatalogItemSlugs() {
+  return getCachedPublishedCatalogSlugs();
 }
 
 export async function listPopularCatalogItems(limit = 4) {

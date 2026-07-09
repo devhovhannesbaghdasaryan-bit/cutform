@@ -51,24 +51,33 @@ export async function generateMetadata({
 export default async function CatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; subcategory?: string }>;
+  searchParams: Promise<{ category?: string; subcategory?: string; page?: string }>;
 }) {
-  const { category, subcategory } = await searchParams;
-  const [locale, categories, subcategories, items, t] = await Promise.all([
+  const { category, subcategory, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number.parseInt(pageParam ?? '1', 10) || 1);
+
+  const [locale, categories, subcategories, t] = await Promise.all([
     getRequestLocale(),
     listCategories().catch(() => []),
     listSubcategories(category).catch(() => []),
-    listPublishedCatalogItems(category, subcategory).catch(() => []),
     getTranslations(),
   ]);
-  const activeCurrency = await getActiveCurrency();
+
+  const activeCategory = categories.find((item) => item.slug === category);
+  const activeSubcategory = subcategories.find((item) => item.slug === subcategory);
+
+  const [{ items, hasMore }, activeCurrency] = await Promise.all([
+    listPublishedCatalogItems(activeCategory?.id, activeSubcategory?.id, page).catch(() => ({
+      items: [],
+      page,
+      hasMore: false,
+    })),
+    getActiveCurrency(),
+  ]);
   const exchangeRates = await getExchangeRates(
     items.map((item) => normalizeCurrency(item.currency) ?? 'AMD'),
     activeCurrency,
   );
-
-  const activeCategory = categories.find((item) => item.slug === category);
-  const activeSubcategory = subcategories.find((item) => item.slug === subcategory);
   const activeCategoryName = activeCategory
     ? tDynamic(t, `category.${activeCategory.slug}.name`, activeCategory.name)
     : null;
@@ -142,25 +151,65 @@ export default async function CatalogPage({
               : t('catalog.empty')}
           </div>
         ) : (
-          <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {items.map((item) => {
-              const fromCurrency = normalizeCurrency(item.currency) ?? 'AMD';
-              // biome-ignore lint/style/noNonNullAssertion: exchangeRates was built from these same items' currencies
-              const rate = exchangeRates.get(fromCurrency)!;
-              return (
-                <CatalogItemCard
-                  key={item.id}
-                  item={item}
-                  locale={locale}
-                  convertedPrice={applyExchangeRate(item.price_cents, rate)}
-                />
-              );
-            })}
-          </div>
+          <>
+            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {items.map((item) => {
+                const fromCurrency = normalizeCurrency(item.currency) ?? 'AMD';
+                // biome-ignore lint/style/noNonNullAssertion: exchangeRates was built from these same items' currencies
+                const rate = exchangeRates.get(fromCurrency)!;
+                return (
+                  <CatalogItemCard
+                    key={item.id}
+                    item={item}
+                    locale={locale}
+                    convertedPrice={applyExchangeRate(item.price_cents, rate)}
+                  />
+                );
+              })}
+            </div>
+
+            {(page > 1 || hasMore) && (
+              <div className="flex items-center justify-center gap-3 pt-2">
+                {page > 1 && (
+                  <Link
+                    href={buildCatalogHref({ category, subcategory, page: page - 1 })}
+                    className="rounded-full border px-4 py-1.5 text-sm transition-colors hover:bg-accent"
+                  >
+                    {t('catalog.previous_page')}
+                  </Link>
+                )}
+                {hasMore && (
+                  <Link
+                    href={buildCatalogHref({ category, subcategory, page: page + 1 })}
+                    className="rounded-full border px-4 py-1.5 text-sm transition-colors hover:bg-accent"
+                  >
+                    {t('catalog.next_page')}
+                  </Link>
+                )}
+              </div>
+            )}
+          </>
         )}
       </main>
     </>
   );
+}
+
+function buildCatalogHref({
+  category,
+  subcategory,
+  page,
+}: {
+  category?: string;
+  subcategory?: string;
+  page: number;
+}) {
+  const search = new URLSearchParams();
+  if (category) search.set('category', category);
+  if (subcategory) search.set('subcategory', subcategory);
+  if (page > 1) search.set('page', String(page));
+  const query = search.toString();
+  return query ? `/catalog?${query}` : '/catalog';
 }
 
 function CategoryPill({

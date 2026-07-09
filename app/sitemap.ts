@@ -1,12 +1,12 @@
 import type { MetadataRoute } from 'next';
 import { APP_LOCALES } from '@/lib/i18n';
-import { listCategories, listPublishedCatalogItems } from '@/lib/marketplace';
+import { listCategories, listPublishedCatalogItemSlugs } from '@/lib/marketplace';
 import { getCanonicalUrl } from '@/lib/seo';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [categories, items] = await Promise.all([
     listCategories().catch(() => []),
-    listPublishedCatalogItems().catch(() => []),
+    listPublishedCatalogItemSlugs().catch(() => []),
   ]);
 
   const paths = new Set<string>(['/', '/catalog']);
