@@ -254,7 +254,9 @@
     "empty_in": "No published items found in {name}.",
     "all_items": "All items",
     "all_category": "All {name}",
-    "generate_custom": "Generate custom item"
+    "generate_custom": "Generate custom item",
+    "previous_page": "Previous",
+    "next_page": "Next"
   },
   "categories": {
     "title": "Explore categories",
