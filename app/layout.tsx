@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getLocaleForFormatting } from '@/lib/i18n';
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
           <Toaster richColors position="top-right" />
         </TooltipProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
