@@ -40,3 +40,18 @@ on conflict (name) do update set
   generate_hidden_svg = excluded.generate_hidden_svg,
   is_active = excluded.is_active,
   sort_order = excluded.sort_order;
+
+-- Local dev admin: grants full admin_permissions to the owner's account so
+-- admin actions (e.g. saving a catalog item) don't silently redirect on a
+-- fresh reset. profiles.role must independently be 'admin' for this to take
+-- effect (set via the profiles table, not here). No-op until this email has
+-- signed in locally at least once (auth.users is empty on a fresh reset).
+insert into public.admin_permissions (user_id, permission)
+select u.id, p.permission
+from auth.users u
+cross join (values
+  ('catalog_manage'), ('seo_manage'), ('orders_manage'), ('generated_review'),
+  ('users_manage'), ('transactions_manage'), ('balances_adjust')
+) as p(permission)
+where u.email = 'dev.hovhannesbaghdasaryan@gmail.com'
+on conflict (user_id, permission) do nothing;
