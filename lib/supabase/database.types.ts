@@ -612,6 +612,10 @@ export type Database = {
           is_customizable: boolean
           is_popular: boolean
           item_type: string
+          laser_contour_enabled: boolean
+          laser_solid_enabled: boolean
+          laser_solid_price_cents: number | null
+          laser_solid_prompt: string | null
           manufacturing_notes: string | null
           price_cents: number
           product_source: string
@@ -638,6 +642,10 @@ export type Database = {
           is_customizable?: boolean
           is_popular?: boolean
           item_type?: string
+          laser_contour_enabled?: boolean
+          laser_solid_enabled?: boolean
+          laser_solid_price_cents?: number | null
+          laser_solid_prompt?: string | null
           manufacturing_notes?: string | null
           price_cents: number
           product_source?: string
@@ -664,6 +672,10 @@ export type Database = {
           is_customizable?: boolean
           is_popular?: boolean
           item_type?: string
+          laser_contour_enabled?: boolean
+          laser_solid_enabled?: boolean
+          laser_solid_price_cents?: number | null
+          laser_solid_prompt?: string | null
           manufacturing_notes?: string | null
           price_cents?: number
           product_source?: string

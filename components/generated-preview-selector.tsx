@@ -5,11 +5,14 @@ import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { addGeneratedItemToCartAction } from '@/app/generated/actions';
 import { Button } from '@/components/ui/button';
+import { type AppLocale, formatLocalizedCurrency } from '@/lib/i18n';
 
 interface GeneratedPreviewOption {
   id: string;
   label: string;
   previewUrl: string | null;
+  /** Per-option price in cents; when set it is shown on the card and summed for the selection. */
+  priceCents: number | null;
 }
 
 interface GeneratedPreviewSelectorProps {
@@ -17,7 +20,10 @@ interface GeneratedPreviewSelectorProps {
   itemTitle: string;
   options: GeneratedPreviewOption[];
   fallbackPreviewUrl: string | null;
+  /** Fallback price label shown when options carry no per-option price. */
   priceLabel: string | null;
+  locale: AppLocale;
+  currency: string;
   copy: {
     resultsTitle: string;
     resultsHelp: string;
@@ -25,6 +31,7 @@ interface GeneratedPreviewSelectorProps {
     previewUnavailable: string;
     noPreview: string;
     previewAlt: string;
+    total: string;
   };
 }
 
@@ -34,6 +41,8 @@ export function GeneratedPreviewSelector({
   options,
   fallbackPreviewUrl,
   priceLabel,
+  locale,
+  currency,
   copy,
 }: GeneratedPreviewSelectorProps) {
   const firstOptionId = options[0]?.id ?? null;
@@ -43,6 +52,10 @@ export function GeneratedPreviewSelector({
   );
   const activeOption = options.find((option) => option.id === activeId) ?? options[0];
   const activePreviewUrl = activeOption?.previewUrl ?? fallbackPreviewUrl;
+  const hasPerOptionPrices = options.some((option) => option.priceCents !== null);
+  const selectedTotalCents = options
+    .filter((option) => selectedIds.has(option.id))
+    .reduce((sum, option) => sum + (option.priceCents ?? 0), 0);
 
   function updateSelection(optionId: string, checked: boolean) {
     setSelectedIds((current) => {
@@ -122,7 +135,14 @@ export function GeneratedPreviewSelector({
                     )}
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-3">
-                    <p className="text-sm font-medium">{option.label}</p>
+                    <div>
+                      <p className="text-sm font-medium">{option.label}</p>
+                      {option.priceCents !== null ? (
+                        <p className="text-sm text-muted-foreground">
+                          {formatLocalizedCurrency(locale, option.priceCents, currency)}
+                        </p>
+                      ) : null}
+                    </div>
                     <span
                       aria-hidden="true"
                       className={`grid h-6 w-6 place-items-center rounded border ${selected ? 'border-primary bg-primary text-primary-foreground' : 'opacity-0'}`}
@@ -135,7 +155,18 @@ export function GeneratedPreviewSelector({
             })}
           </div>
           <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-            {priceLabel ? <p className="font-semibold">{priceLabel}</p> : <span />}
+            {hasPerOptionPrices ? (
+              <p className="font-semibold">
+                {copy.total.replace(
+                  '{price}',
+                  formatLocalizedCurrency(locale, selectedTotalCents, currency),
+                )}
+              </p>
+            ) : priceLabel ? (
+              <p className="font-semibold">{priceLabel}</p>
+            ) : (
+              <span />
+            )}
             <Button type="submit" disabled={!selectedIds.size}>
               {copy.addSelected}
             </Button>

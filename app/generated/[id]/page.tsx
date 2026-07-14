@@ -139,16 +139,39 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
             <GeneratedPreviewSelector
               generatedItemId={item.id}
               itemTitle={itemTitle}
-              options={previewOptions.map((option) => ({
-                id: option.id,
-                previewUrl: option.previewUrl,
-                label: option.boilerplate
-                  ? option.boilerplate.name
-                  : typeof option.metadata.boilerplateName === 'string'
+              options={previewOptions.map((option) => {
+                const style =
+                  typeof option.metadata.engravingStyle === 'string'
+                    ? option.metadata.engravingStyle
+                    : null;
+                const styleFallback =
+                  typeof option.metadata.engravingStyleLabel === 'string'
+                    ? option.metadata.engravingStyleLabel
+                    : '';
+                const styleLabel = style
+                  ? tDynamic(t, `generated.laserStyle.${style}`, styleFallback)
+                  : null;
+                const boilerplateName =
+                  option.boilerplate?.name ??
+                  (typeof option.metadata.boilerplateName === 'string'
                     ? option.metadata.boilerplateName
-                    : t('generated.option', { number: String(option.option_index) }),
-              }))}
+                    : null);
+                const label =
+                  styleLabel && boilerplateName
+                    ? `${boilerplateName} · ${styleLabel}`
+                    : (styleLabel ??
+                      boilerplateName ??
+                      t('generated.option', { number: String(option.option_index) }));
+                return {
+                  id: option.id,
+                  previewUrl: option.previewUrl,
+                  label,
+                  priceCents: previewOptionPriceCents(option, salePriceCents),
+                };
+              })}
               fallbackPreviewUrl={fallbackPreviewUrl}
+              locale={locale}
+              currency={saleCurrency}
               priceLabel={
                 salePriceCents > 0
                   ? t('generated.priceEach', {
@@ -162,8 +185,9 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
                 addSelected: t('personalize.addSelected'),
                 previewUnavailable: t('generated.previewUnavailable'),
                 noPreview: t('generated.noPreview'),
-                // Raw template ({name}) — the client component interpolates it.
+                // Raw templates ({name}/{price}) — the client component interpolates them.
                 previewAlt: t.raw('generated.previewAlt'),
+                total: t.raw('generated.total'),
               }}
             />
             {!hasPreviewOptions && item.svg_content ? (
@@ -242,6 +266,16 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
       </main>
     </>
   );
+}
+
+/** Per-option price in cents: the style's own price, falling back to the catalog price. */
+function previewOptionPriceCents(
+  option: { metadata: Record<string, unknown> },
+  salePriceCents: number,
+): number | null {
+  const raw = option.metadata.unitPriceCents;
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+  return salePriceCents > 0 ? salePriceCents : null;
 }
 
 function extractValidationWarnings(metadata: Record<string, unknown>) {

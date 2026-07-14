@@ -6,6 +6,7 @@ describe('composePersonalizationPrompt', () => {
     const prompt = composePersonalizationPrompt({
       systemPrompt: 'Base instructions.',
       boilerplateInstruction: null,
+      engravingInstruction: null,
       personalizedText: null,
       personalizedTextFormatting: null,
       colorLabel: null,
@@ -19,6 +20,7 @@ describe('composePersonalizationPrompt', () => {
     const prompt = composePersonalizationPrompt({
       systemPrompt: 'Base instructions.',
       boilerplateInstruction: 'Rectangular UV-printed acrylic panel.',
+      engravingInstruction: null,
       personalizedText: 'Happy Birthday',
       personalizedTextFormatting: 'bold emphasis, center aligned',
       colorLabel: 'Warm white',
@@ -36,10 +38,27 @@ describe('composePersonalizationPrompt', () => {
     );
   });
 
+  it('inserts the engraving instruction after the boilerplate instruction', () => {
+    const prompt = composePersonalizationPrompt({
+      systemPrompt: 'Base instructions.',
+      boilerplateInstruction: 'Panel shape.',
+      engravingInstruction: 'Solid scratched fill on glass.',
+      personalizedText: null,
+      personalizedTextFormatting: null,
+      colorLabel: null,
+      colorHex: null,
+      hasPhoto: false,
+    });
+    expect(prompt).toBe(
+      ['Base instructions.', 'Panel shape.', 'Solid scratched fill on glass.'].join('\n\n'),
+    );
+  });
+
   it('omits the formatting parenthetical when no formatting is given', () => {
     const prompt = composePersonalizationPrompt({
       systemPrompt: null,
       boilerplateInstruction: null,
+      engravingInstruction: null,
       personalizedText: 'Hello',
       personalizedTextFormatting: null,
       colorLabel: null,
@@ -53,6 +72,7 @@ describe('composePersonalizationPrompt', () => {
     const prompt = composePersonalizationPrompt({
       systemPrompt: null,
       boilerplateInstruction: null,
+      engravingInstruction: null,
       personalizedText: null,
       personalizedTextFormatting: null,
       colorLabel: null,

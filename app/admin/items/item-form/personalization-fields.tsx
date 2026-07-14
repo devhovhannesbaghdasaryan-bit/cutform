@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PERSONALIZATION_TAGS } from '@/lib/personalization-constants';
+import { EngravingFields } from './engraving-fields';
 import type { BoilerplateOption, ItemFormValue } from './types';
 
 const TAG_LABELS: Record<(typeof PERSONALIZATION_TAGS)[number], string> = {
@@ -15,7 +16,16 @@ export function PersonalizationFields({
   boilerplateOptions,
   selectedBoilerplateIds,
 }: {
-  item?: Pick<ItemFormValue, 'system_prompt' | 'skill_id' | 'tags'>;
+  item?: Pick<
+    ItemFormValue,
+    | 'system_prompt'
+    | 'skill_id'
+    | 'tags'
+    | 'laser_contour_enabled'
+    | 'laser_solid_enabled'
+    | 'laser_solid_price_cents'
+    | 'laser_solid_prompt'
+  >;
   boilerplateOptions: BoilerplateOption[];
   selectedBoilerplateIds: string[];
 }) {
@@ -82,6 +92,8 @@ export function PersonalizationFields({
           </p>
         )}
       </div>
+      <EngravingFields item={item} />
+
       <p className="text-xs text-muted-foreground">
         At least one of System prompt, Skill ID, or a selected boilerplate is required when
         Customizable is checked.

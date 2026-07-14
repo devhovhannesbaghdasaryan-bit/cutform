@@ -38,6 +38,10 @@ export type ItemFormValue = Partial<
     | 'system_prompt'
     | 'skill_id'
     | 'tags'
+    | 'laser_contour_enabled'
+    | 'laser_solid_enabled'
+    | 'laser_solid_price_cents'
+    | 'laser_solid_prompt'
   >
 >;
 

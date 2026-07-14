@@ -312,6 +312,8 @@ export interface FetchedPreviewOptionForCartAdd {
   previewImagePath: string;
   manufacturingFilePath: string | null;
   metadata: Record<string, unknown>;
+  /** Per-option pricing (already converted to the active currency). Falls back to the shared pricing when absent. */
+  pricing?: GeneratedItemCartAddPricing;
 }
 
 export interface GeneratedItemCartAddPricing {
@@ -357,30 +359,40 @@ export function planGeneratedItemCartAdd(input: {
     if (fetchedOptions.length !== optionIds.length) {
       throw new Error('One or more generated options are unavailable.');
     }
-    return fetchedOptions.map((option) => ({
-      generatedItemId: item.id,
-      title:
-        typeof option.metadata.boilerplateName === 'string'
-          ? option.metadata.boilerplateName
-          : (item.title ?? 'Personalized night light'),
-      quantity: 1,
-      unitPriceCents: pricing.unitPriceCents,
-      currency: pricing.currency,
-      configuration: {
-        productType: item.productType,
-        personalizedPreviewOptionId: option.id,
-        selectedPreviewPath: option.previewImagePath,
-        // NOTE: 'hiddenSvgPath' is a stored jsonb key inside cart_items.configuration
-        // (snapshotted into order_items.item_snapshot). Existing rows carry it, so the
-        // key is intentionally NOT renamed; it holds the manufacturing file path.
-        hiddenSvgPath: option.manufacturingFilePath,
-        boilerplateSnapshot: option.metadata,
-        creditCost: 1,
-        sourcePriceCents: pricing.sourcePriceCents,
-        sourceCurrency: pricing.sourceCurrency,
-        exchangeRateContext: pricing.exchangeRateContext,
-      },
-    }));
+    return fetchedOptions.map((option) => {
+      // Each option can carry its own price (e.g. a Solid engraving style priced
+      // differently from Contour); fall back to the shared item pricing otherwise.
+      const optionPricing = option.pricing ?? pricing;
+      const engravingLabel =
+        typeof option.metadata.engravingStyleLabel === 'string'
+          ? option.metadata.engravingStyleLabel
+          : null;
+      return {
+        generatedItemId: item.id,
+        title:
+          engravingLabel ??
+          (typeof option.metadata.boilerplateName === 'string'
+            ? option.metadata.boilerplateName
+            : (item.title ?? 'Personalized night light')),
+        quantity: 1,
+        unitPriceCents: optionPricing.unitPriceCents,
+        currency: optionPricing.currency,
+        configuration: {
+          productType: item.productType,
+          personalizedPreviewOptionId: option.id,
+          selectedPreviewPath: option.previewImagePath,
+          // NOTE: 'hiddenSvgPath' is a stored jsonb key inside cart_items.configuration
+          // (snapshotted into order_items.item_snapshot). Existing rows carry it, so the
+          // key is intentionally NOT renamed; it holds the manufacturing file path.
+          hiddenSvgPath: option.manufacturingFilePath,
+          boilerplateSnapshot: option.metadata,
+          creditCost: 1,
+          sourcePriceCents: optionPricing.sourcePriceCents,
+          sourceCurrency: optionPricing.sourceCurrency,
+          exchangeRateContext: optionPricing.exchangeRateContext,
+        },
+      };
+    });
   }
 
   return [

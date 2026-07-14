@@ -68,6 +68,10 @@ export const itemSchema = z.object({
   skillId: z.string().trim().optional(),
   tags: z.array(z.enum(['personal_color', 'personal_text', 'personal_photo'])),
   boilerplateIds: z.array(z.uuid()),
+  laserContourEnabled: z.boolean(),
+  laserSolidEnabled: z.boolean(),
+  laserSolidPriceCents: z.coerce.number().int().min(0, 'Solid price cannot be negative.').optional(),
+  laserSolidPrompt: z.string().trim().optional(),
   seo: z.object({
     en: seoLocaleSchema,
     ru: seoLocaleSchema,
@@ -109,6 +113,10 @@ export function parseItemForm(formData: FormData) {
     skillId: formData.get('skillId') || undefined,
     tags: formData.getAll('tags').map(String),
     boilerplateIds: formData.getAll('boilerplateIds').map(String),
+    laserContourEnabled: formData.get('laserContourEnabled') === 'on',
+    laserSolidEnabled: formData.get('laserSolidEnabled') === 'on',
+    laserSolidPriceCents: formData.get('laserSolidPriceCents') || undefined,
+    laserSolidPrompt: formData.get('laserSolidPrompt') || undefined,
     seo: {
       en: readSeoLocale(formData, 'en'),
       ru: readSeoLocale(formData, 'ru'),
@@ -298,15 +306,49 @@ export async function syncCatalogItemMedia(
   }
 }
 
-/** True unless the item is customizable with no System Prompt, Skill ID, or boilerplate selected. */
+/**
+ * True unless the item is customizable with no usable generation source — a
+ * System Prompt, Skill ID, a selected boilerplate, or the Solid engraving style
+ * (which carries its own prompt).
+ */
 export function validatePersonalizationConfig(item: {
   isCustomizable: boolean;
   systemPrompt?: string;
   skillId?: string;
   boilerplateIds: string[];
+  laserSolidEnabled?: boolean;
 }) {
   if (!item.isCustomizable) return true;
-  return Boolean(item.systemPrompt) || Boolean(item.skillId) || item.boilerplateIds.length > 0;
+  return (
+    Boolean(item.systemPrompt) ||
+    Boolean(item.skillId) ||
+    item.boilerplateIds.length > 0 ||
+    Boolean(item.laserSolidEnabled)
+  );
+}
+
+/**
+ * Validates the laser engraving configuration. Solid is opt-in and, when
+ * enabled, requires its own price and prompt and always includes the base
+ * Contour style. Returns an error message, or null when the config is valid.
+ */
+export function validateEngravingConfig(item: {
+  laserContourEnabled: boolean;
+  laserSolidEnabled: boolean;
+  laserSolidPriceCents?: number;
+  laserSolidPrompt?: string;
+}): string | null {
+  if (!item.laserSolidEnabled) return null;
+  if (!item.laserContourEnabled) {
+    return 'The Contour style is required whenever Solid scratching is offered.';
+  }
+  if (item.laserSolidPriceCents === undefined) {
+    return 'Enter a price for the Solid scratching style.';
+  }
+  if (!item.laserSolidPrompt) {
+    return 'Enter a generation prompt for the Solid scratching style.';
+  }
+  return null;
 }
 
 export async function syncCatalogItemBoilerplates(
