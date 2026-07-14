@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PERSONALIZATION_TAGS } from '@/lib/personalization-constants';
+import { AutogenerateButton } from './ai-context';
 import { EngravingFields } from './engraving-fields';
 import type { BoilerplateOption, ItemFormValue } from './types';
 
@@ -35,7 +36,10 @@ export function PersonalizationFields({
   return (
     <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
       <div className="space-y-2">
-        <Label htmlFor="systemPrompt">System prompt</Label>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="systemPrompt">System prompt</Label>
+          <AutogenerateButton field="systemPrompt" />
+        </div>
         <Textarea
           id="systemPrompt"
           name="systemPrompt"

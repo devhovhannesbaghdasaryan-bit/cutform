@@ -1,13 +1,19 @@
+'use client';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { AutogenerateButton, useItemFormAi } from './ai-context';
 import type { CategoryOption, ItemFormValue, SubcategoryOption } from './types';
 
 export function TitleSlugFields({ item }: { item?: Pick<ItemFormValue, 'title' | 'slug'> }) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="title">Title</Label>
+          <AutogenerateButton field="title" />
+        </div>
         <Input id="title" name="title" defaultValue={item?.title ?? ''} required />
       </div>
       <div className="space-y-2">
@@ -100,10 +106,16 @@ export function StatusField({ item }: { item?: Pick<ItemFormValue, 'status'> }) 
 }
 
 export function DescriptionField({ item }: { item?: Pick<ItemFormValue, 'description'> }) {
+  const { onDescriptionInput } = useItemFormAi();
   return (
     <div className="space-y-2">
       <Label htmlFor="description">Description</Label>
-      <Textarea id="description" name="description" defaultValue={item?.description ?? ''} />
+      <Textarea
+        id="description"
+        name="description"
+        defaultValue={item?.description ?? ''}
+        onInput={(event) => onDescriptionInput(event.currentTarget.value)}
+      />
     </div>
   );
 }

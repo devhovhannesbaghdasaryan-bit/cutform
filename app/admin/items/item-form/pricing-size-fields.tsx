@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { AutogenerateButton } from './ai-context';
 import type { ItemFormValue } from './types';
 
 export function PriceField({ item }: { item?: Pick<ItemFormValue, 'price_cents'> }) {
@@ -27,7 +28,10 @@ export function ManufacturingNotesField({
 }) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="manufacturingNotes">Manufacturing notes</Label>
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor="manufacturingNotes">Manufacturing notes</Label>
+        <AutogenerateButton field="manufacturingNotes" />
+      </div>
       <Textarea
         id="manufacturingNotes"
         name="manufacturingNotes"
@@ -54,7 +58,10 @@ export function SizesCharacteristicsFields({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="characteristics">Admin-only characteristics</Label>
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="characteristics">Admin-only characteristics</Label>
+          <AutogenerateButton field="characteristics" />
+        </div>
         <Textarea
           id="characteristics"
           name="characteristics"

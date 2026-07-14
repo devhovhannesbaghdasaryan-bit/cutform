@@ -3,6 +3,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { APP_LOCALES, type AppLocale } from '@/lib/i18n';
 import { validateSeoMetadata } from '@/lib/seo-validation';
+import { AutogenerateButton } from './ai-context';
 import type { ItemFormValue, SeoFormValue } from './types';
 
 export function SeoSection({
@@ -78,7 +79,10 @@ export function SeoSection({
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor={`seoTitle_${locale}`}>SEO title</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor={`seoTitle_${locale}`}>SEO title</Label>
+                  <AutogenerateButton field={`seoTitle_${locale}`} />
+                </div>
                 <Input
                   id={`seoTitle_${locale}`}
                   name={`seoTitle_${locale}`}
@@ -86,7 +90,10 @@ export function SeoSection({
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`seoKeywords_${locale}`}>Keywords</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor={`seoKeywords_${locale}`}>Keywords</Label>
+                  <AutogenerateButton field={`seoKeywords_${locale}`} />
+                </div>
                 <Input
                   id={`seoKeywords_${locale}`}
                   name={`seoKeywords_${locale}`}
@@ -96,7 +103,10 @@ export function SeoSection({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor={`seoDescription_${locale}`}>Meta description</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor={`seoDescription_${locale}`}>Meta description</Label>
+                <AutogenerateButton field={`seoDescription_${locale}`} />
+              </div>
               <Textarea
                 id={`seoDescription_${locale}`}
                 name={`seoDescription_${locale}`}
@@ -105,7 +115,10 @@ export function SeoSection({
             </div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor={`ogTitle_${locale}`}>Open Graph title</Label>
+                <div className="flex items-center justify-between gap-2">
+                  <Label htmlFor={`ogTitle_${locale}`}>Open Graph title</Label>
+                  <AutogenerateButton field={`ogTitle_${locale}`} />
+                </div>
                 <Input
                   id={`ogTitle_${locale}`}
                   name={`ogTitle_${locale}`}
@@ -131,7 +144,10 @@ export function SeoSection({
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor={`ogDescription_${locale}`}>Open Graph description</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor={`ogDescription_${locale}`}>Open Graph description</Label>
+                <AutogenerateButton field={`ogDescription_${locale}`} />
+              </div>
               <Textarea
                 id={`ogDescription_${locale}`}
                 name={`ogDescription_${locale}`}

@@ -23,9 +23,14 @@ for (const action of ['createCatalogItemAction', 'updateCatalogItemAction']) {
   if (!catalogActions.includes(action)) throw new Error(`Missing admin action: ${action}`);
 }
 
-const seoActions = readFileSync('app/admin/items/seo-actions.ts', 'utf8');
-if (!seoActions.includes('generateCatalogItemSeoDraftAction')) {
-  throw new Error('Missing admin action: generateCatalogItemSeoDraftAction');
+const itemAiLib = readFileSync('lib/item-ai.ts', 'utf8');
+if (!itemAiLib.includes('generateItemFields')) {
+  throw new Error('Missing item AI helper: generateItemFields');
+}
+
+const aiFillActions = readFileSync('app/admin/items/ai-fill-actions.ts', 'utf8');
+if (!aiFillActions.includes('generateItemFieldValuesAction')) {
+  throw new Error('Missing admin action: generateItemFieldValuesAction');
 }
 
 for (const removedRoute of [
