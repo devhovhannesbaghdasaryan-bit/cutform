@@ -29,7 +29,10 @@ export default async function PersonalizeItemPage({
 
   const supabase = await getServerSupabase();
   const boilerplateRows = await listCatalogItemBoilerplates(supabase, item.id).catch(() => []);
-  const hasUsablePersonalization = Boolean(item.system_prompt) || boilerplateRows.length > 0;
+  // Solid engraving carries its own prompt, so it makes an item personalizable
+  // even without a system prompt or boilerplate.
+  const hasUsablePersonalization =
+    Boolean(item.system_prompt) || boilerplateRows.length > 0 || item.laser_solid_enabled;
   if (!hasUsablePersonalization && !item.skill_id) notFound();
 
   const boilerplates = boilerplateRows.map((boilerplate) => ({

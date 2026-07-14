@@ -67,11 +67,12 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
     ? (normalizeCurrency(item.catalog_item.currency) ?? 'AMD')
     : getGeneratedSaleCurrency(item.generation_options);
   const activeCurrency = await getActiveCurrency();
+  const serviceSupabase = getServiceSupabase();
   const converted = await convertMoney(
     sourcePriceCents,
     sourceCurrency,
     activeCurrency,
-    getServiceSupabase(),
+    serviceSupabase,
   );
 
   const optionIds = [...new Set(parsed.data.optionIds ?? [])];
@@ -100,6 +101,42 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
     fetchedOptions = options ?? [];
   }
 
+  // Resolve each option's own price (e.g. a Solid engraving style priced apart
+  // from Contour), converting each to the active currency. Falls back to the
+  // shared catalog price when an option carries no per-option price.
+  const pricedOptions = await Promise.all(
+    fetchedOptions.map(async (option) => {
+      const rawUnit = option.metadata.unitPriceCents;
+      const optionSourceCents =
+        typeof rawUnit === 'number' && Number.isFinite(rawUnit) && rawUnit >= 0
+          ? Math.round(rawUnit)
+          : sourcePriceCents;
+      const rawCurrency = option.metadata.unitCurrency;
+      const optionSourceCurrency =
+        normalizeCurrency(typeof rawCurrency === 'string' ? rawCurrency : undefined) ??
+        sourceCurrency;
+      const optionConverted = await convertMoney(
+        optionSourceCents,
+        optionSourceCurrency,
+        activeCurrency,
+        serviceSupabase,
+      );
+      return {
+        id: option.id,
+        previewImagePath: option.preview_image_path,
+        manufacturingFilePath: option.manufacturing_file_path,
+        metadata: option.metadata,
+        pricing: {
+          unitPriceCents: optionConverted.amountCents,
+          currency: optionConverted.currency,
+          sourcePriceCents: optionSourceCents,
+          sourceCurrency: optionSourceCurrency,
+          exchangeRateContext: optionConverted.exchangeRateContext,
+        },
+      };
+    }),
+  );
+
   const cartAddCalls = planGeneratedItemCartAdd({
     item: {
       id: item.id,
@@ -108,12 +145,7 @@ export async function addGeneratedItemToCartAction(formData: FormData) {
       creditCost: item.credit_cost,
     },
     optionIds,
-    fetchedOptions: fetchedOptions.map((option) => ({
-      id: option.id,
-      previewImagePath: option.preview_image_path,
-      manufacturingFilePath: option.manufacturing_file_path,
-      metadata: option.metadata,
-    })),
+    fetchedOptions: pricedOptions,
     pricing: {
       unitPriceCents: converted.amountCents,
       currency: converted.currency,

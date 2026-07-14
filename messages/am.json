@@ -183,6 +183,11 @@
     "creditsUsed": "Օգտագործված կրեդիտներ՝ {count}",
     "option": "Տարբերակ {number}",
     "priceEach": "{price}՝ յուրաքանչյուրի համար",
+    "total": "Ընդամենը՝ {price}",
+    "laserStyle": {
+      "contour": "Բարակ եզրագիծ",
+      "solid": "Հոծ փորագրում"
+    },
     "previewAlt": "{name} նախադիտում",
     "previewUnavailable": "Նախադիտումը հասանելի չէ",
     "noPreview": "Նախադիտում հասանելի չէ",

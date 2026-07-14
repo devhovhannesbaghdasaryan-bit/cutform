@@ -18,6 +18,7 @@ import {
   syncCatalogItemBoilerplates,
   syncCatalogItemMedia,
   uploadAdminCatalogAsset,
+  validateEngravingConfig,
   validatePersonalizationConfig,
 } from './item-form-parsing';
 
@@ -190,6 +191,8 @@ export async function createCatalogItemAction(
       'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
     );
   }
+  const engravingError = validateEngravingConfig(item);
+  if (engravingError) return actionError(engravingError);
   let sizes: Json[];
   try {
     sizes = parseSizesJson(item.sizesJson);
@@ -223,6 +226,10 @@ export async function createCatalogItemAction(
       system_prompt: item.systemPrompt ?? null,
       skill_id: item.skillId ?? null,
       tags: item.tags,
+      laser_contour_enabled: item.laserContourEnabled,
+      laser_solid_enabled: item.laserSolidEnabled,
+      laser_solid_price_cents: item.laserSolidEnabled ? (item.laserSolidPriceCents ?? null) : null,
+      laser_solid_prompt: item.laserSolidEnabled ? (item.laserSolidPrompt ?? null) : null,
       created_by: user.id,
     })
     .select('id')
@@ -274,6 +281,8 @@ export async function updateCatalogItemAction(
       'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
     );
   }
+  const engravingError = validateEngravingConfig(item);
+  if (engravingError) return actionError(engravingError);
   let sizes: Json[];
   try {
     sizes = parseSizesJson(item.sizesJson);
@@ -307,6 +316,10 @@ export async function updateCatalogItemAction(
       system_prompt: item.systemPrompt ?? null,
       skill_id: item.skillId ?? null,
       tags: item.tags,
+      laser_contour_enabled: item.laserContourEnabled,
+      laser_solid_enabled: item.laserSolidEnabled,
+      laser_solid_price_cents: item.laserSolidEnabled ? (item.laserSolidPriceCents ?? null) : null,
+      laser_solid_prompt: item.laserSolidEnabled ? (item.laserSolidPrompt ?? null) : null,
     })
     .eq('id', id);
 
