@@ -33,7 +33,7 @@ const sitemapSource = readFileSync('app/sitemap.ts', 'utf8');
 for (const required of [
   'APP_LOCALES',
   'listCategories',
-  'listPublishedCatalogItems',
+  'listPublishedCatalogItemSlugs',
   'getCanonicalUrl',
 ]) {
   if (!sitemapSource.includes(required)) throw new Error(`Sitemap does not include ${required}`);
