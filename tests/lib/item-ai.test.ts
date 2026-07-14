@@ -111,7 +111,10 @@ describe('generateItemFields', () => {
       context: {},
     });
 
-    expect(values).toEqual({ title: 'Oak Jewelry Box', characteristics: 'Solid oak, brass hinges.' });
+    expect(values).toEqual({
+      title: 'Oak Jewelry Box',
+      characteristics: 'Solid oak, brass hinges.',
+    });
     // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
     const requestBody = (create.mock.calls[0] as any[])[0];
     expect(requestBody.text.format).toMatchObject({ type: 'json_schema', strict: true });

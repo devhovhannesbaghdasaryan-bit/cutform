@@ -28,7 +28,9 @@ const ItemFormAiContext = createContext<ItemFormAiContextValue | null>(null);
 
 function readFieldValue(form: HTMLFormElement, name: string): string {
   const element = form.elements.namedItem(name);
-  return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement
+  return element instanceof HTMLInputElement ||
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLSelectElement
     ? element.value
     : '';
 }

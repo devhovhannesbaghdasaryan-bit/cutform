@@ -22,9 +22,18 @@ const CORE_FIELD_INSTRUCTIONS: Record<string, string> = {
     'Directive instructions for generating the solid-scratched glass engraving variant of this product.',
 };
 
-const SEO_SUB_FIELDS = ['seoTitle', 'seoDescription', 'seoKeywords', 'ogTitle', 'ogDescription'] as const;
+const SEO_SUB_FIELDS = [
+  'seoTitle',
+  'seoDescription',
+  'seoKeywords',
+  'ogTitle',
+  'ogDescription',
+] as const;
 
-const SEO_FIELD_INSTRUCTIONS: Record<(typeof SEO_SUB_FIELDS)[number], (language: string) => string> = {
+const SEO_FIELD_INSTRUCTIONS: Record<
+  (typeof SEO_SUB_FIELDS)[number],
+  (language: string) => string
+> = {
   seoTitle: (language) => `An SEO title in ${language}, 70 characters or fewer.`,
   seoDescription: (language) => `A meta description in ${language}, 170 characters or fewer.`,
   seoKeywords: (language) => `A comma-separated list of up to 10 SEO keywords in ${language}.`,

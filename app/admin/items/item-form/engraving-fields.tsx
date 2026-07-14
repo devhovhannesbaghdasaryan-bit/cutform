@@ -19,7 +19,10 @@ export function EngravingFields({
 }: {
   item?: Pick<
     ItemFormValue,
-    'laser_contour_enabled' | 'laser_solid_enabled' | 'laser_solid_price_cents' | 'laser_solid_prompt'
+    | 'laser_contour_enabled'
+    | 'laser_solid_enabled'
+    | 'laser_solid_price_cents'
+    | 'laser_solid_prompt'
   >;
 }) {
   const [contourEnabled, setContourEnabled] = useState(item?.laser_contour_enabled ?? false);
