@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { createCatalogItemAction, updateCatalogItemAction } from '@/app/admin/items/actions';
 import { errorOf, idleState } from '@/lib/action-state';
+import { FillAllButton, ItemFormAiProvider } from './ai-context';
 import {
   ClassificationFields,
   DescriptionField,
@@ -61,59 +62,67 @@ export function ItemForm({
   const [state, action, pending] = useActionState(actionFn, idleState);
   const error = errorOf(state);
   const [isCustomizable, setIsCustomizable] = useState(item?.is_customizable ?? false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <form action={action} className="space-y-6">
+    <form ref={formRef} action={action} className="space-y-6">
       {item?.id && <input type="hidden" name="id" value={item.id} />}
 
-      <TitleSlugFields item={item} />
+      <ItemFormAiProvider
+        formRef={formRef}
+        categories={categories}
+        initialDescription={item?.description ?? ''}
+      >
+        <TitleSlugFields item={item} />
 
-      {marketRegions.length > 0 && (
-        <MarketRulesSection
-          marketRegions={marketRegions}
-          marketCountries={marketCountries}
-          marketRules={marketRules}
-        />
-      )}
+        {marketRegions.length > 0 && (
+          <MarketRulesSection
+            marketRegions={marketRegions}
+            marketCountries={marketCountries}
+            marketRules={marketRules}
+          />
+        )}
 
-      <ClassificationFields categories={categories} subcategories={subcategories} item={item} />
+        <ClassificationFields categories={categories} subcategories={subcategories} item={item} />
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <PriceField item={item} />
-        <StatusField item={item} />
-      </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          <PriceField item={item} />
+          <StatusField item={item} />
+        </div>
 
-      <DescriptionField item={item} />
+        <DescriptionField item={item} />
+        <FillAllButton />
 
-      <ThumbnailFields item={item} />
+        <ThumbnailFields item={item} />
 
-      <MediaSection media={media} />
+        <MediaSection media={media} />
 
-      <ManufacturingNotesField item={item} />
+        <ManufacturingNotesField item={item} />
 
-      <SizesCharacteristicsFields item={item} />
+        <SizesCharacteristicsFields item={item} />
 
-      <SeoSection item={item} seo={seo} seoRecords={seoRecords} />
+        <SeoSection item={item} seo={seo} seoRecords={seoRecords} />
 
-      <FlagsFields item={item} onCustomizableChange={setIsCustomizable} />
+        <FlagsFields item={item} onCustomizableChange={setIsCustomizable} />
 
-      {isCustomizable && (
-        <PersonalizationFields
-          item={item}
-          boilerplateOptions={boilerplateOptions}
-          selectedBoilerplateIds={selectedBoilerplateIds}
-        />
-      )}
+        {isCustomizable && (
+          <PersonalizationFields
+            item={item}
+            boilerplateOptions={boilerplateOptions}
+            selectedBoilerplateIds={selectedBoilerplateIds}
+          />
+        )}
 
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? 'Saving...' : item?.id ? 'Save item' : 'Create item'}
-      </Button>
+        <Button type="submit" disabled={pending}>
+          {pending ? 'Saving...' : item?.id ? 'Save item' : 'Create item'}
+        </Button>
+      </ItemFormAiProvider>
     </form>
   );
 }

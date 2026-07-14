@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DEFAULT_SOLID_ENGRAVING_PROMPT } from '@/lib/personalization-constants';
+import { AutogenerateButton } from './ai-context';
 import type { ItemFormValue } from './types';
 
 /**
@@ -81,7 +82,10 @@ export function EngravingFields({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="laserSolidPrompt">Solid generation prompt</Label>
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="laserSolidPrompt">Solid generation prompt</Label>
+              <AutogenerateButton field="laserSolidPrompt" />
+            </div>
             <Textarea
               id="laserSolidPrompt"
               name="laserSolidPrompt"
