@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useState, useTransition } from 
 import type { RefObject } from 'react';
 import { Button } from '@/components/ui/button';
 import { generateItemFieldValuesAction } from '@/app/admin/items/ai-fill-actions';
-import { ITEM_AI_FIELD_KEYS } from '@/lib/item-ai';
+import { ITEM_AI_FIELD_KEYS } from '@/lib/item-ai-fields';
 import type { CategoryOption } from './types';
 
 interface FieldError {
