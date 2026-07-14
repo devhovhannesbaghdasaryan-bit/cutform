@@ -55,7 +55,7 @@ export async function CatalogItemCard({
           aria-label={item.title}
         />
         <CardContent className="p-0">
-          <div className="product-art-frame flex aspect-[4/3] items-center justify-center rounded-none border-0 p-5">
+          <div className="product-art-frame rounded-none border-0 p-5">
             <CatalogMediaSlider
               media={sliderMedia}
               fallbackTitle={item.title}
