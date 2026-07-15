@@ -1790,7 +1790,7 @@ describe('handleListSubcategories', () => {
   it('throws when the user is not authorized', async () => {
     vi.mocked(hasAdminPermission).mockResolvedValue(false);
     await expect(
-      handleListSubcategories({ categoryId: '00000000-0000-0000-0000-000000000001' }, 'user-1'),
+      handleListSubcategories({ categoryId: '550e8400-e29b-41d4-a716-446655440000' }, 'user-1'),
     ).rejects.toThrow(/not authorized/i);
   });
 
@@ -1814,7 +1814,7 @@ describe('handleListSubcategories', () => {
     } as never);
 
     const result = await handleListSubcategories(
-      { categoryId: '00000000-0000-0000-0000-000000000001' },
+      { categoryId: '550e8400-e29b-41d4-a716-446655440000' },
       'user-1',
     );
 
@@ -1883,7 +1883,7 @@ import { hasAdminPermission } from '@/lib/admin';
 import { getServiceSupabase } from '@/lib/supabase/server';
 import { handleGetCatalogItem } from '@/lib/mcp/tools/get-catalog-item';
 
-const ITEM_ID = '00000000-0000-0000-0000-0000000000aa';
+const ITEM_ID = '550e8400-e29b-41d4-a716-446655440001';
 
 describe('handleGetCatalogItem', () => {
   beforeEach(() => {
@@ -2035,7 +2035,7 @@ const VALID_INPUT = {
   description: 'A laser-cut wooden puzzle for kids.',
   imageUrl: 'https://example.test/puzzle.jpg',
   priceCents: 5000,
-  categoryId: '00000000-0000-0000-0000-000000000001',
+  categoryId: '550e8400-e29b-41d4-a716-446655440000',
   seo: { en: { seoTitle: 'Wooden Puzzle' }, ru: {}, am: {} },
 };
 
@@ -2260,7 +2260,7 @@ import { fetchAndStoreCatalogImage } from '@/lib/catalog-items/upload-from-url';
 import { handleGetCatalogItem } from '@/lib/mcp/tools/get-catalog-item';
 import { handleUpdateCatalogItem } from '@/lib/mcp/tools/update-catalog-item';
 
-const ITEM_ID = '00000000-0000-0000-0000-0000000000aa';
+const ITEM_ID = '550e8400-e29b-41d4-a716-446655440001';
 const EXISTING = {
   id: ITEM_ID,
   title: 'Old Title',
