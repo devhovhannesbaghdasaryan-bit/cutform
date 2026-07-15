@@ -371,3 +371,122 @@ export async function syncCatalogItemBoilerplates(
   );
   if (error) throw new Error(error.message);
 }
+
+export async function upsertSeoMetadata(
+  supabase: AdminSupabase,
+  catalogItemId: string,
+  item: z.infer<typeof itemSchema>,
+  userId: string,
+) {
+  const rows = APP_LOCALES.flatMap((locale) => {
+    const seo = item.seo[locale];
+    const hasSeo =
+      seo.seoTitle ||
+      seo.seoDescription ||
+      seo.seoKeywords ||
+      seo.ogTitle ||
+      seo.ogDescription ||
+      seo.socialImagePath;
+
+    if (!hasSeo) return [];
+
+    return [
+      {
+        catalog_item_id: catalogItemId,
+        locale,
+        seo_title: seo.seoTitle ?? null,
+        seo_description: seo.seoDescription ?? null,
+        seo_slug: item.slug,
+        keywords: parseKeywords(seo.seoKeywords),
+        og_title: seo.ogTitle ?? null,
+        og_description: seo.ogDescription ?? null,
+        social_image_path: seo.socialImagePath ?? null,
+        generated_by_ai: false,
+        reviewed_by_admin: true,
+        updated_by: userId,
+      },
+    ];
+  });
+
+  if (!rows.length) return;
+
+  const { error } = await supabase
+    .from('catalog_item_seo_metadata')
+    .upsert(rows, { onConflict: 'catalog_item_id,locale' });
+  if (error) throw new Error(error.message);
+}
+
+export async function validateSubcategoryBelongsToCategory(
+  supabase: AdminSupabase,
+  subcategoryId: string,
+  categoryId: string,
+) {
+  if (!subcategoryId) return true;
+  const { data, error } = await supabase
+    .from('subcategories')
+    .select('id')
+    .eq('id', subcategoryId)
+    .eq('category_id', categoryId)
+    .maybeSingle<{ id: string }>();
+
+  if (error) throw new Error(error.message);
+  return Boolean(data);
+}
+
+export async function validateCategoryExists(supabase: AdminSupabase, categoryId: string) {
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id')
+    .eq('id', categoryId)
+    .maybeSingle<{ id: string }>();
+
+  if (error) throw new Error(error.message);
+  return Boolean(data);
+}
+
+export async function syncCatalogItemMarketRules(
+  supabase: AdminSupabase,
+  catalogItemId: string,
+  formData: FormData,
+) {
+  const rows: Array<{
+    catalog_item_id: string;
+    region_id: string | null;
+    country_code: string | null;
+    visibility_override: boolean | null;
+    shipping_rate_cents: number | null;
+  }> = [];
+  const targets = new Set<string>();
+  for (const key of formData.keys()) {
+    const match = /^market_(region|country)_([^_]+)_(visibility|shipping)$/.exec(key);
+    if (match) targets.add(`${match[1]}:${match[2]}`);
+  }
+  for (const target of targets) {
+    const [kind, id] = target.split(':') as ['region' | 'country', string];
+    const visibilityValue = String(formData.get(`market_${kind}_${id}_visibility`) ?? '');
+    const shippingValue = String(formData.get(`market_${kind}_${id}_shipping`) ?? '').trim();
+    const visibility =
+      visibilityValue === 'show' ? true : visibilityValue === 'hide' ? false : null;
+    const shipping = shippingValue === '' ? null : Number(shippingValue);
+    if (shipping != null && (!Number.isInteger(shipping) || shipping < 0)) {
+      throw new Error('Shipping rates must be non-negative AMD minor-unit amounts.');
+    }
+    if (visibility == null && shipping == null) continue;
+    rows.push({
+      catalog_item_id: catalogItemId,
+      region_id: kind === 'region' ? id : null,
+      country_code: kind === 'country' ? id : null,
+      visibility_override: visibility,
+      shipping_rate_cents: shipping,
+    });
+  }
+  const { error: deleteError } = await supabase
+    .from('catalog_item_market_rules')
+    .delete()
+    .eq('catalog_item_id', catalogItemId);
+  if (deleteError) throw new Error(deleteError.message);
+  if (rows.length) {
+    const { error } = await supabase.from('catalog_item_market_rules').insert(rows);
+    if (error) throw new Error(error.message);
+  }
+}
