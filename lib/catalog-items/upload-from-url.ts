@@ -36,16 +36,28 @@ function isBlockedIpv4(ip: string): boolean {
   });
 }
 
+const IPV4_MAPPED_IPV6_PREFIX = '::ffff:';
+
 function isBlockedIpv6(ip: string): boolean {
   const normalized = ip.toLowerCase();
+
+  // IPv4-mapped IPv6 addresses (::ffff:a.b.c.d) must be checked against the
+  // same IPv4 blocklist, not string-matched — otherwise ::ffff:192.168.1.1
+  // and similar slip past into internal RFC1918 space.
+  if (normalized.startsWith(IPV4_MAPPED_IPV6_PREFIX)) {
+    const embeddedIpv4 = normalized.slice(IPV4_MAPPED_IPV6_PREFIX.length);
+    if (isIP(embeddedIpv4) === 4) return isBlockedIpv4(embeddedIpv4);
+  }
+
   return (
     normalized === '::1' ||
-    normalized.startsWith('fe80:') ||
+    normalized === '::' ||
+    normalized.startsWith('fe8') ||
+    normalized.startsWith('fe9') ||
+    normalized.startsWith('fea') ||
+    normalized.startsWith('feb') ||
     normalized.startsWith('fc') ||
-    normalized.startsWith('fd') ||
-    normalized.startsWith('::ffff:127.') ||
-    normalized.startsWith('::ffff:10.') ||
-    normalized.startsWith('::ffff:169.254.')
+    normalized.startsWith('fd')
   );
 }
 
@@ -62,7 +74,20 @@ async function assertPublicHost(hostname: string): Promise<void> {
   }
 }
 
-async function fetchImageWithGuards(imageUrl: string): Promise<Response> {
+interface GuardedFetchResult {
+  response: Response;
+  releaseTimeout: () => void;
+}
+
+/**
+ * Fetches through the redirect chain with https/private-IP guards on every
+ * hop. For the final (non-redirect) response, the per-hop timeout is left
+ * armed and returned as `releaseTimeout` rather than cleared here — the
+ * caller must call it after finishing (or failing) the body read, so the
+ * timeout bounds the whole request including the body download, not just
+ * the headers.
+ */
+async function fetchImageWithGuards(imageUrl: string): Promise<GuardedFetchResult> {
   let currentUrl = imageUrl;
   for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount++) {
     const parsed = new URL(currentUrl);
@@ -76,22 +101,61 @@ async function fetchImageWithGuards(imageUrl: string): Promise<Response> {
     let response: Response;
     try {
       response = await fetch(currentUrl, { redirect: 'manual', signal: controller.signal });
-    } finally {
+    } catch (error) {
       clearTimeout(timeout);
+      throw error;
     }
 
     if (response.status >= 300 && response.status < 400) {
+      clearTimeout(timeout);
       const location = response.headers.get('location');
       if (!location) throw new Error(`Redirect from ${currentUrl} had no Location header.`);
       currentUrl = new URL(location, currentUrl).toString();
       continue;
     }
     if (!response.ok) {
+      clearTimeout(timeout);
       throw new Error(`Failed to fetch image (HTTP ${response.status}).`);
     }
-    return response;
+    return { response, releaseTimeout: () => clearTimeout(timeout) };
   }
   throw new Error('Too many redirects while fetching imageUrl.');
+}
+
+/**
+ * Reads the response body through a running byte counter so a hostile
+ * server can't evade the size cap by omitting or lying about
+ * Content-Length — the check fires mid-stream, before the full body is
+ * ever buffered.
+ */
+async function readBodyWithLimit(response: Response, maxBytes: number): Promise<Uint8Array> {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    const buffer = new Uint8Array(await response.arrayBuffer());
+    if (buffer.byteLength > maxBytes) throw new Error('Catalog media must be 50 MB or smaller.');
+    return buffer;
+  }
+
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel();
+      throw new Error('Catalog media must be 50 MB or smaller.');
+    }
+    chunks.push(value);
+  }
+
+  const combined = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    combined.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return combined;
 }
 
 /** Fetches an https image URL with SSRF guards and stores it in the catalog-assets bucket. Returns the storage path. */
@@ -100,27 +164,23 @@ export async function fetchAndStoreCatalogImage(
   userId: string,
   imageUrl: string,
 ): Promise<string> {
-  const response = await fetchImageWithGuards(imageUrl);
+  const { response, releaseTimeout } = await fetchImageWithGuards(imageUrl);
+  try {
+    const contentType = response.headers.get('content-type')?.split(';')[0]?.trim() ?? '';
+    const extension = IMAGE_EXTENSION_BY_MIME[contentType];
+    if (!extension) {
+      throw new Error(`imageUrl must point to a PNG, JPEG, or WEBP image (got "${contentType}").`);
+    }
 
-  const contentType = response.headers.get('content-type')?.split(';')[0]?.trim() ?? '';
-  const extension = IMAGE_EXTENSION_BY_MIME[contentType];
-  if (!extension) {
-    throw new Error(`imageUrl must point to a PNG, JPEG, or WEBP image (got "${contentType}").`);
-  }
+    const body = await readBodyWithLimit(response, MAX_IMAGE_BYTES);
 
-  const contentLength = Number(response.headers.get('content-length') ?? '0');
-  if (contentLength > MAX_IMAGE_BYTES) {
-    throw new Error('Catalog media must be 50 MB or smaller.');
+    return await uploadToBucket(supabase, {
+      bucket: 'catalog-assets',
+      path: `${userId}/mcp-images/${crypto.randomUUID()}.${extension}`,
+      body,
+      contentType,
+    });
+  } finally {
+    releaseTimeout();
   }
-  const body = new Uint8Array(await response.arrayBuffer());
-  if (body.byteLength > MAX_IMAGE_BYTES) {
-    throw new Error('Catalog media must be 50 MB or smaller.');
-  }
-
-  return uploadToBucket(supabase, {
-    bucket: 'catalog-assets',
-    path: `${userId}/mcp-images/${crypto.randomUUID()}.${extension}`,
-    body,
-    contentType,
-  });
 }
