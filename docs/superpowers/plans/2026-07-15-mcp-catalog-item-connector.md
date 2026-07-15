@@ -1503,7 +1503,7 @@ git commit -m "refactor(catalog-items): extract shared create/update core logic 
 
 **Interfaces:**
 - Consumes: `findAccessTokenContext` from `lib/mcp/oauth-store.ts` (Task 3), `hasAdminPermission` from `lib/admin.ts:33`, `MCP_OAUTH_SCOPE` from `lib/mcp/oauth-store.ts`.
-- Produces: `verifyAccessToken(req: Request, bearerToken?: string): Promise<AuthInfo | undefined>` — used by Task 13 (`app/api/mcp/route.ts`).
+- Produces: `verifyAccessToken(req: Request, bearerToken?: string): Promise<AuthInfo | undefined>` — used by Task 12 (`app/api/mcp/route.ts`).
 
 - [ ] **Step 1: Write the failing tests**
 
