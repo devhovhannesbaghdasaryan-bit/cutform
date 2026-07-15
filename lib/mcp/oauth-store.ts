@@ -164,11 +164,12 @@ export async function findAccessTokenContext(accessToken: string): Promise<Acces
   const accessTokenHash = hashToken(accessToken);
   const { data, error } = await supabase
     .from('mcp_oauth_tokens')
-    .select('user_id, client_id, scope, expires_at')
+    .select('user_id, client_id, scope, expires_at, revoked_at')
     .eq('access_token_hash', accessTokenHash)
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) return null;
+  if (data.revoked_at) return null;
   if (new Date(data.expires_at).getTime() < Date.now()) return null;
   return { userId: data.user_id, clientId: data.client_id, scope: data.scope };
 }

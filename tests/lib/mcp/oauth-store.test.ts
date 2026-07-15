@@ -142,16 +142,18 @@ describe('oauth-store', () => {
     expect(await findAccessTokenContext('not-a-real-token')).toBeNull();
   });
 
-  it('rotates a refresh token into a new pair and revokes the old one', async () => {
+  it('rotates a refresh token into a new pair and invalidates the old pair entirely', async () => {
     const pair = await issueTokenPair({ clientId: 'client-1', userId: 'user-1', scope: MCP_OAUTH_SCOPE });
     const rotated = await rotateRefreshToken(pair.refreshToken);
 
     expect(rotated?.userId).toBe('user-1');
     expect(rotated?.accessToken).not.toBe(pair.accessToken);
-    expect(await findAccessTokenContext(pair.accessToken)).not.toBeNull();
-    // Old access token still resolves (only the refresh token was consumed);
-    // the old row's revoked_at is set, so a *second* rotation of the same
-    // refresh token must fail.
+    // Rotation revokes the whole old row (access + refresh token pair), not just the refresh token —
+    // this is what makes explicit revocation (revokeConnectedApp, which sets the same revoked_at flag)
+    // actually cut off a live access token instead of leaving it valid until natural expiry.
+    expect(await findAccessTokenContext(pair.accessToken)).toBeNull();
+    expect(await findAccessTokenContext(rotated?.accessToken ?? '')).not.toBeNull();
+    // A second rotation attempt on the already-rotated refresh token must fail.
     expect(await rotateRefreshToken(pair.refreshToken)).toBeNull();
   });
 });
