@@ -1657,6 +1657,121 @@ export type Database = {
           },
         ]
       }
+      mcp_oauth_authorization_codes: {
+        Row: {
+          client_id: string
+          code_challenge: string
+          code_hash: string
+          created_at: string
+          expires_at: string
+          id: string
+          redirect_uri: string
+          scope: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          code_challenge: string
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          redirect_uri: string
+          scope: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          code_challenge?: string
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          redirect_uri?: string
+          scope?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcp_oauth_authorization_codes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "mcp_oauth_clients"
+            referencedColumns: ["client_id"]
+          },
+        ]
+      }
+      mcp_oauth_clients: {
+        Row: {
+          client_id: string
+          client_name: string
+          created_at: string
+          redirect_uris: string[]
+        }
+        Insert: {
+          client_id?: string
+          client_name: string
+          created_at?: string
+          redirect_uris: string[]
+        }
+        Update: {
+          client_id?: string
+          client_name?: string
+          created_at?: string
+          redirect_uris?: string[]
+        }
+        Relationships: []
+      }
+      mcp_oauth_tokens: {
+        Row: {
+          access_token_hash: string
+          client_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          refresh_expires_at: string
+          refresh_token_hash: string
+          revoked_at: string | null
+          scope: string
+          user_id: string
+        }
+        Insert: {
+          access_token_hash: string
+          client_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          refresh_expires_at: string
+          refresh_token_hash: string
+          revoked_at?: string | null
+          scope: string
+          user_id: string
+        }
+        Update: {
+          access_token_hash?: string
+          client_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          refresh_expires_at?: string
+          refresh_token_hash?: string
+          revoked_at?: string | null
+          scope?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mcp_oauth_tokens_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "mcp_oauth_clients"
+            referencedColumns: ["client_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
