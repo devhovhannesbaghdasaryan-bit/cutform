@@ -1519,6 +1519,9 @@ vi.mock('@/lib/mcp/oauth-store', () => ({
 vi.mock('@/lib/admin', () => ({
   hasAdminPermission: vi.fn(),
 }));
+vi.mock('@/lib/supabase/server', () => ({
+  getServiceSupabase: vi.fn(() => 'fake-service-client'),
+}));
 
 import { hasAdminPermission } from '@/lib/admin';
 import { findAccessTokenContext } from '@/lib/mcp/oauth-store';
@@ -1549,7 +1552,7 @@ describe('verifyAccessToken', () => {
     });
     vi.mocked(hasAdminPermission).mockResolvedValue(false);
     expect(await verifyAccessToken(fakeRequest, 'good-token')).toBeUndefined();
-    expect(hasAdminPermission).toHaveBeenCalledWith('user-1', 'catalog_manage');
+    expect(hasAdminPermission).toHaveBeenCalledWith('user-1', 'catalog_manage', 'fake-service-client');
   });
 
   it('returns AuthInfo with the userId for a valid, authorized token', async () => {
@@ -1585,6 +1588,7 @@ Create `lib/mcp/verify-token.ts`:
 import 'server-only';
 import { hasAdminPermission } from '@/lib/admin';
 import { findAccessTokenContext } from '@/lib/mcp/oauth-store';
+import { getServiceSupabase } from '@/lib/supabase/server';
 
 export interface AuthInfo {
   token: string;
@@ -1596,7 +1600,11 @@ export interface AuthInfo {
 /**
  * Verifier passed to mcp-handler's withMcpAuth. Re-checks catalog_manage
  * live (not just at token-issuance time) so demoting an admin's role cuts
- * off their connector on the very next call.
+ * off their connector on the very next call. Passes the service-role
+ * client explicitly: this request has no Supabase Auth session cookie
+ * (it's authenticated by a Bearer token), so the default cookie-bound
+ * client in hasAdminPermission would resolve no auth.uid() for RLS and
+ * incorrectly return false for every real admin.
  */
 export async function verifyAccessToken(
   _req: Request,
@@ -1607,7 +1615,7 @@ export async function verifyAccessToken(
   const context = await findAccessTokenContext(bearerToken);
   if (!context) return undefined;
 
-  const allowed = await hasAdminPermission(context.userId, 'catalog_manage');
+  const allowed = await hasAdminPermission(context.userId, 'catalog_manage', getServiceSupabase());
   if (!allowed) return undefined;
 
   return {
@@ -1741,7 +1749,7 @@ export interface CategorySummary {
 }
 
 export async function handleListCategories(userId: string): Promise<CategorySummary[]> {
-  const allowed = await hasAdminPermission(userId, 'catalog_manage');
+  const allowed = await hasAdminPermission(userId, 'catalog_manage', getServiceSupabase());
   if (!allowed) throw new Error('You are not authorized to manage the catalog.');
 
   const { data, error } = await getServiceSupabase()
@@ -1841,7 +1849,7 @@ export async function handleListSubcategories(
 ): Promise<CategorySummary[]> {
   const input = listSubcategoriesInputSchema.parse(rawInput);
 
-  const allowed = await hasAdminPermission(userId, 'catalog_manage');
+  const allowed = await hasAdminPermission(userId, 'catalog_manage', getServiceSupabase());
   if (!allowed) throw new Error('You are not authorized to manage the catalog.');
 
   const { data, error } = await getServiceSupabase()
@@ -1965,7 +1973,7 @@ export interface CatalogItemSummary {
 export async function handleGetCatalogItem(rawInput: unknown, userId: string): Promise<CatalogItemSummary> {
   const input = getCatalogItemInputSchema.parse(rawInput);
 
-  const allowed = await hasAdminPermission(userId, 'catalog_manage');
+  const allowed = await hasAdminPermission(userId, 'catalog_manage', getServiceSupabase());
   if (!allowed) throw new Error('You are not authorized to manage the catalog.');
 
   const { data, error } = await getServiceSupabase()
@@ -2159,10 +2167,10 @@ export async function handleCreateCatalogItem(
 ): Promise<CreateCatalogItemToolResult> {
   const input = createCatalogItemInputSchema.parse(rawInput);
 
-  const allowed = await hasAdminPermission(userId, 'catalog_manage');
+  const supabase = getServiceSupabase();
+  const allowed = await hasAdminPermission(userId, 'catalog_manage', supabase);
   if (!allowed) throw new Error('You are not authorized to manage the catalog.');
 
-  const supabase = getServiceSupabase();
   const thumbnailPath = await fetchAndStoreCatalogImage(supabase, userId, input.imageUrl);
 
   let slug = slugify(input.title);
@@ -2375,11 +2383,11 @@ export async function handleUpdateCatalogItem(
 ): Promise<{ id: string }> {
   const input = updateCatalogItemInputSchema.parse(rawInput);
 
-  const allowed = await hasAdminPermission(userId, 'catalog_manage');
+  const supabase = getServiceSupabase();
+  const allowed = await hasAdminPermission(userId, 'catalog_manage', supabase);
   if (!allowed) throw new Error('You are not authorized to manage the catalog.');
 
   const existing = await handleGetCatalogItem({ id: input.id }, userId);
-  const supabase = getServiceSupabase();
 
   const thumbnailPath = input.imageUrl
     ? await fetchAndStoreCatalogImage(supabase, userId, input.imageUrl)

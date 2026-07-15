@@ -1,6 +1,7 @@
 import 'server-only';
 import { hasAdminPermission } from '@/lib/admin';
 import { findAccessTokenContext } from '@/lib/mcp/oauth-store';
+import { getServiceSupabase } from '@/lib/supabase/server';
 
 export interface AuthInfo {
   token: string;
@@ -23,7 +24,7 @@ export async function verifyAccessToken(
   const context = await findAccessTokenContext(bearerToken);
   if (!context) return undefined;
 
-  const allowed = await hasAdminPermission(context.userId, 'catalog_manage');
+  const allowed = await hasAdminPermission(context.userId, 'catalog_manage', getServiceSupabase());
   if (!allowed) return undefined;
 
   return {

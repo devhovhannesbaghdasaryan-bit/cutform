@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
+import type { TypedSupabaseClient } from '@/lib/supabase/types';
 
 export const ADMIN_PERMISSIONS = [
   'catalog_manage',
@@ -30,8 +31,19 @@ export async function requireAdmin() {
   return { supabase, user };
 }
 
-export async function hasAdminPermission(userId: string, permission: AdminPermission) {
-  const supabase = await getServerSupabase();
+/**
+ * `supabaseOverride` lets callers with no browser session cookie (e.g. an
+ * MCP request authenticated by a Bearer token, not Supabase Auth cookies)
+ * pass a service-role client instead of the cookie-bound default — without
+ * it, `getServerSupabase()` resolves no `auth.uid()` for RLS to match and
+ * this would incorrectly return false for every real admin.
+ */
+export async function hasAdminPermission(
+  userId: string,
+  permission: AdminPermission,
+  supabaseOverride?: TypedSupabaseClient,
+) {
+  const supabase = supabaseOverride ?? (await getServerSupabase());
 
   const { data: profile } = await supabase
     .from('profiles')

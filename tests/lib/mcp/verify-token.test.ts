@@ -7,6 +7,9 @@ vi.mock('@/lib/mcp/oauth-store', () => ({
 vi.mock('@/lib/admin', () => ({
   hasAdminPermission: vi.fn(),
 }));
+vi.mock('@/lib/supabase/server', () => ({
+  getServiceSupabase: vi.fn(() => 'fake-service-client'),
+}));
 
 import { hasAdminPermission } from '@/lib/admin';
 import { findAccessTokenContext } from '@/lib/mcp/oauth-store';
@@ -37,7 +40,7 @@ describe('verifyAccessToken', () => {
     });
     vi.mocked(hasAdminPermission).mockResolvedValue(false);
     expect(await verifyAccessToken(fakeRequest, 'good-token')).toBeUndefined();
-    expect(hasAdminPermission).toHaveBeenCalledWith('user-1', 'catalog_manage');
+    expect(hasAdminPermission).toHaveBeenCalledWith('user-1', 'catalog_manage', 'fake-service-client');
   });
 
   it('returns AuthInfo with the userId for a valid, authorized token', async () => {
