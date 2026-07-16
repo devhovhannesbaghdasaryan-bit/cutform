@@ -148,6 +148,55 @@ describe('POST /api/mcp/authorize', () => {
     );
   });
 
+  it('always mints the code with catalog:write, ignoring whatever scope the client requested (or omitted)', async () => {
+    vi.mocked(createAuthorizationCode).mockResolvedValue('code-xyz');
+    const body = new URLSearchParams({
+      decision: 'approve',
+      response_type: 'code',
+      client_id: 'client-1',
+      redirect_uri: 'https://claude.ai/api/mcp/auth_callback',
+      code_challenge: 'challenge-abc',
+      code_challenge_method: 'S256',
+      state: 'state-abc',
+      scope: 'openid profile',
+    });
+    const req = new Request('https://uniqraft.test/api/mcp/authorize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+
+    await POST(req);
+
+    expect(createAuthorizationCode).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: 'catalog:write' }),
+    );
+  });
+
+  it('mints catalog:write even when the client omits scope entirely', async () => {
+    vi.mocked(createAuthorizationCode).mockResolvedValue('code-xyz');
+    const body = new URLSearchParams({
+      decision: 'approve',
+      response_type: 'code',
+      client_id: 'client-1',
+      redirect_uri: 'https://claude.ai/api/mcp/auth_callback',
+      code_challenge: 'challenge-abc',
+      code_challenge_method: 'S256',
+      state: 'state-abc',
+    });
+    const req = new Request('https://uniqraft.test/api/mcp/authorize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+
+    await POST(req);
+
+    expect(createAuthorizationCode).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: 'catalog:write' }),
+    );
+  });
+
   it('rejects a code_challenge_method other than S256, without minting a code', async () => {
     const body = new URLSearchParams({
       decision: 'approve',

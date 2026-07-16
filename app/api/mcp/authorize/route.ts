@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 
 import { NextResponse } from 'next/server';
 import { hasAdminPermission } from '@/lib/admin';
-import { createAuthorizationCode, getOauthClient } from '@/lib/mcp/oauth-store';
+import { createAuthorizationCode, getOauthClient, MCP_OAUTH_SCOPE } from '@/lib/mcp/oauth-store';
 import { getCurrentUser } from '@/lib/supabase/server';
 
 interface AuthorizeParams {
@@ -145,7 +145,12 @@ export async function POST(request: Request) {
     userId: resolved.userId,
     redirectUri: params.redirectUri,
     codeChallenge: params.codeChallenge,
-    scope: params.scope,
+    // This server supports exactly one scope. Grant it unconditionally
+    // rather than trusting whatever the client requested (or omitted) —
+    // otherwise a client that doesn't echo `catalog:write` exactly would
+    // complete the OAuth dance successfully and then get 403 on every
+    // subsequent tool call, with nothing in the flow surfacing why.
+    scope: MCP_OAUTH_SCOPE,
   });
 
   redirectUrl.searchParams.set('code', code);
