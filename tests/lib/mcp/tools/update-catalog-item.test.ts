@@ -47,7 +47,10 @@ function fakeSupabase(boilerplateIds: string[] = []) {
           select: () => ({
             eq: async (column: string, value: unknown) => {
               eqCalls.push([column, value]);
-              return { data: boilerplateIds.map((boilerplate_id) => ({ boilerplate_id })), error: null };
+              return {
+                data: boilerplateIds.map((boilerplate_id) => ({ boilerplate_id })),
+                error: null,
+              };
             },
           }),
         };
@@ -67,9 +70,9 @@ describe('handleUpdateCatalogItem', () => {
 
   it('throws when the user is not authorized', async () => {
     vi.mocked(hasAdminPermission).mockResolvedValue(false);
-    await expect(handleUpdateCatalogItem({ id: ITEM_ID, priceCents: 2000 }, 'user-1')).rejects.toThrow(
-      /not authorized/i,
-    );
+    await expect(
+      handleUpdateCatalogItem({ id: ITEM_ID, priceCents: 2000 }, 'user-1'),
+    ).rejects.toThrow(/not authorized/i);
   });
 
   it('merges a partial patch onto the existing item and keeps the existing thumbnail when imageUrl is omitted', async () => {
@@ -157,7 +160,10 @@ describe('handleUpdateCatalogItem', () => {
     vi.mocked(fetchAndStoreCatalogImage).mockResolvedValue('user-1/mcp-images/new.jpg');
     vi.mocked(updateCatalogItemCore).mockResolvedValue(undefined);
 
-    await handleUpdateCatalogItem({ id: ITEM_ID, imageUrl: 'https://example.test/new.jpg' }, 'user-1');
+    await handleUpdateCatalogItem(
+      { id: ITEM_ID, imageUrl: 'https://example.test/new.jpg' },
+      'user-1',
+    );
 
     expect(fetchAndStoreCatalogImage).toHaveBeenCalledWith(
       expect.anything(),

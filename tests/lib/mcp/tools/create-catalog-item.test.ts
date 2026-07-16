@@ -45,7 +45,11 @@ describe('handleCreateCatalogItem', () => {
 
     const result = await handleCreateCatalogItem(VALID_INPUT, 'user-1');
 
-    expect(fetchAndStoreCatalogImage).toHaveBeenCalledWith(expect.anything(), 'user-1', VALID_INPUT.imageUrl);
+    expect(fetchAndStoreCatalogImage).toHaveBeenCalledWith(
+      expect.anything(),
+      'user-1',
+      VALID_INPUT.imageUrl,
+    );
     expect(createCatalogItemCore).toHaveBeenCalledWith(
       expect.anything(),
       { id: 'user-1' },
@@ -55,7 +59,9 @@ describe('handleCreateCatalogItem', () => {
         status: 'draft',
         priceCents: 5000,
         categoryId: VALID_INPUT.categoryId,
-        seo: expect.objectContaining({ en: expect.objectContaining({ seoTitle: 'Wooden Puzzle' }) }),
+        seo: expect.objectContaining({
+          en: expect.objectContaining({ seoTitle: 'Wooden Puzzle' }),
+        }),
       }),
       'user-1/mcp-images/abc.jpg',
     );
@@ -70,7 +76,10 @@ describe('handleCreateCatalogItem', () => {
     vi.mocked(hasAdminPermission).mockResolvedValue(true);
     vi.mocked(fetchAndStoreCatalogImage).mockResolvedValue('user-1/mcp-images/abc.jpg');
     vi.mocked(ensureCatalogSlugIsAvailable).mockResolvedValue(false);
-    vi.mocked(createCatalogItemCore).mockResolvedValue({ id: 'item-1', slug: 'wooden-puzzle-abcd1234' });
+    vi.mocked(createCatalogItemCore).mockResolvedValue({
+      id: 'item-1',
+      slug: 'wooden-puzzle-abcd1234',
+    });
 
     await handleCreateCatalogItem(VALID_INPUT, 'user-1');
 

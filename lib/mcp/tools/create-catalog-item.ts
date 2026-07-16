@@ -25,7 +25,11 @@ export const createCatalogItemInputShape = {
     .describe('URL of a product photo. The server downloads and stores it as the thumbnail.'),
   priceCents: z.number().int().min(0).describe('Price in the smallest currency unit.'),
   categoryId: z.string().uuid().describe('A category id from list_categories.'),
-  subcategoryId: z.string().uuid().optional().describe('A subcategory id from list_subcategories, if applicable.'),
+  subcategoryId: z
+    .string()
+    .uuid()
+    .optional()
+    .describe('A subcategory id from list_subcategories, if applicable.'),
   manufacturingNotes: z
     .string()
     .trim()
@@ -38,8 +42,12 @@ export const createCatalogItemInputShape = {
     .describe('Admin-only technical specs. Write this yourself.'),
   seo: z.object({
     en: z.object(seoLocaleInputShape).describe('English SEO metadata. Write this yourself.'),
-    ru: z.object(seoLocaleInputShape).describe('Russian SEO metadata, adapted (not transliterated). Write this yourself.'),
-    am: z.object(seoLocaleInputShape).describe('Armenian SEO metadata, adapted (not transliterated). Write this yourself.'),
+    ru: z
+      .object(seoLocaleInputShape)
+      .describe('Russian SEO metadata, adapted (not transliterated). Write this yourself.'),
+    am: z
+      .object(seoLocaleInputShape)
+      .describe('Armenian SEO metadata, adapted (not transliterated). Write this yourself.'),
   }),
 };
 

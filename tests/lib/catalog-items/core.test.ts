@@ -189,7 +189,13 @@ describe('updateCatalogItemCore', () => {
 
   it('re-syncs boilerplates and market rules by default (syncAssociations unset)', async () => {
     const { client, touchedTables } = fakeSupabase();
-    await updateCatalogItemCore(client, 'existing-id', { id: 'user-1' }, baseItem(), 'user-1/thumb.jpg');
+    await updateCatalogItemCore(
+      client,
+      'existing-id',
+      { id: 'user-1' },
+      baseItem(),
+      'user-1/thumb.jpg',
+    );
     expect(touchedTables.has('catalog_item_boilerplates')).toBe(true);
     expect(touchedTables.has('catalog_item_market_rules')).toBe(true);
   });
