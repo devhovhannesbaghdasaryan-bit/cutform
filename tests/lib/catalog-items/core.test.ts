@@ -194,6 +194,21 @@ describe('updateCatalogItemCore', () => {
     expect(touchedTables.has('catalog_item_market_rules')).toBe(true);
   });
 
+  it('accepts a customizable item whose only generation source is a preserved boilerplate id, even with syncAssociations false', async () => {
+    const { client } = fakeSupabase();
+    await expect(
+      updateCatalogItemCore(
+        client,
+        'existing-id',
+        { id: 'user-1' },
+        baseItem({ isCustomizable: true, boilerplateIds: ['existing-boilerplate'] }),
+        'user-1/thumb.jpg',
+        undefined,
+        { syncAssociations: false },
+      ),
+    ).resolves.toBeUndefined();
+  });
+
   it('skips re-syncing boilerplates and market rules when syncAssociations is false, so a partial patch cannot wipe them', async () => {
     const { client, touchedTables } = fakeSupabase();
     await updateCatalogItemCore(

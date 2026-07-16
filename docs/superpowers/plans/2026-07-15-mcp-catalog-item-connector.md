@@ -2416,6 +2416,18 @@ export async function handleUpdateCatalogItem(
 
   const existing = await handleGetCatalogItem({ id: input.id }, userId);
 
+  // Fetched purely to satisfy validatePersonalizationConfig, which runs
+  // unconditionally inside updateCatalogItemCore regardless of
+  // syncAssociations — never written back, since syncAssociations: false
+  // below skips the boilerplates re-sync entirely. Without this, an item
+  // whose personalization comes solely from assigned boilerplates (no
+  // system prompt or skill id) would fail that check on every update.
+  const { data: boilerplateRows } = await supabase
+    .from('catalog_item_boilerplates')
+    .select('boilerplate_id')
+    .eq('catalog_item_id', input.id);
+  const existingBoilerplateIds = (boilerplateRows ?? []).map((row) => row.boilerplate_id);
+
   const thumbnailPath = input.imageUrl
     ? await fetchAndStoreCatalogImage(supabase, userId, input.imageUrl)
     : existing.thumbnail_path;
@@ -2445,7 +2457,7 @@ export async function handleUpdateCatalogItem(
     // supabase/migrations/20260707140000_generic_item_personalization.sql),
     // just typed generically as string[] by the Supabase client.
     tags: existing.tags as z.infer<typeof itemSchema>['tags'],
-    boilerplateIds: [],
+    boilerplateIds: existingBoilerplateIds,
     laserContourEnabled: existing.laser_contour_enabled,
     laserSolidEnabled: existing.laser_solid_enabled,
     laserSolidPriceCents: existing.laser_solid_price_cents ?? undefined,

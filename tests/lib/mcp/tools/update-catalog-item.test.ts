@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/admin', () => ({ hasAdminPermission: vi.fn() }));
-vi.mock('@/lib/supabase/server', () => ({ getServiceSupabase: vi.fn(() => ({})) }));
+vi.mock('@/lib/supabase/server', () => ({ getServiceSupabase: vi.fn() }));
 vi.mock('@/lib/catalog-items/upload-from-url', () => ({ fetchAndStoreCatalogImage: vi.fn() }));
 vi.mock('@/lib/catalog-items/core', () => ({ updateCatalogItemCore: vi.fn() }));
 vi.mock('@/lib/mcp/tools/get-catalog-item', () => ({ handleGetCatalogItem: vi.fn() }));
@@ -11,6 +11,7 @@ import { updateCatalogItemCore } from '@/lib/catalog-items/core';
 import { fetchAndStoreCatalogImage } from '@/lib/catalog-items/upload-from-url';
 import { handleGetCatalogItem } from '@/lib/mcp/tools/get-catalog-item';
 import { handleUpdateCatalogItem } from '@/lib/mcp/tools/update-catalog-item';
+import { getServiceSupabase } from '@/lib/supabase/server';
 
 const ITEM_ID = '550e8400-e29b-41d4-a716-446655440001';
 const EXISTING = {
@@ -37,10 +38,31 @@ const EXISTING = {
   sizes: [{ key: 'small', label: 'Small' }],
 };
 
+function fakeSupabase(boilerplateIds: string[] = []) {
+  const eqCalls: Array<[string, unknown]> = [];
+  return {
+    from: (table: string) => {
+      if (table === 'catalog_item_boilerplates') {
+        return {
+          select: () => ({
+            eq: async (column: string, value: unknown) => {
+              eqCalls.push([column, value]);
+              return { data: boilerplateIds.map((boilerplate_id) => ({ boilerplate_id })), error: null };
+            },
+          }),
+        };
+      }
+      throw new Error(`Unexpected table in test: ${table}`);
+    },
+    eqCalls,
+  };
+}
+
 describe('handleUpdateCatalogItem', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(handleGetCatalogItem).mockResolvedValue(EXISTING);
+    vi.mocked(getServiceSupabase).mockReturnValue(fakeSupabase() as never);
   });
 
   it('throws when the user is not authorized', async () => {
@@ -88,6 +110,46 @@ describe('handleUpdateCatalogItem', () => {
       sizesJson: JSON.stringify(EXISTING.sizes),
     });
     expect(optionsArg).toEqual({ syncAssociations: false });
+  });
+
+  it('fetches and preserves the existing boilerplate ids for validation, without re-syncing them', async () => {
+    vi.mocked(hasAdminPermission).mockResolvedValue(true);
+    vi.mocked(updateCatalogItemCore).mockResolvedValue(undefined);
+    const supabase = fakeSupabase(['boilerplate-1', 'boilerplate-2']);
+    vi.mocked(getServiceSupabase).mockReturnValue(supabase as never);
+
+    await handleUpdateCatalogItem({ id: ITEM_ID, priceCents: 2000 }, 'user-1');
+
+    expect(supabase.eqCalls).toEqual([['catalog_item_id', ITEM_ID]]);
+    const [, , , itemArg] = vi.mocked(updateCatalogItemCore).mock.calls[0];
+    expect(itemArg).toMatchObject({ boilerplateIds: ['boilerplate-1', 'boilerplate-2'] });
+  });
+
+  it('passes an empty boilerplateIds list through unharmed when the item has no boilerplates assigned, even though isCustomizable is preserved as true', async () => {
+    vi.mocked(hasAdminPermission).mockResolvedValue(true);
+    vi.mocked(updateCatalogItemCore).mockResolvedValue(undefined);
+    vi.mocked(handleGetCatalogItem).mockResolvedValue({
+      ...EXISTING,
+      system_prompt: null,
+      skill_id: null,
+      laser_solid_enabled: false,
+    });
+    vi.mocked(getServiceSupabase).mockReturnValue(fakeSupabase(['boilerplate-only']) as never);
+
+    await handleUpdateCatalogItem({ id: ITEM_ID, priceCents: 2000 }, 'user-1');
+
+    // isCustomizable stays true (preserved) and boilerplateIds carries the
+    // fetched id rather than an empty array — updateCatalogItemCore is
+    // mocked here, so this only proves the data is threaded correctly; see
+    // core.test.ts for proof that this combination actually satisfies
+    // validatePersonalizationConfig instead of throwing.
+    const [, , , itemArg] = vi.mocked(updateCatalogItemCore).mock.calls[0];
+    expect(itemArg).toMatchObject({
+      isCustomizable: true,
+      systemPrompt: undefined,
+      skillId: undefined,
+      boilerplateIds: ['boilerplate-only'],
+    });
   });
 
   it('re-fetches the thumbnail when imageUrl is given', async () => {
