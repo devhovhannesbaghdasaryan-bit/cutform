@@ -125,7 +125,7 @@ describe('handleUpdateCatalogItem', () => {
     expect(itemArg).toMatchObject({ boilerplateIds: ['boilerplate-1', 'boilerplate-2'] });
   });
 
-  it('passes an empty boilerplateIds list through unharmed when the item has no boilerplates assigned, even though isCustomizable is preserved as true', async () => {
+  it('passes the fetched boilerplateIds through for a boilerplate-only-personalization item', async () => {
     vi.mocked(hasAdminPermission).mockResolvedValue(true);
     vi.mocked(updateCatalogItemCore).mockResolvedValue(undefined);
     vi.mocked(handleGetCatalogItem).mockResolvedValue({
