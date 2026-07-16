@@ -97,7 +97,7 @@ const handler = createMcpHandler((server) => {
       }
     },
   );
-});
+}, {}, { basePath: '/api' });
 
 const authHandler = withMcpAuth(handler, verifyAccessToken, {
   required: true,
