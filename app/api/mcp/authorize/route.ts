@@ -121,8 +121,12 @@ export async function POST(request: Request) {
   const params = readParams(new URLSearchParams(form as unknown as Record<string, string>));
   const decision = String(form.get('decision') ?? '');
 
+  if (params.responseType !== 'code') return badRequest('response_type must be "code".');
+  if (params.codeChallengeMethod !== 'S256')
+    return badRequest('code_challenge_method must be "S256".');
+
   const client = await getOauthClient(params.clientId);
-  if (!client || !client.redirectUris.includes(params.redirectUri)) {
+  if (!client?.redirectUris.includes(params.redirectUri)) {
     return badRequest('Unknown client or redirect_uri.');
   }
 

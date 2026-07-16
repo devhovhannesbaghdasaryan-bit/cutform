@@ -108,11 +108,67 @@ describe('POST /api/mcp/authorize', () => {
 
     const res = await POST(approvalForm('approve'));
 
+    expect(createAuthorizationCode).toHaveBeenCalledWith({
+      clientId: 'client-1',
+      userId: 'user-1',
+      redirectUri: 'https://claude.ai/api/mcp/auth_callback',
+      codeChallenge: 'challenge-abc',
+      scope: 'catalog:write',
+    });
     expect(res.status).toBe(307);
     const location = new URL(res.headers.get('location') ?? '');
     expect(location.origin + location.pathname).toBe('https://claude.ai/api/mcp/auth_callback');
     expect(location.searchParams.get('code')).toBe('code-xyz');
     expect(location.searchParams.get('state')).toBe('state-abc');
+  });
+
+  it('mints the code for the session user even if a malicious form field tried to claim a different user_id', async () => {
+    vi.mocked(createAuthorizationCode).mockResolvedValue('code-xyz');
+    const body = new URLSearchParams({
+      decision: 'approve',
+      response_type: 'code',
+      client_id: 'client-1',
+      redirect_uri: 'https://claude.ai/api/mcp/auth_callback',
+      code_challenge: 'challenge-abc',
+      code_challenge_method: 'S256',
+      state: 'state-abc',
+      scope: 'catalog:write',
+      user_id: 'attacker-controlled-id',
+    });
+    const req = new Request('https://uniqraft.test/api/mcp/authorize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+
+    await POST(req);
+
+    expect(createAuthorizationCode).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: 'user-1' }),
+    );
+  });
+
+  it('rejects a code_challenge_method other than S256, without minting a code', async () => {
+    const body = new URLSearchParams({
+      decision: 'approve',
+      response_type: 'code',
+      client_id: 'client-1',
+      redirect_uri: 'https://claude.ai/api/mcp/auth_callback',
+      code_challenge: 'challenge-abc',
+      code_challenge_method: 'plain',
+      state: 'state-abc',
+      scope: 'catalog:write',
+    });
+    const req = new Request('https://uniqraft.test/api/mcp/authorize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+
+    const res = await POST(req);
+
+    expect(res.status).toBe(400);
+    expect(createAuthorizationCode).not.toHaveBeenCalled();
   });
 
   it('redirects back with access_denied on denial, without minting a code', async () => {
