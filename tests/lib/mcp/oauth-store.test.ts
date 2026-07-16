@@ -90,7 +90,11 @@ describe('oauth-store', () => {
       redirectUri: 'https://claude.ai/callback',
     });
 
-    expect(consumed).toEqual({ userId: 'user-1', scope: MCP_OAUTH_SCOPE, codeChallenge: 'challenge-abc' });
+    expect(consumed).toEqual({
+      userId: 'user-1',
+      scope: MCP_OAUTH_SCOPE,
+      codeChallenge: 'challenge-abc',
+    });
   });
 
   it('refuses to consume the same code twice', async () => {
@@ -102,7 +106,11 @@ describe('oauth-store', () => {
       scope: MCP_OAUTH_SCOPE,
     });
 
-    await consumeAuthorizationCode({ code, clientId: 'client-1', redirectUri: 'https://claude.ai/callback' });
+    await consumeAuthorizationCode({
+      code,
+      clientId: 'client-1',
+      redirectUri: 'https://claude.ai/callback',
+    });
     const second = await consumeAuthorizationCode({
       code,
       clientId: 'client-1',
@@ -131,7 +139,11 @@ describe('oauth-store', () => {
   });
 
   it('issues a token pair and finds the access token context', async () => {
-    const pair = await issueTokenPair({ clientId: 'client-1', userId: 'user-1', scope: MCP_OAUTH_SCOPE });
+    const pair = await issueTokenPair({
+      clientId: 'client-1',
+      userId: 'user-1',
+      scope: MCP_OAUTH_SCOPE,
+    });
     expect(pair.expiresIn).toBeGreaterThan(0);
 
     const context = await findAccessTokenContext(pair.accessToken);
@@ -143,7 +155,11 @@ describe('oauth-store', () => {
   });
 
   it('rotates a refresh token into a new pair and invalidates the old pair entirely', async () => {
-    const pair = await issueTokenPair({ clientId: 'client-1', userId: 'user-1', scope: MCP_OAUTH_SCOPE });
+    const pair = await issueTokenPair({
+      clientId: 'client-1',
+      userId: 'user-1',
+      scope: MCP_OAUTH_SCOPE,
+    });
     const rotated = await rotateRefreshToken(pair.refreshToken);
 
     expect(rotated?.userId).toBe('user-1');

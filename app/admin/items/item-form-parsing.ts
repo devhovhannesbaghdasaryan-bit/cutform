@@ -70,7 +70,11 @@ export const itemSchema = z.object({
   boilerplateIds: z.array(z.uuid()),
   laserContourEnabled: z.boolean(),
   laserSolidEnabled: z.boolean(),
-  laserSolidPriceCents: z.coerce.number().int().min(0, 'Solid price cannot be negative.').optional(),
+  laserSolidPriceCents: z.coerce
+    .number()
+    .int()
+    .min(0, 'Solid price cannot be negative.')
+    .optional(),
   laserSolidPrompt: z.string().trim().optional(),
   seo: z.object({
     en: seoLocaleSchema,

@@ -37,9 +37,9 @@ describe('fetchAndStoreCatalogImage', () => {
 
   it('rejects non-https URLs before ever calling fetch', async () => {
     const { client } = fakeSupabase();
-    await expect(fetchAndStoreCatalogImage(client, 'user-1', 'http://example.com/a.jpg')).rejects.toThrow(
-      /https/i,
-    );
+    await expect(
+      fetchAndStoreCatalogImage(client, 'user-1', 'http://example.com/a.jpg'),
+    ).rejects.toThrow(/https/i);
     expect(fetch).not.toHaveBeenCalled();
   });
 
@@ -83,7 +83,10 @@ describe('fetchAndStoreCatalogImage', () => {
     });
     // Response constructed from a stream does not auto-set Content-Length,
     // unlike Response constructed from a Uint8Array/Blob.
-    const response = new Response(stream, { status: 200, headers: { 'Content-Type': 'image/jpeg' } });
+    const response = new Response(stream, {
+      status: 200,
+      headers: { 'Content-Type': 'image/jpeg' },
+    });
     vi.mocked(fetch).mockResolvedValue(response);
     const { client } = fakeSupabase();
     await expect(

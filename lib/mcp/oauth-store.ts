@@ -25,7 +25,11 @@ export async function registerOauthClient(input: {
     .select('client_id, client_name, redirect_uris')
     .single();
   if (error || !data) throw new Error(error?.message ?? 'Failed to register client.');
-  return { clientId: data.client_id, clientName: data.client_name, redirectUris: data.redirect_uris };
+  return {
+    clientId: data.client_id,
+    clientName: data.client_name,
+    redirectUris: data.redirect_uris,
+  };
 }
 
 export async function getOauthClient(clientId: string): Promise<McpOauthClient | null> {
@@ -36,7 +40,11 @@ export async function getOauthClient(clientId: string): Promise<McpOauthClient |
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) return null;
-  return { clientId: data.client_id, clientName: data.client_name, redirectUris: data.redirect_uris };
+  return {
+    clientId: data.client_id,
+    clientName: data.client_name,
+    redirectUris: data.redirect_uris,
+  };
 }
 
 export async function createAuthorizationCode(input: {
@@ -149,7 +157,11 @@ export async function rotateRefreshToken(refreshToken: string): Promise<RotatedT
     .eq('id', data.id);
   if (revokeError) throw new Error(revokeError.message);
 
-  const pair = await issueTokenPair({ clientId: data.client_id, userId: data.user_id, scope: data.scope });
+  const pair = await issueTokenPair({
+    clientId: data.client_id,
+    userId: data.user_id,
+    scope: data.scope,
+  });
   return { ...pair, userId: data.user_id, scope: data.scope, clientId: data.client_id };
 }
 
@@ -159,7 +171,9 @@ export interface AccessTokenContext {
   scope: string;
 }
 
-export async function findAccessTokenContext(accessToken: string): Promise<AccessTokenContext | null> {
+export async function findAccessTokenContext(
+  accessToken: string,
+): Promise<AccessTokenContext | null> {
   const supabase = getServiceSupabase();
   const accessTokenHash = hashToken(accessToken);
   const { data, error } = await supabase
@@ -197,7 +211,8 @@ export async function listConnectedApps(
   return (data ?? []).map((row) => ({
     tokenId: row.id,
     clientId: row.client_id,
-    clientName: (row.mcp_oauth_clients as { client_name: string } | null)?.client_name ?? 'Unknown app',
+    clientName:
+      (row.mcp_oauth_clients as { client_name: string } | null)?.client_name ?? 'Unknown app',
     expiresAt: row.expires_at,
     refreshExpiresAt: row.refresh_expires_at,
   }));

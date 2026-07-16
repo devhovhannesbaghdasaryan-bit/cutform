@@ -40,8 +40,8 @@ describe('verifyPkceChallenge', () => {
   });
 
   it('rejects a mismatched verifier', () => {
-    expect(verifyPkceChallenge('wrong-verifier', 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM')).toBe(
-      false,
-    );
+    expect(
+      verifyPkceChallenge('wrong-verifier', 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM'),
+    ).toBe(false);
   });
 });

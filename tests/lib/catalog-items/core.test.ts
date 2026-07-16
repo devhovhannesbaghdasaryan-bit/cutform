@@ -83,7 +83,10 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
         };
       }
       if (table === 'catalog_item_boilerplates') {
-        return { delete: () => ({ eq: async () => ({ error: null }) }), insert: async () => ({ error: null }) };
+        return {
+          delete: () => ({ eq: async () => ({ error: null }) }),
+          insert: async () => ({ error: null }),
+        };
       }
       if (table === 'catalog_item_seo_metadata') {
         return { upsert: async () => ({ error: null }) };
@@ -108,7 +111,10 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
         };
       }
       if (table === 'catalog_item_market_rules') {
-        return { delete: () => ({ eq: async () => ({ error: null }) }), insert: async () => ({ error: null }) };
+        return {
+          delete: () => ({ eq: async () => ({ error: null }) }),
+          insert: async () => ({ error: null }),
+        };
       }
       throw new Error(`Unexpected table in test: ${table}`);
     },
@@ -119,7 +125,12 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
 describe('createCatalogItemCore', () => {
   it('inserts the item and returns its id and slug', async () => {
     const { client, inserted } = fakeSupabase();
-    const result = await createCatalogItemCore(client, { id: 'user-1' }, baseItem(), 'user-1/thumb.jpg');
+    const result = await createCatalogItemCore(
+      client,
+      { id: 'user-1' },
+      baseItem(),
+      'user-1/thumb.jpg',
+    );
     expect(result).toEqual({ id: 'new-id', slug: 'test-item' });
     expect(inserted[0]).toMatchObject({
       title: 'Test Item',
@@ -132,9 +143,9 @@ describe('createCatalogItemCore', () => {
 
   it('rejects an unknown category', async () => {
     const { client } = fakeSupabase({ categoryExists: false });
-    await expect(
-      createCatalogItemCore(client, { id: 'user-1' }, baseItem(), null),
-    ).rejects.toThrow('Selected category does not exist.');
+    await expect(createCatalogItemCore(client, { id: 'user-1' }, baseItem(), null)).rejects.toThrow(
+      'Selected category does not exist.',
+    );
   });
 
   it('rejects a slug already used by another item', async () => {
@@ -162,7 +173,13 @@ describe('updateCatalogItemCore', () => {
   it('updates without throwing for a valid item', async () => {
     const { client } = fakeSupabase();
     await expect(
-      updateCatalogItemCore(client, 'existing-id', { id: 'user-1' }, baseItem(), 'user-1/thumb.jpg'),
+      updateCatalogItemCore(
+        client,
+        'existing-id',
+        { id: 'user-1' },
+        baseItem(),
+        'user-1/thumb.jpg',
+      ),
     ).resolves.toBeUndefined();
   });
 });

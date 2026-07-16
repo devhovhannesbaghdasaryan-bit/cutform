@@ -44,7 +44,9 @@ describe('hasAdminPermission', () => {
   });
 
   it('uses the cookie-bound client from getServerSupabase() when no override is given', async () => {
-    vi.mocked(getServerSupabase).mockResolvedValue(fakeSupabase({ role: 'admin', hasPermission: true }));
+    vi.mocked(getServerSupabase).mockResolvedValue(
+      fakeSupabase({ role: 'admin', hasPermission: true }),
+    );
 
     const allowed = await hasAdminPermission('user-1', 'catalog_manage');
 

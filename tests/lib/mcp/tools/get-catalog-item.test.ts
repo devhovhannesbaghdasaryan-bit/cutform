@@ -16,7 +16,9 @@ describe('handleGetCatalogItem', () => {
 
   it('throws when the user is not authorized', async () => {
     vi.mocked(hasAdminPermission).mockResolvedValue(false);
-    await expect(handleGetCatalogItem({ id: ITEM_ID }, 'user-1')).rejects.toThrow(/not authorized/i);
+    await expect(handleGetCatalogItem({ id: ITEM_ID }, 'user-1')).rejects.toThrow(
+      /not authorized/i,
+    );
   });
 
   it('throws a not-found error when the item does not exist', async () => {

@@ -26,7 +26,10 @@ export interface CatalogItemSummary {
   characteristics: string | null;
 }
 
-export async function handleGetCatalogItem(rawInput: unknown, userId: string): Promise<CatalogItemSummary> {
+export async function handleGetCatalogItem(
+  rawInput: unknown,
+  userId: string,
+): Promise<CatalogItemSummary> {
   const input = getCatalogItemInputSchema.parse(rawInput);
 
   const allowed = await hasAdminPermission(userId, 'catalog_manage', getServiceSupabase());

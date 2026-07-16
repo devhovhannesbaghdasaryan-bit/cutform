@@ -64,7 +64,9 @@ function isBlockedIpv6(ip: string): boolean {
 async function assertPublicHost(hostname: string): Promise<void> {
   const directIpVersion = isIP(hostname);
   const addresses =
-    directIpVersion > 0 ? [{ address: hostname, family: directIpVersion }] : await lookup(hostname, { all: true });
+    directIpVersion > 0
+      ? [{ address: hostname, family: directIpVersion }]
+      : await lookup(hostname, { all: true });
 
   for (const { address, family } of addresses) {
     const blocked = family === 6 ? isBlockedIpv6(address) : isBlockedIpv4(address);

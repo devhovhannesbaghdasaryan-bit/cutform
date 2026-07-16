@@ -31,7 +31,9 @@ async function validateItemAndParseSizes(
   if (!validSubcategory) throw new Error('Selected subcategory does not belong to category.');
 
   if (!validatePersonalizationConfig(item)) {
-    throw new Error('Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.');
+    throw new Error(
+      'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
+    );
   }
 
   const engravingError = validateEngravingConfig(item);
@@ -44,7 +46,11 @@ async function validateItemAndParseSizes(
   }
 }
 
-function toCatalogItemRow(item: z.infer<typeof itemSchema>, sizes: Json[], thumbnailPath: string | null) {
+function toCatalogItemRow(
+  item: z.infer<typeof itemSchema>,
+  sizes: Json[],
+  thumbnailPath: string | null,
+) {
   return {
     title: item.title,
     slug: item.slug,
@@ -99,7 +105,13 @@ export async function createCatalogItemCore(
     .single();
   if (error || !data) throw new Error(error?.message ?? 'Failed to create item.');
 
-  await syncCatalogItemMedia(supabase, user.id, data.id, formData, thumbnailPath ?? item.thumbnailPath ?? null);
+  await syncCatalogItemMedia(
+    supabase,
+    user.id,
+    data.id,
+    formData,
+    thumbnailPath ?? item.thumbnailPath ?? null,
+  );
   await syncCatalogItemBoilerplates(supabase, data.id, item.boilerplateIds);
   await upsertSeoMetadata(supabase, data.id, item, user.id);
   await syncCatalogItemMarketRules(supabase, data.id, formData);
@@ -126,7 +138,13 @@ export async function updateCatalogItemCore(
     .eq('id', id);
   if (error) throw new Error(error.message);
 
-  await syncCatalogItemMedia(supabase, user.id, id, formData, thumbnailPath ?? item.thumbnailPath ?? null);
+  await syncCatalogItemMedia(
+    supabase,
+    user.id,
+    id,
+    formData,
+    thumbnailPath ?? item.thumbnailPath ?? null,
+  );
   await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
   await upsertSeoMetadata(supabase, id, item, user.id);
   await syncCatalogItemMarketRules(supabase, id, formData);

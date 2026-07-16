@@ -40,7 +40,11 @@ describe('verifyAccessToken', () => {
     });
     vi.mocked(hasAdminPermission).mockResolvedValue(false);
     expect(await verifyAccessToken(fakeRequest, 'good-token')).toBeUndefined();
-    expect(hasAdminPermission).toHaveBeenCalledWith('user-1', 'catalog_manage', 'fake-service-client');
+    expect(hasAdminPermission).toHaveBeenCalledWith(
+      'user-1',
+      'catalog_manage',
+      'fake-service-client',
+    );
   });
 
   it('returns AuthInfo with the userId for a valid, authorized token', async () => {
