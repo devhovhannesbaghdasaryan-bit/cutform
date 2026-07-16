@@ -6,6 +6,7 @@ import {
   CreditCard,
   Globe2,
   LayoutDashboard,
+  Plug,
   SlidersHorizontal,
   Sparkles,
   Store,
@@ -23,6 +24,7 @@ const links = [
   { href: '/admin/transactions', label: 'Transactions', icon: CreditCard },
   { href: '/admin/currencies', label: 'Currencies', icon: Banknote },
   { href: '/admin/markets', label: 'Markets', icon: Globe2 },
+  { href: '/admin/connectors', label: 'Connected apps', icon: Plug },
   { href: '/catalog', label: 'Storefront', icon: Store },
 ];
 
