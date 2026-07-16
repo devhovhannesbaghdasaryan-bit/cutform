@@ -1381,6 +1381,19 @@ export async function createCatalogItemCore(
   return { id: data.id, slug: item.slug };
 }
 
+export interface UpdateCatalogItemCoreOptions {
+  /**
+   * Boilerplates and market rules are association tables this function
+   * unconditionally re-syncs from `item.boilerplateIds`/`formData` — correct
+   * for the admin form, which always submits the item's complete current
+   * state. A caller that only has a partial patch (e.g. an MCP tool) must
+   * pass `false` here, or every update would delete those associations by
+   * re-syncing to an empty set. Defaults to `true` to preserve the admin
+   * form's existing behavior unchanged.
+   */
+  syncAssociations?: boolean;
+}
+
 /** Shared update path for a catalog item — see createCatalogItemCore for the formData default. */
 export async function updateCatalogItemCore(
   supabase: AdminSupabase,
@@ -1389,7 +1402,9 @@ export async function updateCatalogItemCore(
   item: z.infer<typeof itemSchema>,
   thumbnailPath: string | null,
   formData: FormData = new FormData(),
+  options: UpdateCatalogItemCoreOptions = {},
 ): Promise<void> {
+  const syncAssociations = options.syncAssociations ?? true;
   const slugAvailable = await ensureCatalogSlugIsAvailable(supabase, item.slug, id);
   if (!slugAvailable) throw new Error('Slug is already used by another item.');
   const sizes = await validateItemAndParseSizes(supabase, item);
@@ -1401,9 +1416,11 @@ export async function updateCatalogItemCore(
   if (error) throw new Error(error.message);
 
   await syncCatalogItemMedia(supabase, user.id, id, formData, thumbnailPath ?? item.thumbnailPath ?? null);
-  await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
+  if (syncAssociations) {
+    await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
+    await syncCatalogItemMarketRules(supabase, id, formData);
+  }
   await upsertSeoMetadata(supabase, id, item, user.id);
-  await syncCatalogItemMarketRules(supabase, id, formData);
 }
 ```
 
@@ -1954,7 +1971,7 @@ export const getCatalogItemInputShape = {
 const getCatalogItemInputSchema = z.object(getCatalogItemInputShape);
 
 const CATALOG_ITEM_COLUMNS =
-  'id, title, slug, status, price_cents, description, category_id, subcategory_id, thumbnail_path, manufacturing_notes, characteristics';
+  'id, title, slug, status, price_cents, description, category_id, subcategory_id, thumbnail_path, manufacturing_notes, characteristics, tags, is_popular, is_customizable, system_prompt, skill_id, laser_contour_enabled, laser_solid_enabled, laser_solid_price_cents, laser_solid_prompt, sizes';
 
 export interface CatalogItemSummary {
   id: string;
@@ -1968,6 +1985,16 @@ export interface CatalogItemSummary {
   thumbnail_path: string | null;
   manufacturing_notes: string | null;
   characteristics: string | null;
+  tags: string[];
+  is_popular: boolean;
+  is_customizable: boolean;
+  system_prompt: string | null;
+  skill_id: string | null;
+  laser_contour_enabled: boolean;
+  laser_solid_enabled: boolean;
+  laser_solid_price_cents: number | null;
+  laser_solid_prompt: string | null;
+  sizes: unknown;
 }
 
 export async function handleGetCatalogItem(rawInput: unknown, userId: string): Promise<CatalogItemSummary> {
@@ -2402,20 +2429,27 @@ export async function handleUpdateCatalogItem(
     description: input.description ?? existing.description ?? undefined,
     priceCents: input.priceCents ?? existing.price_cents,
     status: existing.status as z.infer<typeof itemSchema>['status'],
-    isPopular: false,
-    isCustomizable: false,
+    // Preserved as-is from the existing item — this tool has no way to set
+    // these, and updateCatalogItemCore is called with syncAssociations:
+    // false below so boilerplates/market rules (not columns on this row,
+    // not preservable here) are left untouched rather than wiped.
+    isPopular: existing.is_popular,
+    isCustomizable: existing.is_customizable,
     thumbnailPath: thumbnailPath ?? undefined,
     manufacturingNotes: input.manufacturingNotes ?? existing.manufacturing_notes ?? undefined,
-    sizesJson: undefined,
+    sizesJson: existing.sizes ? JSON.stringify(existing.sizes) : undefined,
     characteristics: input.characteristics ?? existing.characteristics ?? undefined,
-    systemPrompt: undefined,
-    skillId: undefined,
-    tags: [],
+    systemPrompt: existing.system_prompt ?? undefined,
+    skillId: existing.skill_id ?? undefined,
+    // catalog_items.tags is DB-constrained to this same enum (see
+    // supabase/migrations/20260707140000_generic_item_personalization.sql),
+    // just typed generically as string[] by the Supabase client.
+    tags: existing.tags as z.infer<typeof itemSchema>['tags'],
     boilerplateIds: [],
-    laserContourEnabled: false,
-    laserSolidEnabled: false,
-    laserSolidPriceCents: undefined,
-    laserSolidPrompt: undefined,
+    laserContourEnabled: existing.laser_contour_enabled,
+    laserSolidEnabled: existing.laser_solid_enabled,
+    laserSolidPriceCents: existing.laser_solid_price_cents ?? undefined,
+    laserSolidPrompt: existing.laser_solid_prompt ?? undefined,
     seo: {
       en: { ...(input.seo?.en ?? {}), socialImagePath: undefined },
       ru: { ...(input.seo?.ru ?? {}), socialImagePath: undefined },
@@ -2423,7 +2457,9 @@ export async function handleUpdateCatalogItem(
     },
   };
 
-  await updateCatalogItemCore(supabase, input.id, { id: userId }, item, thumbnailPath);
+  await updateCatalogItemCore(supabase, input.id, { id: userId }, item, thumbnailPath, undefined, {
+    syncAssociations: false,
+  });
 
   return { id: input.id };
 }

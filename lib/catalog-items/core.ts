@@ -119,6 +119,19 @@ export async function createCatalogItemCore(
   return { id: data.id, slug: item.slug };
 }
 
+export interface UpdateCatalogItemCoreOptions {
+  /**
+   * Boilerplates and market rules are association tables this function
+   * unconditionally re-syncs from `item.boilerplateIds`/`formData` — correct
+   * for the admin form, which always submits the item's complete current
+   * state. A caller that only has a partial patch (e.g. an MCP tool) must
+   * pass `false` here, or every update would delete those associations by
+   * re-syncing to an empty set. Defaults to `true` to preserve the admin
+   * form's existing behavior unchanged.
+   */
+  syncAssociations?: boolean;
+}
+
 /** Shared update path for a catalog item — see createCatalogItemCore for the formData default. */
 export async function updateCatalogItemCore(
   supabase: AdminSupabase,
@@ -127,7 +140,9 @@ export async function updateCatalogItemCore(
   item: z.infer<typeof itemSchema>,
   thumbnailPath: string | null,
   formData: FormData = new FormData(),
+  options: UpdateCatalogItemCoreOptions = {},
 ): Promise<void> {
+  const syncAssociations = options.syncAssociations ?? true;
   const slugAvailable = await ensureCatalogSlugIsAvailable(supabase, item.slug, id);
   if (!slugAvailable) throw new Error('Slug is already used by another item.');
   const sizes = await validateItemAndParseSizes(supabase, item);
@@ -145,7 +160,9 @@ export async function updateCatalogItemCore(
     formData,
     thumbnailPath ?? item.thumbnailPath ?? null,
   );
-  await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
+  if (syncAssociations) {
+    await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
+    await syncCatalogItemMarketRules(supabase, id, formData);
+  }
   await upsertSeoMetadata(supabase, id, item, user.id);
-  await syncCatalogItemMarketRules(supabase, id, formData);
 }

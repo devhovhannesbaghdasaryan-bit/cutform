@@ -35,8 +35,12 @@ function baseItem(overrides: Partial<z.infer<typeof itemSchema>> = {}): z.infer<
 function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean } = {}) {
   const { categoryExists = true, slugTaken = false } = options;
   const inserted: Record<string, unknown>[] = [];
+  const touchedTables = new Set<string>();
   const client = {
     from(table: string) {
+      if (table === 'catalog_item_boilerplates' || table === 'catalog_item_market_rules') {
+        touchedTables.add(table);
+      }
       if (table === 'categories') {
         return {
           select: () => ({
@@ -119,7 +123,7 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
       throw new Error(`Unexpected table in test: ${table}`);
     },
   };
-  return { client: client as never, inserted };
+  return { client: client as never, inserted, touchedTables };
 }
 
 describe('createCatalogItemCore', () => {
@@ -181,5 +185,27 @@ describe('updateCatalogItemCore', () => {
         'user-1/thumb.jpg',
       ),
     ).resolves.toBeUndefined();
+  });
+
+  it('re-syncs boilerplates and market rules by default (syncAssociations unset)', async () => {
+    const { client, touchedTables } = fakeSupabase();
+    await updateCatalogItemCore(client, 'existing-id', { id: 'user-1' }, baseItem(), 'user-1/thumb.jpg');
+    expect(touchedTables.has('catalog_item_boilerplates')).toBe(true);
+    expect(touchedTables.has('catalog_item_market_rules')).toBe(true);
+  });
+
+  it('skips re-syncing boilerplates and market rules when syncAssociations is false, so a partial patch cannot wipe them', async () => {
+    const { client, touchedTables } = fakeSupabase();
+    await updateCatalogItemCore(
+      client,
+      'existing-id',
+      { id: 'user-1' },
+      baseItem(),
+      'user-1/thumb.jpg',
+      undefined,
+      { syncAssociations: false },
+    );
+    expect(touchedTables.has('catalog_item_boilerplates')).toBe(false);
+    expect(touchedTables.has('catalog_item_market_rules')).toBe(false);
   });
 });

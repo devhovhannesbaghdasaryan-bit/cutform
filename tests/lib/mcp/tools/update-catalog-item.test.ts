@@ -25,6 +25,16 @@ const EXISTING = {
   thumbnail_path: 'old/path.jpg',
   manufacturing_notes: null,
   characteristics: null,
+  tags: ['personal_photo'],
+  is_popular: true,
+  is_customizable: true,
+  system_prompt: 'Existing system prompt',
+  skill_id: 'skill-1',
+  laser_contour_enabled: true,
+  laser_solid_enabled: true,
+  laser_solid_price_cents: 500,
+  laser_solid_prompt: 'Existing solid prompt',
+  sizes: [{ key: 'small', label: 'Small' }],
 };
 
 describe('handleUpdateCatalogItem', () => {
@@ -53,7 +63,31 @@ describe('handleUpdateCatalogItem', () => {
       { id: 'user-1' },
       expect.objectContaining({ title: 'Old Title', priceCents: 2000, description: 'old desc' }),
       'old/path.jpg',
+      undefined,
+      { syncAssociations: false },
     );
+  });
+
+  it('preserves fields it has no way to set (tags, personalization, engraving, sizes) instead of wiping them, and skips re-syncing associations', async () => {
+    vi.mocked(hasAdminPermission).mockResolvedValue(true);
+    vi.mocked(updateCatalogItemCore).mockResolvedValue(undefined);
+
+    await handleUpdateCatalogItem({ id: ITEM_ID, priceCents: 2000 }, 'user-1');
+
+    const [, , , itemArg, , , optionsArg] = vi.mocked(updateCatalogItemCore).mock.calls[0];
+    expect(itemArg).toMatchObject({
+      tags: ['personal_photo'],
+      isPopular: true,
+      isCustomizable: true,
+      systemPrompt: 'Existing system prompt',
+      skillId: 'skill-1',
+      laserContourEnabled: true,
+      laserSolidEnabled: true,
+      laserSolidPriceCents: 500,
+      laserSolidPrompt: 'Existing solid prompt',
+      sizesJson: JSON.stringify(EXISTING.sizes),
+    });
+    expect(optionsArg).toEqual({ syncAssociations: false });
   });
 
   it('re-fetches the thumbnail when imageUrl is given', async () => {

@@ -61,20 +61,27 @@ export async function handleUpdateCatalogItem(
     description: input.description ?? existing.description ?? undefined,
     priceCents: input.priceCents ?? existing.price_cents,
     status: existing.status as z.infer<typeof itemSchema>['status'],
-    isPopular: false,
-    isCustomizable: false,
+    // Preserved as-is from the existing item — this tool has no way to set
+    // these, and updateCatalogItemCore is called with syncAssociations:
+    // false below so boilerplates/market rules (not columns on this row,
+    // not preservable here) are left untouched rather than wiped.
+    isPopular: existing.is_popular,
+    isCustomizable: existing.is_customizable,
     thumbnailPath: thumbnailPath ?? undefined,
     manufacturingNotes: input.manufacturingNotes ?? existing.manufacturing_notes ?? undefined,
-    sizesJson: undefined,
+    sizesJson: existing.sizes ? JSON.stringify(existing.sizes) : undefined,
     characteristics: input.characteristics ?? existing.characteristics ?? undefined,
-    systemPrompt: undefined,
-    skillId: undefined,
-    tags: [],
+    systemPrompt: existing.system_prompt ?? undefined,
+    skillId: existing.skill_id ?? undefined,
+    // catalog_items.tags is DB-constrained to this same enum (see
+    // supabase/migrations/20260707140000_generic_item_personalization.sql),
+    // just typed generically as string[] by the Supabase client.
+    tags: existing.tags as z.infer<typeof itemSchema>['tags'],
     boilerplateIds: [],
-    laserContourEnabled: false,
-    laserSolidEnabled: false,
-    laserSolidPriceCents: undefined,
-    laserSolidPrompt: undefined,
+    laserContourEnabled: existing.laser_contour_enabled,
+    laserSolidEnabled: existing.laser_solid_enabled,
+    laserSolidPriceCents: existing.laser_solid_price_cents ?? undefined,
+    laserSolidPrompt: existing.laser_solid_prompt ?? undefined,
     seo: {
       en: { ...(input.seo?.en ?? {}), socialImagePath: undefined },
       ru: { ...(input.seo?.ru ?? {}), socialImagePath: undefined },
@@ -82,7 +89,9 @@ export async function handleUpdateCatalogItem(
     },
   };
 
-  await updateCatalogItemCore(supabase, input.id, { id: userId }, item, thumbnailPath);
+  await updateCatalogItemCore(supabase, input.id, { id: userId }, item, thumbnailPath, undefined, {
+    syncAssociations: false,
+  });
 
   return { id: input.id };
 }
