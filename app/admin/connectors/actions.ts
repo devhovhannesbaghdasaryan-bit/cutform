@@ -6,7 +6,7 @@ import { requireAdminPermission } from '@/lib/admin';
 import { revokeConnectedApp } from '@/lib/mcp/oauth-store';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
-const revokeSchema = z.object({ tokenId: z.string().min(1) });
+const revokeSchema = z.object({ tokenId: z.string().uuid() });
 
 export async function revokeConnectorAction(formData: FormData) {
   const parsed = revokeSchema.safeParse({ tokenId: formData.get('tokenId') });

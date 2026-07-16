@@ -10,6 +10,8 @@ import { revokeConnectedApp } from '@/lib/mcp/oauth-store';
 import { writeAdminAuditLog } from '@/lib/transactions';
 import { revokeConnectorAction } from '@/app/admin/connectors/actions';
 
+const TOKEN_ID = '550e8400-e29b-41d4-a716-446655440002';
+
 describe('revokeConnectorAction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -22,11 +24,11 @@ describe('revokeConnectorAction', () => {
     });
 
     const formData = new FormData();
-    formData.set('tokenId', 'token-1');
+    formData.set('tokenId', TOKEN_ID);
     await revokeConnectorAction(formData);
 
     expect(requireAdminPermission).toHaveBeenCalledWith('catalog_manage');
-    expect(revokeConnectedApp).toHaveBeenCalledWith(expect.anything(), 'user-1', 'token-1');
+    expect(revokeConnectedApp).toHaveBeenCalledWith(expect.anything(), 'user-1', TOKEN_ID);
   });
 
   it('writes an audit log entry after revoking', async () => {
@@ -36,7 +38,7 @@ describe('revokeConnectorAction', () => {
     });
 
     const formData = new FormData();
-    formData.set('tokenId', 'token-1');
+    formData.set('tokenId', TOKEN_ID);
     await revokeConnectorAction(formData);
 
     expect(writeAdminAuditLog).toHaveBeenCalledWith(
@@ -45,7 +47,7 @@ describe('revokeConnectorAction', () => {
         actorUserId: 'user-1',
         action: 'admin_mcp_connector_revoked',
         entityType: 'mcp_oauth_token',
-        entityId: 'token-1',
+        entityId: TOKEN_ID,
       }),
     );
   });
