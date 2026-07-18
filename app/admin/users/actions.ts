@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { adjustCredits } from '@/lib/credits';
+import { getServiceSupabase } from '@/lib/supabase/server';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 const userProfileSchema = z.object({
@@ -88,7 +89,10 @@ export async function adjustAdminUserCreditsAction(formData: FormData) {
   const values = parsed.data;
   const delta = values.direction === 'credit' ? values.amount : -values.amount;
 
-  const result = await adjustCredits(supabase, {
+  // credit_accounts/credit_ledger have no write RLS policy for any
+  // authenticated role (including admins) — only the service-role client
+  // bypasses RLS, so the balance mutation must go through it.
+  const result = await adjustCredits(getServiceSupabase(), {
     userId: values.userId,
     delta,
     reason: 'admin_adjustment',
