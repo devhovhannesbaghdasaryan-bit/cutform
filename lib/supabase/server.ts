@@ -80,7 +80,7 @@ export function getServiceSupabase(): TypedSupabaseClient {
   }
   serviceClient = createSupabaseClient<Database>(
     env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    env.SUPABASE_SECRET_KEY,
     { auth: { autoRefreshToken: false, persistSession: false } },
   );
   return serviceClient;
