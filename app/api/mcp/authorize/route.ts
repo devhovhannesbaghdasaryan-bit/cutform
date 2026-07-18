@@ -85,7 +85,7 @@ async function resolveAuthorizedUser(
     const next = encodeURIComponent(request.url);
     return {
       ok: false,
-      response: NextResponse.redirect(new URL(`/login?next=${next}`, request.url)),
+      response: NextResponse.redirect(new URL(`/login?next=${next}`, request.url), 303),
     };
   }
   const allowed = await hasAdminPermission(user.id, 'catalog_manage');
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
   if (decision !== 'approve') {
     redirectUrl.searchParams.set('error', 'access_denied');
     redirectUrl.searchParams.set('state', params.state);
-    return NextResponse.redirect(redirectUrl);
+    return NextResponse.redirect(redirectUrl, 303);
   }
 
   const code = await createAuthorizationCode({
@@ -155,5 +155,5 @@ export async function POST(request: Request) {
 
   redirectUrl.searchParams.set('code', code);
   redirectUrl.searchParams.set('state', params.state);
-  return NextResponse.redirect(redirectUrl);
+  return NextResponse.redirect(redirectUrl, 303);
 }

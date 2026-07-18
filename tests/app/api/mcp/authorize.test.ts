@@ -55,7 +55,7 @@ describe('GET /api/mcp/authorize', () => {
   it('redirects to login when no user is signed in', async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(null);
     const res = await GET(new Request(authorizeUrl()));
-    expect(res.status).toBe(307);
+    expect(res.status).toBe(303);
     expect(res.headers.get('location')).toContain('/login?next=');
   });
 
@@ -115,7 +115,11 @@ describe('POST /api/mcp/authorize', () => {
       codeChallenge: 'challenge-abc',
       scope: 'catalog:write',
     });
-    expect(res.status).toBe(307);
+    // Must be 303, not the NextResponse.redirect default of 307: a 307 tells
+    // the browser to replay the original POST against the redirect target,
+    // and claude.ai's callback only accepts GET (reproduced the "Method Not
+    // Allowed" error clients hit after clicking Allow).
+    expect(res.status).toBe(303);
     const location = new URL(res.headers.get('location') ?? '');
     expect(location.origin + location.pathname).toBe('https://claude.ai/api/mcp/auth_callback');
     expect(location.searchParams.get('code')).toBe('code-xyz');
@@ -224,6 +228,7 @@ describe('POST /api/mcp/authorize', () => {
     const res = await POST(approvalForm('deny'));
 
     expect(createAuthorizationCode).not.toHaveBeenCalled();
+    expect(res.status).toBe(303);
     const location = new URL(res.headers.get('location') ?? '');
     expect(location.searchParams.get('error')).toBe('access_denied');
     expect(location.searchParams.get('state')).toBe('state-abc');
