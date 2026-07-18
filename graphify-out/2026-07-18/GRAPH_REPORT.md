@@ -1,16 +1,16 @@
-# Graph Report - snip  (2026-07-18)
+# Graph Report - snip  (2026-07-09)
 
 ## Corpus Check
-- 333 files · ~416,436 words
+- 283 files · ~379,968 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2587 nodes · 4647 edges · 373 communities (178 shown, 195 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 288 edges (avg confidence: 0.79)
+- 2360 nodes · 4107 edges · 353 communities (161 shown, 192 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 297 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0e520e25`
+- Built from commit: `197fef1f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -104,7 +104,6 @@
 - Global Constraints
 - admin.mjs
 - Manufacturing RAG And Manual Plan
-- create-catalog-item.ts
 - generation.mjs
 - runtime-local.mjs
 - Task 2 Report: Vitest setup + payment types + Ameriabank pure core (TDD)
@@ -145,9 +144,7 @@
 - 8. Recommended global strategy
 - 9. Product and business-model recommendation
 - 8. Առաջարկվող գլոբալ ռազմավարություն
-- requireAdmin
 - OpenAI boilerplate file storage go-live gate
-- route.ts
 - next.config.mjs
 - task-10-brief.md
 - CLAUDE.md
@@ -330,34 +327,17 @@
 - Mild/stainless/aluminum/galvanized steel
 - 3000 W Raycus laser source, 0.8-1.6 mm filler wire
 - Handheld laser welding, thin cutting, rust removal, spot welding
-- i18n-config.ts
-- ChatGPT/Claude Catalog Item Connector Implementation Plan
-- GET
 - db-workflows.mjs
-- ChatGPT/Claude Catalog Item Connector — Design
-- Admin Item Form AI Autogenerate — Design
-- formatDate
-- page.tsx
-- currency.ts
-- page.tsx
-- domain-helpers.test.ts
 - 9. Պրոդուկտի և բիզնես մոդելի առաջարկ
-- Global Constraints
-- layout.tsx
-- APP_LOCALES
-- page.tsx
-- page.tsx
-- vercel.json
-- server.test.ts
 
 ## God Nodes (most connected - your core abstractions)
-1. `getServiceSupabase()` - 71 edges
-2. `getServerSupabase` - 62 edges
-3. `GET()` - 54 edges
-4. `getCurrentUser` - 52 edges
-5. `requireAdminPermission()` - 41 edges
-6. `requireAdmin()` - 39 edges
-7. `Button` - 37 edges
+1. `getServerSupabase` - 61 edges
+2. `GET()` - 57 edges
+3. `getCurrentUser` - 49 edges
+4. `getServiceSupabase()` - 44 edges
+5. `requireAdmin()` - 37 edges
+6. `requireAdminPermission()` - 37 edges
+7. `Button` - 36 edges
 8. `5. Ստեղծարար մենեջերի պատասխանները՝ ուժեղ, ազնիվ և presentation-ready` - 36 edges
 9. `5. Creative manager answers—strong, honest, and presentation-ready` - 36 edges
 10. `normalizeCurrency()` - 33 edges
@@ -377,19 +357,19 @@
 ## Import Cycles
 - None detected.
 
-## Communities (373 total, 195 thin omitted)
+## Communities (353 total, 192 thin omitted)
 
 ### Community 0 - "actions.ts"
-Cohesion: 0.05
-Nodes (59): bannerCustomizationSchema, bannerGenerationSchema, customizeBannerSampleAction(), generateBannerAction(), getFile(), uploadCustomizedBannerPreview(), uploadGeneratedBannerPreview(), uploadReferenceImage() (+51 more)
+Cohesion: 0.12
+Nodes (28): errorState(), generatePersonalizedItemAction(), PersonalizedGenerationState, uploadGeneratedPng(), uploadUserImage(), generationFormSchema, getImageFiles(), summarizeTextFormatting() (+20 more)
 
 ### Community 1 - "Marketplace MVP System Design"
 Cohesion: 0.06
 Nodes (32): 2D Laser-Cut Pipeline, Account, Admin, Admin Review, API and Server Actions, Application Areas, Architecture, Authorization and RLS (+24 more)
 
 ### Community 2 - "getCurrentUser"
-Cohesion: 0.22
-Nodes (10): boilerplateSchema, getFile(), imageExtByMime, removeBoilerplateAction(), saveBoilerplateAction(), getOpenAiClient(), deleteReferenceFile(), uploadReferenceImage() (+2 more)
+Cohesion: 0.17
+Nodes (16): boilerplateSchema, getFile(), imageExtByMime, removeBoilerplateAction(), saveBoilerplateAction(), getOpenAiClient(), deleteReferenceFile(), uploadReferenceImage() (+8 more)
 
 ### Community 4 - "Catalog Route (Marketplace Catalog)"
 Cohesion: 0.07
@@ -397,39 +377,39 @@ Nodes (47): AI Generation Feature, Generate Custom Item Action, Language Switche
 
 ### Community 5 - "actions.ts"
 Cohesion: 0.15
-Nodes (17): BoilerplateForm(), CatalogItemDetailPage(), generateMetadata(), PersonalizeItemPage(), getCatalogItem(), getCatalogItemSeoMetadata(), CatalogItemBoilerplateRow, listCatalogItemBoilerplates() (+9 more)
+Nodes (18): CatalogItemDetailPage(), generateMetadata(), generateMetadata(), PersonalizeItemPage(), getCatalogItem(), getCatalogItemSeoMetadata(), CatalogItemBoilerplateRow, listCatalogItemBoilerplates() (+10 more)
 
 ### Community 6 - "Cyberpunk-Inspired Theming Tasks"
 Cohesion: 0.17
 Nodes (8): Component Coverage, Cyberpunk-Inspired Theming Tasks, Foundation, Theme Behavior, Verification, Geographic Commerce Tasks, Personalized night-light implementation tasks, Tasks
 
 ### Community 7 - "index.tsx"
-Cohesion: 0.09
-Nodes (33): AuthorizeParams, badRequest(), consentHtml(), escapeHtml(), GET(), notAuthorizedResponse(), POST(), readParams() (+25 more)
+Cohesion: 0.18
+Nodes (17): AuthActionState, callbackUrl(), credentialsSchema, emailSchema, otpSchema, registerAction(), registerSchema, resendVerificationAction() (+9 more)
 
 ### Community 8 - "Billing Address & Country-Based Payment Routing — Design"
 Cohesion: 0.05
 Nodes (36): 1. Contract verification (needs bank-issued test credentials in `.env.local`), 2. Credit-grant atomicity follow-up (before real payment volume), 3. Manual test checklist, 4. Deploy notes, Ameriabank go-live gate, Admin reconciliation, Ameriabank Payment Integration — Design, Ameriabank vPOS mechanics that shape the design (+28 more)
 
 ### Community 9 - "getServerSupabase"
-Cohesion: 0.20
-Nodes (12): sitemap(), ICONS, MarketplaceCategorySlug, getCachedCategories, getCachedPublishedCatalogItemsPage, getCachedPublishedCatalogSlugs, getCachedSubcategories, listCategories() (+4 more)
+Cohesion: 0.15
+Nodes (25): buildCatalogHref(), CatalogPage(), CategoryPill(), LandingPage(), sitemap(), CatalogItemCard(), CategoryNavigation(), ICONS (+17 more)
 
 ### Community 10 - "getServerEnv"
-Cohesion: 0.06
-Nodes (50): currencySettingsSchema, GET(), GET(), corsHandler, handler, CurrencySettings, getServerEnv(), optionalNonEmpty (+42 more)
+Cohesion: 0.08
+Nodes (44): GET(), getServerEnv(), optionalNonEmpty, publicEnv, publicEnvSchema, publicShape, serverEnvSchema, serverShape (+36 more)
 
 ### Community 11 - "item-form-parsing.ts"
 Cohesion: 0.14
-Nodes (18): asRecord(), asString(), extractBannerDetails(), extractValidationWarnings(), GeneratedItemDetail, GeneratedItemPage(), PreviewOption, previewOptionPriceCents() (+10 more)
+Nodes (24): POST(), CartPage(), getCartPreviewUrls(), generateMetadata(), CreditsPage(), DashboardPage(), asRecord(), asString() (+16 more)
 
 ### Community 13 - "cart.ts"
-Cohesion: 0.14
-Nodes (29): addCatalogItemToCartAction(), clearCartAction(), getCartActor(), removeCartItemAction(), updateCartQuantityAction(), CartPage(), getCartPreviewUrls(), addItemToCart() (+21 more)
+Cohesion: 0.10
+Nodes (40): EditAdminItemPage(), NewAdminItemPage(), addCatalogItemToCartAction(), clearCartAction(), getCartActor(), removeCartItemAction(), updateCartQuantityAction(), CheckoutPage() (+32 more)
 
 ### Community 15 - "page.tsx"
-Cohesion: 0.15
-Nodes (11): AdminCurrenciesPage(), CurrencyRow, RateRow, BillingCountryField(), EmptyState(), Theme, ThemeToggle(), Button (+3 more)
+Cohesion: 0.17
+Nodes (15): PersonalizationFields(), TAG_LABELS, SeoSection(), BoilerplateOption, SeoFormValue, BoilerplateForm(), BoilerplateLibraryPage(), fieldOptions (+7 more)
 
 ### Community 16 - "Personalized Night-Light (product concept)"
 Cohesion: 0.44
@@ -464,16 +444,16 @@ Cohesion: 0.06
 Nodes (31): 1. Personalized LED Wall Decor, 2. Geography and Travel Decor, 30-Day Action Plan, 3. Educational and Motor-Skill Kits, 4. Adult Constructors and Mechanical Models, 5. Wooden Card and Table Games, Best Initial Product Lines, Bottom Line (+23 more)
 
 ### Community 25 - "button.tsx"
-Cohesion: 0.20
-Nodes (12): LABELS, LanguageSwitcher(), LogoutMenuItem(), MarketplaceHeader(), SiteHeader(), DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel (+4 more)
+Cohesion: 0.12
+Nodes (20): BannersPage(), formatShippingAddress(), OrderDetailPage(), CurrencySwitcher(), EmptyState(), LanguageSwitcher(), MarketplaceHeader(), SiteHeader() (+12 more)
 
 ### Community 26 - "marketplace-header.tsx"
-Cohesion: 0.36
-Nodes (8): BannersPage(), AdvancedBannerGenerationPanel(), BannerCopy, BannerCustomizer(), BannerPreset, BannerSample, listBannerSamples(), listBannerSizePresets()
+Cohesion: 0.13
+Nodes (13): CatalogMedia, SeoMetadata, ItemForm(), SeoMetadataManager(), AdvancedBannerGenerationPanel(), BannerCopy, BannerCustomizer(), BannerPreset (+5 more)
 
 ### Community 27 - "transactions.ts"
-Cohesion: 0.16
-Nodes (16): revokeConnectorAction(), revokeSchema, updateCurrencySettingsAction(), adjustAdminUserCreditsAction(), creditAdjustmentSchema, updateAdminUserProfileAction(), userProfileSchema, requireAdminPermission() (+8 more)
+Cohesion: 0.09
+Nodes (30): currencySettingsSchema, updateCurrencySettingsAction(), generateCatalogItemSeoDraftAction(), saveGeneratedCatalogItemSeoDraftAction(), createMarketRegionAction(), optionalCurrency, updateCountryMarketAction(), updateMarketRegionAction() (+22 more)
 
 ### Community 28 - "biome.json"
 Cohesion: 0.07
@@ -484,20 +464,20 @@ Cohesion: 0.08
 Nodes (26): scripts, build, db:types, dev, format, format:check, lint, seed:products:generate (+18 more)
 
 ### Community 30 - "marketplace.ts"
-Cohesion: 0.27
-Nodes (5): CardHoverBoundary(), CardHoverContext, useCardHover(), CatalogMediaSlider(), isSvgPath()
+Cohesion: 0.14
+Nodes (13): CardHoverBoundary(), CardHoverContext, useCardHover(), CatalogMediaSlider(), isSvgPath(), CATALOG_MEDIA_IMAGE_MIME_TYPES, CATALOG_MEDIA_VIDEO_MIME_TYPES, CatalogMediaKind (+5 more)
 
 ### Community 31 - "orders.ts"
-Cohesion: 0.16
-Nodes (18): adminTransactionAction(), transactionActionSchema, ADMIN_PERMISSIONS, AdminPermission, hasAdminPermission(), CatalogItemSummary, getCatalogItemInputSchema, handleGetCatalogItem() (+10 more)
+Cohesion: 0.17
+Nodes (17): bannerCustomizationSchema, bannerGenerationSchema, customizeBannerSampleAction(), generateBannerAction(), getFile(), uploadCustomizedBannerPreview(), uploadGeneratedBannerPreview(), uploadReferenceImage() (+9 more)
 
 ### Community 32 - "ui-workflows.mjs"
 Cohesion: 0.24
 Nodes (20): assert(), baseUrl, bodyText(), checkInput(), clickByText(), connectBrowser(), createdUserIds, evaluate() (+12 more)
 
 ### Community 33 - "GET"
-Cohesion: 0.22
-Nodes (20): BoilerplateLibraryPage(), createCreditPackCheckoutAction(), creditPackRequestSchema, requestManualCreditPackAction(), CreditsPage(), addGeneratedItemToCartAction(), getGeneratedSaleCurrency(), getGeneratedSalePriceCents() (+12 more)
+Cohesion: 0.29
+Nodes (8): addGeneratedItemToCartAction(), getGeneratedSaleCurrency(), getGeneratedSalePriceCents(), requireUser(), GeneratedPreviewOption, GeneratedPreviewSelector(), GeneratedPreviewSelectorProps, planGeneratedItemCartAdd()
 
 ### Community 35 - "Generic Item Personalization — Design"
 Cohesion: 0.09
@@ -505,31 +485,31 @@ Nodes (21): Admin: boilerplate library (`/admin/personalization/boilerplates`), 
 
 ### Community 37 - "dependencies"
 Cohesion: 0.08
-Nodes (26): dependencies, ai, @ai-sdk/openai, class-variance-authority, clsx, isomorphic-dompurify, lucide-react, mcp-handler (+18 more)
+Nodes (24): dependencies, ai, @ai-sdk/openai, class-variance-authority, clsx, isomorphic-dompurify, lucide-react, next (+16 more)
 
 ### Community 38 - "generated-items.ts"
 Cohesion: 0.09
 Nodes (25): AssetPreviewCard(), AssetPreviewCardProps, AdminGeneratedDetailPage(), buildManufacturingPrompt(), extractValidationWarnings(), getOptionName(), hasContent(), AdminGeneratedPreviewOption (+17 more)
 
 ### Community 39 - "utils.ts"
-Cohesion: 0.18
-Nodes (23): AdminSupabase, CATALOG_ASSET_EXTENSIONS, ensureCatalogSlugIsAvailable(), getOptionalFiles(), itemSchema, localeSchema, parseKeywords(), parseSizesJson() (+15 more)
+Cohesion: 0.29
+Nodes (6): logoutAction(), LogoutMenuItem(), DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator
 
 ### Community 40 - "generate-products-seed.mjs"
-Cohesion: 0.21
-Nodes (17): buildCatalogHref(), CatalogPage(), generateMetadata(), DashboardPage(), generateMetadata(), LandingPage(), ProfilePage(), CatalogItemCard() (+9 more)
+Cohesion: 0.29
+Nodes (6): BANNER_CREDIT_COSTS, ITEM_TYPE_TO_PRODUCT_TYPE, mapCatalogItemTypeToProductType(), MARKETPLACE_CATEGORIES, PRODUCT_TYPES, TOY_DECORATION_SIZE_PRESETS
 
 ### Community 41 - "Task 5: Callback Route - Implementation Report"
 Cohesion: 0.10
 Nodes (20): 1. TypeScript Type Checking, 2. Test Suite, 3. Curl Verification Against Dev Server, Changes Applied, Files Changed, Fix: no-500 guarantee, Git Commit, Implementation Summary (+12 more)
 
 ### Community 42 - "admin.ts"
-Cohesion: 0.16
-Nodes (15): AdminPage(), MetricCard(), CategoryPill(), BrandLogo(), ProductCardItem, SvgRender(), Card, CardContent (+7 more)
+Cohesion: 0.06
+Nodes (45): AdminNav(), links, AdminCurrenciesPage(), CurrencyRow, RateRow, AdminGeneratedPage(), AdminItemsPage(), AdminLayout() (+37 more)
 
 ### Community 43 - "AppLocale"
-Cohesion: 0.15
-Nodes (20): cleanTranslation(), DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT, duplicateSlugs, indentedList(), inlineJson(), inlineOrIndentedList(), json, media() (+12 more)
+Cohesion: 0.05
+Nodes (47): localeSchema, seoDraftSaveSchema, seoGenerationSchema, SeoGenerationState, localeBodySchema, LABELS, Messages, MessageTree (+39 more)
 
 ### Community 44 - "Task 7: Admin "Check with Ameriabank" Reconciliation - Report"
 Cohesion: 0.10
@@ -540,8 +520,8 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 46 - "currency.ts"
-Cohesion: 0.15
-Nodes (17): generateItemFieldValuesAction(), GenerateItemFieldValuesInput, GenerateItemFieldValuesResult, generateItemFieldValuesSchema, buildItemFieldsPrompt(), buildResponseSchema(), extractResponseText(), CORE_FIELD_INSTRUCTIONS (+9 more)
+Cohesion: 0.67
+Nodes (3): buildPersonalizedNightLightOpenAiPayload(), buildPersonalizedNightLightPrompt(), friendlyGenerationError()
 
 ### Community 47 - "Uniqraft-ի գլոբալ ստարտափի ուսումնասիրություն և ներդրողի սթրես-թեստ"
 Cohesion: 0.11
@@ -556,8 +536,8 @@ Cohesion: 0.11
 Nodes (17): Change made, Changes made, Commands run and output, Commands run and output, Concerns, Concerns, Files Changed, Finding addressed (+9 more)
 
 ### Community 50 - "market.ts"
-Cohesion: 0.18
-Nodes (13): mergeAnonymousCart(), callbackParamsSchema, GET(), countrySchema, setCountryPreferenceAction(), currencySchema, setCurrencyPreferenceAction(), updateActiveCartCurrency() (+5 more)
+Cohesion: 0.12
+Nodes (26): mergeAnonymousCart(), callbackParamsSchema, GET(), checkoutSchema, createCheckoutOrderAction(), countrySchema, setCountryPreferenceAction(), createCreditPackCheckoutAction() (+18 more)
 
 ### Community 51 - "14. Comprehensive investor presentation question bank"
 Cohesion: 0.12
@@ -592,16 +572,16 @@ Cohesion: 0.13
 Nodes (14): Admin Users, Banner Production, Credits, Currency, Generated Item Production Sizes, Internationalization, Localized Content, Marketplace MVP Product Decisions (+6 more)
 
 ### Community 64 - "formatDate"
-Cohesion: 0.14
-Nodes (17): AdminOrderDetailPage(), AdminOrderDetailRow, AdminOrderItem, BannerManufacturingInstruction, buildOrderItemSnapshot(), CartItemForOrder, CatalogProductionInfo, createOrderFromCart() (+9 more)
+Cohesion: 0.10
+Nodes (30): AppCurrency, CurrencySettings, ExchangeRateContext, ExchangeRateRow, fetchProviderRate(), findCachedRate(), findInverseCachedRate(), getExchangeRate() (+22 more)
 
 ### Community 67 - "Global Constraints"
 Cohesion: 0.14
 Nodes (13): Ameriabank Payment Integration Implementation Plan, Global Constraints, Manual test checklist (test environment, after all tasks), Task 10: Ameriabank smoke script + env example + final verification, Task 1: Database migration + currency smoke update, Task 2: Vitest setup + payment types + Ameriabank pure core (TDD), Task 3: Env vars + server-side Ameriabank client, Task 4: Fulfillment + settlement module (+5 more)
 
 ### Community 68 - "page.tsx"
-Cohesion: 0.05
-Nodes (73): AutogenerateButton(), FieldError, FillAllButton(), ItemFormAiContext, ItemFormAiContextValue, ItemFormAiProvider(), readFieldValue(), useItemFormAi() (+65 more)
+Cohesion: 0.16
+Nodes (20): ClassificationFields(), DescriptionField(), FlagsFields(), StatusField(), TitleSlugFields(), MarketRulesSection(), MediaSection(), ThumbnailFields() (+12 more)
 
 ### Community 70 - "What Was Implemented"
 Cohesion: 0.15
@@ -620,8 +600,8 @@ Cohesion: 0.17
 Nodes (11): Global Constraints, OpenAI Boilerplate File Storage Implementation Plan, Task 1: OpenAI client factory (`lib/openai-client.ts`), Task 2: Reference file upload/delete (`lib/openai-files.ts`), Task 3: Schema migration and type updates, Task 4: Migrate generation to the Responses API (`lib/openai-image.ts`), Task 5: Payload builder takes selected boilerplates (`lib/personalized-night-light-ai.ts`), Task 6: Wire OpenAI upload/delete into the admin boilerplate actions (+3 more)
 
 ### Community 84 - "domain-helpers.test.ts"
-Cohesion: 0.22
-Nodes (14): actions, createCatalogItemAction(), updateCatalogItemAction(), uploadCatalogFormAssets(), buildToyDecorationDraftMetadata(), generateToyDecorationDraftAction(), titleFromPrompt(), toyDecorationGenerationSchema (+6 more)
+Cohesion: 0.15
+Nodes (31): actions, AdminCreatePage(), createCatalogItemAction(), syncCatalogItemMarketRules(), updateCatalogItemAction(), uploadCatalogFormAssets(), upsertSeoMetadata(), validateCategoryExists() (+23 more)
 
 ### Community 91 - "devDependencies"
 Cohesion: 0.15
@@ -712,16 +692,12 @@ Cohesion: 0.22
 Nodes (8): Generic Item Personalization Implementation Plan, Global Constraints, Task 1: Database migration — schema, RLS, and type regeneration, Task 2: Backend swap — lib rewrites, generation engine, results page, delete legacy routes, Task 3: Admin boilerplate library (shared CRUD, replacing the night-lights admin page), Task 4: Admin item form — System Prompt / Skill ID / Tags / Boilerplate picker, Task 5: Storefront — generic personalize page, form, and item-detail entry point, Task 6: Smoke test and full suite verification
 
 ### Community 117 - "admin.mjs"
-Cohesion: 0.20
-Nodes (9): aiFillActions, catalogActions, generatedActions, generatedDetail, generatedItemsLib, itemAiLib, personalizationActions, personalizationPage (+1 more)
+Cohesion: 0.22
+Nodes (8): catalogActions, generatedActions, generatedDetail, generatedItemsLib, personalizationActions, personalizationPage, requiredRoutes, seoActions
 
 ### Community 118 - "Manufacturing RAG And Manual Plan"
 Cohesion: 0.25
 Nodes (7): Manufacturing RAG And Manual Plan, Public Sources Checked, Recommended RAG Chunking, Retrieval Policy, Search Results And Gaps, Suggested Document Metadata, What To Put In RAG
-
-### Community 119 - "create-catalog-item.ts"
-Cohesion: 0.14
-Nodes (16): RFC-1918, assertPublicHost(), BLOCKED_IPV4_RANGES, fetchAndStoreCatalogImage(), fetchImageWithGuards(), GuardedFetchResult, ipv4ToInt(), isBlockedIpv4() (+8 more)
 
 ### Community 120 - "generation.mjs"
 Cohesion: 0.25
@@ -748,8 +724,8 @@ Cohesion: 0.33
 Nodes (5): assert(), baseUrl, orderIdBase, postJson(), state
 
 ### Community 128 - "layout.tsx"
-Cohesion: 0.14
-Nodes (18): AppCurrency, ExchangeRateContext, CatalogAvailability, CatalogMarketResolution, findCountry(), MarketCountry, MarketRegion, MarketRuleRow (+10 more)
+Cohesion: 0.16
+Nodes (14): OrderStatusForm(), updateOrderStatusAction(), loginAction(), LoginCopy, LoginForm(), RegisterCopy, RegisterForm(), providers (+6 more)
 
 ### Community 134 - "12. Metrics investors will expect"
 Cohesion: 0.33
@@ -859,101 +835,37 @@ Nodes (4): 9. Product and business-model recommendation, Beachhead product, Cust
 Cohesion: 0.50
 Nodes (4): 8. Առաջարկվող գլոբալ ռազմավարություն, Գլոբալ հասանելիությունը մի շփոթեք ամեն ինչ ամենուր վաճառելու հետ, Ինչու՞ է տարածաշրջանային fulfillment-ը հիմա ռազմավարական, Շուկաների հերթականություն
 
-### Community 162 - "requireAdmin"
-Cohesion: 0.15
-Nodes (13): AdminCreatePage(), AdminItemsPage(), OrderItemDetail(), AdminOrdersPage(), AdminTransactionDetailPage(), AuditRow, TransactionDetail, AdminTransactionRow (+5 more)
-
 ### Community 163 - "OpenAI boilerplate file storage go-live gate"
 Cohesion: 0.50
 Nodes (3): If a boilerplate's OpenAI file is deleted out-of-band later, OpenAI boilerplate file storage go-live gate, Required immediately after deploy
-
-### Community 164 - "route.ts"
-Cohesion: 0.15
-Nodes (11): authHandler, handler, findAccessTokenContext(), McpToolExtra, requireAuthedUserId(), getCatalogItemInputShape, listCategoriesInputShape, listSubcategoriesInputShape (+3 more)
-
-### Community 354 - "i18n-config.ts"
-Cohesion: 0.17
-Nodes (11): Messages, MessageTree, getDefaultLocaleForRegion(), isAppLocale(), normalizeLocale(), REGION_LOCALE_DEFAULTS, getLocalePrefixedPath(), PROTECTED_PREFIXES (+3 more)
-
-### Community 355 - "ChatGPT/Claude Catalog Item Connector Implementation Plan"
-Cohesion: 0.11
-Nodes (17): ChatGPT/Claude Catalog Item Connector Implementation Plan, Global Constraints, Self-Review, Task 10: Dynamic Client Registration and token endpoints, Task 11: Authorize endpoint (login + consent), Task 12: Resource server route and metadata endpoints, Task 13: Connected Apps admin page, Task 14: Manual end-to-end verification (+9 more)
-
-### Community 356 - "GET"
-Cohesion: 0.23
-Nodes (11): createMarketRegionAction(), optionalCurrency, updateCountryMarketAction(), updateMarketRegionAction(), GET(), getFile(), removePersonalizationBoilerplateAction(), revalidatePersonalization() (+3 more)
 
 ### Community 357 - "db-workflows.mjs"
 Cohesion: 0.22
 Nodes (3): createdOrderIds, createdUserIds, supabase
 
-### Community 358 - "ChatGPT/Claude Catalog Item Connector — Design"
-Cohesion: 0.13
-Nodes (14): Auth architecture, ChatGPT/Claude Catalog Item Connector — Design, Connected Apps admin page (`/admin/connectors`), Endpoints (`app/api/mcp/...`), Error handling & security, Goal, New tables (server-only, no anon/authenticated RLS grants), Out of scope / explicit non-goals for v1 (+6 more)
-
-### Community 359 - "Admin Item Form AI Autogenerate — Design"
-Cohesion: 0.14
-Nodes (13): Admin Item Form AI Autogenerate — Design, Architecture, Client: `app/admin/items/item-form/ai-context.tsx` (new), Data flow, Error handling, Field component changes, Goal, Key decisions (settled with the user) (+5 more)
-
-### Community 360 - "formatDate"
-Cohesion: 0.28
-Nodes (9): AdminGeneratedPage(), AdminTable(), AdminUserDetailPage(), AdminUsersPage(), AdminUserFilters, getAdminUserDetail(), listAdminUsers(), listGeneratedItemsForAdminReview() (+1 more)
-
-### Community 361 - "page.tsx"
-Cohesion: 0.28
-Nodes (10): CatalogMedia, EditAdminItemPage(), SeoMetadata, ItemForm(), NewAdminItemPage(), AdminMarketsPage(), listCurrencySettings(), getCountryDisplayName() (+2 more)
-
-### Community 362 - "currency.ts"
-Cohesion: 0.30
-Nodes (11): ConvertedMoney, ExchangeRateRow, fetchProviderRate(), findCachedRate(), findInverseCachedRate(), getExchangeRate(), getPaymentRouteForCurrency(), insertRate() (+3 more)
-
-### Community 363 - "page.tsx"
-Cohesion: 0.33
-Nodes (7): checkoutSchema, createCheckoutOrderAction(), CheckoutPage(), CountrySwitcherClient(), isPolarEnabled(), calculateOrderTotals(), createTransactionRecord()
-
-### Community 364 - "domain-helpers.test.ts"
-Cohesion: 0.31
-Nodes (7): CATALOG_MEDIA_IMAGE_MIME_TYPES, CATALOG_MEDIA_VIDEO_MIME_TYPES, CatalogMediaKind, getCatalogMediaKind(), getPrimaryCatalogMedia(), sortCatalogMedia(), CatalogItemMedia
-
 ### Community 365 - "9. Պրոդուկտի և բիզնես մոդելի առաջարկ"
 Cohesion: 0.50
 Nodes (4): 9. Պրոդուկտի և բիզնես մոդելի առաջարկ, Առաջին նեղ պրոդուկտը, Եկամտի հերթականություն, Հաճախորդների հերթականություն
 
-### Community 366 - "Global Constraints"
-Cohesion: 0.25
-Nodes (7): Admin Item Form AI Autogenerate Implementation Plan, Global Constraints, Task 1: `lib/item-ai.ts` — field registry, prompt builder, OpenAI call, Task 2: `app/admin/items/ai-fill-actions.ts` — validated, permission-gated server action, Task 3: `app/admin/items/item-form/ai-context.tsx` — client provider and buttons, Task 4: Wire Autogenerate/Fill-all buttons into the item form, Task 5: Remove the old SEO AI draft flow
-
-### Community 367 - "layout.tsx"
-Cohesion: 0.40
-Nodes (3): AdminNav(), links, AdminLayout()
-
-### Community 368 - "APP_LOCALES"
-Cohesion: 0.40
-Nodes (3): localeBodySchema, POST(), APP_LOCALES
-
-### Community 369 - "page.tsx"
-Cohesion: 0.83
-Nodes (3): formatShippingAddress(), OrderDetailPage(), getOrderDetail()
-
 ## Knowledge Gaps
-- **1366 isolated node(s):** `AuthActionState`, `socialProviders`, `safeNextPath`, `credentialsSchema`, `registerSchema` (+1361 more)
+- **1277 isolated node(s):** `AuthActionState`, `socialProviders`, `safeNextPath`, `credentialsSchema`, `registerSchema` (+1272 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **195 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **192 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getServiceSupabase()` connect `orders.ts` to `actions.ts`, `GET`, `layout.tsx`, `page.tsx`, `route.ts`, `GET`, `index.tsx`, `getServerSupabase`, `getServerEnv`, `page.tsx`, `currency.ts`, `cart.ts`, `APP_LOCALES`, `market.ts`, `create-catalog-item.ts`, `button.tsx`, `transactions.ts`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
-- **Why does `GET()` connect `GET` to `actions.ts`, `GET`, `layout.tsx`, `i18n-config.ts`, `page.tsx`, `actions.ts`, `utils.ts`, `formatDate`, `generate-products-seed.mjs`, `getServerEnv`, `page.tsx`, `cart.ts`, `page.tsx`, `market.ts`, `domain-helpers.test.ts`, `actions.ts`, `transactions.ts`, `orders.ts`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
-- **Why does `getServerSupabase` connect `GET` to `actions.ts`, `layout.tsx`, `requireAdmin`, `page.tsx`, `actions.ts`, `generate-products-seed.mjs`, `getServerSupabase`, `currency.ts`, `page.tsx`, `item-form-parsing.ts`, `cart.ts`, `page.tsx`, `market.ts`, `button.tsx`, `marketplace-header.tsx`, `orders.ts`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `GET()` connect `transactions.ts` to `layout.tsx`, `GET`, `formatDate`, `getCurrentUser`, `actions.ts`, `actions.ts`, `index.tsx`, `getServerSupabase`, `admin.ts`, `getServerEnv`, `item-form-parsing.ts`, `cart.ts`, `AppLocale`, `page.tsx`, `market.ts`, `domain-helpers.test.ts`, `actions.ts`, `orders.ts`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Why does `generateSeoMetadataDraft()` connect `AppLocale` to `getServerEnv`, `transactions.ts`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+- **Are the 55 inferred relationships involving `GET()` (e.g. with `addGeneratedItemToCartAction()` and `updateCurrencySettingsAction()`) actually correct?**
+  _`GET()` has 55 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 17 inferred relationships involving `getServiceSupabase()` (e.g. with `adminTransactionAction()` and `POST()`) actually correct?**
   _`getServiceSupabase()` has 17 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 52 inferred relationships involving `GET()` (e.g. with `addGeneratedItemToCartAction()` and `updateCurrencySettingsAction()`) actually correct?**
-  _`GET()` has 52 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 17 inferred relationships involving `requireAdminPermission()` (e.g. with `updateCurrencySettingsAction()` and `generateManufacturingFileAction()`) actually correct?**
-  _`requireAdminPermission()` has 17 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 4 inferred relationships involving `requireAdmin()` (e.g. with `AdminCreatePage()` and `AdminLayout()`) actually correct?**
+  _`requireAdmin()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `AuthActionState`, `socialProviders`, `safeNextPath` to the rest of the system?**
-  _1367 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1278 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `actions.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.11522048364153627 - nodes in this community are weakly interconnected._
