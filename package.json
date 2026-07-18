@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/check-migrations.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "db:check-migrations": "node scripts/check-migrations.mjs",
     "lint": "biome lint .",
     "typecheck": "tsc --noEmit",
     "format": "biome format --write .",
