@@ -94,10 +94,6 @@ export async function handleCreateCatalogItem(
     skillId: undefined,
     tags: [],
     boilerplateIds: [],
-    laserContourEnabled: false,
-    laserSolidEnabled: false,
-    laserSolidPriceCents: undefined,
-    laserSolidPrompt: undefined,
     seo: {
       en: { ...input.seo.en, socialImagePath: undefined },
       ru: { ...input.seo.ru, socialImagePath: undefined },

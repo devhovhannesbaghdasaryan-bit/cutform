@@ -10,7 +10,7 @@ export const getCatalogItemInputShape = {
 const getCatalogItemInputSchema = z.object(getCatalogItemInputShape);
 
 const CATALOG_ITEM_COLUMNS =
-  'id, title, slug, status, price_cents, description, category_id, subcategory_id, thumbnail_path, manufacturing_notes, characteristics, tags, is_popular, is_customizable, system_prompt, skill_id, laser_contour_enabled, laser_solid_enabled, laser_solid_price_cents, laser_solid_prompt, sizes';
+  'id, title, slug, status, price_cents, description, category_id, subcategory_id, thumbnail_path, manufacturing_notes, characteristics, tags, is_popular, is_customizable, system_prompt, skill_id, sizes';
 
 export interface CatalogItemSummary {
   id: string;
@@ -29,10 +29,6 @@ export interface CatalogItemSummary {
   is_customizable: boolean;
   system_prompt: string | null;
   skill_id: string | null;
-  laser_contour_enabled: boolean;
-  laser_solid_enabled: boolean;
-  laser_solid_price_cents: number | null;
-  laser_solid_prompt: string | null;
   sizes: unknown;
 }
 

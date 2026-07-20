@@ -90,10 +90,6 @@ export async function handleUpdateCatalogItem(
     // just typed generically as string[] by the Supabase client.
     tags: existing.tags as z.infer<typeof itemSchema>['tags'],
     boilerplateIds: existingBoilerplateIds,
-    laserContourEnabled: existing.laser_contour_enabled,
-    laserSolidEnabled: existing.laser_solid_enabled,
-    laserSolidPriceCents: existing.laser_solid_price_cents ?? undefined,
-    laserSolidPrompt: existing.laser_solid_prompt ?? undefined,
     seo: {
       en: { ...(input.seo?.en ?? {}), socialImagePath: undefined },
       ru: { ...(input.seo?.ru ?? {}), socialImagePath: undefined },

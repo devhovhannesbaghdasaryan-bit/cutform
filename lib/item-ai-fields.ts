@@ -14,8 +14,6 @@ const CORE_FIELD_INSTRUCTIONS: Record<string, string> = {
     'Admin-only technical characteristics: materials, dimensions, construction details, and open unknowns that need review before publishing. Plain sentences, no markdown.',
   systemPrompt:
     'Directive instructions (not marketing copy) for an AI image-personalization step that will use this product as context.',
-  laserSolidPrompt:
-    'Directive instructions for generating the solid-scratched glass engraving variant of this product.',
 };
 
 const SEO_SUB_FIELDS = [
