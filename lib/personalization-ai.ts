@@ -13,8 +13,6 @@ export function friendlyGenerationError(error: unknown) {
 export interface PersonalizationPromptInput {
   systemPrompt: string | null;
   boilerplateInstruction: string | null;
-  /** Extra style instruction for the selected laser engraving style (e.g. solid scratching). */
-  engravingInstruction: string | null;
   personalizedText: string | null;
   personalizedTextFormatting: string | null;
   colorLabel: string | null;
@@ -32,7 +30,6 @@ export function composePersonalizationPrompt(input: PersonalizationPromptInput):
   const parts = [
     input.systemPrompt?.trim() || null,
     input.boilerplateInstruction?.trim() || null,
-    input.engravingInstruction?.trim() || null,
     input.personalizedText
       ? `Personalized text: ${input.personalizedText}${input.personalizedTextFormatting ? ` (styling: ${input.personalizedTextFormatting})` : ''}.`
       : null,
