@@ -1350,6 +1350,7 @@ export type Database = {
           manufacturing_process: string
           name: string
           openai_file_id: string
+          price_adjustment_percent: number | null
           sort_order: number
           updated_at: string
         }
@@ -1363,6 +1364,7 @@ export type Database = {
           manufacturing_process?: string
           name: string
           openai_file_id: string
+          price_adjustment_percent?: number | null
           sort_order?: number
           updated_at?: string
         }
@@ -1376,6 +1378,7 @@ export type Database = {
           manufacturing_process?: string
           name?: string
           openai_file_id?: string
+          price_adjustment_percent?: number | null
           sort_order?: number
           updated_at?: string
         }
