@@ -363,17 +363,12 @@ export function planGeneratedItemCartAdd(input: {
       // Each option can carry its own price (e.g. a Solid engraving style priced
       // differently from Contour); fall back to the shared item pricing otherwise.
       const optionPricing = option.pricing ?? pricing;
-      const engravingLabel =
-        typeof option.metadata.engravingStyleLabel === 'string'
-          ? option.metadata.engravingStyleLabel
-          : null;
       return {
         generatedItemId: item.id,
         title:
-          engravingLabel ??
-          (typeof option.metadata.boilerplateName === 'string'
+          typeof option.metadata.boilerplateName === 'string'
             ? option.metadata.boilerplateName
-            : (item.title ?? 'Personalized night light')),
+            : (item.title ?? 'Personalized night light'),
         quantity: 1,
         unitPriceCents: optionPricing.unitPriceCents,
         currency: optionPricing.currency,

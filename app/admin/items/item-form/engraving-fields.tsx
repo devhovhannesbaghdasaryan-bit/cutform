@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { DEFAULT_SOLID_ENGRAVING_PROMPT } from '@/lib/personalization-constants';
 import { AutogenerateButton } from './ai-context';
 import type { ItemFormValue } from './types';
 
@@ -93,7 +92,7 @@ export function EngravingFields({
               id="laserSolidPrompt"
               name="laserSolidPrompt"
               rows={4}
-              defaultValue={item?.laser_solid_prompt ?? DEFAULT_SOLID_ENGRAVING_PROMPT}
+              defaultValue={item?.laser_solid_prompt ?? ''}
               placeholder="Instructions for generating the solid-scratched glass image."
             />
           </div>

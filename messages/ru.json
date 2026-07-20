@@ -184,10 +184,6 @@
     "option": "Вариант {number}",
     "priceEach": "{price} за штуку",
     "total": "Итого: {price}",
-    "laserStyle": {
-      "contour": "Тонкий контур",
-      "solid": "Сплошная гравировка"
-    },
     "previewAlt": "Предпросмотр: {name}",
     "previewUnavailable": "Предпросмотр недоступен",
     "noPreview": "Предпросмотр недоступен",
