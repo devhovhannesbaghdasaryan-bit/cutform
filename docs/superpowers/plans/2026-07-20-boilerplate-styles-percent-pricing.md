@@ -118,8 +118,8 @@ describe('adjustedPriceCents', () => {
   });
 
   it('rounds to the nearest cent', () => {
-    // 4999 * 1.125 = 5623.875 -> 5624
-    expect(adjustedPriceCents(4999, 12.5 as number)).toBe(5624);
+    // 4999 * 1.03 = 5148.97 -> 5149
+    expect(adjustedPriceCents(4999, 3)).toBe(5149);
   });
 
   it('floors at 0 for a percent below -100', () => {
