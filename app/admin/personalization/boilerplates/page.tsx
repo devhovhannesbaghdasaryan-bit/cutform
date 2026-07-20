@@ -18,7 +18,7 @@ export default async function BoilerplateLibraryPage() {
   const { data: boilerplates } = await supabase
     .from('personalization_boilerplates')
     .select(
-      'id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order',
+      'id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent',
     )
     .order('sort_order')
     .returns<PersonalizationBoilerplate[]>();
@@ -110,6 +110,16 @@ async function BoilerplateForm({ boilerplate }: { boilerplate?: PersonalizationB
       <div className="space-y-1.5">
         <Label>{t('personalization.displayOrder')}</Label>
         <Input name="sortOrder" type="number" defaultValue={boilerplate?.sort_order ?? 0} />
+      </div>
+      <div className="space-y-1.5">
+        <Label>{t('personalization.priceAdjustmentPercent')}</Label>
+        <Input
+          name="priceAdjustmentPercent"
+          type="number"
+          step={1}
+          defaultValue={boilerplate?.price_adjustment_percent ?? ''}
+        />
+        <p className="text-xs text-muted-foreground">{t('personalization.priceAdjustmentHelp')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-5 md:col-span-2">
         <label className="flex items-center gap-2 text-sm">

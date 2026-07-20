@@ -21,6 +21,7 @@ const boilerplateSchema = z.object({
   sortOrder: z.coerce.number().int(),
   generateHiddenSvg: z.boolean(),
   isActive: z.boolean(),
+  priceAdjustmentPercent: z.coerce.number().int().optional(),
 });
 
 function getFile(formData: FormData, name: string) {
@@ -38,6 +39,7 @@ export async function saveBoilerplateAction(formData: FormData) {
     sortOrder: formData.get('sortOrder') || 0,
     generateHiddenSvg: formData.get('generateHiddenSvg') === 'on',
     isActive: formData.get('isActive') === 'on',
+    priceAdjustmentPercent: formData.get('priceAdjustmentPercent') || undefined,
   });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid boilerplate.');
 
@@ -94,6 +96,7 @@ export async function saveBoilerplateAction(formData: FormData) {
     sort_order: values.sortOrder,
     generate_hidden_svg: values.generateHiddenSvg,
     is_active: values.isActive,
+    price_adjustment_percent: values.priceAdjustmentPercent ?? null,
   };
 
   const query = values.id

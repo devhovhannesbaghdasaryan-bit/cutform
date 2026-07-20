@@ -449,7 +449,9 @@
     "noImage": "Изображение не загружено",
     "currentImageAlt": "Текущее изображение: {label}",
     "replaceImageHelp": "Выберите файл, чтобы заменить текущее изображение.",
-    "uploadHelp": "Загрузите PNG, JPG, WEBP или SVG до 10 МБ."
+    "uploadHelp": "Загрузите PNG, JPG, WEBP или SVG до 10 МБ.",
+    "priceAdjustmentPercent": "Корректировка цены (%)",
+    "priceAdjustmentHelp": "Необязательно. Изменяет базовую цену товара при выборе этого шаблона — например, 20 добавляет 20%, -10 снимает 10%."
   },
   "legal": {
     "privacy": {
