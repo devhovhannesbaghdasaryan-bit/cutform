@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { adjustCredits } from '@/lib/credits';
 import { decideOutcome } from '@/lib/payments/ameria-core';
 import { fetchAmeriaPaymentDetails } from '@/lib/payments/ameria';
+import { decidePolarOutcome } from '@/lib/payments/polar-core';
 import type { PaymentOutcome } from '@/lib/payments/types';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -90,7 +91,7 @@ export async function fulfillCreditPurchase(
   if (error) throw new Error(error.message);
 }
 
-async function claimTransactionSuccess(
+export async function claimTransactionSuccess(
   service: SupabaseClient,
   transactionId: string,
 ): Promise<boolean> {
@@ -196,4 +197,86 @@ export async function settleAmeriaPayment(
   if (updateError) throw new Error(updateError.message);
 
   return { outcome, redirectPath: `${base}?checkout=${outcome}` };
+}
+
+export async function settlePolarPayment(
+  service: SupabaseClient,
+  args: {
+    transactionId: string;
+    paidAmountCents: number;
+    paidCurrency: string;
+    paid: boolean;
+    providerReference?: string | null;
+  },
+): Promise<SettleResult> {
+  const { data: transaction, error } = await service
+    .from('transactions')
+    .select('id, user_id, order_id, type, status, amount_cents, currency, metadata')
+    .eq('id', args.transactionId)
+    .maybeSingle<SettleTransaction>();
+  if (error) throw new Error(error.message);
+  if (!transaction) return { outcome: 'not_found', redirectPath: '/?checkout=invalid' };
+
+  const base = redirectBase(transaction);
+  if (transaction.status === 'succeeded') {
+    return { outcome: 'already_succeeded', redirectPath: `${base}?checkout=success` };
+  }
+
+  const { outcome, amountMatches } = decidePolarOutcome(
+    { amountCents: args.paidAmountCents, currency: args.paidCurrency, paid: args.paid },
+    { amountCents: transaction.amount_cents, currency: transaction.currency },
+  );
+
+  if (outcome === 'succeeded') {
+    const claimed = await claimTransactionSuccess(service, transaction.id);
+    if (!claimed) {
+      const { data: current, error: statusError } = await service
+        .from('transactions')
+        .select('status')
+        .eq('id', transaction.id)
+        .maybeSingle<{ status: string }>();
+      if (statusError) throw new Error(statusError.message);
+      if (current?.status === 'succeeded') {
+        return { outcome: 'already_succeeded', redirectPath: `${base}?checkout=success` };
+      }
+      return { outcome: 'needs_attention', redirectPath: `${base}?checkout=pending` };
+    }
+    try {
+      if (transaction.type === 'credit_purchase') {
+        await fulfillCreditPurchase(service, transaction);
+      } else {
+        await fulfillOrderPayment(service, transaction);
+      }
+    } catch (fulfillError) {
+      const { error: rollbackError } = await service
+        .from('transactions')
+        .update({ status: 'pending' })
+        .eq('id', transaction.id)
+        .eq('status', 'succeeded');
+      if (rollbackError) {
+        console.error('[polar-settle] failed to roll back claim', transaction.id, rollbackError.message);
+      }
+      throw fulfillError;
+    }
+    return { outcome: 'succeeded', redirectPath: `${base}?checkout=success` };
+  }
+
+  if (outcome === 'pending') {
+    return { outcome: 'pending', redirectPath: `${base}?checkout=pending` };
+  }
+
+  const { error: updateError } = await service
+    .from('transactions')
+    .update({
+      status: 'failed',
+      metadata: {
+        ...(transaction.metadata ?? {}),
+        polarAmountMatches: amountMatches,
+        polarProviderReference: args.providerReference ?? null,
+      },
+    })
+    .eq('id', transaction.id);
+  if (updateError) throw new Error(updateError.message);
+
+  return { outcome: 'failed', redirectPath: `${base}?checkout=failed` };
 }
