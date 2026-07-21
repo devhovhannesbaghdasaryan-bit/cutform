@@ -303,6 +303,33 @@ export async function getExchangeRate(
   }
 }
 
+// Force-fetches a fresh provider rate, bypassing the same-day cache short-circuit
+// in getExchangeRate. insertRate upserts on (base,target,rate_date) so a same-day
+// refresh overwrites the cached value.
+export async function refreshExchangeRate(
+  baseCurrency: AppCurrency,
+  targetCurrency: AppCurrency,
+  supabase: SupabaseClient = getServiceSupabase(),
+): Promise<ExchangeRateContext> {
+  if (baseCurrency === targetCurrency) {
+    const row = await insertRate(supabase, baseCurrency, targetCurrency, 1, 'identity', false, {
+      source: 'identity',
+    });
+    return rowToContext(row, 'identity');
+  }
+  const fetched = await fetchProviderRate(baseCurrency, targetCurrency);
+  const row = await insertRate(
+    supabase,
+    baseCurrency,
+    targetCurrency,
+    fetched.rate,
+    fetched.provider,
+    false,
+    { source: 'provider', refreshed: true },
+  );
+  return rowToContext(row, 'provider');
+}
+
 export function applyExchangeRate(
   amountCents: number,
   exchangeRateContext: ExchangeRateContext,

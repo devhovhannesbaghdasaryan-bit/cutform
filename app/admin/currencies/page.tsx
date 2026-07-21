@@ -1,4 +1,4 @@
-import { updateCurrencySettingsAction } from '@/app/admin/currencies/actions';
+import { refreshExchangeRatesAction, updateCurrencySettingsAction } from '@/app/admin/currencies/actions';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import type { AppCurrency } from '@/lib/currency';
@@ -114,6 +114,7 @@ export default async function AdminCurrenciesPage() {
                           className="h-9 rounded-md border border-input bg-background px-2"
                         >
                           <option value="ameria">Ameriabank</option>
+                          <option value="polar">Polar</option>
                           <option value="bank_manual">Bank / manual</option>
                         </select>
                       </td>
@@ -156,6 +157,15 @@ export default async function AdminCurrenciesPage() {
           </div>
         </form>
       )}
+
+      <form action={refreshExchangeRatesAction} className="flex items-center justify-between rounded-lg border p-4">
+        <p className="text-sm text-muted-foreground">
+          Pull the latest AMD→currency rates from the exchange-rate provider now.
+        </p>
+        <Button type="submit" variant="outline">
+          Refresh rates
+        </Button>
+      </form>
     </main>
   );
 }
