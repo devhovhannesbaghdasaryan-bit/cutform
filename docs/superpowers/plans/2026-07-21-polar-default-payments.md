@@ -12,7 +12,7 @@
 
 - Node runtime for all payment route handlers: `export const runtime = 'nodejs'` and `export const dynamic = 'force-dynamic'`.
 - Feature flags are exact-string `'true'` only (mirror existing `isPolarEnabled`): any other value = disabled.
-- Secrets (`POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, `EXCHANGE_RATE_API_KEY`) live in `.env.local` (gitignored) and Vercel env — never hardcoded, never committed. Provided ExchangeRate-API key: `REDACTED` (set as `EXCHANGE_RATE_API_KEY` in `.env.local`, do not commit it).
+- Secrets (`POLAR_ACCESS_TOKEN`, `POLAR_WEBHOOK_SECRET`, `EXCHANGE_RATE_API_KEY`) live in `.env.local` (gitignored) and Vercel env — never hardcoded, never committed. The ExchangeRate-API key was supplied privately by the user; set it as `EXCHANGE_RATE_API_KEY` in `.env.local` only — never write the literal key into any tracked file.
 - Browser redirect params carry no authority — payment outcome is always decided by a server-side check (webhook signature / Polar API fetch), matching the Ameria design.
 - App currencies after this work: `AMD`, `EUR`, `USD` (RUB removed). Default currency stays `AMD`.
 - Money is stored/passed as integer minor units (`amountCents`). Polar amounts are also minor units.
@@ -222,7 +222,7 @@ EXCHANGE_RATE_API_URL=https://v6.exchangerate-api.com/v6/{apiKey}/latest/{base}
 EXCHANGE_RATE_API_KEY=your-exchangerate-api-key
 ```
 
-Set the real key in `.env.local` (not the example file): `EXCHANGE_RATE_API_KEY=REDACTED`.
+Set the real key (supplied privately by the user) in `.env.local` (not the example file, not any tracked file): `EXCHANGE_RATE_API_KEY=<the-key>`.
 
 - [ ] **Step 6: Commit**
 
