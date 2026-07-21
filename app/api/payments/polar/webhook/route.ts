@@ -31,7 +31,10 @@ export async function POST(req: Request) {
 
   // Fulfill only on a confirmed paid order. `data` is the Polar `Order` object:
   // it carries the metadata we set on the checkout plus the amount actually
-  // paid (`totalAmount`, in cents, after discounts/taxes) and its currency.
+  // paid. Use `netAmount` (in cents, after discounts but BEFORE tax) — Polar
+  // is a merchant of record and adds tax on top, so `totalAmount` (tax-
+  // inclusive) would exceed the pre-tax `transaction.amount_cents` we compare
+  // against, causing the exact-match settle to fail for every taxed order.
   if (event.type === 'order.paid') {
     const order = event.data;
     const transactionId =
@@ -43,7 +46,7 @@ export async function POST(req: Request) {
     try {
       await settlePolarPayment(getServiceSupabase(), {
         transactionId,
-        paidAmountCents: order.totalAmount,
+        paidAmountCents: order.netAmount,
         paidCurrency: order.currency,
         paid: true,
         providerReference: order.id,
