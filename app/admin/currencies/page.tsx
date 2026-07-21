@@ -117,7 +117,6 @@ export default async function AdminCurrenciesPage() {
                           className="h-9 rounded-md border border-input bg-background px-2"
                         >
                           <option value="ameria">Ameriabank</option>
-                          <option value="polar">Polar</option>
                           <option value="bank_manual">Bank / manual</option>
                         </select>
                       </td>
