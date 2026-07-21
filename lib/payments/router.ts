@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AppCurrency } from '@/lib/currency';
 import type { PaymentRoute } from '@/lib/payments/types';
 import { normalizeCountryCode } from '@/lib/market';
+import { isAmeriaEnabled } from '@/lib/payments/flags';
 import { getServiceSupabase } from '@/lib/supabase/server';
 
 // DB-driven routing: the admin currencies page controls which provider each
@@ -21,10 +22,11 @@ export async function getPaymentRoute(
   return data?.payment_route === 'ameria' ? 'ameria' : 'bank_manual';
 }
 
-// Country-based routing: Armenia settles via Ameriabank; every other billing
-// country goes to Polar (Merchant of Record). Unknown/blank -> polar.
+// Country-based routing: while Ameria is enabled, Armenia settles via Ameriabank;
+// everyone else — and everyone when Ameria is disabled — goes to Polar.
 export function resolvePaymentRoute(
   billingCountryCode: string | null | undefined,
 ): 'ameria' | 'polar' {
-  return normalizeCountryCode(billingCountryCode) === 'AM' ? 'ameria' : 'polar';
+  if (isAmeriaEnabled() && normalizeCountryCode(billingCountryCode) === 'AM') return 'ameria';
+  return 'polar';
 }
