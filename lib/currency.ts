@@ -212,18 +212,31 @@ async function findInverseCachedRate(
   } satisfies ExchangeRateRow;
 }
 
+export function buildRateProviderUrl(
+  template: string,
+  apiKey: string | undefined,
+  base: string,
+  target: string,
+): string {
+  return template
+    .replace('{apiKey}', encodeURIComponent(apiKey ?? ''))
+    .replace('{base}', encodeURIComponent(base))
+    .replace('{target}', encodeURIComponent(target));
+}
+
 async function fetchProviderRate(baseCurrency: AppCurrency, targetCurrency: AppCurrency) {
   const env = getServerEnv();
-  const provider = env.EXCHANGE_RATE_PROVIDER ?? 'open-er-api';
-  const template = env.EXCHANGE_RATE_API_URL ?? 'https://open.er-api.com/v6/latest/{base}';
-  const url = template
-    .replace('{base}', encodeURIComponent(baseCurrency))
-    .replace('{target}', encodeURIComponent(targetCurrency));
+  const provider = env.EXCHANGE_RATE_PROVIDER ?? 'exchangerate-api';
+  const template =
+    env.EXCHANGE_RATE_API_URL ?? 'https://v6.exchangerate-api.com/v6/{apiKey}/latest/{base}';
+  const url = buildRateProviderUrl(template, env.EXCHANGE_RATE_API_KEY, baseCurrency, targetCurrency);
 
+  const usesApiKeyInUrl = template.includes('{apiKey}');
   const response = await fetch(url, {
-    headers: env.EXCHANGE_RATE_API_KEY
-      ? { authorization: `Bearer ${env.EXCHANGE_RATE_API_KEY}` }
-      : undefined,
+    headers:
+      env.EXCHANGE_RATE_API_KEY && !usesApiKeyInUrl
+        ? { authorization: `Bearer ${env.EXCHANGE_RATE_API_KEY}` }
+        : undefined,
     cache: 'no-store',
   });
 
