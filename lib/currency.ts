@@ -8,7 +8,7 @@ import { resolveMarket } from '@/lib/market';
 import type { Json } from '@/lib/supabase/types';
 import type { PaymentRoute } from '@/lib/payments/types';
 
-export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
+export const APP_CURRENCIES = ['AMD', 'EUR', 'USD'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
 
 export const DEFAULT_CURRENCY: AppCurrency = 'AMD';
@@ -62,7 +62,7 @@ export function normalizeCurrency(value: unknown): AppCurrency | null {
   return APP_CURRENCIES.includes(upper as AppCurrency) ? (upper as AppCurrency) : null;
 }
 
-// Card currencies (USD/EUR) route to Ameriabank vPOS; AMD/RUB fall back to the
+// Card currencies (USD/EUR) route to Ameriabank vPOS; AMD falls back to the
 // manual/bank route. Live routing is DB-driven via getPaymentRoute() in
 // lib/payments/router.ts; this pure currency→route helper backs unit tests.
 function isCardCurrency(currency: AppCurrency) {
