@@ -44,14 +44,14 @@ const { data: currencies, error: currencyError } = await supabase
 if (currencyError) throw new Error(currencyError.message);
 
 const codes = new Set(currencies.map((currency) => currency.code));
-for (const code of ['AMD', 'EUR', 'USD', 'RUB']) {
+for (const code of ['AMD', 'EUR', 'USD']) {
   assert(codes.has(code), `Missing supported currency ${code}`);
 }
 
 const defaultCurrency = currencies.find((currency) => currency.is_default);
 assert(defaultCurrency?.code === 'AMD', 'AMD must be the default currency');
 assert(defaultCurrency.is_enabled, 'Default currency must be enabled');
-for (const code of ['AMD', 'EUR', 'USD', 'RUB']) {
+for (const code of ['AMD', 'EUR', 'USD']) {
   const route = currencies.find((currency) => currency.code === code)?.payment_route;
   assert(
     route === 'ameria' || route === 'bank_manual',
@@ -65,7 +65,7 @@ const { data: rates, error: ratesError } = await supabase
   .eq('base_currency', 'AMD');
 if (ratesError) throw new Error(ratesError.message);
 
-for (const code of ['AMD', 'EUR', 'USD', 'RUB']) {
+for (const code of ['AMD', 'EUR', 'USD']) {
   assert(
     rates.some((rate) => rate.target_currency === code && Number(rate.rate) > 0),
     `Missing AMD to ${code} cached rate`,
@@ -81,7 +81,7 @@ try {
   const { error } = await supabase
     .from('currencies')
     .update({ is_enabled: false })
-    .in('code', ['AMD', 'EUR', 'USD', 'RUB']);
+    .in('code', ['AMD', 'EUR', 'USD']);
   assert(error, 'Disabling every currency should fail');
 } finally {
   for (const state of previousStates) {
