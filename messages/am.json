@@ -184,10 +184,6 @@
     "option": "Տարբերակ {number}",
     "priceEach": "{price}՝ յուրաքանչյուրի համար",
     "total": "Ընդամենը՝ {price}",
-    "laserStyle": {
-      "contour": "Բարակ եզրագիծ",
-      "solid": "Հոծ փորագրում"
-    },
     "previewAlt": "{name} նախադիտում",
     "previewUnavailable": "Նախադիտումը հասանելի չէ",
     "noPreview": "Նախադիտում հասանելի չէ",
@@ -449,7 +445,9 @@
     "noImage": "Պատկեր վերբեռնված չէ",
     "currentImageAlt": "Ընթացիկ պատկեր՝ {label}",
     "replaceImageHelp": "Ընտրեք ֆայլ՝ ընթացիկ պատկերը փոխարինելու համար։",
-    "uploadHelp": "Վերբեռնեք PNG, JPG, WEBP կամ SVG՝ մինչև 10 ՄԲ։"
+    "uploadHelp": "Վերբեռնեք PNG, JPG, WEBP կամ SVG՝ մինչև 10 ՄԲ։",
+    "priceAdjustmentPercent": "Գնի ճշգրտում (%)",
+    "priceAdjustmentHelp": "Ընտրովի։ Ճշգրտում է ապրանքի բազային գինը, երբ ընտրված է այս ձևանմուշը — օրինակ՝ 20-ը ավելացնում է 20%, -10-ը հանում է 10%։"
   },
   "legal": {
     "privacy": {

@@ -10,6 +10,7 @@ export interface PersonalizationBoilerplate {
   generate_hidden_svg: boolean;
   is_active: boolean;
   sort_order: number;
+  price_adjustment_percent: number | null;
 }
 
 interface CatalogItemBoilerplateRow {
@@ -25,7 +26,7 @@ export async function listCatalogItemBoilerplates(
   const { data, error } = await supabase
     .from('catalog_item_boilerplates')
     .select(
-      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order)',
+      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent)',
     )
     .eq('catalog_item_id', catalogItemId)
     .order('sort_order', { ascending: true })
@@ -37,4 +38,13 @@ export async function listCatalogItemBoilerplates(
     .filter((boilerplate): boilerplate is PersonalizationBoilerplate =>
       Boolean(boilerplate?.is_active),
     );
+}
+
+/**
+ * Applies a boilerplate's optional percentage price adjustment to an item's base
+ * price. `pct` is an integer percent of any sign (surcharge or discount); null
+ * means no adjustment. The result is rounded to the nearest cent and floored at 0.
+ */
+export function adjustedPriceCents(baseCents: number, pct: number | null): number {
+  return Math.max(0, Math.round(baseCents * (1 + (pct ?? 0) / 100)));
 }

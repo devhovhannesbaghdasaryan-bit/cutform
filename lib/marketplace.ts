@@ -38,10 +38,6 @@ export interface CatalogItem {
   system_prompt: string | null;
   skill_id: string | null;
   tags: string[];
-  laser_contour_enabled: boolean;
-  laser_solid_enabled: boolean;
-  laser_solid_price_cents: number | null;
-  laser_solid_prompt: string | null;
   thumbnail_path: string | null;
   manufacturing_notes: string | null;
   created_at: string;
@@ -80,10 +76,6 @@ const CATALOG_SELECT = `
   system_prompt,
   skill_id,
   tags,
-  laser_contour_enabled,
-  laser_solid_enabled,
-  laser_solid_price_cents,
-  laser_solid_prompt,
   thumbnail_path,
   manufacturing_notes,
   created_at,

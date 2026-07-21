@@ -7,15 +7,14 @@ import {
 } from '@/lib/item-ai';
 
 describe('ITEM_AI_FIELD_KEYS', () => {
-  it('contains the 5 core fields and 15 localized SEO fields', () => {
-    expect(ITEM_AI_FIELD_KEYS).toHaveLength(20);
+  it('contains the 4 core fields and 15 localized SEO fields', () => {
+    expect(ITEM_AI_FIELD_KEYS).toHaveLength(19);
     expect(ITEM_AI_FIELD_KEYS).toEqual(
       expect.arrayContaining([
         'title',
         'manufacturingNotes',
         'characteristics',
         'systemPrompt',
-        'laserSolidPrompt',
         'seoTitle_en',
         'seoTitle_ru',
         'seoTitle_am',

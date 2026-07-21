@@ -35,7 +35,7 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
     supabase
       .from('catalog_items')
       .select(
-        'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics, system_prompt, skill_id, tags, laser_contour_enabled, laser_solid_enabled, laser_solid_price_cents, laser_solid_prompt',
+        'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics, system_prompt, skill_id, tags',
       )
       .eq('id', id)
       .maybeSingle(),

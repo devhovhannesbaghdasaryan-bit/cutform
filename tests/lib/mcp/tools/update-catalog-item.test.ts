@@ -31,10 +31,6 @@ const EXISTING = {
   is_customizable: true,
   system_prompt: 'Existing system prompt',
   skill_id: 'skill-1',
-  laser_contour_enabled: true,
-  laser_solid_enabled: true,
-  laser_solid_price_cents: 500,
-  laser_solid_prompt: 'Existing solid prompt',
   sizes: [{ key: 'small', label: 'Small' }],
 };
 
@@ -106,10 +102,6 @@ describe('handleUpdateCatalogItem', () => {
       isCustomizable: true,
       systemPrompt: 'Existing system prompt',
       skillId: 'skill-1',
-      laserContourEnabled: true,
-      laserSolidEnabled: true,
-      laserSolidPriceCents: 500,
-      laserSolidPrompt: 'Existing solid prompt',
       sizesJson: JSON.stringify(EXISTING.sizes),
     });
     expect(optionsArg).toEqual({ syncAssociations: false });
@@ -135,7 +127,6 @@ describe('handleUpdateCatalogItem', () => {
       ...EXISTING,
       system_prompt: null,
       skill_id: null,
-      laser_solid_enabled: false,
     });
     vi.mocked(getServiceSupabase).mockReturnValue(fakeSupabase(['boilerplate-only']) as never);
 

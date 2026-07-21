@@ -11,7 +11,6 @@ import {
   syncCatalogItemMedia,
   upsertSeoMetadata,
   validateCategoryExists,
-  validateEngravingConfig,
   validatePersonalizationConfig,
   validateSubcategoryBelongsToCategory,
 } from '@/app/admin/items/item-form-parsing';
@@ -35,9 +34,6 @@ async function validateItemAndParseSizes(
       'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
     );
   }
-
-  const engravingError = validateEngravingConfig(item);
-  if (engravingError) throw new Error(engravingError);
 
   try {
     return parseSizesJson(item.sizesJson);
@@ -69,10 +65,6 @@ function toCatalogItemRow(
     system_prompt: item.systemPrompt ?? null,
     skill_id: item.skillId ?? null,
     tags: item.tags,
-    laser_contour_enabled: item.laserContourEnabled,
-    laser_solid_enabled: item.laserSolidEnabled,
-    laser_solid_price_cents: item.laserSolidEnabled ? (item.laserSolidPriceCents ?? null) : null,
-    laser_solid_prompt: item.laserSolidEnabled ? (item.laserSolidPrompt ?? null) : null,
   };
 }
 

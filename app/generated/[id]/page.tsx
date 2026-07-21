@@ -140,32 +140,17 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
               generatedItemId={item.id}
               itemTitle={itemTitle}
               options={previewOptions.map((option) => {
-                const style =
-                  typeof option.metadata.engravingStyle === 'string'
-                    ? option.metadata.engravingStyle
-                    : null;
-                const styleFallback =
-                  typeof option.metadata.engravingStyleLabel === 'string'
-                    ? option.metadata.engravingStyleLabel
-                    : '';
-                const styleLabel = style
-                  ? tDynamic(t, `generated.laserStyle.${style}`, styleFallback)
-                  : null;
                 const boilerplateName =
                   option.boilerplate?.name ??
                   (typeof option.metadata.boilerplateName === 'string'
                     ? option.metadata.boilerplateName
                     : null);
-                const label =
-                  styleLabel && boilerplateName
-                    ? `${boilerplateName} · ${styleLabel}`
-                    : (styleLabel ??
-                      boilerplateName ??
-                      t('generated.option', { number: String(option.option_index) }));
                 return {
                   id: option.id,
                   previewUrl: option.previewUrl,
-                  label,
+                  label:
+                    boilerplateName ??
+                    t('generated.option', { number: String(option.option_index) }),
                   priceCents: previewOptionPriceCents(option, salePriceCents),
                 };
               })}

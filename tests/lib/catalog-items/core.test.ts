@@ -23,10 +23,6 @@ function baseItem(overrides: Partial<z.infer<typeof itemSchema>> = {}): z.infer<
     skillId: undefined,
     tags: [],
     boilerplateIds: [],
-    laserContourEnabled: false,
-    laserSolidEnabled: false,
-    laserSolidPriceCents: undefined,
-    laserSolidPrompt: undefined,
     seo: { en: {}, ru: {}, am: {} },
     ...overrides,
   };

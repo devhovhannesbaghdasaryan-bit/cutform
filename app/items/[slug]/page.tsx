@@ -58,7 +58,6 @@ export default async function CatalogItemDetailPage({
     item.is_customizable &&
     (Boolean(item.system_prompt) ||
       Boolean(item.skill_id) ||
-      item.laser_solid_enabled ||
       (await listCatalogItemBoilerplates(supabase, item.id).catch(() => [])).length > 0);
   const locale = await getRequestLocale();
   const t = await getTranslations();

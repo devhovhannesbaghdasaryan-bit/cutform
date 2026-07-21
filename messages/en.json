@@ -184,10 +184,6 @@
     "option": "Option {number}",
     "priceEach": "{price} each",
     "total": "Total: {price}",
-    "laserStyle": {
-      "contour": "Hairline contour",
-      "solid": "Solid scratching"
-    },
     "previewAlt": "Preview of {name}",
     "previewUnavailable": "Preview unavailable",
     "noPreview": "No preview available",
@@ -449,7 +445,9 @@
     "noImage": "No image uploaded",
     "currentImageAlt": "Current {label}",
     "replaceImageHelp": "Choose a file to replace the current image.",
-    "uploadHelp": "Upload PNG, JPG, WEBP, or SVG up to 10 MB."
+    "uploadHelp": "Upload PNG, JPG, WEBP, or SVG up to 10 MB.",
+    "priceAdjustmentPercent": "Price adjustment (%)",
+    "priceAdjustmentHelp": "Optional. Adjusts this item's base price when this boilerplate is selected — e.g. 20 adds 20%, -10 takes off 10%."
   },
   "legal": {
     "privacy": {
