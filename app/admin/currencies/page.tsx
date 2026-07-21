@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import type { AppCurrency } from '@/lib/currency';
 import { APP_CURRENCIES } from '@/lib/currency';
+import { PAYMENT_ROUTES, type PaymentRoute } from '@/lib/payments/types';
 import { formatDate } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
@@ -109,7 +110,9 @@ export default async function AdminCurrenciesPage() {
                         <select
                           name={`paymentRoute:${currency.code}`}
                           defaultValue={
-                            currency.payment_route === 'ameria' ? 'ameria' : 'bank_manual'
+                            PAYMENT_ROUTES.includes(currency.payment_route as PaymentRoute)
+                              ? currency.payment_route
+                              : 'bank_manual'
                           }
                           className="h-9 rounded-md border border-input bg-background px-2"
                         >
