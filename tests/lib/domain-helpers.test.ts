@@ -62,6 +62,5 @@ describe('currency helpers', () => {
     expect(getPaymentRouteForCurrency('USD')).toBe('ameria');
     expect(getPaymentRouteForCurrency('EUR')).toBe('ameria');
     expect(getPaymentRouteForCurrency('AMD')).toBe('bank_manual');
-    expect(getPaymentRouteForCurrency('RUB')).toBe('bank_manual');
   });
 });

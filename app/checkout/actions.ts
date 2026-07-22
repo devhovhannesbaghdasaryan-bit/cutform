@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createOrderFromCart } from '@/lib/orders';
 import { initiateAmeriaPayment } from '@/lib/payments/ameria';
-import { isPolarEnabled } from '@/lib/payments/polar';
+import { initiatePolarCheckout, isPolarEnabled } from '@/lib/payments/polar';
 import { resolvePaymentRoute } from '@/lib/payments/router';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
@@ -86,7 +86,7 @@ export async function createCheckoutOrderAction(formData: FormData) {
       total_cents: number;
       currency: string;
       exchange_rate_context: Record<string, unknown>;
-      payment_provider_route: 'ameria' | 'bank_manual' | null;
+      payment_provider_route: 'ameria' | 'bank_manual' | 'polar' | null;
     }>();
 
   if (totalError || !orderTotals)
@@ -124,16 +124,29 @@ export async function createCheckoutOrderAction(formData: FormData) {
   revalidatePath('/checkout');
   revalidatePath('/orders');
 
-  if (orderTotals.payment_provider_route !== 'ameria') {
-    redirect(`/orders/${order.id}?checkout=bank_pending`);
+  const route = orderTotals.payment_provider_route ?? 'bank_manual';
+
+  if (route === 'polar') {
+    const { redirectUrl } = await initiatePolarCheckout(service, {
+      transactionId: transaction.id,
+      amountCents: orderTotals.total_cents,
+      currency: orderTotals.currency,
+      description: `Uniqraft order ${order.id.slice(0, 8)}`,
+      locale: parsed.data.locale || null,
+    });
+    redirect(redirectUrl);
   }
 
-  const { redirectUrl } = await initiateAmeriaPayment(service, {
-    transactionId: transaction.id,
-    amountCents: orderTotals.total_cents,
-    currency: orderTotals.currency,
-    description: `Uniqraft order ${order.id.slice(0, 8)}`,
-    locale: parsed.data.locale || null,
-  });
-  redirect(redirectUrl);
+  if (route === 'ameria') {
+    const { redirectUrl } = await initiateAmeriaPayment(service, {
+      transactionId: transaction.id,
+      amountCents: orderTotals.total_cents,
+      currency: orderTotals.currency,
+      description: `Uniqraft order ${order.id.slice(0, 8)}`,
+      locale: parsed.data.locale || null,
+    });
+    redirect(redirectUrl);
+  }
+
+  redirect(`/orders/${order.id}?checkout=bank_pending`);
 }

@@ -8,7 +8,7 @@ import { resolveMarket } from '@/lib/market';
 import type { Json } from '@/lib/supabase/types';
 import type { PaymentRoute } from '@/lib/payments/types';
 
-export const APP_CURRENCIES = ['AMD', 'EUR', 'USD', 'RUB'] as const;
+export const APP_CURRENCIES = ['AMD', 'EUR', 'USD'] as const;
 export type AppCurrency = (typeof APP_CURRENCIES)[number];
 
 export const DEFAULT_CURRENCY: AppCurrency = 'AMD';
@@ -62,7 +62,7 @@ export function normalizeCurrency(value: unknown): AppCurrency | null {
   return APP_CURRENCIES.includes(upper as AppCurrency) ? (upper as AppCurrency) : null;
 }
 
-// Card currencies (USD/EUR) route to Ameriabank vPOS; AMD/RUB fall back to the
+// Card currencies (USD/EUR) route to Ameriabank vPOS; AMD falls back to the
 // manual/bank route. Live routing is DB-driven via getPaymentRoute() in
 // lib/payments/router.ts; this pure currency→route helper backs unit tests.
 function isCardCurrency(currency: AppCurrency) {
@@ -212,18 +212,31 @@ async function findInverseCachedRate(
   } satisfies ExchangeRateRow;
 }
 
+export function buildRateProviderUrl(
+  template: string,
+  apiKey: string | undefined,
+  base: string,
+  target: string,
+): string {
+  return template
+    .replace('{apiKey}', encodeURIComponent(apiKey ?? ''))
+    .replace('{base}', encodeURIComponent(base))
+    .replace('{target}', encodeURIComponent(target));
+}
+
 async function fetchProviderRate(baseCurrency: AppCurrency, targetCurrency: AppCurrency) {
   const env = getServerEnv();
-  const provider = env.EXCHANGE_RATE_PROVIDER ?? 'open-er-api';
-  const template = env.EXCHANGE_RATE_API_URL ?? 'https://open.er-api.com/v6/latest/{base}';
-  const url = template
-    .replace('{base}', encodeURIComponent(baseCurrency))
-    .replace('{target}', encodeURIComponent(targetCurrency));
+  const provider = env.EXCHANGE_RATE_PROVIDER ?? 'exchangerate-api';
+  const template =
+    env.EXCHANGE_RATE_API_URL ?? 'https://v6.exchangerate-api.com/v6/{apiKey}/latest/{base}';
+  const url = buildRateProviderUrl(template, env.EXCHANGE_RATE_API_KEY, baseCurrency, targetCurrency);
 
+  const usesApiKeyInUrl = template.includes('{apiKey}');
   const response = await fetch(url, {
-    headers: env.EXCHANGE_RATE_API_KEY
-      ? { authorization: `Bearer ${env.EXCHANGE_RATE_API_KEY}` }
-      : undefined,
+    headers:
+      env.EXCHANGE_RATE_API_KEY && !usesApiKeyInUrl
+        ? { authorization: `Bearer ${env.EXCHANGE_RATE_API_KEY}` }
+        : undefined,
     cache: 'no-store',
   });
 
@@ -288,6 +301,33 @@ export async function getExchangeRate(
 
     throw error;
   }
+}
+
+// Force-fetches a fresh provider rate, bypassing the same-day cache short-circuit
+// in getExchangeRate. insertRate upserts on (base,target,rate_date) so a same-day
+// refresh overwrites the cached value.
+export async function refreshExchangeRate(
+  baseCurrency: AppCurrency,
+  targetCurrency: AppCurrency,
+  supabase: SupabaseClient = getServiceSupabase(),
+): Promise<ExchangeRateContext> {
+  if (baseCurrency === targetCurrency) {
+    const row = await insertRate(supabase, baseCurrency, targetCurrency, 1, 'identity', false, {
+      source: 'identity',
+    });
+    return rowToContext(row, 'identity');
+  }
+  const fetched = await fetchProviderRate(baseCurrency, targetCurrency);
+  const row = await insertRate(
+    supabase,
+    baseCurrency,
+    targetCurrency,
+    fetched.rate,
+    fetched.provider,
+    false,
+    { source: 'provider', refreshed: true },
+  );
+  return rowToContext(row, 'provider');
 }
 
 export function applyExchangeRate(

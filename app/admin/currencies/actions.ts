@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
-import { APP_CURRENCIES, normalizeCurrency } from '@/lib/currency';
+import { APP_CURRENCIES, DEFAULT_CURRENCY, listEnabledCurrencies, normalizeCurrency, refreshExchangeRate } from '@/lib/currency';
 import { PAYMENT_ROUTES, type PaymentRoute } from '@/lib/payments/types';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
@@ -64,4 +64,32 @@ export async function updateCurrencySettingsAction(formData: FormData) {
   revalidatePath('/cart');
   revalidatePath('/checkout');
   revalidatePath('/credits');
+}
+
+export async function refreshExchangeRatesAction() {
+  const { supabase, user } = await requireAdminPermission('transactions_manage');
+  const enabled = await listEnabledCurrencies(supabase);
+  const targets = enabled.map((c) => c.code).filter((code) => code !== DEFAULT_CURRENCY);
+
+  const results: Array<{ target: string; ok: boolean; error?: string }> = [];
+  for (const target of targets) {
+    try {
+      await refreshExchangeRate(DEFAULT_CURRENCY, target, supabase);
+      results.push({ target, ok: true });
+    } catch (error) {
+      results.push({ target, ok: false, error: error instanceof Error ? error.message : 'unknown' });
+    }
+  }
+
+  await writeAdminAuditLog(supabase, {
+    actorUserId: user.id,
+    action: 'admin_exchange_rates_refreshed',
+    entityType: 'exchange_rates',
+    reason: 'Manual exchange-rate refresh from admin currencies page.',
+    metadata: { base: DEFAULT_CURRENCY, results },
+  });
+
+  revalidatePath('/admin/currencies');
+  revalidatePath('/');
+  revalidatePath('/catalog');
 }

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { getCreditPack } from '@/lib/credit-packs';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { initiateAmeriaPayment } from '@/lib/payments/ameria';
-import { isPolarEnabled } from '@/lib/payments/polar';
+import { initiatePolarCheckout, isPolarEnabled } from '@/lib/payments/polar';
 import { getPaymentRoute, resolvePaymentRoute } from '@/lib/payments/router';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createCreditPurchaseTransaction } from '@/lib/transactions';
@@ -116,17 +116,28 @@ export async function createCreditPackCheckoutAction(formData: FormData) {
     createdBy: user.id,
   });
 
-  if (paymentRoute !== 'ameria') {
-    revalidatePath('/credits');
-    redirect('/credits?checkout=bank_pending');
+  if (paymentRoute === 'polar') {
+    const { redirectUrl } = await initiatePolarCheckout(service, {
+      transactionId: transaction.id,
+      amountCents: converted.amountCents,
+      currency: converted.currency,
+      description: pack.name,
+      locale: null,
+    });
+    redirect(redirectUrl);
   }
 
-  const { redirectUrl } = await initiateAmeriaPayment(service, {
-    transactionId: transaction.id,
-    amountCents: converted.amountCents,
-    currency: converted.currency,
-    description: pack.name,
-    locale: null,
-  });
-  redirect(redirectUrl);
+  if (paymentRoute === 'ameria') {
+    const { redirectUrl } = await initiateAmeriaPayment(service, {
+      transactionId: transaction.id,
+      amountCents: converted.amountCents,
+      currency: converted.currency,
+      description: pack.name,
+      locale: null,
+    });
+    redirect(redirectUrl);
+  }
+
+  revalidatePath('/credits');
+  redirect('/credits?checkout=bank_pending');
 }
