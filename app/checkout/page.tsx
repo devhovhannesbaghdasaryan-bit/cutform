@@ -1,18 +1,15 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createCheckoutOrderAction } from '@/app/checkout/actions';
-import { BillingCountryField } from '@/components/checkout/billing-country-field';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CountrySwitcherClient } from '@/components/country-switcher-client';
 import { listCartItems, validateCartBeforeCheckout } from '@/lib/cart';
 import { normalizeCurrency } from '@/lib/currency';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
-import { getCountryDisplayName, listMarketGeography, resolveMarket } from '@/lib/market';
-import { isPolarEnabled } from '@/lib/payments/polar';
+import { getCountryDisplayName, resolveMarket } from '@/lib/market';
 import { calculateOrderTotals } from '@/lib/shipping';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { formatPrice } from '@/lib/utils';
@@ -20,22 +17,16 @@ import { getTranslations } from 'next-intl/server';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CheckoutPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ checkout?: string }>;
-}) {
-  const { checkout: checkoutStatus } = await searchParams;
+export default async function CheckoutPage() {
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
 
   if (!user) redirect('/login?next=/checkout');
 
   const locale = await getRequestLocale();
-  const [{ items }, market, geography, t] = await Promise.all([
+  const [{ items }, market, t] = await Promise.all([
     listCartItems(supabase, { userId: user.id }),
-    resolveMarket(),
-    listMarketGeography(supabase),
+    resolveMarket({ checkoutCountryCode: 'AM' }),
     getTranslations(),
   ]);
 
@@ -56,20 +47,11 @@ export default async function CheckoutPage({
         supabase,
       }).catch(() => null)
     : null;
-  const countries = geography.countries
-    .filter((country) => country.is_active)
-    .map((country) => ({ code: country.code, label: getCountryDisplayName(country.code, locale) }))
-    .sort((a, b) => a.label.localeCompare(b.label, locale));
 
   return (
     <>
       <MarketplaceHeader />
       <main className="container max-w-5xl space-y-8 py-10">
-        {checkoutStatus === 'polar_unavailable' ? (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-            {t('checkout.polar_unavailable')}
-          </div>
-        ) : null}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t('checkout.review')}</h1>
@@ -112,22 +94,9 @@ export default async function CheckoutPage({
           </section>
 
           <aside className="space-y-4">
-            <div className="space-y-2 rounded-lg border p-5">
-              <Label>{t('checkout.destination')}</Label>
-              <p className="text-xs text-muted-foreground">{t('checkout.destination_help')}</p>
-              {market.countryCode ? (
-                <CountrySwitcherClient
-                  activeCountry={market.countryCode}
-                  countries={countries}
-                  placeholder={t('checkout.country')}
-                />
-              ) : (
-                <p className="text-sm text-destructive">{t('checkout.select_country')}</p>
-              )}
-            </div>
             <form action={createCheckoutOrderAction} className="space-y-4 rounded-lg border p-5">
               <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="countryCode" value={market.countryCode ?? ''} />
+              <input type="hidden" name="countryCode" value="AM" />
               <div>
                 <h2 className="font-semibold">{t('order.summary')}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">{t('checkout.payment_note')}</p>
@@ -163,19 +132,26 @@ export default async function CheckoutPage({
                 <Label htmlFor="addressLine2">{t('checkout.address2')}</Label>
                 <Input id="addressLine2" name="addressLine2" autoComplete="address-line2" />
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="city">{t('checkout.city')}</Label>
-                  <Input id="city" name="city" autoComplete="address-level2" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="administrativeArea">{t('checkout.region')}</Label>
-                  <Input
-                    id="administrativeArea"
-                    name="administrativeArea"
-                    autoComplete="address-level1"
-                  />
-                </div>
+              <div className="space-y-2">
+                <Label htmlFor="countryDisplay">{t('checkout.country')}</Label>
+                <Input
+                  id="countryDisplay"
+                  value={getCountryDisplayName('AM', locale)}
+                  disabled
+                  readOnly
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city">{t('checkout.city')}</Label>
+                <Input id="city" name="city" autoComplete="address-level2" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="administrativeArea">{t('checkout.region')}</Label>
+                <Input
+                  id="administrativeArea"
+                  name="administrativeArea"
+                  autoComplete="address-level1"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="postalCode">{t('checkout.postal')}</Label>
@@ -206,15 +182,9 @@ export default async function CheckoutPage({
                   {t('checkout.resolve_issues')}
                 </div>
               ) : null}
-              <BillingCountryField
-                countries={countries}
-                defaultCountry={market.countryCode ?? 'AM'}
-                polarEnabled={isPolarEnabled()}
-                baseDisabled={issues.length > 0 || !market.countryCode || !totals}
-                billingLabel={t('checkout.billing_country')}
-                unavailableLabel={t('checkout.polar_unavailable')}
-                submitLabel={t('checkout.create_order')}
-              />
+              <Button type="submit" className="w-full" disabled={issues.length > 0 || !totals}>
+                {t('checkout.create_order')}
+              </Button>
             </form>
           </aside>
         </div>
