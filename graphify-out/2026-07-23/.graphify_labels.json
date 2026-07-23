@@ -371,18 +371,5 @@
   "369": "page.tsx",
   "370": "page.tsx",
   "371": "vercel.json",
-  "372": "server.test.ts",
-  "373": "actions.ts",
-  "374": "Global Constraints",
-  "375": "personalize-item-form.tsx",
-  "376": "Global Constraints",
-  "377": "resend.ts",
-  "378": "openai-image.ts",
-  "379": "Global Constraints",
-  "380": "marketplace-constants.ts",
-  "381": "personalization-boilerplates.ts",
-  "382": "personalization-ai.ts",
-  "383": "Review package: 0e53c42..99f1af6 (Task 5: graph regen + verification)",
-  "384": "buildPersonalizedNightLightOpenAiPayload",
-  "385": "check-migrations.mjs"
+  "372": "server.test.ts"
 }
