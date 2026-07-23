@@ -19,16 +19,6 @@ const checkoutSchema = z.object({
   city: z.string().trim().min(2).max(100),
   administrativeArea: z.string().trim().max(100).optional().or(z.literal('')),
   postalCode: z.string().trim().max(30).optional().or(z.literal('')),
-  countryCode: z
-    .string()
-    .trim()
-    .regex(/^[A-Z]{2}$/),
-  billingCountryCode: z
-    .string()
-    .trim()
-    .regex(/^[A-Z]{2}$/)
-    .optional()
-    .or(z.literal('')),
 });
 
 export async function createCheckoutOrderAction(formData: FormData) {
@@ -42,8 +32,6 @@ export async function createCheckoutOrderAction(formData: FormData) {
     city: formData.get('city'),
     administrativeArea: formData.get('administrativeArea') || '',
     postalCode: formData.get('postalCode') || '',
-    countryCode: formData.get('countryCode'),
-    billingCountryCode: formData.get('billingCountryCode') || '',
   });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid checkout data.');
 
@@ -51,7 +39,8 @@ export async function createCheckoutOrderAction(formData: FormData) {
   const user = await getCurrentUser();
   if (!user) redirect('/login?next=/checkout');
 
-  const billingCountryCode = parsed.data.billingCountryCode || parsed.data.countryCode;
+  const countryCode = 'AM';
+  const billingCountryCode = countryCode;
 
   const order = await createOrderFromCart(supabase, user.id, {
     contactEmail: parsed.data.contactEmail || user.email,
@@ -65,7 +54,7 @@ export async function createCheckoutOrderAction(formData: FormData) {
       city: parsed.data.city,
       administrativeArea: parsed.data.administrativeArea || null,
       postalCode: parsed.data.postalCode || null,
-      countryCode: parsed.data.countryCode,
+      countryCode,
     },
   });
 
