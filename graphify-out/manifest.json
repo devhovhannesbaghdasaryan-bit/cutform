@@ -280,8 +280,8 @@
     "semantic_hash": "d978be0d2025beb45578773824710cf5"
   },
   "app/checkout/actions.ts": {
-    "mtime": 1784793371.056002,
-    "ast_hash": "6fb6353eac0b35c60b31c9a21b8317d5",
+    "mtime": 1784794911.0626056,
+    "ast_hash": "566a768303ed57f1d99823be183278ed",
     "semantic_hash": ""
   },
   "app/checkout/page.tsx": {
@@ -670,8 +670,8 @@
     "semantic_hash": ""
   },
   "lib/payments/polar.ts": {
-    "mtime": 1784710161.4726584,
-    "ast_hash": "1880b65045fa4e0d0df286a8d2b680ce",
+    "mtime": 1784795591.7081306,
+    "ast_hash": "2407f8e07205ea22bea335015f99e492",
     "semantic_hash": ""
   },
   "lib/payments/router.ts": {
@@ -1000,8 +1000,8 @@
     "semantic_hash": "55df60eeb0804c57613a078402468fa0"
   },
   ".superpowers/sdd/progress.md": {
-    "mtime": 1784794296.41679,
-    "ast_hash": "f9fcc4198f4e8a82bc1bbb88970c6f1a",
+    "mtime": 1784795037.2036602,
+    "ast_hash": "a9aafeede4aed80b2a1425425d1e8327",
     "semantic_hash": ""
   },
   ".superpowers/sdd/task-1-brief.md": {
@@ -1060,8 +1060,8 @@
     "semantic_hash": ""
   },
   ".superpowers/sdd/task-5-report.md": {
-    "mtime": 1784635864.9475348,
-    "ast_hash": "261678bfd230bd11d5c2a1710afca321",
+    "mtime": 1784794516.4708364,
+    "ast_hash": "6bb913b1ac4935287ba09348522ecdda",
     "semantic_hash": ""
   },
   ".superpowers/sdd/task-6-brief.md": {
@@ -1947,6 +1947,16 @@
   "docs/superpowers/specs/2026-07-22-checkout-country-refactor-design.md": {
     "mtime": 1784740300.288965,
     "ast_hash": "5bd7f8eb7f043e2a486ed6350001cf1e",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/final-review-fix-report.md": {
+    "mtime": 1784794955.5344357,
+    "ast_hash": "8c01a73243a00b8f4646c054f247a472",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/review-0e53c42..99f1af6-stat.md": {
+    "mtime": 1784794550.7343926,
+    "ast_hash": "9cdfafe315515a454e47aea1331e36e1",
     "semantic_hash": ""
   }
 }
