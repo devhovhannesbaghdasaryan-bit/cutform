@@ -6,19 +6,13 @@ import { z } from 'zod';
 import { getCreditPack } from '@/lib/credit-packs';
 import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { initiateAmeriaPayment } from '@/lib/payments/ameria';
-import { initiatePolarCheckout, isPolarEnabled } from '@/lib/payments/polar';
+import { initiatePolarCheckout } from '@/lib/payments/polar';
 import { getPaymentRoute, resolvePaymentRoute } from '@/lib/payments/router';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createCreditPurchaseTransaction } from '@/lib/transactions';
 
 const creditPackRequestSchema = z.object({
   packKey: z.string().trim().min(1),
-  billingCountryCode: z
-    .string()
-    .trim()
-    .regex(/^[A-Z]{2}$/)
-    .optional()
-    .or(z.literal('')),
 });
 
 export async function requestManualCreditPackAction(formData: FormData) {
@@ -72,7 +66,6 @@ export async function requestManualCreditPackAction(formData: FormData) {
 export async function createCreditPackCheckoutAction(formData: FormData) {
   const parsed = creditPackRequestSchema.safeParse({
     packKey: formData.get('packKey'),
-    billingCountryCode: formData.get('billingCountryCode') || '',
   });
   if (!parsed.success) throw new Error('Choose a credit pack.');
 
@@ -90,11 +83,8 @@ export async function createCreditPackCheckoutAction(formData: FormData) {
     activeCurrency,
     service,
   );
-  const billingCountryCode = parsed.data.billingCountryCode || '';
+  const billingCountryCode = 'AM';
   const paymentRoute = resolvePaymentRoute(billingCountryCode);
-  if (paymentRoute === 'polar' && !isPolarEnabled()) {
-    redirect('/credits?checkout=polar_unavailable');
-  }
 
   const transaction = await createCreditPurchaseTransaction(service, {
     userId: user.id,

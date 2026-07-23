@@ -1,16 +1,16 @@
-# Graph Report - snip  (2026-07-23)
+# Graph Report - snip  (2026-07-21)
 
 ## Corpus Check
-- 350 files · ~432,710 words
+- 345 files · ~428,902 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2522 nodes · 4533 edges · 293 communities (163 shown, 130 thin omitted)
+- 2488 nodes · 4509 edges · 276 communities (146 shown, 130 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.77)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ecc13e3a`
+- Built from commit: `30537d8b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -285,47 +285,30 @@
 - Resend SMTP Auth Email Delivery
 - Uniqraft (AI image-to-SVG marketplace product)
 - 9. Պրոդուկտի և բիզնես մոդելի առաջարկ
-- seo-section.tsx
-- getCartSessionId
-- route.ts
-- 2. Գործադիր եզրակացություն
-- 10. Պաշտպանելիության roadmap
-- route.ts
-- page.tsx
-- env.ts
-- Final Review Fix Report — checkout country trust (Important finding)
-- formatPrice
-- page.tsx
-- ai-context.tsx
-- page.tsx
-- credits.ts
-- seo-validation.ts
-- personalization-boilerplates.ts
-- Review package: 0e53c42..99f1af6 (Task 5: graph regen + verification)
 
 ## God Nodes (most connected - your core abstractions)
-1. `getServiceSupabase()` - 73 edges
+1. `getServiceSupabase()` - 69 edges
 2. `getServerSupabase` - 62 edges
 3. `getCurrentUser` - 52 edges
 4. `requireAdminPermission()` - 39 edges
 5. `requireAdmin()` - 38 edges
-6. `getServerEnv()` - 38 edges
-7. `Button` - 36 edges
-8. `5. Ստեղծարար մենեջերի պատասխանները՝ ուժեղ, ազնիվ և presentation-ready` - 36 edges
-9. `5. Creative manager answers—strong, honest, and presentation-ready` - 36 edges
+6. `Button` - 37 edges
+7. `5. Ստեղծարար մենեջերի պատասխանները՝ ուժեղ, ազնիվ և presentation-ready` - 36 edges
+8. `5. Creative manager answers—strong, honest, and presentation-ready` - 36 edges
+9. `getServerEnv()` - 34 edges
 10. `normalizeCurrency()` - 33 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `AdminCreatePage()` --calls--> `requireAdmin()`  [EXTRACTED]
+  app/admin/create/page.tsx → lib/admin.ts
+- `AdminLayout()` --calls--> `requireAdmin()`  [EXTRACTED]
+  app/admin/layout.tsx → lib/admin.ts
 - `AdminPage()` --calls--> `requireAdmin()`  [EXTRACTED]
   app/admin/page.tsx → lib/admin.ts
 - `BoilerplateLibraryPage()` --calls--> `getServerSupabase`  [EXTRACTED]
   app/admin/personalization/boilerplates/page.tsx → lib/supabase/server.ts
 - `BoilerplateForm()` --calls--> `resolvePublicStorageUrl()`  [EXTRACTED]
   app/admin/personalization/boilerplates/page.tsx → lib/storage.ts
-- `VerifyEmailPage()` --calls--> `getCurrentUser`  [EXTRACTED]
-  app/auth/verify-email/page.tsx → lib/supabase/server.ts
-- `PersonalizeItemForm()` --indirect_call--> `generatePersonalizedItemAction()`  [INFERRED]
-  components/personalize-item-form.tsx → app/personalize/actions.ts
 
 ## Import Cycles
 - None detected.
@@ -343,55 +326,55 @@
 - **Night Light Manufacturing/Finish Reference Set** — public_product_references_night_lights_contour_laser_engraved, public_product_references_night_lights_rectangular_uv_print, public_product_references_night_lights_round_uv_print [INFERRED 0.85]
 - **Personalized Portrait Night Light Mockup Variants** — public_mock_night_lights_personalized_portrait_bunny, public_mock_night_lights_personalized_portrait_halloween, public_mock_night_lights_personalized_portrait [INFERRED 0.75]
 
-## Communities (293 total, 130 thin omitted)
+## Communities (276 total, 130 thin omitted)
 
 ### Community 0 - "Admin Item Form"
-Cohesion: 0.16
-Nodes (20): AuthActionState, callbackUrl(), credentialsSchema, emailSchema, otpSchema, registerAction(), registerSchema, resendVerificationAction() (+12 more)
+Cohesion: 0.05
+Nodes (72): AutogenerateButton(), FieldError, FillAllButton(), ItemFormAiContext, ItemFormAiContextValue, ItemFormAiProvider(), readFieldValue(), useItemFormAi() (+64 more)
 
 ### Community 1 - "Marketplace & Manufacturing Docs"
 Cohesion: 0.06
 Nodes (32): 2D Laser-Cut Pipeline, Account, Admin, Admin Review, API and Server Actions, Application Areas, Architecture, Authorization and RLS (+24 more)
 
 ### Community 2 - "MCP OAuth Token Store"
-Cohesion: 0.13
-Nodes (21): POST(), registerRequestSchema, errorResponse(), POST(), tokenResponse(), generateOpaqueToken(), hashToken(), RFC-7636 (+13 more)
+Cohesion: 0.09
+Nodes (33): AuthorizeParams, badRequest(), consentHtml(), escapeHtml(), GET(), notAuthorizedResponse(), POST(), readParams() (+25 more)
 
 ### Community 3 - "Catalog Item Admin Core"
-Cohesion: 0.06
-Nodes (65): createCatalogItemAction(), updateCatalogItemAction(), uploadCatalogFormAssets(), buildToyDecorationDraftMetadata(), generateToyDecorationDraftAction(), titleFromPrompt(), toyDecorationGenerationSchema, uploadGeneratedCatalogSvg() (+57 more)
+Cohesion: 0.14
+Nodes (29): AdminSupabase, CATALOG_ASSET_EXTENSIONS, ensureCatalogSlugIsAvailable(), getOptionalFiles(), itemSchema, localeSchema, parseKeywords(), parseSizesJson() (+21 more)
 
 ### Community 4 - "Banner Manufacturing Instructions"
-Cohesion: 0.07
-Nodes (41): AdminBannerOrderItem, generateBannerManufacturingInstructionAction(), GeneratedBannerSource, generateSchema, orderStatusSchema, requireStringPath(), ActionState, BANNER_PROCESSES (+33 more)
+Cohesion: 0.06
+Nodes (50): AdminBannerOrderItem, generateBannerManufacturingInstructionAction(), GeneratedBannerSource, generateSchema, orderStatusSchema, requireStringPath(), BannersPage(), AdvancedBannerGenerationPanel() (+42 more)
 
 ### Community 5 - "Cart & Market Resolution"
-Cohesion: 0.23
-Nodes (18): addCatalogItemToCartAction(), createCreditPackCheckoutAction(), creditPackRequestSchema, requestManualCreditPackAction(), CreditsPage(), addGeneratedItemToCartAction(), getGeneratedSaleCurrency(), getGeneratedSalePriceCents() (+10 more)
+Cohesion: 0.19
+Nodes (14): mergeAnonymousCart(), callbackParamsSchema, GET(), countrySchema, setCountryPreferenceAction(), currencySchema, setCurrencyPreferenceAction(), updateActiveCartCurrency() (+6 more)
 
 ### Community 6 - "Site Header & Auth"
-Cohesion: 0.14
-Nodes (24): logoutAction(), CatalogItemDetailPage(), generateMetadata(), formatShippingAddress(), OrderDetailPage(), PersonalizeItemPage(), LABELS, LanguageSwitcher() (+16 more)
+Cohesion: 0.11
+Nodes (19): AdminNav(), links, AdminLayout(), logoutAction(), CurrencySwitcher(), LABELS, LanguageSwitcher(), LogoutMenuItem() (+11 more)
 
 ### Community 7 - "Catalog & Landing Pages"
-Cohesion: 0.12
-Nodes (33): buildCatalogHref(), CatalogPage(), generateMetadata(), generateMetadata(), LandingPage(), sitemap(), CatalogItemCard(), CategoryNavigation() (+25 more)
+Cohesion: 0.13
+Nodes (30): buildCatalogHref(), CatalogPage(), generateMetadata(), LandingPage(), sitemap(), CategoryNavigation(), ICONS, applyExchangeRate() (+22 more)
 
 ### Community 8 - "i18n Locale & Catalog Card"
-Cohesion: 0.08
-Nodes (33): asRecord(), asString(), extractBannerDetails(), extractValidationWarnings(), GeneratedItemDetail, GeneratedItemPage(), PreviewOption, previewOptionPriceCents() (+25 more)
+Cohesion: 0.12
+Nodes (25): addGeneratedItemToCartAction(), getGeneratedSaleCurrency(), getGeneratedSalePriceCents(), requireUser(), asRecord(), asString(), extractBannerDetails(), extractValidationWarnings() (+17 more)
 
 ### Community 10 - "Cart & Banner Customizer"
-Cohesion: 0.12
-Nodes (38): clearCartAction(), getCartActor(), removeCartItemAction(), updateCartQuantityAction(), CartPage(), getCartPreviewUrls(), CheckoutPage(), addItemToCart() (+30 more)
+Cohesion: 0.16
+Nodes (25): addCatalogItemToCartAction(), clearCartAction(), getCartActor(), removeCartItemAction(), updateCartQuantityAction(), addItemToCart(), CartItem, CartItemInput (+17 more)
 
 ### Community 11 - "Currency Conversion"
-Cohesion: 0.21
-Nodes (18): AMERIA_CURRENCY_CODES, AmeriaConfig, AmeriaPaymentDetails, buildInitPaymentBody(), buildPaymentDetailsBody(), buildPaymentPageUrl(), InitPaymentFields, parseInitPaymentResponse() (+10 more)
+Cohesion: 0.25
+Nodes (10): CatalogMedia, EditAdminItemPage(), SeoMetadata, ItemForm(), NewAdminItemPage(), CreditsPage(), CreditPurchaseForm(), getCountryDisplayName() (+2 more)
 
 ### Community 12 - "Ameriabank Payment Integration"
-Cohesion: 0.32
-Nodes (9): GET(), GET(), getServerEnv(), isAmeriaEnabled(), isPolarEnabled(), fetchPolarCheckout(), getPolarClient(), getPolarProductId() (+1 more)
+Cohesion: 0.06
+Nodes (52): GET(), GET(), corsHandler, handler, getServerEnv(), optionalNonEmpty, publicEnv, publicEnvSchema (+44 more)
 
 ### Community 14 - "App UI Screenshots"
 Cohesion: 0.10
@@ -406,8 +389,8 @@ Cohesion: 0.07
 Nodes (28): scripts, build, db:check-migrations, db:types, dev, format, format:check, lint (+20 more)
 
 ### Community 17 - "Catalog Item Detail & Media"
-Cohesion: 0.17
-Nodes (14): CardHoverBoundary(), CardHoverContext, useCardHover(), CatalogMediaSlider(), isSvgPath(), CATALOG_MEDIA_IMAGE_MIME_TYPES, CATALOG_MEDIA_VIDEO_MIME_TYPES, CatalogMediaKind (+6 more)
+Cohesion: 0.15
+Nodes (15): CardHoverBoundary(), CardHoverContext, useCardHover(), CatalogItemCard(), CatalogMediaSlider(), isSvgPath(), CATALOG_MEDIA_IMAGE_MIME_TYPES, CATALOG_MEDIA_VIDEO_MIME_TYPES (+7 more)
 
 ### Community 18 - "Runtime Dependencies"
 Cohesion: 0.08
@@ -418,16 +401,16 @@ Cohesion: 0.24
 Nodes (20): assert(), baseUrl, bodyText(), checkInput(), clickByText(), connectBrowser(), createdUserIds, evaluate() (+12 more)
 
 ### Community 20 - "Item AI Field Generation"
-Cohesion: 0.13
-Nodes (19): generateItemFieldValuesAction(), GenerateItemFieldValuesInput, GenerateItemFieldValuesResult, generateItemFieldValuesSchema, buildItemFieldsPrompt(), buildResponseSchema(), extractResponseText(), CORE_FIELD_INSTRUCTIONS (+11 more)
+Cohesion: 0.08
+Nodes (30): generateItemFieldValuesAction(), GenerateItemFieldValuesInput, GenerateItemFieldValuesResult, generateItemFieldValuesSchema, localeBodySchema, POST(), Messages, MessageTree (+22 more)
 
 ### Community 21 - "Banner Generation & Storage"
-Cohesion: 0.12
-Nodes (23): adjustAdminUserCreditsAction(), creditAdjustmentSchema, updateAdminUserProfileAction(), userProfileSchema, localeBodySchema, POST(), GET(), POST() (+15 more)
+Cohesion: 0.28
+Nodes (11): bannerCustomizationSchema, bannerGenerationSchema, customizeBannerSampleAction(), generateBannerAction(), getFile(), uploadCustomizedBannerPreview(), uploadGeneratedBannerPreview(), uploadReferenceImage() (+3 more)
 
 ### Community 22 - "MCP Catalog Item Creation"
-Cohesion: 0.29
-Nodes (11): decideOutcome(), claimTransactionSuccess(), fulfillCreditPurchase(), fulfillOrderPayment(), redirectBase(), settleAmeriaPayment(), settlePolarPayment(), SettleResult (+3 more)
+Cohesion: 0.22
+Nodes (10): RFC-1918, assertPublicHost(), BLOCKED_IPV4_RANGES, fetchAndStoreCatalogImage(), fetchImageWithGuards(), GuardedFetchResult, ipv4ToInt(), isBlockedIpv4() (+2 more)
 
 ### Community 23 - "Product Seed Generator"
 Cohesion: 0.15
@@ -435,19 +418,19 @@ Nodes (20): cleanTranslation(), DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT, duplicateSlug
 
 ### Community 24 - "Admin Orders"
 Cohesion: 0.14
-Nodes (17): checkoutSchema, createCheckoutOrderAction(), normalizeCountryCode(), AdminOrderDetailRow, buildOrderItemSnapshot(), CartItemForOrder, createOrderFromCart(), GeneratedOrderSource (+9 more)
+Nodes (16): AdminOrderDetailRow, AdminOrderItem, BannerManufacturingInstruction, buildOrderItemSnapshot(), CartItemForOrder, CatalogProductionInfo, createOrderFromCart(), GeneratedOrderInfo (+8 more)
 
 ### Community 25 - "Supabase Server Clients"
-Cohesion: 0.13
-Nodes (19): downloadAsDataUrl(), generateManufacturingFileAction(), generateManufacturingFileSchema, generateManufacturingSvgAction(), generateManufacturingSvgSchema, ManufacturingFileGenerationState, ManufacturingSvgGenerationState, mediaTypeForPath() (+11 more)
+Cohesion: 0.29
+Nodes (9): adjustAdminUserCreditsAction(), creditAdjustmentSchema, userProfileSchema, adjustCredits(), CreditAdjustmentInput, CreditLedgerReason, debitCredits(), getCreditBalance() (+1 more)
 
 ### Community 26 - "i18n Middleware & Routing"
 Cohesion: 0.05
 Nodes (36): 1. Contract verification (needs bank-issued test credentials in `.env.local`), 2. Credit-grant atomicity follow-up (before real payment volume), 3. Manual test checklist, 4. Deploy notes, Ameriabank go-live gate, Admin reconciliation, Ameriabank Payment Integration — Design, Ameriabank vPOS mechanics that shape the design (+28 more)
 
 ### Community 27 - "Currency & Shipping Config"
-Cohesion: 0.11
-Nodes (32): currencySettingsSchema, refreshExchangeRatesAction(), updateCurrencySettingsAction(), AdminCurrenciesPage(), CurrencyRow, RateRow, CurrencySwitcherClient(), CurrencySwitcher() (+24 more)
+Cohesion: 0.17
+Nodes (21): currencySettingsSchema, refreshExchangeRatesAction(), updateCurrencySettingsAction(), AdminCurrenciesPage(), RateRow, APP_CURRENCIES, buildRateProviderUrl(), CurrencySettings (+13 more)
 
 ### Community 28 - "Personalized Item Generation"
 Cohesion: 0.22
@@ -458,32 +441,32 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+11 more)
 
 ### Community 30 - "Admin Permissions & Audit"
-Cohesion: 0.24
-Nodes (8): AdminNav(), links, actions, AdminCreatePage(), AdminGeneratedPage(), AdminLayout(), requireAdmin(), listGeneratedItemsForAdminReview()
+Cohesion: 0.17
+Nodes (19): CartPage(), getCartPreviewUrls(), CheckoutPage(), DashboardPage(), formatShippingAddress(), OrderDetailPage(), ProfilePage(), BillingCountryField() (+11 more)
 
 ### Community 31 - "MCP Category Listing"
-Cohesion: 0.13
-Nodes (16): OrderStatusForm(), updateOrderStatusAction(), loginAction(), LoginCopy, LoginForm(), RegisterCopy, RegisterForm(), providers (+8 more)
+Cohesion: 0.10
+Nodes (22): authHandler, handler, hasAdminPermission(), findAccessTokenContext(), McpToolExtra, requireAuthedUserId(), CatalogItemSummary, getCatalogItemInputSchema (+14 more)
 
 ### Community 32 - "Generated Items Data"
-Cohesion: 0.14
-Nodes (13): FetchedPreviewOptionForCartAdd, fileName(), GeneratedItemAdminListFilters, GeneratedItemAdminListRow, GeneratedItemArtifactRow, GeneratedItemCartAddCall, GeneratedItemCartAddPricing, GeneratedItemForCartAdd (+5 more)
+Cohesion: 0.06
+Nodes (44): downloadAsDataUrl(), generateManufacturingFileAction(), generateManufacturingFileSchema, generateManufacturingSvgAction(), generateManufacturingSvgSchema, ManufacturingFileGenerationState, ManufacturingSvgGenerationState, mediaTypeForPath() (+36 more)
 
 ### Community 33 - "Admin Users & Connectors"
-Cohesion: 0.12
-Nodes (15): 1. Remove the "Shipping destination" aside — `app/checkout/page.tsx`, 2. Pin the market to Armenia — `app/checkout/page.tsx`, 3. Disabled Armenia country field in the delivery address form — `app/checkout/page.tsx`, 4. Remove billing country + Polar-unavailable messaging, 5. Fix the State/province layout — `app/checkout/page.tsx`, 6. i18n cleanup — `messages/en.json`, `messages/ru.json`, `messages/am.json`, 7. Regenerate the knowledge graph, Changes (+7 more)
+Cohesion: 0.17
+Nodes (13): AdminPage(), CategoryPill(), BrandLogo(), ProductCardItem, SvgRender(), Card, CardContent, CardDescription (+5 more)
 
 ### Community 34 - "Manufacturing SVG Generation"
-Cohesion: 0.20
-Nodes (17): ClassificationFields(), DescriptionField(), FlagsFields(), StatusField(), TitleSlugFields(), MarketRulesSection(), MediaSection(), ThumbnailFields() (+9 more)
+Cohesion: 0.56
+Nodes (8): CatalogItemDetailPage(), generateMetadata(), PersonalizeItemPage(), getCatalogItem(), getCatalogItemSeoMetadata(), listCatalogItemBoilerplates(), resolvePublicStorageUrl(), getServerSupabase
 
 ### Community 35 - "Admin Orders/Transactions Pages"
-Cohesion: 0.21
-Nodes (8): AdminConnectorsPage(), AdminOrdersPage(), AdminTransactionDetailPage(), AuditRow, TransactionDetail, AdminTable(), listConnectedApps(), formatDate()
+Cohesion: 0.10
+Nodes (27): AdminConnectorsPage(), AdminGeneratedPage(), AdminItemsPage(), AdminOrderDetailPage(), OrderItemDetail(), AdminOrdersPage(), AdminTransactionDetailPage(), AuditRow (+19 more)
 
 ### Community 36 - "OpenAI Boilerplate Files"
-Cohesion: 0.28
-Nodes (11): bannerCustomizationSchema, bannerGenerationSchema, customizeBannerSampleAction(), generateBannerAction(), getFile(), uploadCustomizedBannerPreview(), uploadGeneratedBannerPreview(), uploadReferenceImage() (+3 more)
+Cohesion: 0.22
+Nodes (10): boilerplateSchema, getFile(), imageExtByMime, removeBoilerplateAction(), saveBoilerplateAction(), getOpenAiClient(), deleteReferenceFile(), uploadReferenceImage() (+2 more)
 
 ### Community 37 - "MCP Well-Known & Env"
 Cohesion: 0.06
@@ -498,8 +481,8 @@ Cohesion: 0.06
 Nodes (35): After MVP, AI Image-to-Wood Constructor Kit Business Model, Competitive Landscape, Cost Drivers, Differentiation, Direct Alternatives, Executive Summary, Future (+27 more)
 
 ### Community 40 - "MCP Catalog Item Get/Update"
-Cohesion: 0.17
-Nodes (13): AdminPage(), CategoryPill(), BrandLogo(), ProductCardItem, SvgRender(), Card, CardContent, CardDescription (+5 more)
+Cohesion: 0.43
+Nodes (7): createCatalogItemAction(), updateCatalogItemAction(), uploadCatalogFormAssets(), getOptionalFile(), parseItemForm(), readSeoLocale(), APP_LOCALES
 
 ### Community 41 - "Dev Dependencies"
 Cohesion: 0.15
@@ -538,8 +521,8 @@ Cohesion: 0.06
 Nodes (31): 1. Personalized LED Wall Decor, 2. Geography and Travel Decor, 30-Day Action Plan, 3. Educational and Motor-Skill Kits, 4. Adult Constructors and Mechanical Models, 5. Wooden Card and Table Games, Best Initial Product Lines, Bottom Line (+23 more)
 
 ### Community 51 - "Marketplace Constants"
-Cohesion: 0.31
-Nodes (9): CatalogMedia, EditAdminItemPage(), SeoMetadata, ItemForm(), NewAdminItemPage(), AdminMarketsPage(), getCountryDisplayName(), listMarketGeography() (+1 more)
+Cohesion: 0.29
+Nodes (6): BANNER_CREDIT_COSTS, ITEM_TYPE_TO_PRODUCT_TYPE, mapCatalogItemTypeToProductType(), MARKETPLACE_CATEGORIES, PRODUCT_TYPES, TOY_DECORATION_SIZE_PRESETS
 
 ### Community 52 - "Generation Smoke Tests"
 Cohesion: 0.25
@@ -554,12 +537,12 @@ Cohesion: 0.09
 Nodes (21): Admin: boilerplate library (`/admin/personalization/boilerplates`), Admin: item form (`app/admin/items/item-form/`), `catalog_items` — new columns, Components, Data model, Dropped entirely, Error handling, `generated_items` — new column (+13 more)
 
 ### Community 55 - "Personalize Item Form"
-Cohesion: 0.17
-Nodes (11): 15. Ներդրողի deck-ի առաջարկվող պատմությունը, 16. Ներկայացման ժամանակ խուսափելու թակարդներ, 17. Վերջնական եզրակացություն, 1. Ո՞ր ստարտափն է գնահատվում, 3. Ինչու՞ շուկան իրական է, 4. Ներդրողի ամենացավոտ հարցերը, 6. Մրցակիցների և փոխարինողների քարտեզ, 7. Ռիսկերի ռեգիստր (+3 more)
+Cohesion: 0.11
+Nodes (18): 10. Պաշտպանելիության roadmap, 15. Ներդրողի deck-ի առաջարկվող պատմությունը, 16. Ներկայացման ժամանակ խուսափելու թակարդներ, 17. Վերջնական եզրակացություն, 1. Ո՞ր ստարտափն է գնահատվում, 2. Գործադիր եզրակացություն, 3. Ինչու՞ շուկան իրական է, 4. Ներդրողի ամենացավոտ հարցերը (+10 more)
 
 ### Community 56 - "Transaction Types"
-Cohesion: 0.17
-Nodes (17): revokeConnectorAction(), revokeSchema, createMarketRegionAction(), optionalCurrency, updateCountryMarketAction(), updateMarketRegionAction(), adminTransactionAction(), transactionActionSchema (+9 more)
+Cohesion: 0.15
+Nodes (21): revokeConnectorAction(), revokeSchema, createMarketRegionAction(), optionalCurrency, updateCountryMarketAction(), updateMarketRegionAction(), AdminMarketsPage(), adminTransactionAction() (+13 more)
 
 ### Community 57 - "Currency Smoke Test"
 Cohesion: 0.29
@@ -586,8 +569,8 @@ Cohesion: 0.11
 Nodes (18): 1. Install dependencies, 2. Start local Supabase, 3. Wire env vars, 3a. Promote a local admin, 4. Run, Acceptance criteria — known deferral, Deploy to Vercel, Email delivery (+10 more)
 
 ### Community 63 - "Personalization AI Prompt"
-Cohesion: 0.13
-Nodes (13): authHandler, handler, findAccessTokenContext(), McpToolExtra, requireAuthedUserId(), createCatalogItemInputShape, getCatalogItemInputShape, listCategoriesInputShape (+5 more)
+Cohesion: 0.16
+Nodes (15): actions, AdminCreatePage(), buildToyDecorationDraftMetadata(), generateToyDecorationDraftAction(), titleFromPrompt(), toyDecorationGenerationSchema, uploadGeneratedCatalogSvg(), uploadAdminCatalogAsset() (+7 more)
 
 ### Community 64 - "Boilerplate Percent Pricing"
 Cohesion: 0.11
@@ -622,8 +605,8 @@ Cohesion: 0.60
 Nodes (4): CONTENT_TYPE_BY_EXT, findAssetFiles(), loadEnv(), main()
 
 ### Community 73 - "Bending Machines (Brake/Tube)"
-Cohesion: 0.15
-Nodes (12): openai, KCN-16025 Press Brake Agent Config, Deliverable, Design rules, Evidence gaps, Hard limits, Hydraulic press brake KCN-16025, Machine profile (+4 more)
+Cohesion: 0.17
+Nodes (11): KCN-16025 Press Brake Agent Config, Deliverable, Design rules, Evidence gaps, Hard limits, Hydraulic press brake KCN-16025, Machine profile, Operating stance (+3 more)
 
 ### Community 74 - "Band Saw & Plotter Cutter"
 Cohesion: 0.17
@@ -638,8 +621,8 @@ Cohesion: 0.67
 Nodes (3): Supabase Account Confirmation Email Template, ConfirmationURL Template Variable, Token Confirmation Code Variable
 
 ### Community 83 - "Flatbed UV Printer"
-Cohesion: 0.17
-Nodes (11): Flatbed UV Printer Agent Config, Deliverable, Design rules, Evidence gaps, Flatbed UV printer, Hard limits, Machine profile, Operating stance (+3 more)
+Cohesion: 0.15
+Nodes (12): openai, Flatbed UV Printer Agent Config, Deliverable, Design rules, Evidence gaps, Flatbed UV printer, Hard limits, Machine profile (+4 more)
 
 ### Community 91 - "14. Ներդրողի ներկայացման համապարփակ հարցաշար"
 Cohesion: 0.12
@@ -655,15 +638,15 @@ Nodes (16): `catalog_items` — revert (forward-only migration), Code changes, D
 
 ### Community 94 - "Changes by File"
 Cohesion: 0.20
-Nodes (9): (a) Dev server / HTTP check, (b) Structural source read of `app/checkout/page.tsx` and `app/credits/page.tsx`, Files changed (this task's commit only), Issues or concerns, Step 1: `graphify update .`, Step 2: Dangling-reference greps (all 5 expected empty), Step 3: `pnpm build`, Step 4: Functional verification (+1 more)
+Nodes (9): Commit, Concerns, Confirmation: Ameria's `settleAmeriaPayment` unaffected, Full-suite result + typecheck, GREEN, RED, Task 5 Report: Shared settle helper + `settlePolarPayment`, TDD evidence (+1 more)
 
 ### Community 95 - "Task 9: Remove Stripe — Report"
-Cohesion: 0.14
-Nodes (13): `app/checkout/actions.ts`, `app/credits/actions.ts`, Commit, Commit (final-review fixes), Concerns, Confirmations, Final-review fixes, Fix 1 — `app/admin/currencies/page.tsx` (+5 more)
+Cohesion: 0.12
+Nodes (16): Commit, Concerns, Context cleanups (from task brief's "leftovers" list), docs/qa/local-e2e-qa.md, .env.local.example, Fix: supersession notes on historical docs, Left untouched (by design), lib/i18n.ts (+8 more)
 
 ### Community 96 - "market.ts"
-Cohesion: 0.24
-Nodes (11): AutogenerateButton(), PersonalizationFields(), TAG_LABELS, ManufacturingNotesField(), PriceField(), SizesCharacteristicsFields(), BoilerplateForm(), BoilerplateLibraryPage() (+3 more)
+Cohesion: 0.15
+Nodes (14): CurrencyRow, AppCurrency, ExchangeRateContext, CatalogAvailability, CatalogMarketResolution, findCountry(), MarketCountry, MarketRegion (+6 more)
 
 ### Community 97 - "Uniqraft Global Startup Investigation and Investor Stress Test"
 Cohesion: 0.13
@@ -694,12 +677,12 @@ Cohesion: 0.14
 Nodes (13): Architecture, Components, Currency & exchange rates, Current state (as built), Data flow (checkout), Decisions (from brainstorming), Goal, New dependencies, env, and provisioning (+5 more)
 
 ### Community 104 - "Task 4: Reversible Ameriabank disable (routing flip) — Report"
-Cohesion: 0.18
-Nodes (10): Commit (Step 3), Files Changed, Key Removals, No Issues or Concerns, Pre-Check (Step 1), Self-Review Findings, Status: DONE, Summary (+2 more)
+Cohesion: 0.14
+Nodes (13): Commit, Concerns, Confirmation: `isPolarEnabled` re-export path, Deviation from brief: `.env.local.example`, Files changed (all committed), Full-suite result, GREEN, RED (+5 more)
 
 ### Community 105 - "Task 1 Report: Drop RUB from supported currencies"
-Cohesion: 0.13
-Nodes (14): Branch / Commit, Codebase Search: Removed References, Concerns, Files Changed, Lint, Scope Verification, Self-Review Checklist, Status (+6 more)
+Cohesion: 0.15
+Nodes (12): Branch / Commit, Commit, Concerns, Files changed, Fix: smoke script RUB, Repo-wide RUB search, Status: DONE, Task 1 Report: Drop RUB from supported currencies (+4 more)
 
 ### Community 106 - "Global Constraints"
 Cohesion: 0.17
@@ -742,8 +725,8 @@ Cohesion: 0.17
 Nodes (11): Concerns, Credential hunt trail (per project-owner instruction modifying Step 3), Final-review fixes, Fix 1 — `2e24548` `fix(payments): settle honestly when success claim loses`, Fix 2 — `183efc2` `fix(payments): treat payment_approved as pending until capture mode confirmed`, Fix 3 — `a2dcd5b` `docs: add Ameriabank go-live gate checklist`, Self-review, Task 10 Report: Ameriabank smoke script + env docs + final verification (+3 more)
 
 ### Community 116 - "Task 2 Report: ExchangeRate-API v6 provider URL"
-Cohesion: 0.20
-Nodes (9): Constraints Verification, Files Changed, Implementation Summary, Self-Review Findings, Step 1: Removed the pre-check redirect block, Step 2: Pruned imports, Step 3: Typecheck and lint, Step 4: Committed (+1 more)
+Cohesion: 0.17
+Nodes (11): Commit, Concerns, `.env.local` git-tracking confirmation, Files changed, Full-suite result, GREEN, RED, Summary (+3 more)
 
 ### Community 117 - "Very-large-format FFF 3D printer T1-100"
 Cohesion: 0.18
@@ -762,8 +745,8 @@ Cohesion: 0.18
 Nodes (10): Deliverable, Design rules, Evidence gaps, Handheld laser welding system HLW-3000, Hard limits, Machine profile, Operating stance, Setup and safety (+2 more)
 
 ### Community 121 - "Task 8 Report: Admin per-currency payment-route editor"
-Cohesion: 0.29
-Nodes (6): Commit, Concerns, SDK notes (verified against installed `@polar-sh/sdk`), Task 8 Report: Polar return-verify route, Verification, What was implemented
+Cohesion: 0.18
+Nodes (10): `app/admin/currencies/actions.ts`, `app/admin/currencies/page.tsx`, Concerns, Form-structure finding (Step 2 caution), Self-review, Status: DONE, Task 8 Report: Admin per-currency payment-route editor, Verification results (+2 more)
 
 ### Community 122 - "Manufacturable Product Opportunities"
 Cohesion: 0.20
@@ -771,11 +754,11 @@ Nodes (9): Category 1: Laser-Cut And Engraved Wood/Acrylic Products, Category 2:
 
 ### Community 123 - "Task 6 Report: Revert the admin item form + write path"
 Cohesion: 0.20
-Nodes (9): Commit, Concerns, Files changed, isPolarEnabled re-export, SDK contract notes (crux of the task), Status: DONE, Task 6 Report: Polar provider — checkout session creation, Verification (+1 more)
+Nodes (9): Commit, Files changed (git show --stat HEAD), `pnpm test -- tests/lib` summary, `pnpm typecheck` output (Step 10), Self-review findings, Status: DONE, Task 6 Report: Revert the admin item form + write path, TDD Evidence (+1 more)
 
 ### Community 124 - "Task 7 Report: Revert the MCP tools + AI field, then drop laser types"
-Cohesion: 0.25
-Nodes (7): Commit, Concerns, Fix: netAmount, Task 7 Report: Polar webhook route (authoritative settle), Verification, Webhook SDK notes (verified against installed `@polar-sh/sdk@0.48.1`), What I implemented
+Cohesion: 0.20
+Nodes (9): Commit, Files changed (exactly the ten named), Full green gate results, Post-Implementation: Manual Rollout (operational, not code — surface to the user), Self-review findings and concerns, Status: DONE, Task 7 Report: Revert the MCP tools + AI field, then drop laser types, TDD Evidence for item-ai (+1 more)
 
 ### Community 125 - "Manufacturing AI Skills"
 Cohesion: 0.22
@@ -786,8 +769,8 @@ Cohesion: 0.22
 Nodes (8): Generic Item Personalization Implementation Plan, Global Constraints, Task 1: Database migration — schema, RLS, and type regeneration, Task 2: Backend swap — lib rewrites, generation engine, results page, delete legacy routes, Task 3: Admin boilerplate library (shared CRUD, replacing the night-lights admin page), Task 4: Admin item form — System Prompt / Skill ID / Tags / Boilerplate picker, Task 5: Storefront — generic personalize page, form, and item-detail entry point, Task 6: Smoke test and full suite verification
 
 ### Community 127 - "Task 3 Report: Admin refresh-rates action + Polar route option"
-Cohesion: 0.20
-Nodes (9): Files changed, Issues or concerns, Note on this report file, `pnpm lint`, `pnpm typecheck`, Self-review findings, Task 3 Report: Remove billing-country selection from the credits page, Verification (+1 more)
+Cohesion: 0.22
+Nodes (8): Commit, Concerns, Fix: polar defaultValue round-trip, Note on this report file, Structural confirmation, Task 3 Report: Admin refresh-rates action + Polar route option, Verification, What was implemented
 
 ### Community 128 - "Manufacturing RAG And Manual Plan"
 Cohesion: 0.25
@@ -802,8 +785,8 @@ Cohesion: 0.29
 Nodes (6): Admin requirements, Customer requirements, Initial data, Localization and accessibility, Personalized night-light requirements, Scope
 
 ### Community 131 - "router.ts"
-Cohesion: 0.24
-Nodes (11): mergeAnonymousCart(), callbackParamsSchema, GET(), countrySchema, setCountryPreferenceAction(), currencySchema, setCurrencyPreferenceAction(), updateActiveCartCurrency() (+3 more)
+Cohesion: 0.22
+Nodes (15): checkoutSchema, createCheckoutOrderAction(), createCreditPackCheckoutAction(), creditPackRequestSchema, requestManualCreditPackAction(), convertMoney(), normalizeCountryCode(), isAmeriaEnabled() (+7 more)
 
 ### Community 132 - "12. Metrics investors will expect"
 Cohesion: 0.33
@@ -882,8 +865,8 @@ Cohesion: 0.50
 Nodes (4): 9. Product and business-model recommendation, Beachhead product, Customer sequence, Revenue sequence
 
 ### Community 151 - "2. Գործադիր եզրակացություն"
-Cohesion: 0.36
-Nodes (8): BannersPage(), AdvancedBannerGenerationPanel(), BannerCopy, BannerCustomizer(), BannerPreset, BannerSample, listBannerSamples(), listBannerSizePresets()
+Cohesion: 0.29
+Nodes (5): PersonalizedGenerationState, initialState, PersonalizeBoilerplateOption, PersonalizeColorOption, PersonalizeItemForm()
 
 ### Community 152 - "8. Առաջարկվող գլոբալ ռազմավարություն"
 Cohesion: 0.50
@@ -893,105 +876,37 @@ Nodes (4): 8. Առաջարկվող գլոբալ ռազմավարություն, 
 Cohesion: 0.50
 Nodes (3): If a boilerplate's OpenAI file is deleted out-of-band later, OpenAI boilerplate file storage go-live gate, Required immediately after deploy
 
-### Community 163 - "progress.md"
+### Community 154 - "task-7-brief.md"
 Cohesion: 0.50
-Nodes (3): Checkout country refactor — SDD progress ledger, New effort progress, Polar default payments — SDD progress ledger
+Nodes (3): Post-Implementation: Manual Rollout (not code — surface to the user), Self-Review, Task 7: Revert the MCP tools + AI field, then drop laser types
 
 ### Community 271 - "Translation Review Checklist"
-Cohesion: 0.22
-Nodes (8): Checkout Country Refactor Implementation Plan, Global Constraints, Notes / Assumptions, Task 1: Refactor the checkout page UI, Task 2: Remove the Polar-unavailable guard from the checkout action, Task 3: Remove billing-country selection from the credits page, Task 4: Remove dead checkout/credits i18n keys, Task 5: Regenerate the graph and full verification
+Cohesion: 0.50
+Nodes (3): adjustedPriceCents(), CatalogItemBoilerplateRow, PersonalizationBoilerplate
 
 ### Community 275 - "9. Պրոդուկտի և բիզնես մոդելի առաջարկ"
 Cohesion: 0.50
 Nodes (4): 9. Պրոդուկտի և բիզնես մոդելի առաջարկ, Առաջին նեղ պրոդուկտը, Եկամտի հերթականություն, Հաճախորդների հերթականություն
 
-### Community 276 - "seo-section.tsx"
-Cohesion: 0.39
-Nodes (7): extractGeneratedImage(), GeneratedImage, generateOpenAiImage(), getImageModel(), getResponsesModel(), OpenAiImageInput, toInputImagePart()
-
-### Community 277 - "getCartSessionId"
-Cohesion: 0.29
-Nodes (6): BANNER_CREDIT_COSTS, ITEM_TYPE_TO_PRODUCT_TYPE, mapCatalogItemTypeToProductType(), MARKETPLACE_CATEGORIES, PRODUCT_TYPES, TOY_DECORATION_SIZE_PRESETS
-
-### Community 278 - "route.ts"
-Cohesion: 0.29
-Nodes (5): PersonalizedGenerationState, initialState, PersonalizeBoilerplateOption, PersonalizeColorOption, PersonalizeItemForm()
-
-### Community 279 - "2. Գործադիր եզրակացություն"
-Cohesion: 0.50
-Nodes (4): 2. Գործադիր եզրակացություն, Գնահատման քարտ, Ի՞նչը կփոխի որոշումը, Կոշտ ներդրումային կոմիտեի այսօրվա որոշումը
-
-### Community 280 - "10. Պաշտպանելիության roadmap"
-Cohesion: 0.67
-Nodes (3): 10. Պաշտպանելիության roadmap, Կարող է պաշտպանելի դառնալ, Պաշտպանելի չէ
-
-### Community 281 - "route.ts"
-Cohesion: 0.26
-Nodes (12): AuthorizeParams, badRequest(), consentHtml(), escapeHtml(), GET(), notAuthorizedResponse(), POST(), readParams() (+4 more)
-
-### Community 282 - "page.tsx"
-Cohesion: 0.21
-Nodes (10): AssetPreviewCard(), AssetPreviewCardProps, AdminGeneratedDetailPage(), buildManufacturingPrompt(), extractValidationWarnings(), getOptionName(), hasContent(), AdminGeneratedPreviewOption (+2 more)
-
-### Community 283 - "env.ts"
-Cohesion: 0.15
-Nodes (9): corsHandler, handler, optionalNonEmpty, publicEnv, publicEnvSchema, publicShape, serverEnvSchema, serverShape (+1 more)
-
-### Community 284 - "Final Review Fix Report — checkout country trust (Important finding)"
-Cohesion: 0.15
-Nodes (12): Branch, Changes made, Commit, Diff, File changed, Final Review Fix Report — checkout country trust (Important finding), `pnpm lint`, `pnpm typecheck` (+4 more)
-
-### Community 285 - "formatPrice"
-Cohesion: 0.27
-Nodes (7): AdminItemsPage(), AdminTransactionRow, AdminTransactionsPage(), DashboardPage(), EmptyState(), ProductCard(), formatPrice()
-
-### Community 286 - "page.tsx"
-Cohesion: 0.22
-Nodes (7): AdminOrderDetailPage(), OrderItemDetail(), AdminOrderItem, BannerManufacturingInstruction, CatalogProductionInfo, GeneratedOrderInfo, getOrderDetailForAdmin()
-
-### Community 287 - "ai-context.tsx"
-Cohesion: 0.31
-Nodes (8): FieldError, FillAllButton(), ItemFormAiContext, ItemFormAiContextValue, ItemFormAiProvider(), readFieldValue(), useItemFormAi(), writeFieldValue()
-
-### Community 288 - "page.tsx"
-Cohesion: 0.38
-Nodes (5): AdminUserDetailPage(), AdminUsersPage(), AdminUserFilters, getAdminUserDetail(), listAdminUsers()
-
-### Community 289 - "credits.ts"
-Cohesion: 0.43
-Nodes (6): adjustCredits(), CreditAdjustmentInput, CreditLedgerReason, debitCredits(), getCreditBalance(), refundCredits()
-
-### Community 290 - "seo-validation.ts"
-Cohesion: 0.33
-Nodes (5): SeoSection(), CatalogSeoMetadata, SeoWarning, SeoWarningCode, validateSeoMetadata()
-
-### Community 291 - "personalization-boilerplates.ts"
-Cohesion: 0.50
-Nodes (3): adjustedPriceCents(), CatalogItemBoilerplateRow, PersonalizationBoilerplate
-
-### Community 292 - "Review package: 0e53c42..99f1af6 (Task 5: graph regen + verification)"
-Cohesion: 0.50
-Nodes (3): Commits, Files changed (stat only — graphify-out is generated data, not reviewed line-by-line), Review package: 0e53c42..99f1af6 (Task 5: graph regen + verification)
-
 ## Knowledge Gaps
-- **1351 isolated node(s):** `AuthActionState`, `socialProviders`, `safeNextPath`, `credentialsSchema`, `registerSchema` (+1346 more)
+- **1331 isolated node(s):** `AuthActionState`, `socialProviders`, `safeNextPath`, `credentialsSchema`, `registerSchema` (+1326 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **130 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getServiceSupabase()` connect `Banner Generation & Storage` to `Admin Item Form`, `MCP OAuth Token Store`, `router.ts`, `OpenAI Boilerplate Files`, `Cart & Market Resolution`, `Site Header & Auth`, `Catalog & Landing Pages`, `route.ts`, `Catalog Item Admin Core`, `Cart & Banner Customizer`, `Ameriabank Payment Integration`, `Transaction Types`, `Admin Orders`, `Currency & Shipping Config`, `Personalized Item Generation`, `Personalization AI Prompt`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
-- **Why does `getServerSupabase` connect `Site Header & Auth` to `market.ts`, `Admin Item Form`, `router.ts`, `OpenAI Boilerplate Files`, `Cart & Market Resolution`, `Catalog & Landing Pages`, `i18n Locale & Catalog Card`, `Cart & Banner Customizer`, `Banner Generation & Storage`, `2. Գործադիր եզրակացություն`, `Admin Orders`, `Currency & Shipping Config`, `Personalized Item Generation`, `formatPrice`, `Admin Permissions & Audit`, `MCP Category Listing`?**
+- **Why does `getServerEnv()` connect `Ameriabank Payment Integration` to `Admin Item Form`, `Catalog Item Admin Core`, `OpenAI Boilerplate Files`, `router.ts`, `Admin Orders/Transactions Pages`, `Item AI Field Generation`, `Currency & Shipping Config`?**
+  _High betweenness centrality (0.012) - this node is a cross-community bridge._
+- **Why does `getServiceSupabase()` connect `router.ts` to `Admin Item Form`, `MCP OAuth Token Store`, `Catalog Item Admin Core`, `Cart & Market Resolution`, `Site Header & Auth`, `Catalog & Landing Pages`, `i18n Locale & Catalog Card`, `Cart & Banner Customizer`, `Ameriabank Payment Integration`, `Item AI Field Generation`, `Banner Generation & Storage`, `Supabase Server Clients`, `Currency & Shipping Config`, `Personalized Item Generation`, `Admin Permissions & Audit`, `MCP Category Listing`, `Admin Orders/Transactions Pages`, `Transaction Types`, `market.ts`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `getServerEnv()` connect `Ameriabank Payment Integration` to `Admin Item Form`, `Catalog Item Admin Core`, `i18n Locale & Catalog Card`, `Currency Conversion`, `env.ts`, `Item AI Field Generation`, `Banner Generation & Storage`, `seo-section.tsx`, `Currency & Shipping Config`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Why does `getServerSupabase` connect `Manufacturing SVG Generation` to `Admin Item Form`, `market.ts`, `router.ts`, `Banner Manufacturing Instructions`, `Cart & Market Resolution`, `Site Header & Auth`, `Admin Orders/Transactions Pages`, `i18n Locale & Catalog Card`, `Catalog & Landing Pages`, `Cart & Banner Customizer`, `Currency Conversion`, `Banner Generation & Storage`, `Currency & Shipping Config`, `Personalized Item Generation`, `Admin Permissions & Audit`, `MCP Category Listing`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **What connects `AuthActionState`, `socialProviders`, `safeNextPath` to the rest of the system?**
-  _1363 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1343 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Admin Item Form` be split into smaller, more focused modules?**
+  _Cohesion score 0.05333333333333334 - nodes in this community are weakly interconnected._
 - **Should `Marketplace & Manufacturing Docs` be split into smaller, more focused modules?**
   _Cohesion score 0.06060606060606061 - nodes in this community are weakly interconnected._
 - **Should `MCP OAuth Token Store` be split into smaller, more focused modules?**
-  _Cohesion score 0.13257575757575757 - nodes in this community are weakly interconnected._
-- **Should `Catalog Item Admin Core` be split into smaller, more focused modules?**
-  _Cohesion score 0.05747126436781609 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09183673469387756 - nodes in this community are weakly interconnected._
