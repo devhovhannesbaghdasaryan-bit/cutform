@@ -51,8 +51,9 @@ export function OrderReceiptEmail({
                 {strings.total}
               </Column>
             </Row>
-            {model.items.map((item) => (
-              <Row key={`${item.title}-${item.total}`} className="py-1">
+            {model.items.map((item, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static per-render order items list, never reordered
+              <Row key={`${item.title}-${index}`} className="py-1">
                 <Column className="text-sm text-gray-900">{item.title}</Column>
                 <Column align="center" className="w-16 text-sm text-gray-900">
                   {item.quantity}
