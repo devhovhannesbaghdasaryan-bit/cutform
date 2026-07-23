@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { Polar } from '@polar-sh/sdk';
+import type { PresentmentCurrency } from '@polar-sh/sdk/models/components/presentmentcurrency';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getServerEnv } from '@/lib/env';
 import type { InitiatePaymentInput, InitiatePaymentResult } from '@/lib/payments/types';
@@ -45,10 +46,14 @@ export async function initiatePolarCheckout(
   // Dynamic amount: `amount` on `CheckoutCreate` sets the checkout total in
   // cents for a pay-what-you-want-priced product (confirmed against the
   // installed @polar-sh/sdk 0.48.1 types — see lib/payments/polar.ts report).
+  // `currency` must be passed explicitly: if the Polar product carries more
+  // than one presentment currency, Polar picks which price to show without
+  // it, which can disagree with the currency `amount` was computed in.
   // Metadata propagates from the checkout to the resulting order.
   const checkout = await polar.checkouts.create({
     products: [getPolarProductId(input.currency)],
     amount: input.amountCents,
+    currency: input.currency.toLowerCase() as PresentmentCurrency,
     metadata: { transactionId: input.transactionId },
     successUrl,
   });
