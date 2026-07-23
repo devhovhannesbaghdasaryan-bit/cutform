@@ -21,7 +21,7 @@ export interface ReceiptStrings {
 export const RECEIPT_STRINGS: Record<ReceiptLocale, ReceiptStrings> = {
   en: {
     orderSubject: 'Your Uniqraft order receipt',
-    creditsSubject: 'Your Uniqcraft credits receipt',
+    creditsSubject: 'Your Uniqraft credits receipt',
     preview: 'Thanks for your purchase — your receipt is inside.',
     thanks: 'Thanks for your purchase!',
     item: 'Item',
@@ -51,7 +51,7 @@ export const RECEIPT_STRINGS: Record<ReceiptLocale, ReceiptStrings> = {
   },
   am: {
     orderSubject: 'Ձեր Uniqraft պատվերի անդորրագիրը',
-    creditsSubject: 'Ձեր Uniqcraft կրեդիտների անդորրագիրը',
+    creditsSubject: 'Ձեր Uniqraft կրեդիտների անդորրագիրը',
     preview: 'Շնորհակալություն գնումի համար — անդորրագիրը ներսում է։',
     thanks: 'Շնորհակալություն գնումի համար։',
     item: 'Ապրանք',
@@ -62,6 +62,6 @@ export const RECEIPT_STRINGS: Record<ReceiptLocale, ReceiptStrings> = {
     creditsAdded: 'Ավելացված կրեդիտներ',
     viewOrder: 'Դիտել պատվերը',
     viewCredits: 'Դիտել կրեդիտները',
-    footerNote: 'Դուք ստացել եք այս նամակը, քանի որ գնում եք կատարել Uniqcraft-ում։',
+    footerNote: 'Դուք ստացել եք այս նամակը, քանի որ գնում եք կատարել Uniqraft-ում։',
   },
 };
