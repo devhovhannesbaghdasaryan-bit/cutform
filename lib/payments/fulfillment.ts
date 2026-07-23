@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { adjustCredits } from '@/lib/credits';
+import { sendReceiptEmail } from '@/lib/email/receipt';
 import { decideOutcome } from '@/lib/payments/ameria-core';
 import { fetchAmeriaPaymentDetails } from '@/lib/payments/ameria';
 import { decidePolarOutcome } from '@/lib/payments/polar-core';
@@ -175,6 +176,11 @@ export async function settleAmeriaPayment(
       }
       throw error;
     }
+    try {
+      await sendReceiptEmail(service, transaction);
+    } catch (emailError) {
+      console.error('[receipt-email] send failed', transaction.id, emailError);
+    }
     return { outcome, redirectPath: `${base}?checkout=success` };
   }
 
@@ -257,6 +263,11 @@ export async function settlePolarPayment(
         console.error('[polar-settle] failed to roll back claim', transaction.id, rollbackError.message);
       }
       throw fulfillError;
+    }
+    try {
+      await sendReceiptEmail(service, transaction);
+    } catch (emailError) {
+      console.error('[receipt-email] send failed', transaction.id, emailError);
     }
     return { outcome: 'succeeded', redirectPath: `${base}?checkout=success` };
   }
