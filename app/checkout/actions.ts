@@ -5,8 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { createOrderFromCart } from '@/lib/orders';
 import { initiateAmeriaPayment } from '@/lib/payments/ameria';
-import { initiatePolarCheckout, isPolarEnabled } from '@/lib/payments/polar';
-import { resolvePaymentRoute } from '@/lib/payments/router';
+import { initiatePolarCheckout } from '@/lib/payments/polar';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
 
@@ -53,9 +52,6 @@ export async function createCheckoutOrderAction(formData: FormData) {
   if (!user) redirect('/login?next=/checkout');
 
   const billingCountryCode = parsed.data.billingCountryCode || parsed.data.countryCode;
-  if (resolvePaymentRoute(billingCountryCode) === 'polar' && !isPolarEnabled()) {
-    redirect('/checkout?checkout=polar_unavailable');
-  }
 
   const order = await createOrderFromCart(supabase, user.id, {
     contactEmail: parsed.data.contactEmail || user.email,
