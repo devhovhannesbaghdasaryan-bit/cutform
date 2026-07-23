@@ -344,9 +344,6 @@
     }
   },
   "checkout": {
-    "destination": "Shipping destination",
-    "destination_help": "Changing destination refreshes availability, currency defaults, and shipping.",
-    "select_country": "Select a country from the header before checkout.",
     "recipient": "Recipient name",
     "phone": "Phone",
     "address1": "Address line 1",
@@ -364,9 +361,7 @@
     "select_destination": "Select destination",
     "resolve_issues": "Resolve cart issues before creating an order.",
     "create_order": "Create order",
-    "country": "Country",
-    "billing_country": "Billing country",
-    "polar_unavailable": "International payments are temporarily unavailable. Choose Armenia as the billing country or contact support."
+    "country": "Country"
   },
   "order": {
     "title": "Order",
