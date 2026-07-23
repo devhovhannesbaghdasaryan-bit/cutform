@@ -40,6 +40,8 @@ const serverShape = {
   EXCHANGE_RATE_API_URL: optionalNonEmpty,
   EXCHANGE_RATE_API_KEY: optionalNonEmpty,
   EXCHANGE_RATE_PROVIDER: optionalNonEmpty,
+  RESEND_API_KEY: optionalNonEmpty,
+  RESEND_FROM: optionalNonEmpty,
 };
 
 // Cross-field fallback shared by both parse paths: prefer the new publishable
