@@ -18,7 +18,7 @@ export default async function BoilerplateLibraryPage() {
   const { data: boilerplates } = await supabase
     .from('personalization_boilerplates')
     .select(
-      'id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent',
+      'id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path',
     )
     .order('sort_order')
     .returns<PersonalizationBoilerplate[]>();
