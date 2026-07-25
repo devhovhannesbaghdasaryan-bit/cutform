@@ -70,7 +70,7 @@ describe('uploadSkillAssets', () => {
     expect(result.skillPath).toMatch(/^user-1\/personalization-skills\/[0-9a-f-]+\.md$/);
     expect(uploadToBucket).toHaveBeenCalledWith(
       storageClient,
-      expect.objectContaining({ bucket: 'catalog-assets', contentType: 'text/markdown' }),
+      expect.objectContaining({ bucket: 'uploads', contentType: 'text/markdown' }),
     );
   });
 
@@ -154,9 +154,9 @@ describe('applyItemSkillFields', () => {
       skillId: 'file-old',
       skillPath: 'user-1/personalization-skills/old.md',
     };
-    await expect(applyItemSkillFields(openai, storageClient, 'user-1', formData, item)).resolves.toBe(
-      'file-old',
-    );
+    await expect(
+      applyItemSkillFields(() => openai, storageClient, 'user-1', formData, item),
+    ).resolves.toBe('file-old');
     expect(item.skillId).toBe('file-new-skill');
     expect(item.skillPath).toMatch(/^user-1\/personalization-skills\//);
   });
@@ -165,7 +165,7 @@ describe('applyItemSkillFields', () => {
     const openai = fakeOpenAi();
     const item: { skillId?: string; skillPath?: string } = { skillId: 'file-old' };
     await expect(
-      applyItemSkillFields(openai, storageClient, 'user-1', new FormData(), item),
+      applyItemSkillFields(() => openai, storageClient, 'user-1', new FormData(), item),
     ).resolves.toBeNull();
     expect(item.skillId).toBe('file-old');
   });
@@ -178,9 +178,9 @@ describe('applyItemSkillFields', () => {
       skillId: 'file-old',
       skillPath: 'user-1/personalization-skills/old.md',
     };
-    await expect(applyItemSkillFields(openai, storageClient, 'user-1', formData, item)).resolves.toBe(
-      'file-old',
-    );
+    await expect(
+      applyItemSkillFields(() => openai, storageClient, 'user-1', formData, item),
+    ).resolves.toBe('file-old');
     expect(item.skillId).toBeUndefined();
     expect(item.skillPath).toBeUndefined();
   });
@@ -191,8 +191,19 @@ describe('applyItemSkillFields', () => {
     formData.set('removeSkill', 'on');
     const item: { skillId?: string; skillPath?: string } = { skillId: 'skill-1' };
     await expect(
-      applyItemSkillFields(openai, storageClient, 'user-1', formData, item),
+      applyItemSkillFields(() => openai, storageClient, 'user-1', formData, item),
     ).resolves.toBeNull();
     expect(item.skillId).toBeUndefined();
+  });
+
+  it('never invokes the OpenAI client getter without a skill file to upload', async () => {
+    const getOpenAi = vi.fn(() => {
+      throw new Error('should not be called');
+    });
+    const item: { skillId?: string; skillPath?: string } = {};
+    await expect(
+      applyItemSkillFields(getOpenAi, storageClient, 'user-1', new FormData(), item),
+    ).resolves.toBeNull();
+    expect(getOpenAi).not.toHaveBeenCalled();
   });
 });

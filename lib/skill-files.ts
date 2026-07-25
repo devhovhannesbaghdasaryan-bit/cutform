@@ -25,7 +25,7 @@ export function getSkillFile(formData: FormData): File | null {
 
 /**
  * Uploads a skill document: OpenAI File Storage first (source of truth), then
- * a recovery copy in the catalog-assets bucket. If the Supabase copy fails,
+ * a recovery copy in the private uploads bucket. If the Supabase copy fails,
  * the just-uploaded OpenAI file is best-effort deleted so no orphan id persists.
  */
 export async function uploadSkillAssets(
@@ -41,7 +41,7 @@ export async function uploadSkillAssets(
   const openaiFileId = await uploadSkillFile(openai, file);
   try {
     const skillPath = await uploadToBucket(supabase, {
-      bucket: 'catalog-assets',
+      bucket: 'uploads',
       path: `${userId}/personalization-skills/${crypto.randomUUID()}.${ext}`,
       body: await file.arrayBuffer(),
       contentType: file.type || SKILL_CONTENT_TYPE_BY_EXT[ext],
@@ -95,10 +95,12 @@ export function resolveSkillColumns(options: {
  * removeSkill checkbox clears it, otherwise the hidden-input values already
  * on `item` are kept. Mutates `item` and returns the previous OpenAI file id
  * to delete after the catalog row is written (legacy non `file-` ids are
- * never deleted — they were not uploaded through this flow).
+ * never deleted — they were not uploaded through this flow). `getOpenAi` is
+ * only invoked when a skill file is actually present, so plain item saves in
+ * keyless environments never construct an OpenAI client.
  */
 export async function applyItemSkillFields(
-  openai: Pick<OpenAI, 'files'>,
+  getOpenAi: () => Pick<OpenAI, 'files'>,
   supabase: StorageClient,
   userId: string,
   formData: FormData,
@@ -109,7 +111,7 @@ export async function applyItemSkillFields(
   const previous = isOpenAiSkillFileId(item.skillId) ? item.skillId : null;
 
   if (skillFile) {
-    const uploaded = await uploadSkillAssets(openai, supabase, userId, skillFile);
+    const uploaded = await uploadSkillAssets(getOpenAi(), supabase, userId, skillFile);
     item.skillId = uploaded.openaiFileId;
     item.skillPath = uploaded.skillPath;
     return previous;

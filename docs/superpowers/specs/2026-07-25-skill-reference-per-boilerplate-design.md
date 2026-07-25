@@ -16,7 +16,7 @@ Admins need to attach an optional skill file to a catalog item and/or to each bo
 
 1. **Both skills attach** when item and boilerplate each have one: product skill first, boilerplate skill second.
 2. **Upload through the admin forms** (item form and boilerplate form); the server uploads to OpenAI storage and stores the returned file id. No paste-an-id UX.
-3. **Supabase copy kept** for every uploaded skill file (recovery after OpenAI file loss / environment resets).
+3. **Supabase copy kept** for every uploaded skill file, in the private `uploads` bucket (recovery after OpenAI file loss / environment resets; `catalog-assets` is public and MIME-restricted to images/video, so it cannot hold text/markdown skill files).
 4. **Inline columns**, no shared skills table (YAGNI at current scale; duplicate uploads of the same skill across items are acceptable).
 5. **Content injection, not `input_file`:** the Responses API `input_file` part is PDF-oriented and does not reliably accept markdown/plain text. At generation time the server fetches the skill file's content by id (`client.files.content`) and injects it as an `input_text` part. Skills remain managed purely as OpenAI storage file ids.
 
@@ -44,7 +44,7 @@ alter table catalog_items
 - New optional field: **Skill file** — accepts `.md`/`.txt`, max 1 MB.
 - On save with a new skill file, ordered like the existing image flow (OpenAI first so nothing persists if it fails):
   1. Upload to OpenAI storage with `purpose: 'user_data'` → `skill_openai_file_id`.
-  2. Copy to Supabase `catalog-assets` bucket at `{userId}/personalization-skills/{uuid}.{ext}` → `skill_path`.
+  2. Copy to the private Supabase `uploads` bucket (not `catalog-assets`, which is public and MIME-restricted to images/video) at `{userId}/personalization-skills/{uuid}.{ext}` → `skill_path`.
   3. On replace, best-effort delete the previous OpenAI skill file after the DB write (mirrors `previousOpenaiFileId` handling for images).
 - **Remove skill** checkbox clears both columns and best-effort deletes the OpenAI file.
 - `removeBoilerplateAction` also best-effort deletes `skill_openai_file_id` alongside the image file.
