@@ -64,7 +64,7 @@ export async function createCatalogItemAction(
   let previousSkillFileId: string | null = null;
   try {
     previousSkillFileId = await applyItemSkillFields(
-      getOpenAiClient(),
+      getOpenAiClient,
       supabase,
       user.id,
       formData,
@@ -87,7 +87,13 @@ export async function createCatalogItemAction(
     return actionError(error instanceof Error ? error.message : 'Failed to create item.');
   }
 
-  if (previousSkillFileId) await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
+  if (previousSkillFileId) {
+    try {
+      await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
+    } catch (error) {
+      console.error('[openai-files] failed to delete previous skill file', previousSkillFileId, error);
+    }
+  }
 
   revalidatePath('/');
   revalidatePath('/catalog');
@@ -119,7 +125,7 @@ export async function updateCatalogItemAction(
   let previousSkillFileId: string | null = null;
   try {
     previousSkillFileId = await applyItemSkillFields(
-      getOpenAiClient(),
+      getOpenAiClient,
       supabase,
       user.id,
       formData,
@@ -142,7 +148,13 @@ export async function updateCatalogItemAction(
     return actionError(error instanceof Error ? error.message : 'Failed to update item.');
   }
 
-  if (previousSkillFileId) await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
+  if (previousSkillFileId) {
+    try {
+      await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
+    } catch (error) {
+      console.error('[openai-files] failed to delete previous skill file', previousSkillFileId, error);
+    }
+  }
 
   revalidatePath('/');
   revalidatePath('/catalog');

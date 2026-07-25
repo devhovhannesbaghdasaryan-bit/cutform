@@ -28,6 +28,6 @@ export async function deleteReferenceFile(
   try {
     await client.files.delete(fileId);
   } catch (error) {
-    console.error('[personalization-boilerplates] failed to delete OpenAI file', fileId, error);
+    console.error('[openai-files] failed to delete OpenAI file', fileId, error);
   }
 }
