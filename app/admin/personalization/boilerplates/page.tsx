@@ -121,6 +121,28 @@ async function BoilerplateForm({ boilerplate }: { boilerplate?: PersonalizationB
         />
         <p className="text-xs text-muted-foreground">{t('personalization.priceAdjustmentHelp')}</p>
       </div>
+      <div className="space-y-1.5 md:col-span-2">
+        <Label htmlFor={`boilerplate-skill-${boilerplate?.id ?? 'new'}`}>
+          {t('personalization.skillFile')}
+        </Label>
+        <Input
+          id={`boilerplate-skill-${boilerplate?.id ?? 'new'}`}
+          name="skillFile"
+          type="file"
+          accept=".md,.txt,text/markdown,text/plain"
+        />
+        <p className="text-xs text-muted-foreground">{t('personalization.skillFileHelp')}</p>
+        {boilerplate?.skill_openai_file_id ? (
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">
+              {t('personalization.skillAttached')}: <code>{boilerplate.skill_openai_file_id}</code>
+            </p>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="removeSkill" /> {t('personalization.removeSkill')}
+            </label>
+          </div>
+        ) : null}
+      </div>
       <div className="flex flex-wrap items-center gap-5 md:col-span-2">
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="isActive" defaultChecked={boilerplate?.is_active ?? true} />{' '}

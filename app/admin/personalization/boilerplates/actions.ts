@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { deleteReferenceFile, uploadReferenceImage } from '@/lib/openai-files';
 import { getOpenAiClient } from '@/lib/openai-client';
+import { getSkillFile, resolveSkillColumns, uploadSkillAssets } from '@/lib/skill-files';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 
 const imageExtByMime: Record<string, string> = {
@@ -22,6 +23,7 @@ const boilerplateSchema = z.object({
   generateHiddenSvg: z.boolean(),
   isActive: z.boolean(),
   priceAdjustmentPercent: z.coerce.number().int().optional(),
+  removeSkill: z.boolean(),
 });
 
 function getFile(formData: FormData, name: string) {
@@ -40,12 +42,31 @@ export async function saveBoilerplateAction(formData: FormData) {
     generateHiddenSvg: formData.get('generateHiddenSvg') === 'on',
     isActive: formData.get('isActive') === 'on',
     priceAdjustmentPercent: formData.get('priceAdjustmentPercent') || undefined,
+    removeSkill: formData.get('removeSkill') === 'on',
   });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid boilerplate.');
 
   const { supabase, user } = await requireAdminPermission('catalog_manage');
   const values = parsed.data;
   const newImageFile = getFile(formData, 'imageFile');
+  const newSkillFile = getSkillFile(formData);
+
+  interface ExistingBoilerplateFiles {
+    openai_file_id: string;
+    image_path: string;
+    skill_openai_file_id: string | null;
+    skill_path: string | null;
+  }
+  let existing: ExistingBoilerplateFiles | null = null;
+  if (values.id) {
+    const { data } = await supabase
+      .from('personalization_boilerplates')
+      .select('openai_file_id, image_path, skill_openai_file_id, skill_path')
+      .eq('id', values.id)
+      .maybeSingle<ExistingBoilerplateFiles>();
+    if (!data) throw new Error('Boilerplate not found.');
+    existing = data;
+  }
 
   let imagePath: string;
   let openaiFileId: string;
@@ -65,27 +86,24 @@ export async function saveBoilerplateAction(formData: FormData) {
       body: await newImageFile.arrayBuffer(),
       contentType: newImageFile.type,
     });
-
-    if (values.id) {
-      const { data: existing } = await supabase
-        .from('personalization_boilerplates')
-        .select('openai_file_id')
-        .eq('id', values.id)
-        .maybeSingle<{ openai_file_id: string }>();
-      previousOpenaiFileId = existing?.openai_file_id ?? null;
-    }
-  } else if (!values.id) {
+    previousOpenaiFileId = existing?.openai_file_id ?? null;
+  } else if (!existing) {
     throw new Error('Upload a boilerplate image.');
   } else {
-    const { data: existing } = await supabase
-      .from('personalization_boilerplates')
-      .select('openai_file_id, image_path')
-      .eq('id', values.id)
-      .maybeSingle<{ openai_file_id: string; image_path: string }>();
-    if (!existing) throw new Error('Boilerplate not found.');
     openaiFileId = existing.openai_file_id;
     imagePath = existing.image_path;
   }
+
+  const uploadedSkill = newSkillFile
+    ? await uploadSkillAssets(getOpenAiClient(), supabase, user.id, newSkillFile)
+    : null;
+  const skill = resolveSkillColumns({
+    uploaded: uploadedSkill,
+    removeSkill: values.removeSkill,
+    existing: existing
+      ? { skillOpenaiFileId: existing.skill_openai_file_id, skillPath: existing.skill_path }
+      : null,
+  });
 
   const payload = {
     name: values.name,
@@ -97,6 +115,8 @@ export async function saveBoilerplateAction(formData: FormData) {
     generate_hidden_svg: values.generateHiddenSvg,
     is_active: values.isActive,
     price_adjustment_percent: values.priceAdjustmentPercent ?? null,
+    skill_openai_file_id: skill.skillOpenaiFileId,
+    skill_path: skill.skillPath,
   };
 
   const query = values.id
@@ -106,6 +126,8 @@ export async function saveBoilerplateAction(formData: FormData) {
   if (error) throw new Error(error.message);
 
   if (previousOpenaiFileId) await deleteReferenceFile(getOpenAiClient(), previousOpenaiFileId);
+  if (skill.previousOpenaiFileId)
+    await deleteReferenceFile(getOpenAiClient(), skill.previousOpenaiFileId);
 
   revalidatePath('/admin/personalization/boilerplates');
   revalidatePath('/admin/items');
@@ -118,9 +140,9 @@ export async function removeBoilerplateAction(formData: FormData) {
   const { supabase } = await requireAdminPermission('catalog_manage');
   const { data: existing } = await supabase
     .from('personalization_boilerplates')
-    .select('openai_file_id')
+    .select('openai_file_id, skill_openai_file_id')
     .eq('id', parsed.data.id)
-    .maybeSingle<{ openai_file_id: string }>();
+    .maybeSingle<{ openai_file_id: string; skill_openai_file_id: string | null }>();
 
   const { error } = await supabase
     .from('personalization_boilerplates')
@@ -129,6 +151,8 @@ export async function removeBoilerplateAction(formData: FormData) {
   if (error) throw new Error(error.message);
 
   if (existing?.openai_file_id) await deleteReferenceFile(getOpenAiClient(), existing.openai_file_id);
+  if (existing?.skill_openai_file_id)
+    await deleteReferenceFile(getOpenAiClient(), existing.skill_openai_file_id);
 
   revalidatePath('/admin/personalization/boilerplates');
   revalidatePath('/admin/items');
