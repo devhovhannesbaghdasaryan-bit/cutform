@@ -85,6 +85,9 @@ export async function handleUpdateCatalogItem(
     characteristics: input.characteristics ?? existing.characteristics ?? undefined,
     systemPrompt: existing.system_prompt ?? undefined,
     skillId: existing.skill_id ?? undefined,
+    // Not settable via MCP — preserved so toCatalogItemRow doesn't null out
+    // an admin-uploaded skill copy on unrelated updates.
+    skillPath: existing.skill_path ?? undefined,
     // catalog_items.tags is DB-constrained to this same enum (see
     // supabase/migrations/20260707140000_generic_item_personalization.sql),
     // just typed generically as string[] by the Supabase client.

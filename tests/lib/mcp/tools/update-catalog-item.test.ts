@@ -31,6 +31,7 @@ const EXISTING = {
   is_customizable: true,
   system_prompt: 'Existing system prompt',
   skill_id: 'skill-1',
+  skill_path: 'user-1/personalization-skills/existing.md',
   sizes: [{ key: 'small', label: 'Small' }],
 };
 
@@ -89,7 +90,7 @@ describe('handleUpdateCatalogItem', () => {
     );
   });
 
-  it('preserves fields it has no way to set (tags, personalization, engraving, sizes) instead of wiping them, and skips re-syncing associations', async () => {
+  it('preserves fields it has no way to set (tags, personalization incl. skill_path, engraving, sizes) instead of wiping them, and skips re-syncing associations', async () => {
     vi.mocked(hasAdminPermission).mockResolvedValue(true);
     vi.mocked(updateCatalogItemCore).mockResolvedValue(undefined);
 
@@ -102,6 +103,7 @@ describe('handleUpdateCatalogItem', () => {
       isCustomizable: true,
       systemPrompt: 'Existing system prompt',
       skillId: 'skill-1',
+      skillPath: 'user-1/personalization-skills/existing.md',
       sizesJson: JSON.stringify(EXISTING.sizes),
     });
     expect(optionsArg).toEqual({ syncAssociations: false });
