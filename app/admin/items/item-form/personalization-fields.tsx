@@ -16,7 +16,7 @@ export function PersonalizationFields({
   boilerplateOptions,
   selectedBoilerplateIds,
 }: {
-  item?: Pick<ItemFormValue, 'system_prompt' | 'skill_id' | 'tags'>;
+  item?: Pick<ItemFormValue, 'system_prompt' | 'skill_id' | 'skill_path' | 'tags'>;
   boilerplateOptions: BoilerplateOption[];
   selectedBoilerplateIds: string[];
 }) {
@@ -38,13 +38,28 @@ export function PersonalizationFields({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="skillId">Skill ID</Label>
+        <Label htmlFor="skillFile">Skill file</Label>
+        <input type="hidden" name="skillId" defaultValue={item?.skill_id ?? ''} />
+        <input type="hidden" name="skillPath" defaultValue={item?.skill_path ?? ''} />
         <Input
-          id="skillId"
-          name="skillId"
-          defaultValue={item?.skill_id ?? ''}
-          placeholder="Opaque reference to an OpenAI Assistant/Skill resource"
+          id="skillFile"
+          name="skillFile"
+          type="file"
+          accept=".md,.txt,text/markdown,text/plain"
         />
+        <p className="text-xs text-muted-foreground">
+          Optional .md or .txt document (max 1 MB) injected into AI generation instructions.
+        </p>
+        {item?.skill_id ? (
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">
+              Attached skill: <code>{item.skill_id.slice(0, 24)}…</code>
+            </p>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="removeSkill" /> Remove skill
+            </label>
+          </div>
+        ) : null}
       </div>
       <div className="space-y-2">
         <Label>Tags</Label>
@@ -88,7 +103,7 @@ export function PersonalizationFields({
       </div>
 
       <p className="text-xs text-muted-foreground">
-        At least one of System prompt, Skill ID, or a selected boilerplate is required when
+        At least one of System prompt, a skill file, or a selected boilerplate is required when
         Customizable is checked.
       </p>
     </div>

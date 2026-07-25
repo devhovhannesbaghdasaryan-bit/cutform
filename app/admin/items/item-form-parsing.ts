@@ -66,6 +66,7 @@ export const itemSchema = z.object({
   characteristics: z.string().trim().optional(),
   systemPrompt: z.string().trim().optional(),
   skillId: z.string().trim().optional(),
+  skillPath: z.string().trim().optional(),
   tags: z.array(z.enum(['personal_color', 'personal_text', 'personal_photo'])),
   boilerplateIds: z.array(z.uuid()),
   seo: z.object({
@@ -107,6 +108,7 @@ export function parseItemForm(formData: FormData) {
     characteristics: formData.get('characteristics') || undefined,
     systemPrompt: formData.get('systemPrompt') || undefined,
     skillId: formData.get('skillId') || undefined,
+    skillPath: formData.get('skillPath') || undefined,
     tags: formData.getAll('tags').map(String),
     boilerplateIds: formData.getAll('boilerplateIds').map(String),
     seo: {
