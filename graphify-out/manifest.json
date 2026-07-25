@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "app/admin/items/actions.ts": {
-    "mtime": 1784979563.955578,
-    "ast_hash": "6cc053368b888c74cf69177aff75da2a",
+    "mtime": 1784984267.7470257,
+    "ast_hash": "23747f4df0a0ac3cdab4ed5562da8139",
     "semantic_hash": ""
   },
   "app/admin/items/ai-draft-actions.ts": {
@@ -130,8 +130,8 @@
     "semantic_hash": "600a29859f5e323e17b532aea74d25b4"
   },
   "app/admin/items/item-form-parsing.ts": {
-    "mtime": 1784979515.1248314,
-    "ast_hash": "96729213eb06f6db7af93228e43e0e35",
+    "mtime": 1784984351.1362152,
+    "ast_hash": "247c861293e884f10aaa64726eb08d7d",
     "semantic_hash": ""
   },
   "app/admin/items/item-form/ai-context.tsx": {
@@ -145,9 +145,9 @@
     "semantic_hash": "e6993451a2f374b587932710306db3ed"
   },
   "app/admin/items/item-form/index.tsx": {
-    "mtime": 1784364014.4661272,
-    "ast_hash": "b5898c8847a43f58333f25e515ad72f3",
-    "semantic_hash": "b5898c8847a43f58333f25e515ad72f3"
+    "mtime": 1784984335.5515485,
+    "ast_hash": "5b4643ac76da9a962ed06bfff5b66144",
+    "semantic_hash": ""
   },
   "app/admin/items/item-form/market-rules-fields.tsx": {
     "mtime": 1783349596.422637,
@@ -160,8 +160,8 @@
     "semantic_hash": "0f621b9895ad58b660082bf19e2f986f"
   },
   "app/admin/items/item-form/personalization-fields.tsx": {
-    "mtime": 1784979606.6156895,
-    "ast_hash": "3f2888b0ee92065d1d99efdeee2c0678",
+    "mtime": 1784984324.318205,
+    "ast_hash": "3d681e25f3318eae7df8a672d02eb875",
     "semantic_hash": ""
   },
   "app/admin/items/item-form/pricing-size-fields.tsx": {
@@ -425,8 +425,8 @@
     "semantic_hash": "bc641eb6fae63b8658159ece8591d113"
   },
   "app/personalize/actions.ts": {
-    "mtime": 1784978428.7117398,
-    "ast_hash": "75be6564b41e57fc9e9cc4ac3eb4e95d",
+    "mtime": 1784984301.2633364,
+    "ast_hash": "90dae9db8c770f8464ebb3d85bdd1876",
     "semantic_hash": ""
   },
   "app/personalize/form-parsing.ts": {
@@ -815,8 +815,8 @@
     "semantic_hash": "6ef1c9f10bc9d9c683e15aecf4109b9a"
   },
   "lib/openai-files.ts": {
-    "mtime": 1784977599.930473,
-    "ast_hash": "38e8400c3eb244d0de669f8bf7bc40d2",
+    "mtime": 1784984362.9486947,
+    "ast_hash": "ec1f5faa61e50fcdfac846d8e46fc7be",
     "semantic_hash": ""
   },
   "lib/openai-image.ts": {
@@ -1375,8 +1375,8 @@
     "semantic_hash": "8c01a73243a00b8f4646c054f247a472"
   },
   ".superpowers/sdd/progress.md": {
-    "mtime": 1784980189.1651368,
-    "ast_hash": "e25a028cd41a12c1025607815d34e4d3",
+    "mtime": 1784980384.1770601,
+    "ast_hash": "c3baec3baaaf18fc8d976d89c93a692c",
     "semantic_hash": ""
   },
   ".superpowers/sdd/review-0e53c42..99f1af6-stat.md": {
@@ -1405,9 +1405,9 @@
     "semantic_hash": ""
   },
   ".superpowers/sdd/task-10-report.md": {
-    "mtime": 1783322312.0505905,
-    "ast_hash": "39626da728abb73832cd54e6270799c1",
-    "semantic_hash": "39626da728abb73832cd54e6270799c1"
+    "mtime": 1784980341.3810804,
+    "ast_hash": "b1b87b6806d4334d8ca509fa98fc8718",
+    "semantic_hash": ""
   },
   ".superpowers/sdd/task-2-brief.md": {
     "mtime": 1784977540.4227126,
@@ -2045,13 +2045,13 @@
     "semantic_hash": ""
   },
   "lib/skill-files.ts": {
-    "mtime": 1784978700.9382703,
-    "ast_hash": "8c4145f3e65c46676b8bd6f700a1c6cf",
+    "mtime": 1784984240.5978684,
+    "ast_hash": "b2a68c4d3109acd465cd4d2b801be52e",
     "semantic_hash": ""
   },
   "supabase/migrations/20260725120000_skill_reference_columns.sql": {
-    "mtime": 1784977274.6532912,
-    "ast_hash": "da6566a9c651c9b21f967d835706b1e4",
+    "mtime": 1784984822.2979639,
+    "ast_hash": "0b3c352dfff092e09205274ee8a432d3",
     "semantic_hash": ""
   },
   "tests/lib/personalization-skills.test.ts": {
@@ -2060,8 +2060,8 @@
     "semantic_hash": ""
   },
   "tests/lib/skill-files.test.ts": {
-    "mtime": 1784978680.8022244,
-    "ast_hash": "41d3eb0e301fb3861aab28197f254196",
+    "mtime": 1784984286.1758282,
+    "ast_hash": "d80533eaa8ee39cbb2066a6f62705a53",
     "semantic_hash": ""
   },
   "docs/superpowers/plans/2026-07-25-skill-reference-per-boilerplate.md": {
@@ -2070,8 +2070,13 @@
     "semantic_hash": ""
   },
   "docs/superpowers/specs/2026-07-25-skill-reference-per-boilerplate-design.md": {
-    "mtime": 1784969740.797728,
-    "ast_hash": "8f27c6ed3c122c0b2afecd67037adee2",
+    "mtime": 1784984552.1121564,
+    "ast_hash": "af6120fd6cf1ff7f86ec638a7d78d06d",
+    "semantic_hash": ""
+  },
+  ".superpowers/sdd/final-fix-report.md": {
+    "mtime": 1784984621.8510456,
+    "ast_hash": "64c68a339a7e08a1358f6ee12bcde8d8",
     "semantic_hash": ""
   }
 }
