@@ -300,7 +300,7 @@ export async function syncCatalogItemMedia(
   }
 }
 
-/** True unless the item is customizable with no System Prompt, Skill ID, or boilerplate selected. */
+/** True unless the item is customizable with no System Prompt, skill file, or boilerplate selected. */
 export function validatePersonalizationConfig(item: {
   isCustomizable: boolean;
   systemPrompt?: string;

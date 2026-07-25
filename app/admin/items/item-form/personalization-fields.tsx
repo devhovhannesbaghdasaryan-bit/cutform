@@ -39,8 +39,6 @@ export function PersonalizationFields({
       </div>
       <div className="space-y-2">
         <Label htmlFor="skillFile">Skill file</Label>
-        <input type="hidden" name="skillId" defaultValue={item?.skill_id ?? ''} />
-        <input type="hidden" name="skillPath" defaultValue={item?.skill_path ?? ''} />
         <Input
           id="skillFile"
           name="skillFile"
