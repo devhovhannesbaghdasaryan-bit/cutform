@@ -83,6 +83,8 @@ export interface OpenAiImageInput {
 
 Items and boilerplates without skills produce byte-identical calls to today's behavior.
 
+An item whose only personalization config is an uploaded skill file (no system prompt, no configured boilerplates) still generates: the "coming soon" gate accepts any `item.skill_id` that passes `isOpenAiSkillFileId` (i.e. starts with `file-`).
+
 ## Error handling
 
 - **Skill content fetch fails** → the whole generation attempt fails inside the existing `try/catch`: credits refunded, `friendlyGenerationError` shown. No partial "generate without the skill" fallback — a missing skill silently changing output quality is worse than a retryable error.

@@ -19,7 +19,11 @@ import {
   listCatalogItemBoilerplates,
   type PersonalizationBoilerplate,
 } from '@/lib/personalization-boilerplates';
-import { collectSkillFileIds, createSkillTextLoader } from '@/lib/personalization-skills';
+import {
+  collectSkillFileIds,
+  createSkillTextLoader,
+  isOpenAiSkillFileId,
+} from '@/lib/personalization-skills';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
@@ -103,7 +107,11 @@ export async function generatePersonalizedItemAction(
   if (itemError || !item || !item.is_customizable) return errorState(t('errorItem'));
 
   const configuredBoilerplates = await listCatalogItemBoilerplates(supabase, item.id);
-  if (!item.system_prompt && !configuredBoilerplates.length) {
+  if (
+    !item.system_prompt &&
+    !configuredBoilerplates.length &&
+    !isOpenAiSkillFileId(item.skill_id)
+  ) {
     return errorState(t('comingSoonBody'));
   }
 
