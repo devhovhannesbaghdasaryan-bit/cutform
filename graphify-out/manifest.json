@@ -965,9 +965,9 @@
     "semantic_hash": "5bb40b59feb964d9d0662fbc7b188e2b"
   },
   "package.json": {
-    "mtime": 1784807101.448641,
-    "ast_hash": "917ec2d9273d4a077be5c12532d09a4c",
-    "semantic_hash": "917ec2d9273d4a077be5c12532d09a4c"
+    "mtime": 1785072918.72515,
+    "ast_hash": "53ef945226abe78ee744e64b10dabfc6",
+    "semantic_hash": ""
   },
   "postcss.config.mjs": {
     "mtime": 1780925886.0280235,
@@ -2080,13 +2080,13 @@
     "semantic_hash": ""
   },
   "lib/openai-skills.ts": {
-    "mtime": 1785066821.1593869,
-    "ast_hash": "ee67b0130cee6eba66d6ddec810dae15",
+    "mtime": 1785072934.6418104,
+    "ast_hash": "9866839d4651b9cd4e0762db83033cb7",
     "semantic_hash": ""
   },
   "tests/lib/openai-skills.test.ts": {
-    "mtime": 1785066821.159891,
-    "ast_hash": "4b9e3d211574d8f6e8d84045550a860a",
+    "mtime": 1785072967.9905856,
+    "ast_hash": "2c59cd380c1ef67e44e5fb37f53ca34a",
     "semantic_hash": ""
   }
 }
