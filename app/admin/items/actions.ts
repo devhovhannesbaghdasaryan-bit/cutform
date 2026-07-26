@@ -7,7 +7,7 @@ import { actionError, actionSuccess, type ActionState } from '@/lib/action-state
 import { requireAdminPermission } from '@/lib/admin';
 import { APP_LOCALES } from '@/lib/i18n';
 import { createCatalogItemCore, updateCatalogItemCore } from '@/lib/catalog-items/core';
-import { deleteReferenceFile } from '@/lib/openai-files';
+import { deleteSkillArtifact } from '@/lib/openai-skills';
 import { getOpenAiClient } from '@/lib/openai-client';
 import { applyItemSkillFields } from '@/lib/skill-files';
 import {
@@ -88,11 +88,7 @@ export async function createCatalogItemAction(
   }
 
   if (previousSkillFileId) {
-    try {
-      await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
-    } catch (error) {
-      console.error('[openai-files] failed to delete previous skill file', previousSkillFileId, error);
-    }
+    await deleteSkillArtifact(getOpenAiClient(), previousSkillFileId);
   }
 
   revalidatePath('/');
@@ -149,11 +145,7 @@ export async function updateCatalogItemAction(
   }
 
   if (previousSkillFileId) {
-    try {
-      await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
-    } catch (error) {
-      console.error('[openai-files] failed to delete previous skill file', previousSkillFileId, error);
-    }
+    await deleteSkillArtifact(getOpenAiClient(), previousSkillFileId);
   }
 
   revalidatePath('/');

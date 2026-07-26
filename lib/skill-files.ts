@@ -1,8 +1,8 @@
 import 'server-only';
 
 import type OpenAI from 'openai';
-import { deleteReferenceFile, uploadSkillFile } from '@/lib/openai-files';
-import { isOpenAiSkillFileId } from '@/lib/personalization-skills';
+import { deleteSkillArtifact, uploadSkill } from '@/lib/openai-skills';
+import { isOpenAiSkillId } from '@/lib/personalization-skills';
 import { uploadToBucket } from '@/lib/storage';
 
 export const SKILL_FILE_MAX_BYTES = 1024 * 1024;
@@ -24,12 +24,15 @@ export function getSkillFile(formData: FormData): File | null {
 }
 
 /**
- * Uploads a skill document: OpenAI File Storage first (source of truth), then
- * a recovery copy in the private uploads bucket. If the Supabase copy fails,
- * the just-uploaded OpenAI file is best-effort deleted so no orphan id persists.
+ * Uploads a skill document: OpenAI Skills API first (source of truth — the
+ * dashboard's Skills tab), then a recovery copy in the private uploads bucket.
+ * If the Supabase copy fails, the just-created skill is best-effort deleted so
+ * no orphan id persists. `openaiFileId` carries the `skill_…` id; the name
+ * mirrors the skill_openai_file_id / skill_id DB columns, which also still
+ * hold legacy `file-…` ids from pre-Skills uploads.
  */
 export async function uploadSkillAssets(
-  openai: Pick<OpenAI, 'files'>,
+  openai: Pick<OpenAI, 'files' | 'skills'>,
   supabase: StorageClient,
   userId: string,
   file: File,
@@ -38,7 +41,7 @@ export async function uploadSkillAssets(
   if (!ext) throw new Error('Upload .md or .txt skill files only.');
   if (file.size > SKILL_FILE_MAX_BYTES) throw new Error('Skill files must be 1 MB or smaller.');
 
-  const openaiFileId = await uploadSkillFile(openai, file);
+  const openaiFileId = await uploadSkill(openai, file);
   try {
     const skillPath = await uploadToBucket(supabase, {
       bucket: 'uploads',
@@ -48,7 +51,7 @@ export async function uploadSkillAssets(
     });
     return { openaiFileId, skillPath };
   } catch (error) {
-    await deleteReferenceFile(openai, openaiFileId);
+    await deleteSkillArtifact(openai, openaiFileId);
     throw error;
   }
 }
@@ -93,14 +96,14 @@ export function resolveSkillColumns(options: {
 /**
  * Item-form skill semantics: a new upload replaces the attachment, the
  * removeSkill checkbox clears it, otherwise the hidden-input values already
- * on `item` are kept. Mutates `item` and returns the previous OpenAI file id
- * to delete after the catalog row is written (legacy non `file-` ids are
- * never deleted — they were not uploaded through this flow). `getOpenAi` is
- * only invoked when a skill file is actually present, so plain item saves in
+ * on `item` are kept. Mutates `item` and returns the previous OpenAI skill id
+ * to delete after the catalog row is written (legacy free-text ids are never
+ * deleted — they were not uploaded through this flow). `getOpenAi` is only
+ * invoked when a skill file is actually present, so plain item saves in
  * keyless environments never construct an OpenAI client.
  */
 export async function applyItemSkillFields(
-  getOpenAi: () => Pick<OpenAI, 'files'>,
+  getOpenAi: () => Pick<OpenAI, 'files' | 'skills'>,
   supabase: StorageClient,
   userId: string,
   formData: FormData,
@@ -108,7 +111,7 @@ export async function applyItemSkillFields(
 ): Promise<string | null> {
   const skillFile = getSkillFile(formData);
   const removeSkill = formData.get('removeSkill') === 'on';
-  const previous = isOpenAiSkillFileId(item.skillId) ? item.skillId : null;
+  const previous = isOpenAiSkillId(item.skillId) ? item.skillId : null;
 
   if (skillFile) {
     const uploaded = await uploadSkillAssets(getOpenAi(), supabase, userId, skillFile);

@@ -1,12 +1,14 @@
 import { downloadFromBucket } from '@/lib/storage';
 
 /**
- * Only ids minted by OpenAI File Storage mark a real skill attachment. Legacy
- * free-text values in catalog_items.skill_id (e.g. `skill-1` from seeds) are
- * inert by design — see the 2026-07-25 skill-reference spec.
+ * Only ids minted by OpenAI mark a real skill attachment: `skill_…` from the
+ * Skills API, or `file-…` from File Storage (rows uploaded before the Skills
+ * API migration). Legacy free-text values in catalog_items.skill_id (e.g.
+ * `skill-1` from seeds — hyphen, not underscore) are inert by design — see
+ * the 2026-07-25 skill-reference spec.
  */
-export function isOpenAiSkillFileId(value: string | null | undefined): value is string {
-  return typeof value === 'string' && value.startsWith('file-');
+export function isOpenAiSkillId(value: string | null | undefined): value is string {
+  return typeof value === 'string' && (value.startsWith('skill_') || value.startsWith('file-'));
 }
 
 export interface ItemSkillSource {
@@ -21,27 +23,27 @@ export interface BoilerplateSkillSource {
 
 /**
  * True when the item carries a skill uploaded through the admin form: a real
- * OpenAI file id plus the uploads-bucket copy the text is read from. A bare
- * `file-` id without a copy (e.g. set via MCP as a plain string) cannot be
- * injected and does not count.
+ * OpenAI skill id plus the uploads-bucket copy the text is read from. A bare
+ * id without a copy (e.g. set via MCP as a plain string) cannot be injected
+ * and does not count.
  */
 export function hasInjectableSkill(item: ItemSkillSource): boolean {
-  return isOpenAiSkillFileId(item.skill_id) && Boolean(item.skill_path);
+  return isOpenAiSkillId(item.skill_id) && Boolean(item.skill_path);
 }
 
 /**
  * Storage paths of the skill documents for one generation call: product skill
- * first, boilerplate skill second, duplicates dropped. OpenAI forbids
- * downloading the content of `user_data` files, so skill text is read from
- * the uploads-bucket copies; the OpenAI file id acts purely as the
- * attachment marker.
+ * first, boilerplate skill second, duplicates dropped. Skill text is read
+ * from the uploads-bucket copies; the OpenAI-side skill acts purely as the
+ * attachment marker (image generation cannot attach Skills API tools, and
+ * legacy `user_data` files forbid content download).
  */
 export function collectSkillPaths(
   item: ItemSkillSource,
   boilerplate: BoilerplateSkillSource | null | undefined,
 ): string[] {
   const paths: string[] = [];
-  if (isOpenAiSkillFileId(item.skill_id) && item.skill_path) paths.push(item.skill_path);
+  if (isOpenAiSkillId(item.skill_id) && item.skill_path) paths.push(item.skill_path);
   if (
     boilerplate?.skill_openai_file_id &&
     boilerplate.skill_path &&

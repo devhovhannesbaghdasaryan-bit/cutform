@@ -3,7 +3,7 @@ import {
   collectSkillPaths,
   createSkillTextLoader,
   hasInjectableSkill,
-  isOpenAiSkillFileId,
+  isOpenAiSkillId,
 } from '@/lib/personalization-skills';
 
 const NO_SKILL_ITEM = { skill_id: null, skill_path: null };
@@ -14,22 +14,24 @@ const SKILL_BOILERPLATE = {
 };
 const NO_SKILL_BOILERPLATE = { skill_openai_file_id: null, skill_path: null };
 
-describe('isOpenAiSkillFileId', () => {
-  it('accepts ids starting with file-', () => {
-    expect(isOpenAiSkillFileId('file-abc123')).toBe(true);
+describe('isOpenAiSkillId', () => {
+  it('accepts Skills API ids and legacy File Storage ids', () => {
+    expect(isOpenAiSkillId('skill_abc123')).toBe(true);
+    expect(isOpenAiSkillId('file-abc123')).toBe(true);
   });
 
-  it('rejects legacy seed ids, null, undefined, and empty strings', () => {
-    expect(isOpenAiSkillFileId('skill-1')).toBe(false);
-    expect(isOpenAiSkillFileId(null)).toBe(false);
-    expect(isOpenAiSkillFileId(undefined)).toBe(false);
-    expect(isOpenAiSkillFileId('')).toBe(false);
+  it('rejects legacy seed ids (hyphen), null, undefined, and empty strings', () => {
+    expect(isOpenAiSkillId('skill-1')).toBe(false);
+    expect(isOpenAiSkillId(null)).toBe(false);
+    expect(isOpenAiSkillId(undefined)).toBe(false);
+    expect(isOpenAiSkillId('')).toBe(false);
   });
 });
 
 describe('hasInjectableSkill', () => {
   it('is true only with a real OpenAI id AND a bucket copy path', () => {
     expect(hasInjectableSkill(SKILL_ITEM)).toBe(true);
+    expect(hasInjectableSkill({ skill_id: 'skill_abc', skill_path: 'x/y.md' })).toBe(true);
   });
 
   it('is false for a legacy id even with a path', () => {

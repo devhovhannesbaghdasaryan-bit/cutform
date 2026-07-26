@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { requireAdminPermission } from '@/lib/admin';
 import { deleteReferenceFile, uploadReferenceImage } from '@/lib/openai-files';
+import { deleteSkillArtifact } from '@/lib/openai-skills';
 import { getOpenAiClient } from '@/lib/openai-client';
 import { getSkillFile, resolveSkillColumns, uploadSkillAssets } from '@/lib/skill-files';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
@@ -127,7 +128,7 @@ export async function saveBoilerplateAction(formData: FormData) {
 
   if (previousOpenaiFileId) await deleteReferenceFile(getOpenAiClient(), previousOpenaiFileId);
   if (skill.previousOpenaiFileId)
-    await deleteReferenceFile(getOpenAiClient(), skill.previousOpenaiFileId);
+    await deleteSkillArtifact(getOpenAiClient(), skill.previousOpenaiFileId);
 
   revalidatePath('/admin/personalization/boilerplates');
   revalidatePath('/admin/items');
@@ -152,7 +153,7 @@ export async function removeBoilerplateAction(formData: FormData) {
 
   if (existing?.openai_file_id) await deleteReferenceFile(getOpenAiClient(), existing.openai_file_id);
   if (existing?.skill_openai_file_id)
-    await deleteReferenceFile(getOpenAiClient(), existing.skill_openai_file_id);
+    await deleteSkillArtifact(getOpenAiClient(), existing.skill_openai_file_id);
 
   revalidatePath('/admin/personalization/boilerplates');
   revalidatePath('/admin/items');
