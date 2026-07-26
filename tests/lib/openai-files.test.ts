@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { deleteReferenceFile, uploadReferenceImage, uploadSkillFile } from '@/lib/openai-files';
+import { deleteReferenceFile, uploadReferenceImage } from '@/lib/openai-files';
 
 type FilesClient = Parameters<typeof uploadReferenceImage>[0];
 
@@ -53,24 +53,5 @@ describe('deleteReferenceFile', () => {
     await expect(deleteReferenceFile(client, 'file-missing')).resolves.toBeUndefined();
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
-  });
-});
-
-describe('uploadSkillFile', () => {
-  it('uploads with the user_data purpose and returns the file id', async () => {
-    const client = fakeOpenAiClient();
-    const file = new File(['# Skill'], 'skill.md', { type: 'text/markdown' });
-    await expect(uploadSkillFile(client, file)).resolves.toBe('file-abc123');
-    expect(client.files.create).toHaveBeenCalledWith({ file, purpose: 'user_data' });
-  });
-
-  it('throws when the upload fails', async () => {
-    const client = fakeOpenAiClient({
-      create: vi.fn(async () => {
-        throw new Error('network error');
-      }),
-    });
-    const file = new File(['# Skill'], 'skill.md', { type: 'text/markdown' });
-    await expect(uploadSkillFile(client, file)).rejects.toThrow('network error');
   });
 });

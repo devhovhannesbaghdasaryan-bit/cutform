@@ -18,9 +18,12 @@ function fakeOpenAi(
   overrides: { create?: (...args: unknown[]) => unknown; del?: (...args: unknown[]) => unknown } = {},
 ) {
   return {
+    skills: {
+      create: overrides.create ?? vi.fn(async () => ({ id: 'skill_new' })),
+      delete: overrides.del ?? vi.fn(async () => ({ id: 'skill_new', deleted: true })),
+    },
     files: {
-      create: overrides.create ?? vi.fn(async () => ({ id: 'file-new-skill' })),
-      delete: overrides.del ?? vi.fn(async () => ({ id: 'file-new-skill', deleted: true })),
+      delete: vi.fn(async () => ({ id: 'file-old', deleted: true })),
     },
   } as unknown as OpenAiFilesClient;
 }
@@ -62,11 +65,11 @@ describe('getSkillFile', () => {
 });
 
 describe('uploadSkillAssets', () => {
-  it('uploads to OpenAI then copies to Supabase under personalization-skills', async () => {
+  it('creates an OpenAI skill then copies to Supabase under personalization-skills', async () => {
     const openai = fakeOpenAi();
     const file = new File(['# Skill'], 'skill.md', { type: 'text/markdown' });
     const result = await uploadSkillAssets(openai, storageClient, 'user-1', file);
-    expect(result.openaiFileId).toBe('file-new-skill');
+    expect(result.openaiFileId).toBe('skill_new');
     expect(result.skillPath).toMatch(/^user-1\/personalization-skills\/[0-9a-f-]+\.md$/);
     expect(uploadToBucket).toHaveBeenCalledWith(
       storageClient,
@@ -80,7 +83,7 @@ describe('uploadSkillAssets', () => {
     await expect(uploadSkillAssets(openai, storageClient, 'user-1', file)).rejects.toThrow(
       'Upload .md or .txt skill files only.',
     );
-    expect(openai.files.create).not.toHaveBeenCalled();
+    expect(openai.skills.create).not.toHaveBeenCalled();
   });
 
   it('rejects files over 1 MB before uploading anything', async () => {
@@ -89,17 +92,17 @@ describe('uploadSkillAssets', () => {
     await expect(uploadSkillAssets(openai, storageClient, 'user-1', file)).rejects.toThrow(
       'Skill files must be 1 MB or smaller.',
     );
-    expect(openai.files.create).not.toHaveBeenCalled();
+    expect(openai.skills.create).not.toHaveBeenCalled();
   });
 
-  it('deletes the OpenAI file and rethrows when the Supabase copy fails', async () => {
+  it('deletes the OpenAI skill and rethrows when the Supabase copy fails', async () => {
     vi.mocked(uploadToBucket).mockRejectedValueOnce(new Error('bucket unavailable'));
     const openai = fakeOpenAi();
     const file = new File(['# Skill'], 'skill.md', { type: 'text/markdown' });
     await expect(uploadSkillAssets(openai, storageClient, 'user-1', file)).rejects.toThrow(
       'bucket unavailable',
     );
-    expect(openai.files.delete).toHaveBeenCalledWith('file-new-skill');
+    expect(openai.skills.delete).toHaveBeenCalledWith('skill_new');
   });
 });
 
@@ -157,7 +160,7 @@ describe('applyItemSkillFields', () => {
     await expect(
       applyItemSkillFields(() => openai, storageClient, 'user-1', formData, item),
     ).resolves.toBe('file-old');
-    expect(item.skillId).toBe('file-new-skill');
+    expect(item.skillId).toBe('skill_new');
     expect(item.skillPath).toMatch(/^user-1\/personalization-skills\//);
   });
 
@@ -185,7 +188,7 @@ describe('applyItemSkillFields', () => {
     expect(item.skillPath).toBeUndefined();
   });
 
-  it('never reports a legacy non file- id for deletion', async () => {
+  it('never reports a legacy free-text id for deletion', async () => {
     const openai = fakeOpenAi();
     const formData = new FormData();
     formData.set('removeSkill', 'on');
