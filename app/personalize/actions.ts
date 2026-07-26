@@ -20,9 +20,9 @@ import {
   type PersonalizationBoilerplate,
 } from '@/lib/personalization-boilerplates';
 import {
-  collectSkillFileIds,
+  collectSkillPaths,
   createSkillTextLoader,
-  isOpenAiSkillFileId,
+  hasInjectableSkill,
 } from '@/lib/personalization-skills';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
@@ -99,7 +99,7 @@ export async function generatePersonalizedItemAction(
   const { data: item, error: itemError } = await supabase
     .from('catalog_items')
     .select(
-      'id, slug, title, price_cents, currency, item_type, status, is_customizable, system_prompt, skill_id, tags',
+      'id, slug, title, price_cents, currency, item_type, status, is_customizable, system_prompt, skill_id, skill_path, tags',
     )
     .eq('id', catalogItemId)
     .eq('status', 'published')
@@ -107,11 +107,7 @@ export async function generatePersonalizedItemAction(
   if (itemError || !item || !item.is_customizable) return errorState(t('errorItem'));
 
   const configuredBoilerplates = await listCatalogItemBoilerplates(supabase, item.id);
-  if (
-    !item.system_prompt &&
-    !configuredBoilerplates.length &&
-    !isOpenAiSkillFileId(item.skill_id)
-  ) {
+  if (!item.system_prompt && !configuredBoilerplates.length && !hasInjectableSkill(item)) {
     return errorState(t('comingSoonBody'));
   }
 
@@ -199,7 +195,11 @@ export async function generatePersonalizedItemAction(
     generatedId = generated.id;
 
     const openAiClient = getOpenAiClient();
-    const loadSkillText = createSkillTextLoader(openAiClient);
+    // Skill text comes from the private uploads-bucket copies (OpenAI forbids
+    // downloading user_data file content). Copies live under the uploading
+    // admin's folder, so the customer's session client cannot read them —
+    // the service client can.
+    const loadSkillText = createSkillTextLoader(getServiceSupabase());
     const options = [];
     let optionIndex = 0;
     for (const reference of callTargets) {
@@ -213,9 +213,7 @@ export async function generatePersonalizedItemAction(
         colorHex: selectedColor?.hex ?? null,
         hasPhoto,
       });
-      const skillTexts = await Promise.all(
-        collectSkillFileIds(item.skill_id, reference?.skill_openai_file_id).map(loadSkillText),
-      );
+      const skillTexts = await Promise.all(collectSkillPaths(item, reference).map(loadSkillText));
       const image = await generateOpenAiImage(openAiClient, {
         prompt,
         skillTexts,
