@@ -37,6 +37,7 @@ export type ItemFormValue = Partial<
     | 'characteristics'
     | 'system_prompt'
     | 'skill_id'
+    | 'skill_path'
     | 'tags'
   >
 >;

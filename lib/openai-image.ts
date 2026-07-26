@@ -5,6 +5,8 @@ import { getServerEnv } from '@/lib/env';
 
 export interface OpenAiImageInput {
   prompt: string;
+  /** Skill document texts injected as input_text parts before the prompt, in given order. */
+  skillTexts?: string[];
   userImages: File[];
   referenceFileId?: string | null;
   size?: '1024x1024' | '1536x1024' | '1024x1536' | 'auto';
@@ -64,6 +66,7 @@ export async function generateOpenAiImage(
       {
         role: 'user',
         content: [
+          ...(input.skillTexts ?? []).map((text) => ({ type: 'input_text' as const, text })),
           { type: 'input_text', text: input.prompt },
           ...userImageParts,
           ...(input.referenceFileId

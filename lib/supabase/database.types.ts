@@ -617,6 +617,7 @@ export type Database = {
           product_source: string
           sizes: Json
           skill_id: string | null
+          skill_path: string | null
           slug: string
           status: string
           subcategory_id: string | null
@@ -643,6 +644,7 @@ export type Database = {
           product_source?: string
           sizes?: Json
           skill_id?: string | null
+          skill_path?: string | null
           slug: string
           status?: string
           subcategory_id?: string | null
@@ -669,6 +671,7 @@ export type Database = {
           product_source?: string
           sizes?: Json
           skill_id?: string | null
+          skill_path?: string | null
           slug?: string
           status?: string
           subcategory_id?: string | null
@@ -1339,6 +1342,8 @@ export type Database = {
           name: string
           openai_file_id: string
           price_adjustment_percent: number | null
+          skill_openai_file_id: string | null
+          skill_path: string | null
           sort_order: number
           updated_at: string
         }
@@ -1353,6 +1358,8 @@ export type Database = {
           name: string
           openai_file_id: string
           price_adjustment_percent?: number | null
+          skill_openai_file_id?: string | null
+          skill_path?: string | null
           sort_order?: number
           updated_at?: string
         }
@@ -1367,6 +1374,8 @@ export type Database = {
           name?: string
           openai_file_id?: string
           price_adjustment_percent?: number | null
+          skill_openai_file_id?: string | null
+          skill_path?: string | null
           sort_order?: number
           updated_at?: string
         }

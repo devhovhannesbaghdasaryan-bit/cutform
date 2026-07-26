@@ -88,4 +88,59 @@ describe('generateOpenAiImage', () => {
     expect(message.content).toHaveLength(2);
     expect(message.content.some((part: { type: string }) => part.type === 'input_image' && 'file_id' in part)).toBe(false);
   });
+
+  it('injects skill texts as input_text parts before the prompt', async () => {
+    const base64 = Buffer.from('generated-bytes').toString('base64');
+    const create = vi.fn(async () => ({
+      output: [{ type: 'image_generation_call', result: base64 }],
+    }));
+    const client = { responses: { create } } as unknown as Parameters<
+      typeof generateOpenAiImage
+    >[0];
+
+    await generateOpenAiImage(client, {
+      prompt: 'Generate a night light',
+      skillTexts: ['product skill guidance', 'boilerplate skill guidance'],
+      userImages: [],
+      referenceFileId: 'file-boilerplate-1',
+      size: '1024x1024',
+      quality: 'low',
+    });
+
+    // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
+    const requestBody = (create.mock.calls[0] as any[])[0];
+    const [message] = requestBody.input;
+    expect(message.content[0]).toEqual({ type: 'input_text', text: 'product skill guidance' });
+    expect(message.content[1]).toEqual({ type: 'input_text', text: 'boilerplate skill guidance' });
+    expect(message.content[2]).toEqual({ type: 'input_text', text: 'Generate a night light' });
+    expect(message.content[3]).toEqual({
+      type: 'input_image',
+      detail: 'auto',
+      file_id: 'file-boilerplate-1',
+    });
+  });
+
+  it('produces the exact legacy content shape for an empty skillTexts array', async () => {
+    const base64 = Buffer.from('generated-bytes').toString('base64');
+    const create = vi.fn(async () => ({
+      output: [{ type: 'image_generation_call', result: base64 }],
+    }));
+    const client = { responses: { create } } as unknown as Parameters<
+      typeof generateOpenAiImage
+    >[0];
+
+    await generateOpenAiImage(client, {
+      prompt: 'Generate a preview',
+      skillTexts: [],
+      userImages: [],
+      referenceFileId: null,
+      size: '1024x1024',
+      quality: 'low',
+    });
+
+    // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
+    const requestBody = (create.mock.calls[0] as any[])[0];
+    const [message] = requestBody.input;
+    expect(message.content).toEqual([{ type: 'input_text', text: 'Generate a preview' }]);
+  });
 });

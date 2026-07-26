@@ -442,7 +442,11 @@
     "replaceImageHelp": "Choose a file to replace the current image.",
     "uploadHelp": "Upload PNG, JPG, WEBP, or SVG up to 10 MB.",
     "priceAdjustmentPercent": "Price adjustment (%)",
-    "priceAdjustmentHelp": "Optional. Adjusts this item's base price when this boilerplate is selected — e.g. 20 adds 20%, -10 takes off 10%."
+    "priceAdjustmentHelp": "Optional. Adjusts this item's base price when this boilerplate is selected — e.g. 20 adds 20%, -10 takes off 10%.",
+    "skillFile": "Skill file (optional)",
+    "skillFileHelp": "Upload a .md or .txt document up to 1 MB. Its content is injected into AI generation instructions.",
+    "skillAttached": "Attached skill",
+    "removeSkill": "Remove skill"
   },
   "legal": {
     "privacy": {

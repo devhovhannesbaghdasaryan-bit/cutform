@@ -19,6 +19,11 @@ import {
   listCatalogItemBoilerplates,
   type PersonalizationBoilerplate,
 } from '@/lib/personalization-boilerplates';
+import {
+  collectSkillFileIds,
+  createSkillTextLoader,
+  isOpenAiSkillFileId,
+} from '@/lib/personalization-skills';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
@@ -102,7 +107,11 @@ export async function generatePersonalizedItemAction(
   if (itemError || !item || !item.is_customizable) return errorState(t('errorItem'));
 
   const configuredBoilerplates = await listCatalogItemBoilerplates(supabase, item.id);
-  if (!item.system_prompt && !configuredBoilerplates.length) {
+  if (
+    !item.system_prompt &&
+    !configuredBoilerplates.length &&
+    !isOpenAiSkillFileId(item.skill_id)
+  ) {
     return errorState(t('comingSoonBody'));
   }
 
@@ -190,6 +199,7 @@ export async function generatePersonalizedItemAction(
     generatedId = generated.id;
 
     const openAiClient = getOpenAiClient();
+    const loadSkillText = createSkillTextLoader(openAiClient);
     const options = [];
     let optionIndex = 0;
     for (const reference of callTargets) {
@@ -203,8 +213,12 @@ export async function generatePersonalizedItemAction(
         colorHex: selectedColor?.hex ?? null,
         hasPhoto,
       });
+      const skillTexts = await Promise.all(
+        collectSkillFileIds(item.skill_id, reference?.skill_openai_file_id).map(loadSkillText),
+      );
       const image = await generateOpenAiImage(openAiClient, {
         prompt,
+        skillTexts,
         userImages: files,
         referenceFileId: reference?.openai_file_id ?? null,
         size: '1024x1024',

@@ -105,6 +105,16 @@ export function ItemForm({
 
         <FlagsFields item={item} onCustomizableChange={setIsCustomizable} />
 
+        {/*
+          Rendered unconditionally (not just while Customizable is checked) so an
+          existing skill attachment survives a save with Customizable unchecked —
+          otherwise these hidden inputs would be absent from the form and the
+          skill_id/skill_path columns would be nulled without deleting the
+          OpenAI file.
+        */}
+        <input type="hidden" name="skillId" defaultValue={item?.skill_id ?? ''} />
+        <input type="hidden" name="skillPath" defaultValue={item?.skill_path ?? ''} />
+
         {isCustomizable && (
           <PersonalizationFields
             item={item}

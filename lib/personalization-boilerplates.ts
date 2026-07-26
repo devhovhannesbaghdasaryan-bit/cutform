@@ -11,6 +11,8 @@ export interface PersonalizationBoilerplate {
   is_active: boolean;
   sort_order: number;
   price_adjustment_percent: number | null;
+  skill_openai_file_id: string | null;
+  skill_path: string | null;
 }
 
 interface CatalogItemBoilerplateRow {
@@ -26,7 +28,7 @@ export async function listCatalogItemBoilerplates(
   const { data, error } = await supabase
     .from('catalog_item_boilerplates')
     .select(
-      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent)',
+      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path)',
     )
     .eq('catalog_item_id', catalogItemId)
     .order('sort_order', { ascending: true })

@@ -11,6 +11,15 @@ export async function uploadReferenceImage(
   return uploaded.id;
 }
 
+/** Uploads a skill document (.md/.txt) to OpenAI File Storage. Throws on failure. */
+export async function uploadSkillFile(
+  client: Pick<OpenAI, 'files'>,
+  file: File,
+): Promise<string> {
+  const uploaded = await client.files.create({ file, purpose: 'user_data' });
+  return uploaded.id;
+}
+
 /** Best-effort delete of a previously uploaded reference file. Never throws. */
 export async function deleteReferenceFile(
   client: Pick<OpenAI, 'files'>,
@@ -19,6 +28,6 @@ export async function deleteReferenceFile(
   try {
     await client.files.delete(fileId);
   } catch (error) {
-    console.error('[personalization-boilerplates] failed to delete OpenAI file', fileId, error);
+    console.error('[openai-files] failed to delete OpenAI file', fileId, error);
   }
 }

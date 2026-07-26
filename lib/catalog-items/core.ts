@@ -31,7 +31,7 @@ async function validateItemAndParseSizes(
 
   if (!validatePersonalizationConfig(item)) {
     throw new Error(
-      'Customizable items need a System Prompt, a Skill ID, or at least one boilerplate.',
+      'Customizable items need a System Prompt, a skill file, or at least one boilerplate.',
     );
   }
 
@@ -64,6 +64,7 @@ function toCatalogItemRow(
     characteristics: item.characteristics ?? null,
     system_prompt: item.systemPrompt ?? null,
     skill_id: item.skillId ?? null,
+    skill_path: item.skillPath ?? null,
     tags: item.tags,
   };
 }

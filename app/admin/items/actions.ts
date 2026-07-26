@@ -7,6 +7,9 @@ import { actionError, actionSuccess, type ActionState } from '@/lib/action-state
 import { requireAdminPermission } from '@/lib/admin';
 import { APP_LOCALES } from '@/lib/i18n';
 import { createCatalogItemCore, updateCatalogItemCore } from '@/lib/catalog-items/core';
+import { deleteReferenceFile } from '@/lib/openai-files';
+import { getOpenAiClient } from '@/lib/openai-client';
+import { applyItemSkillFields } from '@/lib/skill-files';
 import {
   type AdminSupabase,
   getOptionalFile,
@@ -58,6 +61,19 @@ export async function createCatalogItemAction(
     return actionError(error instanceof Error ? error.message : 'Failed to upload catalog assets.');
   }
 
+  let previousSkillFileId: string | null = null;
+  try {
+    previousSkillFileId = await applyItemSkillFields(
+      getOpenAiClient,
+      supabase,
+      user.id,
+      formData,
+      item,
+    );
+  } catch (error) {
+    return actionError(error instanceof Error ? error.message : 'Failed to upload skill file.');
+  }
+
   let created: { id: string; slug: string };
   try {
     created = await createCatalogItemCore(
@@ -69,6 +85,14 @@ export async function createCatalogItemAction(
     );
   } catch (error) {
     return actionError(error instanceof Error ? error.message : 'Failed to create item.');
+  }
+
+  if (previousSkillFileId) {
+    try {
+      await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
+    } catch (error) {
+      console.error('[openai-files] failed to delete previous skill file', previousSkillFileId, error);
+    }
   }
 
   revalidatePath('/');
@@ -98,6 +122,19 @@ export async function updateCatalogItemAction(
     return actionError(error instanceof Error ? error.message : 'Failed to upload catalog assets.');
   }
 
+  let previousSkillFileId: string | null = null;
+  try {
+    previousSkillFileId = await applyItemSkillFields(
+      getOpenAiClient,
+      supabase,
+      user.id,
+      formData,
+      item,
+    );
+  } catch (error) {
+    return actionError(error instanceof Error ? error.message : 'Failed to upload skill file.');
+  }
+
   try {
     await updateCatalogItemCore(
       supabase,
@@ -109,6 +146,14 @@ export async function updateCatalogItemAction(
     );
   } catch (error) {
     return actionError(error instanceof Error ? error.message : 'Failed to update item.');
+  }
+
+  if (previousSkillFileId) {
+    try {
+      await deleteReferenceFile(getOpenAiClient(), previousSkillFileId);
+    } catch (error) {
+      console.error('[openai-files] failed to delete previous skill file', previousSkillFileId, error);
+    }
   }
 
   revalidatePath('/');
