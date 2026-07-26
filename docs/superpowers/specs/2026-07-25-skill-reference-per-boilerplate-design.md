@@ -18,7 +18,7 @@ Admins need to attach an optional skill file to a catalog item and/or to each bo
 2. **Upload through the admin forms** (item form and boilerplate form); the server uploads to OpenAI storage and stores the returned file id. No paste-an-id UX.
 3. **Supabase copy kept** for every uploaded skill file, in the private `uploads` bucket (recovery after OpenAI file loss / environment resets; `catalog-assets` is public and MIME-restricted to images/video, so it cannot hold text/markdown skill files).
 4. **Inline columns**, no shared skills table (YAGNI at current scale; duplicate uploads of the same skill across items are acceptable).
-5. **Content injection, not `input_file`:** the Responses API `input_file` part is PDF-oriented and does not reliably accept markdown/plain text. At generation time the server fetches the skill file's content by id (`client.files.content`) and injects it as an `input_text` part. Skills remain managed purely as OpenAI storage file ids.
+5. **Content injection, not `input_file`:** the Responses API `input_file` part is PDF-oriented and does not reliably accept markdown/plain text. At generation time the server reads the skill text and injects it as an `input_text` part. *(Amended 2026-07-26 after live QA:)* the text is read from the **`uploads`-bucket copy via `skill_path`** using the service-role client — OpenAI rejects `client.files.content` for `user_data` files with `400 Not allowed to download files of purpose: user_data`, so the OpenAI file id serves purely as the attachment marker/generation gate, and the bucket copy is the primary read path (not just recovery).
 
 ## Schema
 
@@ -65,7 +65,7 @@ In `generatePersonalizedItemAction` (`app/personalize/actions.ts`):
 
 1. Select `skill_id` on the item (already selected) and `skill_openai_file_id` via `listCatalogItemBoilerplates` (add the column to its select in `lib/personalization-boilerplates.ts`).
 2. Per call target, build the skill id list: `[item.skill_id if it starts with 'file-', boilerplate?.skill_openai_file_id]`, dropping nulls. Order fixed: product first, boilerplate second.
-3. Fetch each **unique** file id's content once per action invocation (`client.files.content(fileId)` → text), memoized in a local `Map` — one fetch even when several selected boilerplates share the product skill.
+3. Download each **unique** skill copy once per action invocation (`uploads` bucket by `skill_path`, service-role client → text), memoized in a local `Map` — one download even when several selected boilerplates share the product skill. A skill participates only when both the `file-` id and the `skill_path` copy exist (`hasInjectableSkill` / `collectSkillPaths`).
 4. Pass the fetched texts to `generateOpenAiImage` via a new optional input:
 
 ```ts
