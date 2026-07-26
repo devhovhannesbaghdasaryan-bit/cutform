@@ -1,0 +1,43 @@
+name: Deploy Supabase migrations
+
+# Applies new files in supabase/migrations/ to the production Supabase project
+# whenever they land on main. This closes the recurring gap where app code
+# deploys via Vercel but schema changes never reach prod (the Vercel<->Supabase
+# integration only syncs env vars; it never runs migrations).
+#
+# Required repository secrets:
+#   SUPABASE_ACCESS_TOKEN — personal access token (Supabase dashboard -> Account -> Access Tokens)
+#   SUPABASE_DB_PASSWORD  — the project's database password
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+  workflow_dispatch:
+
+concurrency:
+  group: supabase-migrations
+  cancel-in-progress: false
+
+jobs:
+  push-migrations:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: vyizcqfrcaxufskmmonp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+
+      - name: Show pending migrations
+        run: supabase migration list
+
+      - name: Push migrations
+        run: supabase db push
