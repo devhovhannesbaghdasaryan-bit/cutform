@@ -1,3 +1,4 @@
+import { strFromU8, unzipSync } from 'fflate';
 import { describe, expect, it, vi } from 'vitest';
 import {
   deleteSkillArtifact,
@@ -60,15 +61,17 @@ describe('ensureSkillManifest', () => {
 });
 
 describe('uploadSkill', () => {
-  it('creates a SKILL.md bundle under the skill-name folder and returns the skill id', async () => {
+  it('zips SKILL.md under the skill-name folder and returns the skill id', async () => {
     const client = fakeOpenAiClient();
     const file = new File(['# Guide'], 'Night Light Guide.md', { type: 'text/markdown' });
     await expect(uploadSkill(client, file)).resolves.toBe('skill_abc123');
 
-    const call = vi.mocked(client.skills.create).mock.calls[0][0] as { files: File[] };
-    expect(call.files).toHaveLength(1);
-    expect(call.files[0].name).toBe('night-light-guide/SKILL.md');
-    await expect(call.files[0].text()).resolves.toContain('name: night-light-guide');
+    const call = vi.mocked(client.skills.create).mock.calls[0][0] as { files: File };
+    expect(call.files.name).toBe('night-light-guide.zip');
+    expect(call.files.type).toBe('application/zip');
+    const entries = unzipSync(new Uint8Array(await call.files.arrayBuffer()));
+    expect(Object.keys(entries)).toEqual(['night-light-guide/SKILL.md']);
+    expect(strFromU8(entries['night-light-guide/SKILL.md'])).toContain('name: night-light-guide');
   });
 
   it('throws when the Skills API rejects the upload', async () => {

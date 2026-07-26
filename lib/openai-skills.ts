@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { strToU8, zipSync } from 'fflate';
 import type OpenAI from 'openai';
 
 const DEFAULT_SKILL_NAME = 'personalization-skill';
@@ -57,16 +58,19 @@ export function ensureSkillManifest(
 /**
  * Publishes a skill document (.md/.txt) to the OpenAI Skills API so it appears
  * under the dashboard's Skills tab. The document is wrapped as SKILL.md inside
- * the required single top-level folder. Returns the `skill_…` id. Throws on
- * failure.
+ * the required single top-level folder and uploaded as a zip — multipart
+ * uploads lose the folder path (the form serializer sends only the basename),
+ * which the API rejects with "All files must be under a single top-level
+ * directory". Returns the `skill_…` id. Throws on failure.
  */
 export async function uploadSkill(client: Pick<OpenAI, 'skills'>, file: File): Promise<string> {
   const { manifest, name } = ensureSkillManifest(
     await file.text(),
     skillNameFromFileName(file.name),
   );
-  const bundle = new File([manifest], `${name}/SKILL.md`, { type: 'text/markdown' });
-  const created = await client.skills.create({ files: [bundle] });
+  const zipped = zipSync({ [`${name}/SKILL.md`]: strToU8(manifest) });
+  const bundle = new File([zipped as BlobPart], `${name}.zip`, { type: 'application/zip' });
+  const created = await client.skills.create({ files: bundle });
   return created.id;
 }
 
