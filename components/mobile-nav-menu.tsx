@@ -1,17 +1,29 @@
 'use client';
 
 import Link from 'next/link';
-import { Coins, LayoutDashboard, LayoutGrid, Menu, ShieldCheck, UserCircle } from 'lucide-react';
+import {
+  Coins,
+  LayoutDashboard,
+  LayoutGrid,
+  Menu,
+  Moon,
+  ShieldCheck,
+  Sun,
+  UserCircle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { toggleTheme } from '@/components/theme-toggle';
 
 export interface MobileNavLabels {
   menu: string;
+  theme: string;
   catalog: string;
   credits: string;
   dashboard: string;
@@ -95,6 +107,18 @@ export function MobileNavMenu({
               </DropdownMenuItem>
             </>
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onSelect={(event) => {
+              event.preventDefault();
+              toggleTheme();
+            }}
+          >
+            <Sun className="mr-2 h-4 w-4 scale-100 rotate-0 transition-transform dark:scale-0 dark:-rotate-90" />
+            <Moon className="absolute mr-2 h-4 w-4 scale-0 rotate-90 transition-transform dark:scale-100 dark:rotate-0" />
+            {labels.theme}
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

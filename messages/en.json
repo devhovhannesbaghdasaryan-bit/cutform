@@ -141,7 +141,8 @@
     "admin": "Admin",
     "orders": "Orders",
     "home": "Uniqraft home",
-    "menu": "Menu"
+    "menu": "Menu",
+    "theme": "Theme"
   },
   "personalize": {
     "back": "Back to item",

@@ -49,7 +49,7 @@ export async function MarketplaceHeader() {
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">
           <CurrencySwitcher />
           <LanguageSwitcher activeLocale={locale} />
-          <ThemeToggle />
+          <ThemeToggle className="hidden sm:inline-flex" />
           {user ? (
             <>
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
@@ -78,7 +78,7 @@ export async function MarketplaceHeader() {
                   </Link>
                 </Button>
               )}
-              <Button asChild variant="ghost" size="icon">
+              <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex">
                 <Link href="/profile" aria-label={t('nav.profile')}>
                   <UserCircle className="h-4 w-4" />
                 </Link>
@@ -92,7 +92,7 @@ export async function MarketplaceHeader() {
                   {cartCount}
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
                 <Link href="/login">{t('auth.login')}</Link>
               </Button>
               <Button asChild size="sm" className="hidden sm:inline-flex">
@@ -106,6 +106,7 @@ export async function MarketplaceHeader() {
             creditBalance={creditBalance}
             labels={{
               menu: t('nav.menu'),
+              theme: t('nav.theme'),
               catalog: t('nav.catalog'),
               credits: t('nav.credits'),
               dashboard: t('nav.dashboard'),
