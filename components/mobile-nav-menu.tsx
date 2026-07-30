@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Coins, LayoutDashboard, Menu, ShieldCheck, UserCircle } from 'lucide-react';
+import { Coins, LayoutDashboard, LayoutGrid, Menu, ShieldCheck, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -48,6 +48,7 @@ export function MobileNavMenu({
         <DropdownMenuContent align="end" className="min-w-[12rem]">
           <DropdownMenuItem asChild>
             <Link href="/catalog" className="cursor-pointer">
+              <LayoutGrid className="mr-2 h-4 w-4" />
               {labels.catalog}
             </Link>
           </DropdownMenuItem>
