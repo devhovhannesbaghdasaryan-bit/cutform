@@ -31,6 +31,11 @@ export async function retryTransient<T>(fn: () => Promise<T>): Promise<T> {
     } catch (error) {
       lastError = error;
       if (attempt === MAX_ATTEMPTS || !isTransientSupabaseError(error)) throw error;
+      console.warn(
+        '[retryTransient] attempt %d failed transiently: %s',
+        attempt,
+        error instanceof Error ? error.message : String(error),
+      );
       const base = BASE_DELAY_MS * attempt; // 250ms, then 500ms
       const jitter = base * (Math.random() - 0.5); // ±50%
       await sleep(base + jitter);

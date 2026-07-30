@@ -24,6 +24,7 @@ describe('retryTransient', () => {
     vi.useFakeTimers();
     // Pin jitter to 0 (jitter = base * (random - 0.5)) so delays are exactly 250ms/500ms.
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
