@@ -194,6 +194,37 @@ export async function clearCart(supabase: TypedSupabaseClient, owner: CartOwner)
   if (error) throw new Error(error.message);
 }
 
+export type CartAddPlan =
+  | { kind: 'insert' }
+  | { kind: 'increment'; cartItemId: string; nextQuantity: number };
+
+/**
+ * Pure merge-vs-insert decision for adding an item to a cart. Repeat adds of
+ * the same catalog item coalesce into one line — but only when currency and
+ * unit price also match, so lines priced under different display currencies
+ * or exchange rates are never silently merged. Configuration is ignored on
+ * purpose: for catalog items it stores volatile pricing context
+ * (exchangeRateContext), not user-visible options. Generated items and
+ * banner samples are unique and always insert.
+ */
+export function planCartAdd(existingItems: CartItem[], input: CartItemInput): CartAddPlan {
+  if (!input.catalogItemId || !input.currency) return { kind: 'insert' };
+
+  const match = existingItems.find(
+    (item) =>
+      item.catalog_item_id === input.catalogItemId &&
+      item.currency === input.currency &&
+      item.unit_price_cents === input.unitPriceCents,
+  );
+
+  if (!match) return { kind: 'insert' };
+  return {
+    kind: 'increment',
+    cartItemId: match.id,
+    nextQuantity: match.quantity + (input.quantity ?? 1),
+  };
+}
+
 export interface CartMergePlan {
   /** Session items to append to the user cart as new rows. */
   inserts: CartItemSnapshot[];
