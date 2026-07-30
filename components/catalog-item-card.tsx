@@ -1,10 +1,9 @@
 import Link from 'next/link';
-import { ShoppingCart, Sparkles } from 'lucide-react';
-import { addCatalogItemToCartAction } from '@/app/cart/actions';
+import { Sparkles } from 'lucide-react';
+import { AddToCartButton } from '@/components/add-to-cart-button';
 import { CardHoverBoundary } from '@/components/catalog-card-hover';
 import { CatalogMediaSlider } from '@/components/catalog-media-slider';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { sortCatalogMedia } from '@/lib/catalog-media';
 import type { ConvertedMoney } from '@/lib/currency';
 import { getTranslations } from 'next-intl/server';
@@ -66,10 +65,7 @@ export async function CatalogItemCard({
         </CardContent>
         <CardFooter className="flex flex-col items-stretch gap-3 p-4">
           <div className="min-w-0 space-y-1.5">
-            <p
-              className="line-clamp-2 min-h-[2.5rem] font-medium leading-snug"
-              title={item.title}
-            >
+            <p className="line-clamp-2 min-h-[2.5rem] font-medium leading-snug" title={item.title}>
               {item.title}
             </p>
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -87,18 +83,11 @@ export async function CatalogItemCard({
             <p className="truncate font-semibold">
               {formatLocalizedCurrency(locale, convertedPrice.amountCents, convertedPrice.currency)}
             </p>
-            <form action={addCatalogItemToCartAction} className="shrink-0">
-              <input type="hidden" name="itemId" value={item.id} />
-              <Button
-                type="submit"
-                size="sm"
-                variant="outline"
-                className="shadow-sm"
-                aria-label={`Add ${item.title} to cart`}
-              >
-                <ShoppingCart className="h-4 w-4" />
-              </Button>
-            </form>
+            <AddToCartButton
+              itemId={item.id}
+              ariaLabel={`Add ${item.title} to cart`}
+              className="shadow-sm"
+            />
           </div>
         </CardFooter>
       </Card>

@@ -1,7 +1,9 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
+import { type ActionState, actionError, actionSuccess } from '@/lib/action-state';
 import {
   addItemToCart,
   type CartOwner,
@@ -27,66 +29,75 @@ async function getCartActor() {
   return { supabase, owner, cartSupabase: getServiceSupabase() };
 }
 
-export async function addCatalogItemToCartAction(formData: FormData) {
+export async function addCatalogItemToCartAction(
+  _prevState: ActionState<null>,
+  formData: FormData,
+): Promise<ActionState<null>> {
+  const t = await getTranslations();
   const parsed = z.object({ itemId: z.string().uuid() }).safeParse({
     itemId: formData.get('itemId'),
   });
 
-  if (!parsed.success) throw new Error('Invalid item.');
+  if (!parsed.success) return actionError(t('cart.add_invalid'));
 
-  const { supabase, owner, cartSupabase } = await getCartActor();
-  const { data: item, error } = await supabase
-    .from('catalog_items')
-    .select('id, title, price_cents, currency, status')
-    .eq('id', parsed.data.itemId)
-    .maybeSingle<{
-      id: string;
-      title: string;
-      price_cents: number;
-      currency: string;
-      status: string;
-    }>();
+  try {
+    const { supabase, owner, cartSupabase } = await getCartActor();
+    const { data: item, error } = await supabase
+      .from('catalog_items')
+      .select('id, title, price_cents, currency, status')
+      .eq('id', parsed.data.itemId)
+      .maybeSingle<{
+        id: string;
+        title: string;
+        price_cents: number;
+        currency: string;
+        status: string;
+      }>();
 
-  if (error || !item || item.status !== 'published') {
-    throw new Error(error?.message ?? 'Item is not available.');
-  }
-
-  const market = await resolveMarket({ supabase: getServiceSupabase() });
-  if (market.countryCode) {
-    const marketResolution = await resolveCatalogMarket(item.id, market, getServiceSupabase());
-    if (!marketResolution.availability.available) {
-      throw new Error('This item is not available for shipping to your selected country.');
+    if (error || !item || item.status !== 'published') {
+      return actionError(t('cart.add_unavailable'));
     }
-  }
 
-  const sourceCurrency = normalizeCurrency(item.currency) ?? 'AMD';
-  const activeCurrency = await getActiveCurrency();
-  const converted = await convertMoney(
-    item.price_cents,
-    sourceCurrency,
-    activeCurrency,
-    getServiceSupabase(),
-  );
+    const market = await resolveMarket({ supabase: getServiceSupabase() });
+    if (market.countryCode) {
+      const marketResolution = await resolveCatalogMarket(item.id, market, getServiceSupabase());
+      if (!marketResolution.availability.available) {
+        return actionError(t('cart.add_market_unavailable'));
+      }
+    }
 
-  const input = {
-    catalogItemId: item.id,
-    title: item.title,
-    unitPriceCents: converted.amountCents,
-    currency: converted.currency,
-    configuration: {
-      sourcePriceCents: item.price_cents,
+    const sourceCurrency = normalizeCurrency(item.currency) ?? 'AMD';
+    const activeCurrency = await getActiveCurrency();
+    const converted = await convertMoney(
+      item.price_cents,
       sourceCurrency,
-      exchangeRateContext: converted.exchangeRateContext,
-    },
-  };
+      activeCurrency,
+      getServiceSupabase(),
+    );
 
-  if (owner) {
-    await addItemToCart(cartSupabase, owner, input);
+    const input = {
+      catalogItemId: item.id,
+      title: item.title,
+      unitPriceCents: converted.amountCents,
+      currency: converted.currency,
+      configuration: {
+        sourcePriceCents: item.price_cents,
+        sourceCurrency,
+        exchangeRateContext: converted.exchangeRateContext,
+      },
+    };
+
+    if (owner) {
+      await addItemToCart(cartSupabase, owner, input);
+    }
+
+    revalidatePath('/cart');
+    revalidatePath('/catalog');
+    revalidatePath(`/items/${item.id}`);
+    return actionSuccess(null, t('cart.added'));
+  } catch {
+    return actionError(t('cart.add_failed'));
   }
-
-  revalidatePath('/cart');
-  revalidatePath('/catalog');
-  revalidatePath(`/items/${item.id}`);
 }
 
 export async function updateCartQuantityAction(formData: FormData) {
