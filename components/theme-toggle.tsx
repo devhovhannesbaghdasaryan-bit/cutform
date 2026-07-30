@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 const THEME_KEY = 'snip-theme';
 
@@ -12,14 +13,14 @@ function getTheme(): Theme {
   return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
 }
 
-export function ThemeToggle() {
-  function toggleTheme() {
-    const nextTheme: Theme = getTheme() === 'dark' ? 'light' : 'dark';
-    document.documentElement.classList.toggle('dark', nextTheme === 'dark');
-    document.documentElement.dataset.theme = nextTheme;
-    window.localStorage.setItem(THEME_KEY, nextTheme);
-  }
+export function toggleTheme() {
+  const nextTheme: Theme = getTheme() === 'dark' ? 'light' : 'dark';
+  document.documentElement.classList.toggle('dark', nextTheme === 'dark');
+  document.documentElement.dataset.theme = nextTheme;
+  window.localStorage.setItem(THEME_KEY, nextTheme);
+}
 
+export function ThemeToggle({ className }: { className?: string }) {
   return (
     <Button
       type="button"
@@ -28,7 +29,10 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label="Toggle color theme"
       title="Toggle color theme"
-      className="relative shrink-0 text-cyber-cyan hover:bg-secondary hover:text-secondary-foreground"
+      className={cn(
+        'relative shrink-0 text-cyber-cyan hover:bg-secondary hover:text-secondary-foreground',
+        className,
+      )}
     >
       <Sun
         className="h-4 w-4 scale-100 rotate-0 transition-transform dark:scale-0 dark:-rotate-90"

@@ -141,7 +141,8 @@
     "admin": "Админ",
     "orders": "Заказы",
     "home": "Главная Uniqraft",
-    "menu": "Меню"
+    "menu": "Меню",
+    "theme": "Тема"
   },
   "personalize": {
     "back": "Назад к товару",
