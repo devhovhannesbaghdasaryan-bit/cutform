@@ -340,7 +340,7 @@
     "semantic_hash": "92298ca768140c365c98dfc5aa4fa2ec"
   },
   "app/cart/actions.ts": {
-    "mtime": 1783349596.4348745,
+    "mtime": 1785413037.7841141,
     "ast_hash": "79b430011e9d2acc805fbb196e4d06c6",
     "semantic_hash": "79b430011e9d2acc805fbb196e4d06c6"
   },
@@ -400,7 +400,7 @@
     "semantic_hash": "370cf8a5f39c3a8f63d3133c57aefafc"
   },
   "app/items/[slug]/page.tsx": {
-    "mtime": 1784613575.3568218,
+    "mtime": 1785413037.7841141,
     "ast_hash": "815330b94e8373e89d01ccb0eb9bb3e3",
     "semantic_hash": "815330b94e8373e89d01ccb0eb9bb3e3"
   },
@@ -475,7 +475,7 @@
     "semantic_hash": "a15d634711681054a9b258dd059c7a5c"
   },
   "components/catalog-item-card.tsx": {
-    "mtime": 1785406423.466777,
+    "mtime": 1785413037.7841141,
     "ast_hash": "8d08745f0e1d672c3cbdd48306600817",
     "semantic_hash": "8d08745f0e1d672c3cbdd48306600817"
   },
@@ -530,7 +530,7 @@
     "semantic_hash": "ec2e1c0f791f04aafa394ccb0729622c"
   },
   "components/marketplace-header.tsx": {
-    "mtime": 1785408461.0942423,
+    "mtime": 1785413037.7851145,
     "ast_hash": "dcbfa7a36b89aaadf43dec31ff4deda5",
     "semantic_hash": ""
   },
@@ -650,7 +650,7 @@
     "semantic_hash": "0ab9a34e22b1f8ffc280d420f93eb706"
   },
   "lib/cart.ts": {
-    "mtime": 1783494153.6286762,
+    "mtime": 1785413037.7981923,
     "ast_hash": "88a3a4d23a7357046c10b160974f4d25",
     "semantic_hash": "88a3a4d23a7357046c10b160974f4d25"
   },
@@ -760,9 +760,9 @@
     "semantic_hash": "7c0209de334015a17e0fa921d53868f5"
   },
   "lib/marketplace.ts": {
-    "mtime": 1785407389.271276,
-    "ast_hash": "334eb3b380e47dd86af657aa9625ce77",
-    "semantic_hash": "334eb3b380e47dd86af657aa9625ce77"
+    "mtime": 1785413038.916753,
+    "ast_hash": "004edafae92e91a6910db4ffb15b0545",
+    "semantic_hash": ""
   },
   "lib/mcp/oauth-crypto.ts": {
     "mtime": 1784364014.479128,
@@ -945,18 +945,18 @@
     "semantic_hash": "588591fce77286794880b892b1a4c8e3"
   },
   "messages/am.json": {
-    "mtime": 1785408436.144665,
-    "ast_hash": "1a4e0a9cd31cb4c76a79eed8e3c14bb8",
+    "mtime": 1785413037.7987027,
+    "ast_hash": "010978fcbb3ab7682d850adf4eac82f5",
     "semantic_hash": ""
   },
   "messages/en.json": {
-    "mtime": 1785408431.122582,
+    "mtime": 1785413037.799217,
     "ast_hash": "7ca15f24676a94f11700db9ef0e0ff1c",
     "semantic_hash": ""
   },
   "messages/ru.json": {
-    "mtime": 1785408439.515068,
-    "ast_hash": "36d0888444fb8d5368a8e967193ec274",
+    "mtime": 1785413037.799728,
+    "ast_hash": "90e9f812613b05dcfcdf34e5a679019f",
     "semantic_hash": ""
   },
   "next.config.mjs": {
@@ -2089,9 +2089,14 @@
     "ast_hash": "2c59cd380c1ef67e44e5fb37f53ca34a",
     "semantic_hash": ""
   },
-  "components/mobile-nav-menu.tsx": {
-    "mtime": 1785408448.960612,
-    "ast_hash": "aac07e99bec80f7489486f4dfe03769b",
+  "lib/supabase/retry.ts": {
+    "mtime": 1785413038.916753,
+    "ast_hash": "a9644f837b3834b13effc071d2c86cce",
+    "semantic_hash": ""
+  },
+  "tests/lib/supabase-retry.test.ts": {
+    "mtime": 1785413038.916753,
+    "ast_hash": "0ff54f36b30791b26970d208b2bbd07a",
     "semantic_hash": ""
   },
   ".github/workflows/supabase-migrations.yml": {
@@ -2099,39 +2104,34 @@
     "ast_hash": "5d3117f5e86cf8fcc7ff2fec9114e181",
     "semantic_hash": ""
   },
-  ".superpowers/sdd/2026-07-30-mobile-nav-menu/progress.md": {
-    "mtime": 1785408392.4010365,
-    "ast_hash": "e4138a7f79904b9c281e5d8340a5190d",
+  "docs/superpowers/plans/2026-07-30-supabase-transient-retry.md": {
+    "mtime": 1785413038.9017525,
+    "ast_hash": "6002204a15e9963e522a4025e76d8fd9",
     "semantic_hash": ""
   },
-  ".superpowers/sdd/2026-07-30-mobile-nav-menu/task-1-brief.md": {
-    "mtime": 1785408392.549703,
-    "ast_hash": "bf356c64ad33ebee0551408bb1acbb28",
-    "semantic_hash": ""
-  },
-  "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md": {
-    "mtime": 1785407886.4652028,
-    "ast_hash": "e87df696b4e79ff9cdd4bcf6abaa2052",
-    "semantic_hash": ""
-  },
-  "docs/superpowers/plans/2026-07-30-mobile-nav-menu.md": {
-    "mtime": 1785407803.9680314,
-    "ast_hash": "48c1f4829ca9e9faa070e1381151ff02",
-    "semantic_hash": ""
-  },
-  "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md": {
-    "mtime": 1785407385.164929,
-    "ast_hash": "4b5528c5c4dc2edeff46b059a94264f8",
-    "semantic_hash": ""
-  },
-  "docs/superpowers/specs/2026-07-30-mobile-nav-menu-design.md": {
-    "mtime": 1785407382.0668933,
-    "ast_hash": "fedae0d0742516caef1c6aa197017d07",
+  "docs/superpowers/specs/2026-07-30-supabase-transient-retry-design.md": {
+    "mtime": 1785413038.9017525,
+    "ast_hash": "5e197a8de254f752bb6208a898345f17",
     "semantic_hash": ""
   },
   "docs/pitch/Uniqraft-PitchDeck.pdf": {
     "mtime": 1785406056.2548025,
     "ast_hash": "91a578149e5a341c62542fadd782c4fc",
+    "semantic_hash": ""
+  },
+  "components/mobile-nav-menu.tsx": {
+    "mtime": 1785413037.7851145,
+    "ast_hash": "520ca852da6d9f894a381e3e62575e53",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-07-30-mobile-nav-menu.md": {
+    "mtime": 1785413037.7851145,
+    "ast_hash": "48c1f4829ca9e9faa070e1381151ff02",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-07-30-mobile-nav-menu-design.md": {
+    "mtime": 1785413037.7861137,
+    "ast_hash": "fedae0d0742516caef1c6aa197017d07",
     "semantic_hash": ""
   }
 }
