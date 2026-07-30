@@ -56,19 +56,19 @@ function getStringConfigurationValue(record: Record<string, unknown>, key: strin
 export type CartOwner = { userId: string } | { sessionId: string };
 
 /**
- * Error-tolerant item count for the owner's active cart, for display surfaces
+ * Error-tolerant total unit count (sum of quantities) for the owner's active cart, for display surfaces
  * such as headers. Never creates a cart; returns 0 when no active cart exists
  * or the query fails.
  */
 export async function getActiveCartItemCount(supabase: TypedSupabaseClient, owner: CartOwner) {
-  const query = supabase.from('carts').select('id, cart_items(id)');
+  const query = supabase.from('carts').select('id, cart_items(quantity)');
   const { data } = await ('userId' in owner
     ? query.eq('user_id', owner.userId)
     : query.eq('session_id', owner.sessionId)
   )
     .eq('status', 'active')
     .maybeSingle();
-  return data?.cart_items?.length ?? 0;
+  return (data?.cart_items ?? []).reduce((sum, item) => sum + (item.quantity ?? 0), 0);
 }
 
 export async function getOrCreateCart(supabase: TypedSupabaseClient, owner: CartOwner) {
@@ -126,6 +126,29 @@ export async function addItemToCart(
   }
 
   const cart = await getOrCreateCart(supabase, owner);
+
+  const { data: existingItems, error: existingItemsError } = await supabase
+    .from('cart_items')
+    .select(
+      'id, cart_id, catalog_item_id, generated_item_id, banner_sample_id, title, quantity, unit_price_cents, currency, configuration',
+    )
+    .eq('cart_id', cart.id)
+    .returns<CartItem[]>();
+
+  if (existingItemsError) throw new Error(existingItemsError.message);
+
+  const plan = planCartAdd(existingItems ?? [], input);
+  if (plan.kind === 'increment') {
+    const { error: incrementError } = await supabase
+      .from('cart_items')
+      .update({ quantity: plan.nextQuantity })
+      .eq('id', plan.cartItemId)
+      .eq('cart_id', cart.id);
+
+    if (incrementError) throw new Error(incrementError.message);
+    return { id: plan.cartItemId };
+  }
+
   const { data, error } = await supabase
     .from('cart_items')
     .insert({
