@@ -140,7 +140,8 @@
     "dashboard": "Кабинет",
     "admin": "Админ",
     "orders": "Заказы",
-    "home": "Главная Uniqraft"
+    "home": "Главная Uniqcraft",
+    "menu": "Меню"
   },
   "personalize": {
     "back": "Назад к товару",
