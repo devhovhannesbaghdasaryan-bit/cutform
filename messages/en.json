@@ -140,7 +140,8 @@
     "dashboard": "Dashboard",
     "admin": "Admin",
     "orders": "Orders",
-    "home": "Uniqraft home"
+    "home": "Uniqraft home",
+    "menu": "Menu"
   },
   "personalize": {
     "back": "Back to item",

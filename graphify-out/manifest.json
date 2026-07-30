@@ -340,7 +340,7 @@
     "semantic_hash": "92298ca768140c365c98dfc5aa4fa2ec"
   },
   "app/cart/actions.ts": {
-    "mtime": 1785409890.2398832,
+    "mtime": 1785413501.544101,
     "ast_hash": "b94924a0099778a3dbc6b6acd7330da2",
     "semantic_hash": ""
   },
@@ -400,7 +400,7 @@
     "semantic_hash": "370cf8a5f39c3a8f63d3133c57aefafc"
   },
   "app/items/[slug]/page.tsx": {
-    "mtime": 1785409919.6222422,
+    "mtime": 1785413501.544101,
     "ast_hash": "80c68dc16b791d0657d8ad33493d9a6e",
     "semantic_hash": ""
   },
@@ -475,7 +475,7 @@
     "semantic_hash": "a15d634711681054a9b258dd059c7a5c"
   },
   "components/catalog-item-card.tsx": {
-    "mtime": 1785409945.5161984,
+    "mtime": 1785413501.5451012,
     "ast_hash": "3840b97f6c330f9582ba24e1fee8fd38",
     "semantic_hash": ""
   },
@@ -530,9 +530,9 @@
     "semantic_hash": "ec2e1c0f791f04aafa394ccb0729622c"
   },
   "components/marketplace-header.tsx": {
-    "mtime": 1785409271.511391,
-    "ast_hash": "349a6eca2c69b2b96cd694408d139d83",
-    "semantic_hash": "349a6eca2c69b2b96cd694408d139d83"
+    "mtime": 1785413502.66615,
+    "ast_hash": "dcbfa7a36b89aaadf43dec31ff4deda5",
+    "semantic_hash": ""
   },
   "components/personalize-item-form.tsx": {
     "mtime": 1783494153.627676,
@@ -650,7 +650,7 @@
     "semantic_hash": "0ab9a34e22b1f8ffc280d420f93eb706"
   },
   "lib/cart.ts": {
-    "mtime": 1785409662.852295,
+    "mtime": 1785413501.5586119,
     "ast_hash": "22119afbd336fd1aa83e50b86abeeaf1",
     "semantic_hash": ""
   },
@@ -760,9 +760,9 @@
     "semantic_hash": "7c0209de334015a17e0fa921d53868f5"
   },
   "lib/marketplace.ts": {
-    "mtime": 1785407389.271276,
-    "ast_hash": "334eb3b380e47dd86af657aa9625ce77",
-    "semantic_hash": "334eb3b380e47dd86af657aa9625ce77"
+    "mtime": 1785413502.683149,
+    "ast_hash": "004edafae92e91a6910db4ffb15b0545",
+    "semantic_hash": ""
   },
   "lib/mcp/oauth-crypto.ts": {
     "mtime": 1784364014.479128,
@@ -945,18 +945,18 @@
     "semantic_hash": "588591fce77286794880b892b1a4c8e3"
   },
   "messages/am.json": {
-    "mtime": 1785409867.6208076,
-    "ast_hash": "16fa09a5c8608573aaf1aae7682ad948",
+    "mtime": 1785413502.684149,
+    "ast_hash": "1cb9dcfdc4c2684939f274553a4be318",
     "semantic_hash": ""
   },
   "messages/en.json": {
-    "mtime": 1785409858.211556,
-    "ast_hash": "54d7b15e5ff877188f094d6b898bd65a",
+    "mtime": 1785413502.684149,
+    "ast_hash": "43e3840d43cd675f51947bd5a1fb450a",
     "semantic_hash": ""
   },
   "messages/ru.json": {
-    "mtime": 1785409869.6843357,
-    "ast_hash": "ff9cb08309554db8bf31c40c9dc231cb",
+    "mtime": 1785413502.685149,
+    "ast_hash": "884199eaad0c9c958a7fac3ac53bc91b",
     "semantic_hash": ""
   },
   "next.config.mjs": {
@@ -2089,14 +2089,14 @@
     "ast_hash": "2c59cd380c1ef67e44e5fb37f53ca34a",
     "semantic_hash": ""
   },
-  "components/add-to-cart-button.tsx": {
-    "mtime": 1785409907.5827484,
-    "ast_hash": "34c33211f4bd0d156546d5cd9003b247",
+  "lib/supabase/retry.ts": {
+    "mtime": 1785413502.683149,
+    "ast_hash": "a9644f837b3834b13effc071d2c86cce",
     "semantic_hash": ""
   },
-  "tests/lib/cart-add-plan.test.ts": {
-    "mtime": 1785409308.3809004,
-    "ast_hash": "69ddf12c80f60dd8375fcbf4210eb348",
+  "tests/lib/supabase-retry.test.ts": {
+    "mtime": 1785413502.685149,
+    "ast_hash": "0ff54f36b30791b26970d208b2bbd07a",
     "semantic_hash": ""
   },
   ".github/workflows/supabase-migrations.yml": {
@@ -2104,49 +2104,54 @@
     "ast_hash": "5d3117f5e86cf8fcc7ff2fec9114e181",
     "semantic_hash": ""
   },
-  ".superpowers/sdd/2026-07-30-cart-ux-feedback/progress.md": {
-    "mtime": 1785409803.8140457,
-    "ast_hash": "762d0daac0bd668a234c4d7ef0af1b6c",
+  "docs/superpowers/plans/2026-07-30-supabase-transient-retry.md": {
+    "mtime": 1785413502.667149,
+    "ast_hash": "6002204a15e9963e522a4025e76d8fd9",
     "semantic_hash": ""
   },
-  ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-brief.md": {
-    "mtime": 1785409271.8640907,
-    "ast_hash": "1bcd95fff0c3360d8b09eff4bf1e08a3",
-    "semantic_hash": ""
-  },
-  ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md": {
-    "mtime": 1785409594.3247526,
-    "ast_hash": "831d454c199ce5b562257e3b03f6e608",
-    "semantic_hash": ""
-  },
-  ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-brief.md": {
-    "mtime": 1785409617.9750378,
-    "ast_hash": "3960ee94ba2e26ccbfc522a1b1c179a0",
-    "semantic_hash": ""
-  },
-  ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md": {
-    "mtime": 1785409710.7960045,
-    "ast_hash": "e3b09d3bc52a136593a58c71c694929c",
-    "semantic_hash": ""
-  },
-  ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-3-brief.md": {
-    "mtime": 1785409803.9286816,
-    "ast_hash": "55450194e06a4413ec186af305392145",
-    "semantic_hash": ""
-  },
-  "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md": {
-    "mtime": 1785409258.1400607,
-    "ast_hash": "8c0051acc7f43646270906de3879a67b",
-    "semantic_hash": ""
-  },
-  "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md": {
-    "mtime": 1785407385.164929,
-    "ast_hash": "4b5528c5c4dc2edeff46b059a94264f8",
+  "docs/superpowers/specs/2026-07-30-supabase-transient-retry-design.md": {
+    "mtime": 1785413502.6681495,
+    "ast_hash": "5e197a8de254f752bb6208a898345f17",
     "semantic_hash": ""
   },
   "docs/pitch/Uniqraft-PitchDeck.pdf": {
     "mtime": 1785406056.2548025,
     "ast_hash": "91a578149e5a341c62542fadd782c4fc",
+    "semantic_hash": ""
+  },
+  "components/mobile-nav-menu.tsx": {
+    "mtime": 1785413502.667149,
+    "ast_hash": "520ca852da6d9f894a381e3e62575e53",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-07-30-mobile-nav-menu.md": {
+    "mtime": 1785413502.667149,
+    "ast_hash": "48c1f4829ca9e9faa070e1381151ff02",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-07-30-mobile-nav-menu-design.md": {
+    "mtime": 1785413502.6681495,
+    "ast_hash": "fedae0d0742516caef1c6aa197017d07",
+    "semantic_hash": ""
+  },
+  "components/add-to-cart-button.tsx": {
+    "mtime": 1785413501.5451012,
+    "ast_hash": "34c33211f4bd0d156546d5cd9003b247",
+    "semantic_hash": ""
+  },
+  "tests/lib/cart-add-plan.test.ts": {
+    "mtime": 1785413501.5606127,
+    "ast_hash": "69ddf12c80f60dd8375fcbf4210eb348",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md": {
+    "mtime": 1785413501.5461018,
+    "ast_hash": "8c0051acc7f43646270906de3879a67b",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md": {
+    "mtime": 1785413501.5461018,
+    "ast_hash": "4b5528c5c4dc2edeff46b059a94264f8",
     "semantic_hash": ""
   }
 }

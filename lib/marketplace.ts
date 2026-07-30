@@ -1,5 +1,6 @@
 import { unstable_cache, unstable_noStore as noStore } from 'next/cache';
 import { getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
+import { retryTransient } from '@/lib/supabase/retry';
 import type { AppLocale } from '@/lib/i18n';
 import type { CatalogSeoMetadata } from '@/lib/seo';
 import { resolveCatalogMarkets, resolveMarket } from '@/lib/market';
@@ -106,18 +107,19 @@ const CATALOG_SELECT = `
 // callbacks cannot call the cookie-dependent dynamic APIs the request-scoped
 // client relies on.
 const getCachedCategories = unstable_cache(
-  async () => {
-    const supabase = getServiceSupabase();
-    const { data, error } = await supabase
-      .from('categories')
-      .select('id, slug, name, description, sort_order')
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true })
-      .returns<MarketplaceCategory[]>();
+  async () =>
+    retryTransient(async () => {
+      const supabase = getServiceSupabase();
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, slug, name, description, sort_order')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+        .returns<MarketplaceCategory[]>();
 
-    if (error) throw new Error(error.message);
-    return data ?? [];
-  },
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    }),
   ['catalog-categories'],
   { revalidate: 3600, tags: ['categories'] },
 );
@@ -127,36 +129,37 @@ export async function listCategories() {
 }
 
 const getCachedSubcategories = unstable_cache(
-  async (categorySlug: string | undefined) => {
-    const supabase = getServiceSupabase();
-    let query = supabase
-      .from('subcategories')
-      .select(
-        `
-        id,
-        category_id,
-        slug,
-        name,
-        description,
-        sort_order,
-        category:categories (
+  async (categorySlug: string | undefined) =>
+    retryTransient(async () => {
+      const supabase = getServiceSupabase();
+      let query = supabase
+        .from('subcategories')
+        .select(
+          `
+          id,
+          category_id,
           slug,
-          name
+          name,
+          description,
+          sort_order,
+          category:categories (
+            slug,
+            name
+          )
+        `,
         )
-      `,
-      )
-      .eq('is_active', true)
-      .order('sort_order', { ascending: true });
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
 
-    if (categorySlug) {
-      query = query.eq('categories.slug', categorySlug);
-    }
+      if (categorySlug) {
+        query = query.eq('categories.slug', categorySlug);
+      }
 
-    const { data, error } = await query.returns<MarketplaceSubcategory[]>();
-    if (error) throw new Error(error.message);
+      const { data, error } = await query.returns<MarketplaceSubcategory[]>();
+      if (error) throw new Error(error.message);
 
-    return (data ?? []).filter((item) => !categorySlug || item.category?.slug === categorySlug);
-  },
+      return (data ?? []).filter((item) => !categorySlug || item.category?.slug === categorySlug);
+    }),
   ['catalog-subcategories'],
   { revalidate: 3600, tags: ['subcategories'] },
 );
@@ -176,24 +179,25 @@ export const CATALOG_PAGE_SIZE = 24;
 // silently a no-op and the whole (unfiltered, unpaginated) published catalog
 // was fetched and filtered in JS on every request instead.
 const getCachedPublishedCatalogItemsPage = unstable_cache(
-  async (categoryId: string | undefined, subcategoryId: string | undefined, offset: number) => {
-    const supabase = getServiceSupabase();
-    let query = supabase
-      .from('catalog_items')
-      .select(CATALOG_SELECT)
-      .eq('status', 'published')
-      .order('created_at', { ascending: false })
-      // Fetch one extra row so the caller can tell whether another page
-      // exists without a separate COUNT(*) query.
-      .range(offset, offset + CATALOG_PAGE_SIZE);
+  async (categoryId: string | undefined, subcategoryId: string | undefined, offset: number) =>
+    retryTransient(async () => {
+      const supabase = getServiceSupabase();
+      let query = supabase
+        .from('catalog_items')
+        .select(CATALOG_SELECT)
+        .eq('status', 'published')
+        .order('created_at', { ascending: false })
+        // Fetch one extra row so the caller can tell whether another page
+        // exists without a separate COUNT(*) query.
+        .range(offset, offset + CATALOG_PAGE_SIZE);
 
-    if (categoryId) query = query.eq('category_id', categoryId);
-    if (subcategoryId) query = query.eq('subcategory_id', subcategoryId);
+      if (categoryId) query = query.eq('category_id', categoryId);
+      if (subcategoryId) query = query.eq('subcategory_id', subcategoryId);
 
-    const { data, error } = await query.returns<CatalogItem[]>();
-    if (error) throw new Error(error.message);
-    return data ?? [];
-  },
+      const { data, error } = await query.returns<CatalogItem[]>();
+      if (error) throw new Error(error.message);
+      return data ?? [];
+    }),
   ['catalog-items-page'],
   { revalidate: 300, tags: ['catalog-items'] },
 );

@@ -4,6 +4,7 @@ import { BrandLogo } from '@/components/brand-logo';
 import { CurrencySwitcher } from '@/components/currency-switcher';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { MobileNavMenu } from '@/components/mobile-nav-menu';
 import { Button } from '@/components/ui/button';
 import { getCurrentUserRole } from '@/lib/admin';
 import { getActiveCartItemCount } from '@/lib/cart';
@@ -99,6 +100,21 @@ export async function MarketplaceHeader() {
               </Button>
             </>
           )}
+          <MobileNavMenu
+            isAuthenticated={Boolean(user)}
+            isAdmin={role === 'admin'}
+            creditBalance={creditBalance}
+            labels={{
+              menu: t('nav.menu'),
+              catalog: t('nav.catalog'),
+              credits: t('nav.credits'),
+              dashboard: t('nav.dashboard'),
+              admin: t('nav.admin'),
+              profile: t('nav.profile'),
+              login: t('auth.login'),
+              signup: t('auth.signup'),
+            }}
+          />
         </div>
       </div>
     </header>
