@@ -333,6 +333,11 @@
     "checkout_review": "Review checkout",
     "resolve_issues": "Resolve the item messages before checkout.",
     "clear": "Clear cart",
+    "added": "Added to cart",
+    "add_invalid": "Invalid item.",
+    "add_unavailable": "This item is not available.",
+    "add_market_unavailable": "This item is not available for shipping to your selected country.",
+    "add_failed": "Couldn't add the item. Please try again.",
     "issue": {
       "price_changed": "The item price changed. Please review it before checkout.",
       "item_unavailable": "This item is no longer available.",

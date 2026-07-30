@@ -252,7 +252,7 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "app_auth_actions_callbackurl",
-      "community": 26,
+      "community": 33,
       "norm_label": "callbackurl()"
     },
     {
@@ -262,7 +262,7 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "app_auth_actions_mergeanonymouscart",
-      "community": 33,
+      "community": 329,
       "norm_label": "mergeanonymouscart()"
     },
     {
@@ -272,7 +272,7 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "app_auth_actions_registeraction",
-      "community": 26,
+      "community": 33,
       "norm_label": "registeraction()"
     },
     {
@@ -282,7 +282,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "app_auth_actions_loginaction",
-      "community": 33,
+      "community": 329,
       "norm_label": "loginaction()"
     },
     {
@@ -292,7 +292,7 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "app_auth_actions_socialloginaction",
-      "community": 33,
+      "community": 327,
       "norm_label": "socialloginaction()"
     },
     {
@@ -312,7 +312,7 @@
       "source_location": "L146",
       "_origin": "ast",
       "id": "app_auth_actions_resendverificationaction",
-      "community": 26,
+      "community": 33,
       "norm_label": "resendverificationaction()"
     },
     {
@@ -332,7 +332,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_login_login_form",
-      "community": 26,
+      "community": 329,
       "norm_label": "login-form.tsx"
     },
     {
@@ -342,7 +342,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_auth_login_login_form_logincopy",
-      "community": 26,
+      "community": 329,
       "norm_label": "logincopy"
     },
     {
@@ -352,7 +352,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "app_auth_login_login_form_loginform",
-      "community": 26,
+      "community": 329,
       "norm_label": "loginform()"
     },
     {
@@ -362,7 +362,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_login_page",
-      "community": 26,
+      "community": 329,
       "norm_label": "page.tsx"
     },
     {
@@ -372,7 +372,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_auth_login_page_loginpage",
-      "community": 26,
+      "community": 329,
       "norm_label": "loginpage()"
     },
     {
@@ -382,7 +382,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_register_page",
-      "community": 26,
+      "community": 327,
       "norm_label": "page.tsx"
     },
     {
@@ -392,7 +392,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_auth_register_page_registerpage",
-      "community": 26,
+      "community": 327,
       "norm_label": "registerpage()"
     },
     {
@@ -402,7 +402,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_register_register_form",
-      "community": 26,
+      "community": 327,
       "norm_label": "register-form.tsx"
     },
     {
@@ -412,7 +412,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_auth_register_register_form_registercopy",
-      "community": 26,
+      "community": 327,
       "norm_label": "registercopy"
     },
     {
@@ -422,7 +422,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "app_auth_register_register_form_registerform",
-      "community": 26,
+      "community": 327,
       "norm_label": "registerform()"
     },
     {
@@ -432,7 +432,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_social_login_buttons",
-      "community": 26,
+      "community": 327,
       "norm_label": "social-login-buttons.tsx"
     },
     {
@@ -442,7 +442,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_auth_social_login_buttons_providers",
-      "community": 26,
+      "community": 327,
       "norm_label": "providers"
     },
     {
@@ -452,7 +452,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_auth_social_login_buttons_sociallogincopy",
-      "community": 26,
+      "community": 327,
       "norm_label": "sociallogincopy"
     },
     {
@@ -462,7 +462,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_auth_social_login_buttons_socialloginbuttons",
-      "community": 26,
+      "community": 327,
       "norm_label": "socialloginbuttons()"
     },
     {
@@ -522,7 +522,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_admin_nav",
-      "community": 57,
+      "community": 23,
       "norm_label": "admin-nav.tsx"
     },
     {
@@ -532,7 +532,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_admin_admin_nav_links",
-      "community": 57,
+      "community": 23,
       "norm_label": "links"
     },
     {
@@ -542,7 +542,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "app_admin_admin_nav_adminnav",
-      "community": 57,
+      "community": 23,
       "norm_label": "adminnav()"
     },
     {
@@ -582,7 +582,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_connectors_page",
-      "community": 11,
+      "community": 148,
       "norm_label": "page.tsx"
     },
     {
@@ -592,7 +592,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_admin_connectors_page_adminconnectorspage",
-      "community": 11,
+      "community": 148,
       "norm_label": "adminconnectorspage()"
     },
     {
@@ -682,7 +682,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_admin_currencies_page_currencyrow",
-      "community": 320,
+      "community": 104,
       "norm_label": "currencyrow"
     },
     {
@@ -702,7 +702,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "app_admin_currencies_page_admincurrenciespage",
-      "community": 104,
+      "community": 11,
       "norm_label": "admincurrenciespage()"
     },
     {
@@ -742,7 +742,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_generated_id_manufacturing_file_form",
-      "community": 37,
+      "community": 328,
       "norm_label": "manufacturing-file-form.tsx"
     },
     {
@@ -752,7 +752,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_admin_generated_id_manufacturing_file_form_manufacturingfileformprops",
-      "community": 37,
+      "community": 328,
       "norm_label": "manufacturingfileformprops"
     },
     {
@@ -762,7 +762,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_admin_generated_id_manufacturing_file_form_initialstate",
-      "community": 37,
+      "community": 328,
       "norm_label": "initialstate"
     },
     {
@@ -772,7 +772,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "app_admin_generated_id_manufacturing_file_form_manufacturingfileform",
-      "community": 37,
+      "community": 328,
       "norm_label": "manufacturingfileform()"
     },
     {
@@ -782,7 +782,7 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "app_admin_generated_id_manufacturing_file_form_field",
-      "community": 37,
+      "community": 328,
       "norm_label": "field()"
     },
     {
@@ -952,7 +952,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "app_admin_generated_actions_manufacturingfilegenerationstate",
-      "community": 37,
+      "community": 328,
       "norm_label": "manufacturingfilegenerationstate"
     },
     {
@@ -992,7 +992,7 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "app_admin_generated_actions_generatemanufacturingfileaction",
-      "community": 37,
+      "community": 328,
       "norm_label": "generatemanufacturingfileaction()"
     },
     {
@@ -1012,7 +1012,7 @@
       "source_location": "L310",
       "_origin": "ast",
       "id": "app_admin_generated_actions_reviewgenerateditemaction",
-      "community": 32,
+      "community": 37,
       "norm_label": "reviewgenerateditemaction()"
     },
     {
@@ -1292,7 +1292,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "app_admin_items_item_form_parsing_readseolocale",
-      "community": 9,
+      "community": 5,
       "norm_label": "readseolocale()"
     },
     {
@@ -1352,7 +1352,7 @@
       "source_location": "L153",
       "_origin": "ast",
       "id": "app_admin_items_item_form_parsing_uploadadmincatalogasset",
-      "community": 2,
+      "community": 5,
       "norm_label": "uploadadmincatalogasset()"
     },
     {
@@ -1362,7 +1362,7 @@
       "source_location": "L173",
       "_origin": "ast",
       "id": "app_admin_items_item_form_parsing_ensurecatalogslugisavailable",
-      "community": 21,
+      "community": 9,
       "norm_label": "ensurecatalogslugisavailable()"
     },
     {
@@ -1442,7 +1442,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context",
-      "community": 26,
+      "community": 326,
       "norm_label": "ai-context.tsx"
     },
     {
@@ -1452,7 +1452,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_fielderror",
-      "community": 26,
+      "community": 326,
       "norm_label": "fielderror"
     },
     {
@@ -1462,7 +1462,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_itemformaicontextvalue",
-      "community": 26,
+      "community": 326,
       "norm_label": "itemformaicontextvalue"
     },
     {
@@ -1472,7 +1472,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_itemformaicontext",
-      "community": 26,
+      "community": 326,
       "norm_label": "itemformaicontext"
     },
     {
@@ -1482,7 +1482,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_readfieldvalue",
-      "community": 26,
+      "community": 326,
       "norm_label": "readfieldvalue()"
     },
     {
@@ -1492,7 +1492,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_writefieldvalue",
-      "community": 26,
+      "community": 326,
       "norm_label": "writefieldvalue()"
     },
     {
@@ -1502,7 +1502,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_itemformaiprovider",
-      "community": 26,
+      "community": 326,
       "norm_label": "itemformaiprovider()"
     },
     {
@@ -1512,7 +1512,7 @@
       "source_location": "L132",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_useitemformai",
-      "community": 26,
+      "community": 326,
       "norm_label": "useitemformai()"
     },
     {
@@ -1522,7 +1522,7 @@
       "source_location": "L140",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_autogeneratebutton",
-      "community": 26,
+      "community": 326,
       "norm_label": "autogeneratebutton()"
     },
     {
@@ -1532,7 +1532,7 @@
       "source_location": "L171",
       "_origin": "ast",
       "id": "app_admin_items_item_form_ai_context_fillallbutton",
-      "community": 26,
+      "community": 326,
       "norm_label": "fillallbutton()"
     },
     {
@@ -1682,7 +1682,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_items_item_form_personalization_fields",
-      "community": 26,
+      "community": 34,
       "norm_label": "personalization-fields.tsx"
     },
     {
@@ -1692,7 +1692,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "app_admin_items_item_form_personalization_fields_tag_labels",
-      "community": 26,
+      "community": 34,
       "norm_label": "tag_labels"
     },
     {
@@ -1702,7 +1702,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_admin_items_item_form_personalization_fields_personalizationfields",
-      "community": 26,
+      "community": 34,
       "norm_label": "personalizationfields()"
     },
     {
@@ -1712,7 +1712,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_items_item_form_pricing_size_fields",
-      "community": 26,
+      "community": 34,
       "norm_label": "pricing-size-fields.tsx"
     },
     {
@@ -1722,7 +1722,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_admin_items_item_form_pricing_size_fields_pricefield",
-      "community": 26,
+      "community": 34,
       "norm_label": "pricefield()"
     },
     {
@@ -1732,7 +1732,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "app_admin_items_item_form_pricing_size_fields_manufacturingnotesfield",
-      "community": 26,
+      "community": 34,
       "norm_label": "manufacturingnotesfield()"
     },
     {
@@ -1742,7 +1742,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "app_admin_items_item_form_pricing_size_fields_sizescharacteristicsfields",
-      "community": 26,
+      "community": 34,
       "norm_label": "sizescharacteristicsfields()"
     },
     {
@@ -1752,7 +1752,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_items_item_form_seo_section",
-      "community": 26,
+      "community": 34,
       "norm_label": "seo-section.tsx"
     },
     {
@@ -1762,7 +1762,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_admin_items_item_form_seo_section_seosection",
-      "community": 26,
+      "community": 34,
       "norm_label": "seosection()"
     },
     {
@@ -1802,7 +1802,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_admin_items_item_form_types_seoformvalue",
-      "community": 26,
+      "community": 34,
       "norm_label": "seoformvalue"
     },
     {
@@ -1892,7 +1892,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_items_page",
-      "community": 11,
+      "community": 51,
       "norm_label": "page.tsx"
     },
     {
@@ -1902,7 +1902,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_admin_items_page_adminitemspage",
-      "community": 11,
+      "community": 51,
       "norm_label": "adminitemspage()"
     },
     {
@@ -1912,7 +1912,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_layout",
-      "community": 57,
+      "community": 23,
       "norm_label": "layout.tsx"
     },
     {
@@ -1922,7 +1922,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_admin_layout_adminlayout",
-      "community": 57,
+      "community": 23,
       "norm_label": "adminlayout()"
     },
     {
@@ -1932,7 +1932,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_markets_actions",
-      "community": 32,
+      "community": 320,
       "norm_label": "actions.ts"
     },
     {
@@ -1942,7 +1942,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "app_admin_markets_actions_optionalcurrency",
-      "community": 32,
+      "community": 320,
       "norm_label": "optionalcurrency"
     },
     {
@@ -1952,7 +1952,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_admin_markets_actions_createmarketregionaction",
-      "community": 32,
+      "community": 320,
       "norm_label": "createmarketregionaction()"
     },
     {
@@ -1962,7 +1962,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "app_admin_markets_actions_updatemarketregionaction",
-      "community": 32,
+      "community": 320,
       "norm_label": "updatemarketregionaction()"
     },
     {
@@ -1972,7 +1972,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "app_admin_markets_actions_updatecountrymarketaction",
-      "community": 32,
+      "community": 320,
       "norm_label": "updatecountrymarketaction()"
     },
     {
@@ -1982,7 +1982,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_markets_page",
-      "community": 32,
+      "community": 320,
       "norm_label": "page.tsx"
     },
     {
@@ -1992,7 +1992,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_admin_markets_page_adminmarketspage",
-      "community": 23,
+      "community": 320,
       "norm_label": "adminmarketspage()"
     },
     {
@@ -2002,7 +2002,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_order_status_form",
-      "community": 26,
+      "community": 323,
       "norm_label": "order-status-form.tsx"
     },
     {
@@ -2012,7 +2012,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "app_admin_order_status_form_orderstatusform",
-      "community": 26,
+      "community": 323,
       "norm_label": "orderstatusform()"
     },
     {
@@ -2022,7 +2022,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_orders_id_actions",
-      "community": 39,
+      "community": 323,
       "norm_label": "actions.ts"
     },
     {
@@ -2032,7 +2032,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_admin_orders_id_actions_generateschema",
-      "community": 39,
+      "community": 323,
       "norm_label": "generateschema"
     },
     {
@@ -2042,7 +2042,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_admin_orders_id_actions_orderstatusschema",
-      "community": 39,
+      "community": 323,
       "norm_label": "orderstatusschema"
     },
     {
@@ -2052,7 +2052,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "app_admin_orders_id_actions_updateorderstatusaction",
-      "community": 26,
+      "community": 323,
       "norm_label": "updateorderstatusaction()"
     },
     {
@@ -2082,7 +2082,7 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "app_admin_orders_id_actions_requirestringpath",
-      "community": 39,
+      "community": 323,
       "norm_label": "requirestringpath()"
     },
     {
@@ -2092,7 +2092,7 @@
       "source_location": "L89",
       "_origin": "ast",
       "id": "app_admin_orders_id_actions_generatebannermanufacturinginstructionaction",
-      "community": 39,
+      "community": 323,
       "norm_label": "generatebannermanufacturinginstructionaction()"
     },
     {
@@ -2102,7 +2102,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_orders_id_page",
-      "community": 20,
+      "community": 51,
       "norm_label": "page.tsx"
     },
     {
@@ -2112,7 +2112,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_admin_orders_id_page_adminorderdetailpage",
-      "community": 11,
+      "community": 51,
       "norm_label": "adminorderdetailpage()"
     },
     {
@@ -2122,7 +2122,7 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "app_admin_orders_id_page_orderitemdetail",
-      "community": 11,
+      "community": 51,
       "norm_label": "orderitemdetail()"
     },
     {
@@ -2132,7 +2132,7 @@
       "source_location": "L258",
       "_origin": "ast",
       "id": "app_admin_orders_id_page_info",
-      "community": 20,
+      "community": 51,
       "norm_label": "info()"
     },
     {
@@ -2142,7 +2142,7 @@
       "source_location": "L267",
       "_origin": "ast",
       "id": "app_admin_orders_id_page_snapshot",
-      "community": 20,
+      "community": 51,
       "norm_label": "snapshot()"
     },
     {
@@ -2262,7 +2262,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_personalization_boilerplates_page",
-      "community": 26,
+      "community": 34,
       "norm_label": "page.tsx"
     },
     {
@@ -2272,7 +2272,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_admin_personalization_boilerplates_page_boilerplatelibrarypage",
-      "community": 26,
+      "community": 34,
       "norm_label": "boilerplatelibrarypage()"
     },
     {
@@ -2282,7 +2282,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "app_admin_personalization_boilerplates_page_boilerplateform",
-      "community": 148,
+      "community": 34,
       "norm_label": "boilerplateform()"
     },
     {
@@ -2312,7 +2312,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_transactions_id_page",
-      "community": 11,
+      "community": 148,
       "norm_label": "page.tsx"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_admin_transactions_id_page_transactiondetail",
-      "community": 11,
+      "community": 148,
       "norm_label": "transactiondetail"
     },
     {
@@ -2332,7 +2332,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "app_admin_transactions_id_page_auditrow",
-      "community": 11,
+      "community": 148,
       "norm_label": "auditrow"
     },
     {
@@ -2342,7 +2342,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "app_admin_transactions_id_page_admintransactiondetailpage",
-      "community": 11,
+      "community": 148,
       "norm_label": "admintransactiondetailpage()"
     },
     {
@@ -2352,7 +2352,7 @@
       "source_location": "L222",
       "_origin": "ast",
       "id": "app_admin_transactions_id_page_detail",
-      "community": 11,
+      "community": 148,
       "norm_label": "detail()"
     },
     {
@@ -2362,7 +2362,7 @@
       "source_location": "L231",
       "_origin": "ast",
       "id": "app_admin_transactions_id_page_linkedrecord",
-      "community": 11,
+      "community": 148,
       "norm_label": "linkedrecord()"
     },
     {
@@ -2402,7 +2402,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_transactions_page",
-      "community": 11,
+      "community": 51,
       "norm_label": "page.tsx"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_admin_transactions_page_admintransactionrow",
-      "community": 11,
+      "community": 51,
       "norm_label": "admintransactionrow"
     },
     {
@@ -2422,7 +2422,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "app_admin_transactions_page_admintransactionspage",
-      "community": 11,
+      "community": 51,
       "norm_label": "admintransactionspage()"
     },
     {
@@ -2462,7 +2462,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_admin_users_actions",
-      "community": 32,
+      "community": 320,
       "norm_label": "actions.ts"
     },
     {
@@ -2472,7 +2472,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "app_admin_users_actions_userprofileschema",
-      "community": 32,
+      "community": 320,
       "norm_label": "userprofileschema"
     },
     {
@@ -2482,7 +2482,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_admin_users_actions_creditadjustmentschema",
-      "community": 32,
+      "community": 320,
       "norm_label": "creditadjustmentschema"
     },
     {
@@ -2492,7 +2492,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "app_admin_users_actions_updateadminuserprofileaction",
-      "community": 32,
+      "community": 320,
       "norm_label": "updateadminuserprofileaction()"
     },
     {
@@ -2502,7 +2502,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "app_admin_users_actions_adjustadminusercreditsaction",
-      "community": 6,
+      "community": 320,
       "norm_label": "adjustadminusercreditsaction()"
     },
     {
@@ -2532,7 +2532,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_locale_route",
-      "community": 6,
+      "community": 141,
       "norm_label": "route.ts"
     },
     {
@@ -2542,7 +2542,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "app_api_locale_route_localebodyschema",
-      "community": 6,
+      "community": 141,
       "norm_label": "localebodyschema"
     },
     {
@@ -2552,7 +2552,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_api_locale_route_post",
-      "community": 6,
+      "community": 141,
       "norm_label": "post()"
     },
     {
@@ -2562,7 +2562,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route",
-      "community": 51,
+      "community": 4,
       "norm_label": "route.ts"
     },
     {
@@ -2572,7 +2572,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_authorizeparams",
-      "community": 51,
+      "community": 4,
       "norm_label": "authorizeparams"
     },
     {
@@ -2582,7 +2582,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_readparams",
-      "community": 51,
+      "community": 4,
       "norm_label": "readparams()"
     },
     {
@@ -2592,7 +2592,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_badrequest",
-      "community": 51,
+      "community": 4,
       "norm_label": "badrequest()"
     },
     {
@@ -2602,7 +2602,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_notauthorizedresponse",
-      "community": 51,
+      "community": 4,
       "norm_label": "notauthorizedresponse()"
     },
     {
@@ -2612,7 +2612,7 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_consenthtml",
-      "community": 51,
+      "community": 4,
       "norm_label": "consenthtml()"
     },
     {
@@ -2622,7 +2622,7 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_escapehtml",
-      "community": 51,
+      "community": 4,
       "norm_label": "escapehtml()"
     },
     {
@@ -2632,7 +2632,7 @@
       "source_location": "L80",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_resolveauthorizeduser",
-      "community": 51,
+      "community": 4,
       "norm_label": "resolveauthorizeduser()"
     },
     {
@@ -2642,7 +2642,7 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_get",
-      "community": 51,
+      "community": 4,
       "norm_label": "get()"
     },
     {
@@ -2652,7 +2652,7 @@
       "source_location": "L119",
       "_origin": "ast",
       "id": "app_api_mcp_authorize_route_post",
-      "community": 51,
+      "community": 4,
       "norm_label": "post()"
     },
     {
@@ -2662,7 +2662,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_api_mcp_register_route",
-      "community": 322,
+      "community": 4,
       "norm_label": "route.ts"
     },
     {
@@ -2672,7 +2672,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_api_mcp_register_route_isallowedredirecturi",
-      "community": 322,
+      "community": 4,
       "norm_label": "isallowedredirecturi()"
     },
     {
@@ -2682,7 +2682,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "app_api_mcp_register_route_registerrequestschema",
-      "community": 322,
+      "community": 4,
       "norm_label": "registerrequestschema"
     },
     {
@@ -2692,7 +2692,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "app_api_mcp_register_route_post",
-      "community": 322,
+      "community": 4,
       "norm_label": "post()"
     },
     {
@@ -2852,7 +2852,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_callback_route",
-      "community": 33,
+      "community": 141,
       "norm_label": "route.ts"
     },
     {
@@ -2862,7 +2862,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "app_auth_callback_route_callbackparamsschema",
-      "community": 33,
+      "community": 141,
       "norm_label": "callbackparamsschema"
     },
     {
@@ -2872,7 +2872,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "app_auth_callback_route_get",
-      "community": 33,
+      "community": 141,
       "norm_label": "get()"
     },
     {
@@ -2882,7 +2882,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_auth_verify_email_page",
-      "community": 33,
+      "community": 141,
       "norm_label": "page.tsx"
     },
     {
@@ -2892,7 +2892,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "app_auth_verify_email_page_verifyemailpage",
-      "community": 33,
+      "community": 141,
       "norm_label": "verifyemailpage()"
     },
     {
@@ -3022,7 +3022,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_banners_page",
-      "community": 26,
+      "community": 39,
       "norm_label": "page.tsx"
     },
     {
@@ -3032,7 +3032,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_banners_page_bannerspage",
-      "community": 26,
+      "community": 39,
       "norm_label": "bannerspage()"
     },
     {
@@ -3049,7 +3049,7 @@
       "label": "getCartActor()",
       "file_type": "code",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L17",
+      "source_location": "L19",
       "_origin": "ast",
       "id": "app_cart_actions_getcartactor",
       "community": 16,
@@ -3059,7 +3059,7 @@
       "label": "addCatalogItemToCartAction()",
       "file_type": "code",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "app_cart_actions_addcatalogitemtocartaction",
       "community": 16,
@@ -3069,7 +3069,7 @@
       "label": "updateCartQuantityAction()",
       "file_type": "code",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L92",
+      "source_location": "L103",
       "_origin": "ast",
       "id": "app_cart_actions_updatecartquantityaction",
       "community": 16,
@@ -3079,7 +3079,7 @@
       "label": "removeCartItemAction()",
       "file_type": "code",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L112",
+      "source_location": "L123",
       "_origin": "ast",
       "id": "app_cart_actions_removecartitemaction",
       "community": 16,
@@ -3089,7 +3089,7 @@
       "label": "clearCartAction()",
       "file_type": "code",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L126",
+      "source_location": "L137",
       "_origin": "ast",
       "id": "app_cart_actions_clearcartaction",
       "community": 16,
@@ -3102,7 +3102,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_cart_page",
-      "community": 16,
+      "community": 141,
       "norm_label": "page.tsx"
     },
     {
@@ -3112,7 +3112,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "app_cart_page_getcartpreviewurls",
-      "community": 16,
+      "community": 141,
       "norm_label": "getcartpreviewurls()"
     },
     {
@@ -3122,7 +3122,7 @@
       "source_location": "L118",
       "_origin": "ast",
       "id": "app_cart_page_cartpage",
-      "community": 16,
+      "community": 141,
       "norm_label": "cartpage()"
     },
     {
@@ -3142,7 +3142,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_catalog_page_generatemetadata",
-      "community": 13,
+      "community": 7,
       "norm_label": "generatemetadata()"
     },
     {
@@ -3172,7 +3172,7 @@
       "source_location": "L215",
       "_origin": "ast",
       "id": "app_catalog_page_categorypill",
-      "community": 52,
+      "community": 324,
       "norm_label": "categorypill()"
     },
     {
@@ -3182,7 +3182,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_checkout_actions",
-      "community": 13,
+      "community": 141,
       "norm_label": "actions.ts"
     },
     {
@@ -3192,7 +3192,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "app_checkout_actions_checkoutschema",
-      "community": 13,
+      "community": 141,
       "norm_label": "checkoutschema"
     },
     {
@@ -3202,7 +3202,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "app_checkout_actions_createcheckoutorderaction",
-      "community": 13,
+      "community": 141,
       "norm_label": "createcheckoutorderaction()"
     },
     {
@@ -3212,7 +3212,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_checkout_page",
-      "community": 13,
+      "community": 141,
       "norm_label": "page.tsx"
     },
     {
@@ -3222,7 +3222,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "app_checkout_page_checkoutpage",
-      "community": 16,
+      "community": 141,
       "norm_label": "checkoutpage()"
     },
     {
@@ -3302,7 +3302,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_credits_page",
-      "community": 13,
+      "community": 117,
       "norm_label": "page.tsx"
     },
     {
@@ -3312,7 +3312,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "app_credits_page_creditspage",
-      "community": 13,
+      "community": 117,
       "norm_label": "creditspage()"
     },
     {
@@ -3362,7 +3362,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_dashboard_page",
-      "community": 13,
+      "community": 51,
       "norm_label": "page.tsx"
     },
     {
@@ -3372,7 +3372,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "app_dashboard_page_dashboardpage",
-      "community": 13,
+      "community": 51,
       "norm_label": "dashboardpage()"
     },
     {
@@ -3472,7 +3472,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_generated_actions",
-      "community": 15,
+      "community": 117,
       "norm_label": "actions.ts"
     },
     {
@@ -3482,7 +3482,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "app_generated_actions_requireuser",
-      "community": 15,
+      "community": 117,
       "norm_label": "requireuser()"
     },
     {
@@ -3492,7 +3492,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "app_generated_actions_getgeneratedsalepricecents",
-      "community": 15,
+      "community": 117,
       "norm_label": "getgeneratedsalepricecents()"
     },
     {
@@ -3502,7 +3502,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "app_generated_actions_getgeneratedsalecurrency",
-      "community": 15,
+      "community": 117,
       "norm_label": "getgeneratedsalecurrency()"
     },
     {
@@ -3512,7 +3512,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "app_generated_actions_addgenerateditemtocartaction",
-      "community": 15,
+      "community": 117,
       "norm_label": "addgenerateditemtocartaction()"
     },
     {
@@ -3522,7 +3522,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_items_slug_page",
-      "community": 148,
+      "community": 13,
       "norm_label": "page.tsx"
     },
     {
@@ -3532,7 +3532,7 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "app_items_slug_page_generatemetadata",
-      "community": 148,
+      "community": 13,
       "norm_label": "generatemetadata()"
     },
     {
@@ -3542,7 +3542,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "app_items_slug_page_catalogitemdetailpage",
-      "community": 148,
+      "community": 13,
       "norm_label": "catalogitemdetailpage()"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_orders_id_page",
-      "community": 13,
+      "community": 324,
       "norm_label": "page.tsx"
     },
     {
@@ -3592,7 +3592,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "app_orders_id_page_orderdetailpage",
-      "community": 13,
+      "community": 324,
       "norm_label": "orderdetailpage()"
     },
     {
@@ -3602,7 +3602,7 @@
       "source_location": "L149",
       "_origin": "ast",
       "id": "app_orders_id_page_formatshippingaddress",
-      "community": 13,
+      "community": 324,
       "norm_label": "formatshippingaddress()"
     },
     {
@@ -3622,7 +3622,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_page_generatemetadata",
-      "community": 34,
+      "community": 7,
       "norm_label": "generatemetadata()"
     },
     {
@@ -3642,7 +3642,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_personalize_itemslug_page",
-      "community": 148,
+      "community": 13,
       "norm_label": "page.tsx"
     },
     {
@@ -3652,7 +3652,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_personalize_itemslug_page_personalizeitempage",
-      "community": 148,
+      "community": 13,
       "norm_label": "personalizeitempage()"
     },
     {
@@ -3822,7 +3822,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_robots",
-      "community": 34,
+      "community": 7,
       "norm_label": "robots.ts"
     },
     {
@@ -3832,7 +3832,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "app_robots_robots",
-      "community": 34,
+      "community": 7,
       "norm_label": "robots()"
     },
     {
@@ -3842,7 +3842,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_sitemap",
-      "community": 34,
+      "community": 7,
       "norm_label": "sitemap.ts"
     },
     {
@@ -3852,7 +3852,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "app_sitemap_sitemap",
-      "community": 34,
+      "community": 7,
       "norm_label": "sitemap()"
     },
     {
@@ -4146,13 +4146,33 @@
       "norm_label": "enabled"
     },
     {
+      "label": "add-to-cart-button.tsx",
+      "file_type": "code",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "components_add_to_cart_button",
+      "community": 16,
+      "norm_label": "add-to-cart-button.tsx"
+    },
+    {
+      "label": "AddToCartButton()",
+      "file_type": "code",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "components_add_to_cart_button_addtocartbutton",
+      "community": 16,
+      "norm_label": "addtocartbutton()"
+    },
+    {
       "label": "banner-customizer.tsx",
       "file_type": "code",
       "source_file": "components/banner-customizer.tsx",
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_banner_customizer",
-      "community": 26,
+      "community": 39,
       "norm_label": "banner-customizer.tsx"
     },
     {
@@ -4162,7 +4182,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_banner_customizer_bannercopy",
-      "community": 26,
+      "community": 39,
       "norm_label": "bannercopy"
     },
     {
@@ -4172,7 +4192,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_banner_customizer_bannercustomizer",
-      "community": 26,
+      "community": 39,
       "norm_label": "bannercustomizer()"
     },
     {
@@ -4182,7 +4202,7 @@
       "source_location": "L128",
       "_origin": "ast",
       "id": "components_banner_customizer_advancedbannergenerationpanel",
-      "community": 26,
+      "community": 39,
       "norm_label": "advancedbannergenerationpanel()"
     },
     {
@@ -4192,7 +4212,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_brand_logo",
-      "community": 52,
+      "community": 13,
       "norm_label": "brand-logo.tsx"
     },
     {
@@ -4202,7 +4222,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_brand_logo_brandlogo",
-      "community": 52,
+      "community": 13,
       "norm_label": "brandlogo()"
     },
     {
@@ -4212,7 +4232,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_catalog_card_hover",
-      "community": 27,
+      "community": 52,
       "norm_label": "catalog-card-hover.tsx"
     },
     {
@@ -4222,7 +4242,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_catalog_card_hover_cardhovercontext",
-      "community": 27,
+      "community": 52,
       "norm_label": "cardhovercontext"
     },
     {
@@ -4232,7 +4252,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_catalog_card_hover_usecardhover",
-      "community": 27,
+      "community": 52,
       "norm_label": "usecardhover()"
     },
     {
@@ -4242,7 +4262,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_catalog_card_hover_cardhoverboundary",
-      "community": 27,
+      "community": 52,
       "norm_label": "cardhoverboundary()"
     },
     {
@@ -4252,17 +4272,17 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_catalog_item_card",
-      "community": 27,
+      "community": 52,
       "norm_label": "catalog-item-card.tsx"
     },
     {
       "label": "CatalogItemCard()",
       "file_type": "code",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L16",
+      "source_location": "L15",
       "_origin": "ast",
       "id": "components_catalog_item_card_catalogitemcard",
-      "community": 27,
+      "community": 324,
       "norm_label": "catalogitemcard()"
     },
     {
@@ -4272,7 +4292,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_catalog_media_slider",
-      "community": 27,
+      "community": 52,
       "norm_label": "catalog-media-slider.tsx"
     },
     {
@@ -4282,7 +4302,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_catalog_media_slider_issvgpath",
-      "community": 27,
+      "community": 52,
       "norm_label": "issvgpath()"
     },
     {
@@ -4292,7 +4312,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "components_catalog_media_slider_catalogmediaslider",
-      "community": 27,
+      "community": 52,
       "norm_label": "catalogmediaslider()"
     },
     {
@@ -4302,7 +4322,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_category_navigation",
-      "community": 7,
+      "community": 324,
       "norm_label": "category-navigation.tsx"
     },
     {
@@ -4312,7 +4332,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_category_navigation_icons",
-      "community": 7,
+      "community": 324,
       "norm_label": "icons"
     },
     {
@@ -4322,7 +4342,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "components_category_navigation_categorynavigation",
-      "community": 7,
+      "community": 324,
       "norm_label": "categorynavigation()"
     },
     {
@@ -4372,7 +4392,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_currency_switcher_client",
-      "community": 141,
+      "community": 117,
       "norm_label": "currency-switcher-client.tsx"
     },
     {
@@ -4382,7 +4402,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_currency_switcher_client_currencyswitcherclient",
-      "community": 141,
+      "community": 117,
       "norm_label": "currencyswitcherclient()"
     },
     {
@@ -4392,7 +4412,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_currency_switcher",
-      "community": 141,
+      "community": 117,
       "norm_label": "currency-switcher.tsx"
     },
     {
@@ -4402,7 +4422,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_currency_switcher_currencyswitcher",
-      "community": 141,
+      "community": 117,
       "norm_label": "currencyswitcher()"
     },
     {
@@ -4412,7 +4432,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_empty_state",
-      "community": 15,
+      "community": 51,
       "norm_label": "empty-state.tsx"
     },
     {
@@ -4422,7 +4442,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_empty_state_emptystate",
-      "community": 15,
+      "community": 51,
       "norm_label": "emptystate()"
     },
     {
@@ -4432,7 +4452,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_generated_preview_selector",
-      "community": 15,
+      "community": 31,
       "norm_label": "generated-preview-selector.tsx"
     },
     {
@@ -4442,7 +4462,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_generated_preview_selector_generatedpreviewoption",
-      "community": 15,
+      "community": 31,
       "norm_label": "generatedpreviewoption"
     },
     {
@@ -4462,7 +4482,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_generated_preview_selector_generatedpreviewselector",
-      "community": 15,
+      "community": 31,
       "norm_label": "generatedpreviewselector()"
     },
     {
@@ -4472,7 +4492,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_language_switcher",
-      "community": 57,
+      "community": 13,
       "norm_label": "language-switcher.tsx"
     },
     {
@@ -4482,7 +4502,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_language_switcher_labels",
-      "community": 57,
+      "community": 13,
       "norm_label": "labels"
     },
     {
@@ -4492,7 +4512,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_language_switcher_languageswitcher",
-      "community": 57,
+      "community": 13,
       "norm_label": "languageswitcher()"
     },
     {
@@ -4502,7 +4522,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_logout_menu_item",
-      "community": 57,
+      "community": 13,
       "norm_label": "logout-menu-item.tsx"
     },
     {
@@ -4512,7 +4532,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_logout_menu_item_logoutmenuitem",
-      "community": 57,
+      "community": 13,
       "norm_label": "logoutmenuitem()"
     },
     {
@@ -4622,7 +4642,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "components_product_card_productcard",
-      "community": 11,
+      "community": 51,
       "norm_label": "productcard()"
     },
     {
@@ -4632,7 +4652,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_site_header",
-      "community": 57,
+      "community": 13,
       "norm_label": "site-header.tsx"
     },
     {
@@ -4672,7 +4692,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_theme_toggle",
-      "community": 15,
+      "community": 148,
       "norm_label": "theme-toggle.tsx"
     },
     {
@@ -4682,7 +4702,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_theme_toggle_theme",
-      "community": 15,
+      "community": 148,
       "norm_label": "theme"
     },
     {
@@ -4692,7 +4712,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_theme_toggle_gettheme",
-      "community": 15,
+      "community": 148,
       "norm_label": "gettheme()"
     },
     {
@@ -4702,7 +4722,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_theme_toggle_themetoggle",
-      "community": 15,
+      "community": 148,
       "norm_label": "themetoggle()"
     },
     {
@@ -4712,7 +4732,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_button",
-      "community": 15,
+      "community": 148,
       "norm_label": "button.tsx"
     },
     {
@@ -4722,7 +4742,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "components_ui_button_buttonvariants",
-      "community": 15,
+      "community": 148,
       "norm_label": "buttonvariants"
     },
     {
@@ -4732,7 +4752,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_ui_button_buttonprops",
-      "community": 15,
+      "community": 148,
       "norm_label": "buttonprops"
     },
     {
@@ -4742,7 +4762,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_ui_button_button",
-      "community": 15,
+      "community": 148,
       "norm_label": "button"
     },
     {
@@ -4822,7 +4842,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_dropdown_menu",
-      "community": 57,
+      "community": 13,
       "norm_label": "dropdown-menu.tsx"
     },
     {
@@ -4832,7 +4852,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_ui_dropdown_menu_dropdownmenucontent",
-      "community": 57,
+      "community": 13,
       "norm_label": "dropdownmenucontent"
     },
     {
@@ -4842,7 +4862,7 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_ui_dropdown_menu_dropdownmenuitem",
-      "community": 57,
+      "community": 13,
       "norm_label": "dropdownmenuitem"
     },
     {
@@ -4852,7 +4872,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_ui_dropdown_menu_dropdownmenulabel",
-      "community": 57,
+      "community": 13,
       "norm_label": "dropdownmenulabel"
     },
     {
@@ -4862,7 +4882,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "components_ui_dropdown_menu_dropdownmenuseparator",
-      "community": 57,
+      "community": 13,
       "norm_label": "dropdownmenuseparator"
     },
     {
@@ -4872,7 +4892,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_input",
-      "community": 26,
+      "community": 34,
       "norm_label": "input.tsx"
     },
     {
@@ -4882,7 +4902,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_ui_input_input",
-      "community": 26,
+      "community": 34,
       "norm_label": "input"
     },
     {
@@ -4892,7 +4912,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_label",
-      "community": 26,
+      "community": 34,
       "norm_label": "label.tsx"
     },
     {
@@ -4902,7 +4922,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "components_ui_label_label",
-      "community": 26,
+      "community": 34,
       "norm_label": "label"
     },
     {
@@ -4912,7 +4932,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_textarea",
-      "community": 26,
+      "community": 34,
       "norm_label": "textarea.tsx"
     },
     {
@@ -4922,7 +4942,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "components_ui_textarea_textarea",
-      "community": 26,
+      "community": 34,
       "norm_label": "textarea"
     },
     {
@@ -5052,7 +5072,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_action_state",
-      "community": 26,
+      "community": 323,
       "norm_label": "action-state.ts"
     },
     {
@@ -5062,7 +5082,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_action_state_actionstate",
-      "community": 39,
+      "community": 323,
       "norm_label": "actionstate"
     },
     {
@@ -5072,7 +5092,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_action_state_idlestate",
-      "community": 26,
+      "community": 323,
       "norm_label": "idlestate"
     },
     {
@@ -5082,7 +5102,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_action_state_actionsuccess",
-      "community": 26,
+      "community": 323,
       "norm_label": "actionsuccess()"
     },
     {
@@ -5092,7 +5112,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "lib_action_state_actionerror",
-      "community": 26,
+      "community": 33,
       "norm_label": "actionerror()"
     },
     {
@@ -5102,7 +5122,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_action_state_zoderrortostate",
-      "community": 26,
+      "community": 33,
       "norm_label": "zoderrortostate()"
     },
     {
@@ -5112,7 +5132,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "lib_action_state_errorof",
-      "community": 26,
+      "community": 323,
       "norm_label": "errorof()"
     },
     {
@@ -5162,7 +5182,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_admin",
-      "community": 6,
+      "community": 40,
       "norm_label": "admin.ts"
     },
     {
@@ -5172,7 +5192,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_admin_admin_permissions",
-      "community": 6,
+      "community": 40,
       "norm_label": "admin_permissions"
     },
     {
@@ -5182,7 +5202,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_admin_adminpermission",
-      "community": 6,
+      "community": 40,
       "norm_label": "adminpermission"
     },
     {
@@ -5192,7 +5212,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_admin_requireadmin",
-      "community": 11,
+      "community": 23,
       "norm_label": "requireadmin()"
     },
     {
@@ -5202,7 +5222,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "lib_admin_hasadminpermission",
-      "community": 6,
+      "community": 40,
       "norm_label": "hasadminpermission()"
     },
     {
@@ -5212,7 +5232,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "lib_admin_requireadminpermission",
-      "community": 32,
+      "community": 320,
       "norm_label": "requireadminpermission()"
     },
     {
@@ -5402,7 +5422,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_banners",
-      "community": 26,
+      "community": 39,
       "norm_label": "banners.ts"
     },
     {
@@ -5412,7 +5432,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_banners_bannersample",
-      "community": 26,
+      "community": 39,
       "norm_label": "bannersample"
     },
     {
@@ -5422,7 +5442,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_banners_bannerpreset",
-      "community": 26,
+      "community": 39,
       "norm_label": "bannerpreset"
     },
     {
@@ -5432,7 +5452,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_banners_listbannersamples",
-      "community": 26,
+      "community": 39,
       "norm_label": "listbannersamples()"
     },
     {
@@ -5442,7 +5462,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_banners_listbannersizepresets",
-      "community": 26,
+      "community": 39,
       "norm_label": "listbannersizepresets()"
     },
     {
@@ -5452,7 +5472,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_cart_session",
-      "community": 33,
+      "community": 141,
       "norm_label": "cart-session.ts"
     },
     {
@@ -5462,7 +5482,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_cart_session_getcartsessionid",
-      "community": 33,
+      "community": 141,
       "norm_label": "getcartsessionid()"
     },
     {
@@ -5472,7 +5492,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "lib_cart_session_clearcartsessionid",
-      "community": 33,
+      "community": 141,
       "norm_label": "clearcartsessionid()"
     },
     {
@@ -5599,7 +5619,7 @@
       "label": "updateCartItemQuantity()",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L156",
+      "source_location": "L179",
       "_origin": "ast",
       "id": "lib_cart_updatecartitemquantity",
       "community": 16,
@@ -5609,7 +5629,7 @@
       "label": "removeCartItem()",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L176",
+      "source_location": "L199",
       "_origin": "ast",
       "id": "lib_cart_removecartitem",
       "community": 16,
@@ -5619,17 +5639,37 @@
       "label": "clearCart()",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L191",
+      "source_location": "L214",
       "_origin": "ast",
       "id": "lib_cart_clearcart",
       "community": 16,
       "norm_label": "clearcart()"
     },
     {
+      "label": "CartAddPlan",
+      "file_type": "code",
+      "source_file": "lib/cart.ts",
+      "source_location": "L220",
+      "_origin": "ast",
+      "id": "lib_cart_cartaddplan",
+      "community": 16,
+      "norm_label": "cartaddplan"
+    },
+    {
+      "label": "planCartAdd()",
+      "file_type": "code",
+      "source_file": "lib/cart.ts",
+      "source_location": "L233",
+      "_origin": "ast",
+      "id": "lib_cart_plancartadd",
+      "community": 16,
+      "norm_label": "plancartadd()"
+    },
+    {
       "label": "CartMergePlan",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L197",
+      "source_location": "L251",
       "_origin": "ast",
       "id": "lib_cart_cartmergeplan",
       "community": 16,
@@ -5639,7 +5679,7 @@
       "label": "planCartMerge()",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L214",
+      "source_location": "L268",
       "_origin": "ast",
       "id": "lib_cart_plancartmerge",
       "community": 16,
@@ -5649,17 +5689,17 @@
       "label": "mergeSessionCartIntoUserCart()",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L234",
+      "source_location": "L288",
       "_origin": "ast",
       "id": "lib_cart_mergesessioncartintousercart",
-      "community": 33,
+      "community": 16,
       "norm_label": "mergesessioncartintousercart()"
     },
     {
       "label": "validateCartBeforeCheckout()",
       "file_type": "code",
       "source_file": "lib/cart.ts",
-      "source_location": "L311",
+      "source_location": "L365",
       "_origin": "ast",
       "id": "lib_cart_validatecartbeforecheckout",
       "community": 16,
@@ -5952,7 +5992,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_credits",
-      "community": 146,
+      "community": 47,
       "norm_label": "credits.ts"
     },
     {
@@ -5962,7 +6002,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_credits_creditledgerreason",
-      "community": 146,
+      "community": 47,
       "norm_label": "creditledgerreason"
     },
     {
@@ -5972,7 +6012,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_credits_creditadjustmentinput",
-      "community": 146,
+      "community": 47,
       "norm_label": "creditadjustmentinput"
     },
     {
@@ -5982,7 +6022,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_credits_getcreditbalance",
-      "community": 146,
+      "community": 47,
       "norm_label": "getcreditbalance()"
     },
     {
@@ -6002,7 +6042,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "lib_credits_adjustcredits",
-      "community": 146,
+      "community": 47,
       "norm_label": "adjustcredits()"
     },
     {
@@ -6012,7 +6052,7 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "lib_credits_debitcredits",
-      "community": 146,
+      "community": 47,
       "norm_label": "debitcredits()"
     },
     {
@@ -6022,7 +6062,7 @@
       "source_location": "L103",
       "_origin": "ast",
       "id": "lib_credits_refundcredits",
-      "community": 146,
+      "community": 47,
       "norm_label": "refundcredits()"
     },
     {
@@ -6052,7 +6092,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_currency_appcurrency",
-      "community": 320,
+      "community": 104,
       "norm_label": "appcurrency"
     },
     {
@@ -6072,7 +6112,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "lib_currency_exchangeratecontext",
-      "community": 320,
+      "community": 104,
       "norm_label": "exchangeratecontext"
     },
     {
@@ -6082,7 +6122,7 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "lib_currency_convertedmoney",
-      "community": 104,
+      "community": 52,
       "norm_label": "convertedmoney"
     },
     {
@@ -6132,7 +6172,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "lib_currency_listcurrencysettings",
-      "community": 23,
+      "community": 320,
       "norm_label": "listcurrencysettings()"
     },
     {
@@ -6142,7 +6182,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "lib_currency_listenabledcurrencies",
-      "community": 141,
+      "community": 117,
       "norm_label": "listenabledcurrencies()"
     },
     {
@@ -6152,7 +6192,7 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "lib_currency_getactivecurrency",
-      "community": 141,
+      "community": 117,
       "norm_label": "getactivecurrency()"
     },
     {
@@ -6282,7 +6322,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_email_receipt_core",
-      "community": 22,
+      "community": 103,
       "norm_label": "receipt-core.ts"
     },
     {
@@ -6292,7 +6332,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_email_receipt_core_resolvereceiptlocale",
-      "community": 22,
+      "community": 1,
       "norm_label": "resolvereceiptlocale()"
     },
     {
@@ -6322,7 +6362,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_email_receipt_core_logourl",
-      "community": 22,
+      "community": 103,
       "norm_label": "logourl()"
     },
     {
@@ -6332,7 +6372,7 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "lib_email_receipt_core_buildorderreceiptmodel",
-      "community": 22,
+      "community": 103,
       "norm_label": "buildorderreceiptmodel()"
     },
     {
@@ -6342,7 +6382,7 @@
       "source_location": "L73",
       "_origin": "ast",
       "id": "lib_email_receipt_core_buildcreditsreceiptmodel",
-      "community": 22,
+      "community": 103,
       "norm_label": "buildcreditsreceiptmodel()"
     },
     {
@@ -6612,7 +6652,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_generated_items_generateditemadmindetail",
-      "community": 151,
+      "community": 28,
       "norm_label": "generateditemadmindetail"
     },
     {
@@ -6772,7 +6812,7 @@
       "source_location": "L350",
       "_origin": "ast",
       "id": "lib_generated_items_plangenerateditemcartadd",
-      "community": 15,
+      "community": 117,
       "norm_label": "plangenerateditemcartadd()"
     },
     {
@@ -6812,7 +6852,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_i18n_config_app_locales",
-      "community": 9,
+      "community": 7,
       "norm_label": "app_locales"
     },
     {
@@ -6882,7 +6922,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_i18n_dynamic",
-      "community": 13,
+      "community": 324,
       "norm_label": "i18n-dynamic.ts"
     },
     {
@@ -6892,7 +6932,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_i18n_dynamic_translatorlike",
-      "community": 13,
+      "community": 324,
       "norm_label": "translatorlike"
     },
     {
@@ -6902,7 +6942,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_i18n_dynamic_loosetranslator",
-      "community": 13,
+      "community": 324,
       "norm_label": "loosetranslator"
     },
     {
@@ -6912,7 +6952,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_i18n_dynamic_tdynamic",
-      "community": 13,
+      "community": 324,
       "norm_label": "tdynamic()"
     },
     {
@@ -6952,7 +6992,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_i18n_formatlocalizeddate",
-      "community": 13,
+      "community": 31,
       "norm_label": "formatlocalizeddate()"
     },
     {
@@ -6962,7 +7002,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_i18n_formatlocalizedcurrency",
-      "community": 15,
+      "community": 31,
       "norm_label": "formatlocalizedcurrency()"
     },
     {
@@ -7212,7 +7252,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_market",
-      "community": 23,
+      "community": 141,
       "norm_label": "market.ts"
     },
     {
@@ -7222,7 +7262,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "lib_market_marketregion",
-      "community": 23,
+      "community": 26,
       "norm_label": "marketregion"
     },
     {
@@ -7232,7 +7272,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "lib_market_marketcountry",
-      "community": 23,
+      "community": 26,
       "norm_label": "marketcountry"
     },
     {
@@ -7242,7 +7282,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_market_resolvedmarket",
-      "community": 320,
+      "community": 141,
       "norm_label": "resolvedmarket"
     },
     {
@@ -7252,7 +7292,7 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "lib_market_catalogavailability",
-      "community": 23,
+      "community": 141,
       "norm_label": "catalogavailability"
     },
     {
@@ -7262,7 +7302,7 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "lib_market_resolvedshippingrate",
-      "community": 23,
+      "community": 141,
       "norm_label": "resolvedshippingrate"
     },
     {
@@ -7272,7 +7312,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "lib_market_catalogmarketresolution",
-      "community": 23,
+      "community": 141,
       "norm_label": "catalogmarketresolution"
     },
     {
@@ -7282,7 +7322,7 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "lib_market_marketrulerow",
-      "community": 23,
+      "community": 141,
       "norm_label": "marketrulerow"
     },
     {
@@ -7292,7 +7332,7 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "lib_market_normalizecountrycode",
-      "community": 117,
+      "community": 141,
       "norm_label": "normalizecountrycode()"
     },
     {
@@ -7312,7 +7352,7 @@
       "source_location": "L82",
       "_origin": "ast",
       "id": "lib_market_findcountry",
-      "community": 23,
+      "community": 141,
       "norm_label": "findcountry()"
     },
     {
@@ -7322,7 +7362,7 @@
       "source_location": "L101",
       "_origin": "ast",
       "id": "lib_market_resolvemarket",
-      "community": 16,
+      "community": 141,
       "norm_label": "resolvemarket()"
     },
     {
@@ -7382,7 +7422,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "lib_marketplace_constants_marketplacecategoryslug",
-      "community": 7,
+      "community": 321,
       "norm_label": "marketplacecategoryslug"
     },
     {
@@ -7472,7 +7512,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_marketplace_marketplacecategory",
-      "community": 7,
+      "community": 321,
       "norm_label": "marketplacecategory"
     },
     {
@@ -7482,7 +7522,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "lib_marketplace_marketplacesubcategory",
-      "community": 7,
+      "community": 26,
       "norm_label": "marketplacesubcategory"
     },
     {
@@ -7492,7 +7532,7 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "lib_marketplace_catalogitem",
-      "community": 27,
+      "community": 52,
       "norm_label": "catalogitem"
     },
     {
@@ -7572,7 +7612,7 @@
       "source_location": "L231",
       "_origin": "ast",
       "id": "lib_marketplace_getcachedpublishedcatalogslugs",
-      "community": 34,
+      "community": 7,
       "norm_label": "getcachedpublishedcatalogslugs"
     },
     {
@@ -7582,7 +7622,7 @@
       "source_location": "L247",
       "_origin": "ast",
       "id": "lib_marketplace_listpublishedcatalogitemslugs",
-      "community": 34,
+      "community": 7,
       "norm_label": "listpublishedcatalogitemslugs()"
     },
     {
@@ -7602,7 +7642,7 @@
       "source_location": "L274",
       "_origin": "ast",
       "id": "lib_marketplace_getcatalogitem",
-      "community": 148,
+      "community": 13,
       "norm_label": "getcatalogitem()"
     },
     {
@@ -7612,7 +7652,7 @@
       "source_location": "L291",
       "_origin": "ast",
       "id": "lib_marketplace_getcatalogitemseometadata",
-      "community": 148,
+      "community": 13,
       "norm_label": "getcatalogitemseometadata()"
     },
     {
@@ -7692,7 +7732,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_mcp_oauth_store_registeroauthclient",
-      "community": 322,
+      "community": 4,
       "norm_label": "registeroauthclient()"
     },
     {
@@ -7702,7 +7742,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "lib_mcp_oauth_store_getoauthclient",
-      "community": 51,
+      "community": 4,
       "norm_label": "getoauthclient()"
     },
     {
@@ -7712,7 +7752,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "lib_mcp_oauth_store_createauthorizationcode",
-      "community": 51,
+      "community": 4,
       "norm_label": "createauthorizationcode()"
     },
     {
@@ -7792,7 +7832,7 @@
       "source_location": "L174",
       "_origin": "ast",
       "id": "lib_mcp_oauth_store_findaccesstokencontext",
-      "community": 40,
+      "community": 4,
       "norm_label": "findaccesstokencontext()"
     },
     {
@@ -7812,7 +7852,7 @@
       "source_location": "L200",
       "_origin": "ast",
       "id": "lib_mcp_oauth_store_listconnectedapps",
-      "community": 11,
+      "community": 148,
       "norm_label": "listconnectedapps()"
     },
     {
@@ -7882,7 +7922,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_mcp_tools_create_catalog_item_createcatalogiteminputshape",
-      "community": 40,
+      "community": 21,
       "norm_label": "createcatalogiteminputshape"
     },
     {
@@ -7932,7 +7972,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_mcp_tools_get_catalog_item_getcatalogiteminputshape",
-      "community": 40,
+      "community": 6,
       "norm_label": "getcatalogiteminputshape"
     },
     {
@@ -7972,7 +8012,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_mcp_tools_list_categories",
-      "community": 6,
+      "community": 40,
       "norm_label": "list-categories.ts"
     },
     {
@@ -7992,7 +8032,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "lib_mcp_tools_list_categories_categorysummary",
-      "community": 6,
+      "community": 40,
       "norm_label": "categorysummary"
     },
     {
@@ -8002,7 +8042,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_mcp_tools_list_categories_handlelistcategories",
-      "community": 6,
+      "community": 40,
       "norm_label": "handlelistcategories()"
     },
     {
@@ -8012,7 +8052,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_mcp_tools_list_subcategories",
-      "community": 6,
+      "community": 40,
       "norm_label": "list-subcategories.ts"
     },
     {
@@ -8032,7 +8072,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_mcp_tools_list_subcategories_listsubcategoriesinputschema",
-      "community": 6,
+      "community": 40,
       "norm_label": "listsubcategoriesinputschema"
     },
     {
@@ -8042,7 +8082,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "lib_mcp_tools_list_subcategories_handlelistsubcategories",
-      "community": 6,
+      "community": 40,
       "norm_label": "handlelistsubcategories()"
     },
     {
@@ -8382,7 +8422,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "lib_orders_adminorderitem",
-      "community": 20,
+      "community": 51,
       "norm_label": "adminorderitem"
     },
     {
@@ -8392,7 +8432,7 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "lib_orders_catalogproductioninfo",
-      "community": 20,
+      "community": 51,
       "norm_label": "catalogproductioninfo"
     },
     {
@@ -8402,7 +8442,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "lib_orders_generatedorderinfo",
-      "community": 20,
+      "community": 51,
       "norm_label": "generatedorderinfo"
     },
     {
@@ -8412,7 +8452,7 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "lib_orders_bannermanufacturinginstruction",
-      "community": 20,
+      "community": 51,
       "norm_label": "bannermanufacturinginstruction"
     },
     {
@@ -8422,7 +8462,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "lib_orders_getorderdetail",
-      "community": 13,
+      "community": 324,
       "norm_label": "getorderdetail()"
     },
     {
@@ -8432,7 +8472,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "lib_orders_getorderdetailforadmin",
-      "community": 20,
+      "community": 51,
       "norm_label": "getorderdetailforadmin()"
     },
     {
@@ -8872,7 +8912,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_payments_router",
-      "community": 117,
+      "community": 104,
       "norm_label": "router.ts"
     },
     {
@@ -9002,7 +9042,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_personalization_boilerplates",
-      "community": 148,
+      "community": 47,
       "norm_label": "personalization-boilerplates.ts"
     },
     {
@@ -9012,7 +9052,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "lib_personalization_boilerplates_personalizationboilerplate",
-      "community": 148,
+      "community": 47,
       "norm_label": "personalizationboilerplate"
     },
     {
@@ -9022,7 +9062,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "lib_personalization_boilerplates_catalogitemboilerplaterow",
-      "community": 148,
+      "community": 47,
       "norm_label": "catalogitemboilerplaterow"
     },
     {
@@ -9032,7 +9072,7 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "lib_personalization_boilerplates_listcatalogitemboilerplates",
-      "community": 148,
+      "community": 13,
       "norm_label": "listcatalogitemboilerplates()"
     },
     {
@@ -9042,7 +9082,7 @@
       "source_location": "L50",
       "_origin": "ast",
       "id": "lib_personalization_boilerplates_adjustedpricecents",
-      "community": 148,
+      "community": 47,
       "norm_label": "adjustedpricecents()"
     },
     {
@@ -9232,7 +9272,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "lib_seo_validation_validateseometadata",
-      "community": 26,
+      "community": 34,
       "norm_label": "validateseometadata()"
     },
     {
@@ -9242,7 +9282,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_seo",
-      "community": 34,
+      "community": 7,
       "norm_label": "seo.ts"
     },
     {
@@ -9252,7 +9292,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "lib_seo_catalogseometadata",
-      "community": 34,
+      "community": 26,
       "norm_label": "catalogseometadata"
     },
     {
@@ -9262,7 +9302,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "lib_seo_seofallbacksource",
-      "community": 34,
+      "community": 7,
       "norm_label": "seofallbacksource"
     },
     {
@@ -9272,7 +9312,7 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "lib_seo_getcanonicalpath",
-      "community": 34,
+      "community": 7,
       "norm_label": "getcanonicalpath()"
     },
     {
@@ -9282,7 +9322,7 @@
       "source_location": "L30",
       "_origin": "ast",
       "id": "lib_seo_getcanonicalurl",
-      "community": 34,
+      "community": 7,
       "norm_label": "getcanonicalurl()"
     },
     {
@@ -9292,7 +9332,7 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "lib_seo_getalternatelanguages",
-      "community": 34,
+      "community": 7,
       "norm_label": "getalternatelanguages()"
     },
     {
@@ -9302,7 +9342,7 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "lib_seo_resolvecatalogmetadata",
-      "community": 34,
+      "community": 7,
       "norm_label": "resolvecatalogmetadata()"
     },
     {
@@ -9312,7 +9352,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "lib_seo_createproductstructureddata",
-      "community": 34,
+      "community": 7,
       "norm_label": "createproductstructureddata()"
     },
     {
@@ -9322,7 +9362,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_shipping",
-      "community": 320,
+      "community": 141,
       "norm_label": "shipping.ts"
     },
     {
@@ -9342,7 +9382,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "lib_shipping_shippinglinetotal",
-      "community": 320,
+      "community": 104,
       "norm_label": "shippinglinetotal"
     },
     {
@@ -9352,7 +9392,7 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "lib_shipping_ordertotals",
-      "community": 320,
+      "community": 104,
       "norm_label": "ordertotals"
     },
     {
@@ -9362,7 +9402,7 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "lib_shipping_calculateordertotals",
-      "community": 16,
+      "community": 141,
       "norm_label": "calculateordertotals()"
     },
     {
@@ -9502,7 +9542,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "lib_storage_uploadtobucket",
-      "community": 2,
+      "community": 146,
       "norm_label": "uploadtobucket()"
     },
     {
@@ -9512,7 +9552,7 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "lib_storage_downloadfrombucket",
-      "community": 91,
+      "community": 319,
       "norm_label": "downloadfrombucket()"
     },
     {
@@ -9522,7 +9562,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "lib_storage_resolvepublicstorageurl",
-      "community": 148,
+      "community": 13,
       "norm_label": "resolvepublicstorageurl()"
     },
     {
@@ -9692,7 +9732,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_supabase_server",
-      "community": 6,
+      "community": 141,
       "norm_label": "server.ts"
     },
     {
@@ -9712,7 +9752,7 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "lib_supabase_server_getcurrentuser",
-      "community": 13,
+      "community": 141,
       "norm_label": "getcurrentuser"
     },
     {
@@ -9722,7 +9762,7 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "lib_supabase_server_getservicesupabase",
-      "community": 6,
+      "community": 141,
       "norm_label": "getservicesupabase()"
     },
     {
@@ -9752,7 +9792,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "lib_supabase_types_tables",
-      "community": 20,
+      "community": 23,
       "norm_label": "tables"
     },
     {
@@ -9882,7 +9922,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "lib_transactions_createtransactionrecord",
-      "community": 146,
+      "community": 32,
       "norm_label": "createtransactionrecord()"
     },
     {
@@ -9912,7 +9952,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_utils",
-      "community": 11,
+      "community": 31,
       "norm_label": "utils.ts"
     },
     {
@@ -9922,7 +9962,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "lib_utils_cn",
-      "community": 52,
+      "community": 324,
       "norm_label": "cn()"
     },
     {
@@ -9932,7 +9972,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_utils_formatprice",
-      "community": 11,
+      "community": 51,
       "norm_label": "formatprice()"
     },
     {
@@ -9952,7 +9992,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "lib_utils_slugify",
-      "community": 21,
+      "community": 2,
       "norm_label": "slugify()"
     },
     {
@@ -10512,7 +10552,7 @@
       "source_location": "L54",
       "_origin": "ast",
       "id": "package_dependencies_openai",
-      "community": 127,
+      "community": 125,
       "norm_label": "openai"
     },
     {
@@ -12222,7 +12262,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_app_admin_users_actions_test",
-      "community": 6,
+      "community": 320,
       "norm_label": "actions.test.ts"
     },
     {
@@ -12232,7 +12272,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_app_api_mcp_authorize_test",
-      "community": 51,
+      "community": 4,
       "norm_label": "authorize.test.ts"
     },
     {
@@ -12242,7 +12282,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "tests_app_api_mcp_authorize_test_client",
-      "community": 51,
+      "community": 4,
       "norm_label": "client"
     },
     {
@@ -12252,7 +12292,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "tests_app_api_mcp_authorize_test_authorizeurl",
-      "community": 51,
+      "community": 4,
       "norm_label": "authorizeurl()"
     },
     {
@@ -12262,7 +12302,7 @@
       "source_location": "L88",
       "_origin": "ast",
       "id": "tests_app_api_mcp_authorize_test_approvalform",
-      "community": 51,
+      "community": 4,
       "norm_label": "approvalform()"
     },
     {
@@ -12272,7 +12312,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_app_api_mcp_register_test",
-      "community": 322,
+      "community": 4,
       "norm_label": "register.test.ts"
     },
     {
@@ -12332,7 +12372,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_action_state_test",
-      "community": 26,
+      "community": 323,
       "norm_label": "action-state.test.ts"
     },
     {
@@ -12342,7 +12382,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_admin_test",
-      "community": 6,
+      "community": 40,
       "norm_label": "admin.test.ts"
     },
     {
@@ -12352,8 +12392,38 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "tests_lib_admin_test_fakesupabase",
-      "community": 6,
+      "community": 40,
       "norm_label": "fakesupabase()"
+    },
+    {
+      "label": "cart-add-plan.test.ts",
+      "file_type": "code",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_lib_cart_add_plan_test",
+      "community": 16,
+      "norm_label": "cart-add-plan.test.ts"
+    },
+    {
+      "label": "line()",
+      "file_type": "code",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "tests_lib_cart_add_plan_test_line",
+      "community": 16,
+      "norm_label": "line()"
+    },
+    {
+      "label": "catalogInput()",
+      "file_type": "code",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "tests_lib_cart_add_plan_test_cataloginput",
+      "community": 16,
+      "norm_label": "cataloginput()"
     },
     {
       "label": "cart-merge.test.ts",
@@ -12462,7 +12532,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_cookie_names_test",
-      "community": 31,
+      "community": 141,
       "norm_label": "cookie-names.test.ts"
     },
     {
@@ -12492,7 +12562,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_email_receipt_core_test",
-      "community": 22,
+      "community": 103,
       "norm_label": "receipt-core.test.ts"
     },
     {
@@ -12792,7 +12862,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_mcp_tools_list_categories_test",
-      "community": 6,
+      "community": 40,
       "norm_label": "list-categories.test.ts"
     },
     {
@@ -12802,7 +12872,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_mcp_tools_list_subcategories_test",
-      "community": 6,
+      "community": 40,
       "norm_label": "list-subcategories.test.ts"
     },
     {
@@ -12962,7 +13032,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_lib_personalization_boilerplates_test",
-      "community": 148,
+      "community": 47,
       "norm_label": "personalization-boilerplates.test.ts"
     },
     {
@@ -13182,7 +13252,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_payments_routing_test",
-      "community": 117,
+      "community": 104,
       "norm_label": "routing.test.ts"
     },
     {
@@ -13192,7 +13262,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "tests_payments_routing_test_importrouter",
-      "community": 117,
+      "community": 104,
       "norm_label": "importrouter()"
     },
     {
@@ -13474,6 +13544,436 @@
       "id": "vitest_config",
       "community": 90,
       "norm_label": "vitest.config.ts"
+    },
+    {
+      "label": "progress.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/progress.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_progress",
+      "community": 333,
+      "norm_label": "progress.md"
+    },
+    {
+      "label": "SDD ledger \u2014 plan: docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/progress.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_progress_sdd_ledger_plan_docs_superpowers_plans_2026_07_30_cart_ux_feedback_md",
+      "community": 333,
+      "norm_label": "sdd ledger \u2014 plan: docs/superpowers/plans/2026-07-30-cart-ux-feedback.md"
+    },
+    {
+      "label": "task-1-brief.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-brief.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_brief",
+      "community": 334,
+      "norm_label": "task-1-brief.md"
+    },
+    {
+      "label": "Task 1: `planCartAdd` pure helper (TDD)",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-brief.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_brief_task_1_plancartadd_pure_helper_tdd",
+      "community": 334,
+      "norm_label": "task 1: `plancartadd` pure helper (tdd)"
+    },
+    {
+      "label": "task-1-report.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report",
+      "community": 322,
+      "norm_label": "task-1-report.md"
+    },
+    {
+      "label": "Task 1: `planCartAdd` Pure Helper (TDD) \u2014 Report",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "community": 322,
+      "norm_label": "task 1: `plancartadd` pure helper (tdd) \u2014 report"
+    },
+    {
+      "label": "Overview",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_overview",
+      "community": 322,
+      "norm_label": "overview"
+    },
+    {
+      "label": "TDD Process",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_tdd_process",
+      "community": 322,
+      "norm_label": "tdd process"
+    },
+    {
+      "label": "Step 1: Write Failing Tests (RED)",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_1_write_failing_tests_red",
+      "community": 322,
+      "norm_label": "step 1: write failing tests (red)"
+    },
+    {
+      "label": "Step 2: Implement (GREEN)",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L173",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_2_implement_green",
+      "community": 322,
+      "norm_label": "step 2: implement (green)"
+    },
+    {
+      "label": "Step 3: Verify",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L196",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_3_verify",
+      "community": 322,
+      "norm_label": "step 3: verify"
+    },
+    {
+      "label": "Step 4: Commit",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L201",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_4_commit",
+      "community": 322,
+      "norm_label": "step 4: commit"
+    },
+    {
+      "label": "Files Changed",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L208",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_files_changed",
+      "community": 322,
+      "norm_label": "files changed"
+    },
+    {
+      "label": "Implementation Details",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L212",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_implementation_details",
+      "community": 322,
+      "norm_label": "implementation details"
+    },
+    {
+      "label": "Merge Decision Logic",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L214",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_merge_decision_logic",
+      "community": 322,
+      "norm_label": "merge decision logic"
+    },
+    {
+      "label": "Key Implementation Notes",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L226",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_key_implementation_notes",
+      "community": 322,
+      "norm_label": "key implementation notes"
+    },
+    {
+      "label": "Self-Review Checklist",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L232",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_self_review_checklist",
+      "community": 322,
+      "norm_label": "self-review checklist"
+    },
+    {
+      "label": "Test Coverage",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L244",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_test_coverage",
+      "community": 322,
+      "norm_label": "test coverage"
+    },
+    {
+      "label": "Status",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L257",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_status",
+      "community": 322,
+      "norm_label": "status"
+    },
+    {
+      "label": "task-2-brief.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-brief.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_brief",
+      "community": 335,
+      "norm_label": "task-2-brief.md"
+    },
+    {
+      "label": "Task 2: Wire merging into `addItemToCart`; badge counts units",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-brief.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_brief_task_2_wire_merging_into_additemtocart_badge_counts_units",
+      "community": 335,
+      "norm_label": "task 2: wire merging into `additemtocart`; badge counts units"
+    },
+    {
+      "label": "task-2-report.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report",
+      "community": 57,
+      "norm_label": "task-2-report.md"
+    },
+    {
+      "label": "Task 2 Report: Wire merging into `addItemToCart`; badge counts units",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "community": 57,
+      "norm_label": "task 2 report: wire merging into `additemtocart`; badge counts units"
+    },
+    {
+      "label": "Implementation Summary",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_implementation_summary",
+      "community": 57,
+      "norm_label": "implementation summary"
+    },
+    {
+      "label": "Changes Made",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_changes_made",
+      "community": 57,
+      "norm_label": "changes made"
+    },
+    {
+      "label": "1. `addItemToCart` function (lines 115-175)",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_1_additemtocart_function_lines_115_175",
+      "community": 57,
+      "norm_label": "1. `additemtocart` function (lines 115-175)"
+    },
+    {
+      "label": "2. `getActiveCartItemCount` function (lines 58-72)",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L16",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_2_getactivecartitemcount_function_lines_58_72",
+      "community": 57,
+      "norm_label": "2. `getactivecartitemcount` function (lines 58-72)"
+    },
+    {
+      "label": "Verification",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L22",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_verification",
+      "community": 57,
+      "norm_label": "verification"
+    },
+    {
+      "label": "Test Suite",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_test_suite",
+      "community": 57,
+      "norm_label": "test suite"
+    },
+    {
+      "label": "Type Checking",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_type_checking",
+      "community": 57,
+      "norm_label": "type checking"
+    },
+    {
+      "label": "Linting",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_linting",
+      "community": 57,
+      "norm_label": "linting"
+    },
+    {
+      "label": "Formatting",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L49",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_formatting",
+      "community": 57,
+      "norm_label": "formatting"
+    },
+    {
+      "label": "Files Changed",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L55",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_files_changed",
+      "community": 57,
+      "norm_label": "files changed"
+    },
+    {
+      "label": "Self-Review",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L62",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_self_review",
+      "community": 57,
+      "norm_label": "self-review"
+    },
+    {
+      "label": "Completeness",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L64",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_completeness",
+      "community": 57,
+      "norm_label": "completeness"
+    },
+    {
+      "label": "Quality",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L71",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_quality",
+      "community": 57,
+      "norm_label": "quality"
+    },
+    {
+      "label": "Discipline",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L78",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_discipline",
+      "community": 57,
+      "norm_label": "discipline"
+    },
+    {
+      "label": "Integration",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L84",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_integration",
+      "community": 57,
+      "norm_label": "integration"
+    },
+    {
+      "label": "Concerns",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L89",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_concerns",
+      "community": 57,
+      "norm_label": "concerns"
+    },
+    {
+      "label": "Commit Details",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L98",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_commit_details",
+      "community": 57,
+      "norm_label": "commit details"
+    },
+    {
+      "label": "task-3-brief.md",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-3-brief.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief",
+      "community": 332,
+      "norm_label": "task-3-brief.md"
+    },
+    {
+      "label": "Task 3: ActionState add-to-cart with toasts",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-3-brief.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief_task_3_actionstate_add_to_cart_with_toasts",
+      "community": 332,
+      "norm_label": "task 3: actionstate add-to-cart with toasts"
+    },
+    {
+      "label": "Manual follow-ups (not engineer tasks)",
+      "file_type": "document",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-3-brief.md",
+      "source_location": "L281",
+      "_origin": "ast",
+      "id": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief_manual_follow_ups_not_engineer_tasks",
+      "community": 332,
+      "norm_label": "manual follow-ups (not engineer tasks)"
     },
     {
       "label": "final-fix-report.md",
@@ -15762,7 +16262,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "docs_investigations_uniqraft_global_startup_investor_due_diligence_2026_07_06_hy_2_\u0563\u0578\u0580\u056e\u0561\u0564\u056b\u0580_\u0565\u0566\u0580\u0561\u056f\u0561\u0581\u0578\u0582\u0569\u0575\u0578\u0582\u0576",
-      "community": 323,
+      "community": 331,
       "norm_label": "2. \u0563\u0578\u0580\u056e\u0561\u0564\u056b\u0580 \u0565\u0566\u0580\u0561\u056f\u0561\u0581\u0578\u0582\u0569\u0575\u0578\u0582\u0576"
     },
     {
@@ -15772,7 +16272,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "docs_investigations_uniqraft_global_startup_investor_due_diligence_2026_07_06_hy_\u056f\u0578\u0577\u057f_\u0576\u0565\u0580\u0564\u0580\u0578\u0582\u0574\u0561\u0575\u056b\u0576_\u056f\u0578\u0574\u056b\u057f\u0565\u056b_\u0561\u0575\u057d\u0585\u0580\u057e\u0561_\u0578\u0580\u0578\u0577\u0578\u0582\u0574\u0568",
-      "community": 323,
+      "community": 331,
       "norm_label": "\u056f\u0578\u0577\u057f \u0576\u0565\u0580\u0564\u0580\u0578\u0582\u0574\u0561\u0575\u056b\u0576 \u056f\u0578\u0574\u056b\u057f\u0565\u056b \u0561\u0575\u057d\u0585\u0580\u057e\u0561 \u0578\u0580\u0578\u0577\u0578\u0582\u0574\u0568"
     },
     {
@@ -15782,7 +16282,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "docs_investigations_uniqraft_global_startup_investor_due_diligence_2026_07_06_hy_\u056b_\u0576\u0579\u0568_\u056f\u0583\u0578\u056d\u056b_\u0578\u0580\u0578\u0577\u0578\u0582\u0574\u0568",
-      "community": 323,
+      "community": 331,
       "norm_label": "\u056b\u055e\u0576\u0579\u0568 \u056f\u0583\u0578\u056d\u056b \u0578\u0580\u0578\u0577\u0578\u0582\u0574\u0568"
     },
     {
@@ -15792,7 +16292,7 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "docs_investigations_uniqraft_global_startup_investor_due_diligence_2026_07_06_hy_\u0563\u0576\u0561\u0570\u0561\u057f\u0574\u0561\u0576_\u0584\u0561\u0580\u057f",
-      "community": 323,
+      "community": 331,
       "norm_label": "\u0563\u0576\u0561\u0570\u0561\u057f\u0574\u0561\u0576 \u0584\u0561\u0580\u057f"
     },
     {
@@ -21076,6 +21576,76 @@
       "norm_label": "task 10: full verification + knowledge graph refresh"
     },
     {
+      "label": "2026-07-30-cart-ux-feedback.md",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback",
+      "community": 330,
+      "norm_label": "2026-07-30-cart-ux-feedback.md"
+    },
+    {
+      "label": "Cart UX Feedback Implementation Plan",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_cart_ux_feedback_implementation_plan",
+      "community": 330,
+      "norm_label": "cart ux feedback implementation plan"
+    },
+    {
+      "label": "Global Constraints",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_global_constraints",
+      "community": 330,
+      "norm_label": "global constraints"
+    },
+    {
+      "label": "Task 1: `planCartAdd` pure helper (TDD)",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L24",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_task_1_plancartadd_pure_helper_tdd",
+      "community": 330,
+      "norm_label": "task 1: `plancartadd` pure helper (tdd)"
+    },
+    {
+      "label": "Task 2: Wire merging into `addItemToCart`; badge counts units",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L198",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_task_2_wire_merging_into_additemtocart_badge_counts_units",
+      "community": 330,
+      "norm_label": "task 2: wire merging into `additemtocart`; badge counts units"
+    },
+    {
+      "label": "Task 3: ActionState add-to-cart with toasts",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L314",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_task_3_actionstate_add_to_cart_with_toasts",
+      "community": 330,
+      "norm_label": "task 3: actionstate add-to-cart with toasts"
+    },
+    {
+      "label": "Manual follow-ups (not engineer tasks)",
+      "file_type": "document",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L594",
+      "_origin": "ast",
+      "id": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_manual_follow_ups_not_engineer_tasks",
+      "community": 330,
+      "norm_label": "manual follow-ups (not engineer tasks)"
+    },
+    {
       "label": "2026-07-06-ameriabank-payments-design.md",
       "file_type": "document",
       "source_file": "docs/superpowers/specs/2026-07-06-ameriabank-payments-design.md",
@@ -22843,6 +23413,116 @@
       "_origin": "ast",
       "id": "docs_superpowers_specs_2026_07_25_skill_reference_per_boilerplate_design_out_of_scope",
       "community": 135,
+      "norm_label": "out of scope"
+    },
+    {
+      "label": "2026-07-30-cart-ux-feedback-design.md",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design",
+      "community": 325,
+      "norm_label": "2026-07-30-cart-ux-feedback-design.md"
+    },
+    {
+      "label": "Cart UX: add-to-cart feedback, line merging, badge semantics",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_cart_ux_add_to_cart_feedback_line_merging_badge_semantics",
+      "community": 325,
+      "norm_label": "cart ux: add-to-cart feedback, line merging, badge semantics"
+    },
+    {
+      "label": "Design",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "community": 325,
+      "norm_label": "design"
+    },
+    {
+      "label": "1. `planCartAdd` \u2014 pure merge decision (`lib/cart.ts`)",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_1_plancartadd_pure_merge_decision_lib_cart_ts",
+      "community": 325,
+      "norm_label": "1. `plancartadd` \u2014 pure merge decision (`lib/cart.ts`)"
+    },
+    {
+      "label": "2. Badge counts units (`lib/cart.ts`)",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L29",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_2_badge_counts_units_lib_cart_ts",
+      "community": 325,
+      "norm_label": "2. badge counts units (`lib/cart.ts`)"
+    },
+    {
+      "label": "3. `addCatalogItemToCartAction` returns `ActionState` (`app/cart/actions.ts`)",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_3_addcatalogitemtocartaction_returns_actionstate_app_cart_actions_ts",
+      "community": 325,
+      "norm_label": "3. `addcatalogitemtocartaction` returns `actionstate` (`app/cart/actions.ts`)"
+    },
+    {
+      "label": "4. `components/add-to-cart-button.tsx` (new, client component)",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_4_components_add_to_cart_button_tsx_new_client_component",
+      "community": 325,
+      "norm_label": "4. `components/add-to-cart-button.tsx` (new, client component)"
+    },
+    {
+      "label": "i18n",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L46",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_i18n",
+      "community": 325,
+      "norm_label": "i18n"
+    },
+    {
+      "label": "Success criteria",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L50",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_success_criteria",
+      "community": 325,
+      "norm_label": "success criteria"
+    },
+    {
+      "label": "Testing",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_testing",
+      "community": 325,
+      "norm_label": "testing"
+    },
+    {
+      "label": "Out of scope",
+      "file_type": "document",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L60",
+      "_origin": "ast",
+      "id": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_out_of_scope",
+      "community": 325,
       "norm_label": "out of scope"
     },
     {
@@ -40551,7 +41231,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "app_cart_actions_addcatalogitemtocartaction",
@@ -40561,7 +41241,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L126",
+      "source_location": "L137",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "app_cart_actions_clearcartaction",
@@ -40571,7 +41251,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "app_cart_actions_getcartactor",
@@ -40581,7 +41261,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L112",
+      "source_location": "L123",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "app_cart_actions_removecartitemaction",
@@ -40591,7 +41271,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L92",
+      "source_location": "L103",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "app_cart_actions_updatecartquantityaction",
@@ -40602,7 +41282,51 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L5",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "app_cart_actions",
+      "target": "lib_action_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/cart/actions.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "app_cart_actions",
+      "target": "lib_action_state_actionerror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/cart/actions.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "app_cart_actions",
+      "target": "lib_action_state_actionstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/cart/actions.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "app_cart_actions",
+      "target": "lib_action_state_actionsuccess",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/cart/actions.ts",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart",
@@ -40613,7 +41337,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_additemtocart",
@@ -40624,7 +41348,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_cartowner",
@@ -40635,7 +41359,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_clearcart",
@@ -40646,7 +41370,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_removecartitem",
@@ -40657,7 +41381,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_session",
@@ -40668,7 +41392,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_session_getcartsessionid",
@@ -40679,7 +41403,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_cart_updatecartitemquantity",
@@ -40690,7 +41414,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_currency",
@@ -40701,7 +41425,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_currency_convertmoney",
@@ -40712,7 +41436,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_currency_getactivecurrency",
@@ -40723,7 +41447,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_currency_normalizecurrency",
@@ -40734,7 +41458,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_market",
@@ -40745,7 +41469,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_market_resolvecatalogmarket",
@@ -40756,7 +41480,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_market_resolvemarket",
@@ -40767,7 +41491,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_supabase_server",
@@ -40778,7 +41502,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_supabase_server_getcurrentuser",
@@ -40789,7 +41513,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_supabase_server_getserversupabase",
@@ -40800,7 +41524,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L14",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "app_cart_actions",
       "target": "lib_supabase_server_getservicesupabase",
@@ -40821,21 +41545,10 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/items/[slug]/page.tsx",
-      "source_location": "L5",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L6",
       "weight": 1.0,
-      "source": "app_items_slug_page",
-      "target": "app_cart_actions",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L3",
-      "weight": 1.0,
-      "source": "components_catalog_item_card",
+      "source": "components_add_to_cart_button",
       "target": "app_cart_actions",
       "confidence_score": 1.0
     },
@@ -40844,7 +41557,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L37",
+      "source_location": "L44",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "app_cart_actions_getcartactor",
@@ -40855,7 +41568,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L127",
+      "source_location": "L138",
       "weight": 1.0,
       "source": "app_cart_actions_clearcartaction",
       "target": "app_cart_actions_getcartactor",
@@ -40866,7 +41579,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0,
       "source": "app_cart_actions_getcartactor",
       "target": "lib_cart_session_getcartsessionid",
@@ -40877,7 +41590,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0,
       "source": "app_cart_actions_getcartactor",
       "target": "lib_supabase_server_getcurrentuser",
@@ -40888,7 +41601,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L18",
+      "source_location": "L20",
       "weight": 1.0,
       "source": "app_cart_actions_getcartactor",
       "target": "lib_supabase_server_getserversupabase",
@@ -40899,7 +41612,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L27",
+      "source_location": "L29",
       "weight": 1.0,
       "source": "app_cart_actions_getcartactor",
       "target": "lib_supabase_server_getservicesupabase",
@@ -40910,7 +41623,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L119",
+      "source_location": "L130",
       "weight": 1.0,
       "source": "app_cart_actions_removecartitemaction",
       "target": "app_cart_actions_getcartactor",
@@ -40921,7 +41634,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "app/cart/actions.ts",
-      "source_location": "L105",
+      "source_location": "L116",
       "weight": 1.0,
       "source": "app_cart_actions_updatecartquantityaction",
       "target": "app_cart_actions_getcartactor",
@@ -40933,7 +41646,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L84",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "app_cart_actions_addcatalogitemtocartaction",
+      "target": "lib_action_state_actionerror"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/cart/actions.ts",
+      "source_location": "L97",
+      "weight": 1.0,
+      "source": "app_cart_actions_addcatalogitemtocartaction",
+      "target": "lib_action_state_actionsuccess"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "app/cart/actions.ts",
+      "source_location": "L91",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_cart_additemtocart"
@@ -40944,7 +41679,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L64",
+      "source_location": "L71",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_currency_convertmoney"
@@ -40955,7 +41690,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L63",
+      "source_location": "L70",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_currency_getactivecurrency"
@@ -40966,7 +41701,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L62",
+      "source_location": "L69",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_currency_normalizecurrency"
@@ -40977,7 +41712,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L56",
+      "source_location": "L63",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_market_resolvecatalogmarket"
@@ -40988,7 +41723,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L54",
+      "source_location": "L61",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_market_resolvemarket"
@@ -40999,7 +41734,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L54",
+      "source_location": "L61",
       "weight": 1.0,
       "source": "app_cart_actions_addcatalogitemtocartaction",
       "target": "lib_supabase_server_getservicesupabase"
@@ -41008,23 +41743,23 @@
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
-      "source_file": "app/items/[slug]/page.tsx",
-      "source_location": "L5",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L6",
       "weight": 1.0,
-      "source": "app_items_slug_page",
+      "source": "components_add_to_cart_button",
       "target": "app_cart_actions_addcatalogitemtocartaction",
       "confidence_score": 1.0
     },
     {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L3",
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L30",
       "weight": 1.0,
-      "source": "components_catalog_item_card",
-      "target": "app_cart_actions_addcatalogitemtocartaction",
-      "confidence_score": 1.0
+      "source": "components_add_to_cart_button_addtocartbutton",
+      "target": "app_cart_actions_addcatalogitemtocartaction"
     },
     {
       "relation": "calls",
@@ -41032,7 +41767,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L107",
+      "source_location": "L118",
       "weight": 1.0,
       "source": "app_cart_actions_updatecartquantityaction",
       "target": "lib_cart_updatecartitemquantity"
@@ -41054,7 +41789,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L121",
+      "source_location": "L132",
       "weight": 1.0,
       "source": "app_cart_actions_removecartitemaction",
       "target": "lib_cart_removecartitem"
@@ -41076,7 +41811,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "app/cart/actions.ts",
-      "source_location": "L129",
+      "source_location": "L140",
       "weight": 1.0,
       "source": "app_cart_actions_clearcartaction",
       "target": "lib_cart_clearcart"
@@ -45024,6 +45759,28 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "app/items/[slug]/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "app_items_slug_page",
+      "target": "components_add_to_cart_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/items/[slug]/page.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "app_items_slug_page",
+      "target": "components_add_to_cart_button_addtocartbutton",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app/items/[slug]/page.tsx",
       "source_location": "L6",
       "weight": 1.0,
       "source": "app_items_slug_page",
@@ -48040,6 +48797,82 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "components_add_to_cart_button",
+      "target": "components_add_to_cart_button_addtocartbutton",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_add_to_cart_button",
+      "target": "components_ui_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "components_add_to_cart_button",
+      "target": "components_ui_button_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "components_add_to_cart_button",
+      "target": "lib_action_state",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/add-to-cart-button.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "components_add_to_cart_button",
+      "target": "lib_action_state_idlestate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/catalog-item-card.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "components_catalog_item_card",
+      "target": "components_add_to_cart_button",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/catalog-item-card.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "components_catalog_item_card",
+      "target": "components_add_to_cart_button_addtocartbutton",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "components/banner-customizer.tsx",
       "source_location": "L128",
       "weight": 1.0,
@@ -48342,7 +49175,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L16",
+      "source_location": "L15",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "components_catalog_item_card_catalogitemcard",
@@ -48368,28 +49201,6 @@
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "components_catalog_media_slider_catalogmediaslider",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports_from",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "components_catalog_item_card",
-      "target": "components_ui_button",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "imports",
-      "context": "import",
-      "confidence": "EXTRACTED",
-      "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L7",
-      "weight": 1.0,
-      "source": "components_catalog_item_card",
-      "target": "components_ui_button_button",
       "confidence_score": 1.0
     },
     {
@@ -48441,7 +49252,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_catalog_media",
@@ -48452,7 +49263,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_catalog_media_sortcatalogmedia",
@@ -48463,7 +49274,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L9",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_currency",
@@ -48474,7 +49285,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L9",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_currency_convertedmoney",
@@ -48485,7 +49296,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L12",
+      "source_location": "L11",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_i18n",
@@ -48496,7 +49307,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L11",
+      "source_location": "L10",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_i18n_config_applocale",
@@ -48507,7 +49318,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_i18n_dynamic",
@@ -48518,7 +49329,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L13",
+      "source_location": "L12",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_i18n_dynamic_tdynamic",
@@ -48529,7 +49340,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L12",
+      "source_location": "L11",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_i18n_formatlocalizedcurrency",
@@ -48540,7 +49351,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_marketplace",
@@ -48551,7 +49362,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0,
       "source": "components_catalog_item_card",
       "target": "lib_marketplace_catalogitem",
@@ -48563,7 +49374,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L26",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "components_catalog_item_card_catalogitemcard",
       "target": "lib_catalog_media_sortcatalogmedia"
@@ -48574,7 +49385,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L43",
+      "source_location": "L42",
       "weight": 1.0,
       "source": "components_catalog_item_card_catalogitemcard",
       "target": "lib_i18n_dynamic_tdynamic"
@@ -48585,7 +49396,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/catalog-item-card.tsx",
-      "source_location": "L88",
+      "source_location": "L84",
       "weight": 1.0,
       "source": "components_catalog_item_card_catalogitemcard",
       "target": "lib_i18n_formatlocalizedcurrency"
@@ -52289,6 +53100,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "lib_cart",
+      "target": "lib_cart_cartaddplan",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/cart.ts",
       "source_location": "L15",
       "weight": 1.0,
       "source": "lib_cart",
@@ -52319,7 +53140,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L197",
+      "source_location": "L251",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_cartmergeplan",
@@ -52349,7 +53170,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L191",
+      "source_location": "L214",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_clearcart",
@@ -52409,7 +53230,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L234",
+      "source_location": "L288",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_mergesessioncartintousercart",
@@ -52419,7 +53240,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L214",
+      "source_location": "L233",
+      "weight": 1.0,
+      "source": "lib_cart",
+      "target": "lib_cart_plancartadd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/cart.ts",
+      "source_location": "L268",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_plancartmerge",
@@ -52429,7 +53260,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L176",
+      "source_location": "L199",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_removecartitem",
@@ -52439,7 +53270,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L156",
+      "source_location": "L179",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_updatecartitemquantity",
@@ -52449,7 +53280,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L311",
+      "source_location": "L365",
       "weight": 1.0,
       "source": "lib_cart",
       "target": "lib_cart_validatecartbeforecheckout",
@@ -52547,11 +53378,44 @@
       "relation": "imports_from",
       "context": "import",
       "confidence": "EXTRACTED",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_lib_cart_add_plan_test",
+      "target": "lib_cart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
       "source_file": "tests/lib/cart-merge.test.ts",
       "source_location": "L2",
       "weight": 1.0,
       "source": "tests_lib_cart_merge_test",
       "target": "lib_cart",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_lib_cart_add_plan_test",
+      "target": "lib_cart_cartiteminput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_lib_cart_add_plan_test",
+      "target": "lib_cart_cartitem",
       "confidence_score": 1.0
     },
     {
@@ -52581,7 +53445,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L353",
+      "source_location": "L407",
       "weight": 1.0,
       "source": "lib_cart_validatecartbeforecheckout",
       "target": "lib_cart_getnumericconfigurationvalue",
@@ -52592,7 +53456,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L356",
+      "source_location": "L410",
       "weight": 1.0,
       "source": "lib_cart_validatecartbeforecheckout",
       "target": "lib_cart_getstringconfigurationvalue",
@@ -52625,7 +53489,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L192",
+      "source_location": "L215",
       "weight": 1.0,
       "source": "lib_cart_clearcart",
       "target": "lib_cart_getorcreatecart",
@@ -52658,7 +53522,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L239",
+      "source_location": "L293",
       "weight": 1.0,
       "source": "lib_cart_mergesessioncartintousercart",
       "target": "lib_cart_getorcreatecart",
@@ -52669,7 +53533,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L181",
+      "source_location": "L204",
       "weight": 1.0,
       "source": "lib_cart_removecartitem",
       "target": "lib_cart_getorcreatecart",
@@ -52680,7 +53544,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L166",
+      "source_location": "L189",
       "weight": 1.0,
       "source": "lib_cart_updatecartitemquantity",
       "target": "lib_cart_getorcreatecart",
@@ -52702,10 +53566,21 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L316",
+      "source_location": "L370",
       "weight": 1.0,
       "source": "lib_cart_validatecartbeforecheckout",
       "target": "lib_cart_listcartitems",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/cart.ts",
+      "source_location": "L140",
+      "weight": 1.0,
+      "source": "lib_cart_additemtocart",
+      "target": "lib_cart_plancartadd",
       "confidence_score": 1.0
     },
     {
@@ -52714,7 +53589,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L129",
+      "source_location": "L130",
       "weight": 1.0,
       "source": "lib_cart_additemtocart",
       "target": "lib_supabase_types_typedsupabaseclient"
@@ -52725,7 +53600,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L167",
+      "source_location": "L190",
       "weight": 1.0,
       "source": "lib_cart_updatecartitemquantity",
       "target": "lib_supabase_types_typedsupabaseclient"
@@ -52736,7 +53611,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L182",
+      "source_location": "L205",
       "weight": 1.0,
       "source": "lib_cart_removecartitem",
       "target": "lib_supabase_types_typedsupabaseclient"
@@ -52747,17 +53622,28 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L193",
+      "source_location": "L216",
       "weight": 1.0,
       "source": "lib_cart_clearcart",
       "target": "lib_supabase_types_typedsupabaseclient"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "tests_lib_cart_add_plan_test",
+      "target": "lib_cart_plancartadd",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "lib/cart.ts",
-      "source_location": "L262",
+      "source_location": "L316",
       "weight": 1.0,
       "source": "lib_cart_mergesessioncartintousercart",
       "target": "lib_cart_plancartmerge",
@@ -52780,7 +53666,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L240",
+      "source_location": "L294",
       "weight": 1.0,
       "source": "lib_cart_mergesessioncartintousercart",
       "target": "lib_supabase_types_typedsupabaseclient"
@@ -52791,7 +53677,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L365",
+      "source_location": "L419",
       "weight": 1.0,
       "source": "lib_cart_validatecartbeforecheckout",
       "target": "lib_market_resolvecatalogmarket"
@@ -52802,7 +53688,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L324",
+      "source_location": "L378",
       "weight": 1.0,
       "source": "lib_cart_validatecartbeforecheckout",
       "target": "lib_market_resolvemarket"
@@ -52813,7 +53699,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/cart.ts",
-      "source_location": "L318",
+      "source_location": "L372",
       "weight": 1.0,
       "source": "lib_cart_validatecartbeforecheckout",
       "target": "lib_supabase_types_typedsupabaseclient"
@@ -57083,6 +57969,17 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "indirect_call",
+      "context": "argument",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/item-ai.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "lib_item_ai_builditemfieldsprompt",
+      "target": "tests_lib_cart_add_plan_test_line"
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -60406,6 +61303,17 @@
       "weight": 1.0,
       "source": "lib_orders_createorderfromcart",
       "target": "lib_shipping_calculateordertotals"
+    },
+    {
+      "relation": "indirect_call",
+      "context": "collection",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "lib/orders.ts",
+      "source_location": "L308",
+      "weight": 1.0,
+      "source": "lib_orders_createorderfromcart",
+      "target": "tests_lib_cart_add_plan_test_line"
     },
     {
       "relation": "imports_from",
@@ -63981,7 +64889,7 @@
       "weight": 1.0,
       "context": "import",
       "source": "package_dependencies_openai",
-      "target": "skills_print_with_l1s80_agents_openai",
+      "target": "skills_cut_with_co2_laser_agents_openai",
       "confidence_score": 1.0
     },
     {
@@ -66109,6 +67017,26 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "tests_lib_cart_add_plan_test",
+      "target": "tests_lib_cart_add_plan_test_cataloginput",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/lib/cart-add-plan.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "tests_lib_cart_add_plan_test",
+      "target": "tests_lib_cart_add_plan_test_line",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "tests/lib/cart-merge.test.ts",
       "source_location": "L4",
       "weight": 1.0,
@@ -66795,6 +67723,376 @@
       "weight": 1.0,
       "source": "vercel",
       "target": "vercel_schema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/progress.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_progress",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_progress_sdd_ledger_plan_docs_superpowers_plans_2026_07_30_cart_ux_feedback_md",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-brief.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_brief",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_brief_task_1_plancartadd_pure_helper_tdd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L208",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_files_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L212",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_implementation_details",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_overview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L232",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_self_review_checklist",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L257",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_status",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_tdd_process",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_task_1_plancartadd_pure_helper_tdd_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_test_coverage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_tdd_process",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_1_write_failing_tests_red",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L173",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_tdd_process",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_2_implement_green",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L196",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_tdd_process",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_3_verify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_tdd_process",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_step_4_commit",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L226",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_implementation_details",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_key_implementation_notes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-1-report.md",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_implementation_details",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_1_report_merge_decision_logic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-brief.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_brief",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_brief_task_2_wire_merging_into_additemtocart_badge_counts_units",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L98",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_commit_details",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_concerns",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L55",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_files_changed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_implementation_summary",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L62",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_self_review",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_task_2_report_wire_merging_into_additemtocart_badge_counts_units",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_verification",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_implementation_summary",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_changes_made",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_changes_made",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_1_additemtocart_function_lines_115_175",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_changes_made",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_2_getactivecartitemcount_function_lines_58_72",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L49",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_verification",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_formatting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_verification",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_linting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_verification",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_test_suite",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_verification",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_type_checking",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_self_review",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_completeness",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_self_review",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_discipline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_self_review",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_integration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-2-report.md",
+      "source_location": "L71",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_self_review",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_2_report_quality",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-3-brief.md",
+      "source_location": "L281",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief_manual_follow_ups_not_engineer_tasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".superpowers/sdd/2026-07-30-cart-ux-feedback/task-3-brief.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief",
+      "target": "superpowers_sdd_2026_07_30_cart_ux_feedback_task_3_brief_task_3_actionstate_add_to_cart_with_toasts",
       "confidence_score": 1.0
     },
     {
@@ -73800,6 +75098,66 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_superpowers_plans_2026_07_30_cart_ux_feedback",
+      "target": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_cart_ux_feedback_implementation_plan",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_cart_ux_feedback_implementation_plan",
+      "target": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_global_constraints",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L594",
+      "weight": 1.0,
+      "source": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_cart_ux_feedback_implementation_plan",
+      "target": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_manual_follow_ups_not_engineer_tasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_global_constraints",
+      "target": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_task_1_plancartadd_pure_helper_tdd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L198",
+      "weight": 1.0,
+      "source": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_global_constraints",
+      "target": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_task_2_wire_merging_into_additemtocart_badge_counts_units",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/plans/2026-07-30-cart-ux-feedback.md",
+      "source_location": "L314",
+      "weight": 1.0,
+      "source": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_global_constraints",
+      "target": "docs_superpowers_plans_2026_07_30_cart_ux_feedback_task_3_actionstate_add_to_cart_with_toasts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/superpowers/specs/2026-07-06-ameriabank-payments-design.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -75465,6 +76823,106 @@
       "weight": 1.0,
       "source": "docs_superpowers_specs_2026_07_25_skill_reference_per_boilerplate_design_admin_ux",
       "target": "docs_superpowers_specs_2026_07_25_skill_reference_per_boilerplate_design_shared_helper",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_cart_ux_add_to_cart_feedback_line_merging_badge_semantics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_cart_ux_add_to_cart_feedback_line_merging_badge_semantics",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_cart_ux_add_to_cart_feedback_line_merging_badge_semantics",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_out_of_scope",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_cart_ux_add_to_cart_feedback_line_merging_badge_semantics",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_success_criteria",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_cart_ux_add_to_cart_feedback_line_merging_badge_semantics",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_testing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_1_plancartadd_pure_merge_decision_lib_cart_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_2_badge_counts_units_lib_cart_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_3_addcatalogitemtocartaction_returns_actionstate_app_cart_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_4_components_add_to_cart_button_tsx_new_client_component",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-07-30-cart-ux-feedback-design.md",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_design",
+      "target": "docs_superpowers_specs_2026_07_30_cart_ux_feedback_design_i18n",
       "confidence_score": 1.0
     },
     {
@@ -78599,5 +80057,5 @@
       "source_file": "public/product-references/night-lights/contour-laser-engraved.jpg"
     }
   ],
-  "built_at_commit": "fb2cf14bc5cdc02888d9e2a2f443b56fb6b7114f"
+  "built_at_commit": "e13d6df7c432f04245ae6684ce13f80c2b74fbe4"
 }

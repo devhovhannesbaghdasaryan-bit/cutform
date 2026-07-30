@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, ShoppingCart, Sparkles } from 'lucide-react';
-import { addCatalogItemToCartAction } from '@/app/cart/actions';
+import { AddToCartButton } from '@/components/add-to-cart-button';
 import { CatalogMediaSlider } from '@/components/catalog-media-slider';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
@@ -162,13 +162,13 @@ export default async function CatalogItemDetailPage({
             )}
 
             <div className="flex flex-wrap gap-3">
-              <form action={addCatalogItemToCartAction}>
-                <input type="hidden" name="itemId" value={item.id} />
-                <Button size="lg" type="submit">
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  {t('product.add_to_cart')}
-                </Button>
-              </form>
+              <AddToCartButton
+                itemId={item.id}
+                ariaLabel={t('product.add_to_cart')}
+                buttonText={t('product.add_to_cart')}
+                size="lg"
+                variant="default"
+              />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
