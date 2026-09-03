@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { requireAdmin } from '@/lib/admin';
-import { formatPrice } from '@/lib/utils';
+import { hasAdminPermission, requireAdmin } from '@/lib/admin';
+import { getCatalogPreviewPath } from '@/lib/catalog-media';
+import { type AdminItemRow, ItemsTable } from './items-table';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ export default async function AdminItemsPage({
   searchParams: Promise<{ status?: string; category?: string; q?: string }>;
 }) {
   const params = await searchParams;
-  const { supabase } = await requireAdmin();
+  const { supabase, user } = await requireAdmin();
 
   let query = supabase
     .from('catalog_items')
@@ -26,7 +27,17 @@ export default async function AdminItemsPage({
         is_popular,
         is_customizable,
         created_at,
-        category:categories (name, slug)
+        thumbnail_path,
+        category:categories (name, slug),
+        media:catalog_item_media (
+          id,
+          media_type,
+          storage_path,
+          alt_text,
+          poster_path,
+          sort_order,
+          is_primary
+        )
       `,
     )
     .order('created_at', { ascending: false });
@@ -35,14 +46,18 @@ export default async function AdminItemsPage({
   if (params.category) query = query.eq('categories.slug', params.category);
   if (params.q) query = query.ilike('title', `%${params.q}%`);
 
-  const [{ data: items, error }, { data: categories }] = await Promise.all([
+  const [{ data: items, error }, { data: categories }, canDelete] = await Promise.all([
     query,
     supabase.from('categories').select('slug, name').order('sort_order', { ascending: true }),
+    hasAdminPermission(user.id, 'catalog_manage'),
   ]);
 
-  const filteredItems = (items ?? []).filter(
-    (item) => !params.category || item.category?.slug === params.category,
-  );
+  const rows = (items ?? [])
+    .filter((item) => !params.category || item.category?.slug === params.category)
+    .map((item) => ({
+      ...item,
+      previewPath: getCatalogPreviewPath(item),
+    })) as AdminItemRow[];
 
   return (
     <main className="container space-y-6 py-10">
@@ -95,44 +110,12 @@ export default async function AdminItemsPage({
 
       {error ? (
         <p className="text-sm text-destructive">{error.message}</p>
-      ) : filteredItems.length === 0 ? (
+      ) : rows.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-sm text-muted-foreground">
           No items found.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left">
-              <tr>
-                <th className="px-4 py-3 font-medium">Item</th>
-                <th className="px-4 py-3 font-medium">Category</th>
-                <th className="px-4 py-3 font-medium">Price</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Flags</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredItems.map((item) => (
-                <tr key={item.id} className="border-t">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/items/${item.id}`} className="font-medium hover:underline">
-                      {item.title}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">{item.slug}</p>
-                  </td>
-                  <td className="px-4 py-3">{item.category?.name ?? '-'}</td>
-                  <td className="px-4 py-3">{formatPrice(item.price_cents)}</td>
-                  <td className="px-4 py-3 capitalize">{item.status}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">
-                    {[item.is_popular && 'popular', item.is_customizable && 'custom']
-                      .filter(Boolean)
-                      .join(', ') || '-'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ItemsTable items={rows} canDelete={canDelete} />
       )}
     </main>
   );

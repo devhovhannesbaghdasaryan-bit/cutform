@@ -3,10 +3,15 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { actionError, actionSuccess, type ActionState } from '@/lib/action-state';
+import { actionError, actionSuccess, type ActionState, zodErrorToState } from '@/lib/action-state';
 import { requireAdminPermission } from '@/lib/admin';
 import { APP_LOCALES } from '@/lib/i18n';
-import { createCatalogItemCore, updateCatalogItemCore } from '@/lib/catalog-items/core';
+import {
+  createCatalogItemCore,
+  type DeleteCatalogItemsResult,
+  deleteCatalogItemsCore,
+  updateCatalogItemCore,
+} from '@/lib/catalog-items/core';
 import { deleteSkillArtifact } from '@/lib/openai-skills';
 import { getOpenAiClient } from '@/lib/openai-client';
 import { applyItemSkillFields } from '@/lib/skill-files';
@@ -153,4 +158,40 @@ export async function updateCatalogItemAction(
   revalidatePath('/admin/items');
   revalidatePath(`/admin/items/${id}`);
   return actionSuccess(null);
+}
+
+const deleteItemsSchema = z.object({
+  itemIds: z.array(z.string().uuid()).min(1, 'Select at least one item to delete.'),
+});
+
+function describeDeleteResult({ deleted, blocked }: DeleteCatalogItemsResult) {
+  const deletedPart = `Deleted ${deleted} ${deleted === 1 ? 'item' : 'items'}.`;
+  if (blocked.length === 0) return deletedPart;
+
+  const names = blocked.map((item) => item.title).join(', ');
+  const kept = `${blocked.length} ${blocked.length === 1 ? 'item is' : 'items are'} used in an order and ${blocked.length === 1 ? 'was' : 'were'} kept: ${names}.`;
+  return `${deletedPart} ${kept}`;
+}
+
+/** Bulk hard-delete from the admin items table. Items used in an order are kept. */
+export async function deleteCatalogItemsAction(
+  _prev: ActionState<DeleteCatalogItemsResult>,
+  formData: FormData,
+): Promise<ActionState<DeleteCatalogItemsResult>> {
+  const parsed = deleteItemsSchema.safeParse({ itemIds: formData.getAll('itemIds') });
+  if (!parsed.success) return zodErrorToState(parsed.error);
+
+  const { supabase } = await requireAdminPermission('catalog_manage');
+
+  let result: DeleteCatalogItemsResult;
+  try {
+    result = await deleteCatalogItemsCore(supabase, parsed.data.itemIds);
+  } catch (error) {
+    return actionError(error instanceof Error ? error.message : 'Failed to delete items.');
+  }
+
+  revalidatePath('/');
+  revalidatePath('/catalog');
+  revalidatePath('/admin/items');
+  return actionSuccess(result, describeDeleteResult(result));
 }

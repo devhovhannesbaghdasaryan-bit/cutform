@@ -33,6 +33,22 @@ export async function uploadToBucket(
   return path;
 }
 
+/**
+ * Best-effort removal of storage objects. Deliberately logs instead of
+ * throwing: callers clean up *after* a database delete has already
+ * committed, so a failing bucket must not turn a successful delete into an
+ * error. Orphaned objects are recoverable; a misreported delete is not.
+ */
+export async function removeFromBucket(
+  client: SupabaseStorageClient,
+  bucket: string,
+  paths: string[],
+) {
+  if (paths.length === 0) return;
+  const { error } = await client.storage.from(bucket).remove(paths);
+  if (error) console.error('[storage] failed to remove objects', bucket, error.message);
+}
+
 /** Downloads from a storage bucket, throwing on error or missing data. Returns the Blob. */
 export async function downloadFromBucket(
   client: SupabaseStorageClient,

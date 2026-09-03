@@ -115,8 +115,8 @@
     "semantic_hash": ""
   },
   "app/admin/items/actions.ts": {
-    "mtime": 1785066821.1159818,
-    "ast_hash": "25ff8cc0daa3660cc8613b247ecd14a6",
+    "mtime": 1788428706.7091045,
+    "ast_hash": "359a35c447c68e17e9d4d6d1bf099c4c",
     "semantic_hash": ""
   },
   "app/admin/items/ai-draft-actions.ts": {
@@ -180,14 +180,14 @@
     "semantic_hash": ""
   },
   "app/admin/items/new/page.tsx": {
-    "mtime": 1785406423.4615946,
+    "mtime": 1788428927.990633,
     "ast_hash": "0358d4c62a953c8f10a7b4defe1fef36",
     "semantic_hash": "0358d4c62a953c8f10a7b4defe1fef36"
   },
   "app/admin/items/page.tsx": {
-    "mtime": 1783349596.425223,
-    "ast_hash": "ad989f67c2c3b9c0d0b7e519f65a1231",
-    "semantic_hash": "ad989f67c2c3b9c0d0b7e519f65a1231"
+    "mtime": 1788428679.237449,
+    "ast_hash": "7def9b98aec5aa02d12f6d4015fdc498",
+    "semantic_hash": ""
   },
   "app/admin/layout.tsx": {
     "mtime": 1781098114.3426764,
@@ -530,7 +530,7 @@
     "semantic_hash": "ec2e1c0f791f04aafa394ccb0729622c"
   },
   "components/marketplace-header.tsx": {
-    "mtime": 1785419017.8640463,
+    "mtime": 1785429712.5954745,
     "ast_hash": "4769f31b038a5e507f18158c22e2a86d",
     "semantic_hash": ""
   },
@@ -555,7 +555,7 @@
     "semantic_hash": "37402e5bf9238049c030027b0533ea99"
   },
   "components/theme-toggle.tsx": {
-    "mtime": 1785418993.1310146,
+    "mtime": 1785429712.59743,
     "ast_hash": "c64524b79395665173377d559362bbe1",
     "semantic_hash": ""
   },
@@ -655,8 +655,8 @@
     "semantic_hash": ""
   },
   "lib/catalog-items/core.ts": {
-    "mtime": 1785063538.3203413,
-    "ast_hash": "cd36334a58fb6fbb33c619772e82603b",
+    "mtime": 1788428909.148208,
+    "ast_hash": "3ef7682781d8022e0a483403da0658bc",
     "semantic_hash": ""
   },
   "lib/catalog-items/upload-from-url.ts": {
@@ -905,9 +905,9 @@
     "semantic_hash": "cde383fd25c0f84d92732035604f2b21"
   },
   "lib/storage.ts": {
-    "mtime": 1783326810.1372876,
-    "ast_hash": "0a63c871b56ca5434640c3aafe7ab04f",
-    "semantic_hash": "0a63c871b56ca5434640c3aafe7ab04f"
+    "mtime": 1788428679.2384489,
+    "ast_hash": "02a40391bd0f533688bcb924bdb321f3",
+    "semantic_hash": ""
   },
   "lib/supabase/database.types.ts": {
     "mtime": 1785063538.3243406,
@@ -945,17 +945,17 @@
     "semantic_hash": "588591fce77286794880b892b1a4c8e3"
   },
   "messages/am.json": {
-    "mtime": 1785418981.2288897,
+    "mtime": 1785429712.6124375,
     "ast_hash": "255a55529f11bfe1428c15d94df95b74",
     "semantic_hash": ""
   },
   "messages/en.json": {
-    "mtime": 1785418964.9811995,
+    "mtime": 1785429712.6124375,
     "ast_hash": "ddda67406f480d8e9924956db7f5b24e",
     "semantic_hash": ""
   },
   "messages/ru.json": {
-    "mtime": 1785418985.1380353,
+    "mtime": 1785429712.613438,
     "ast_hash": "d3c841b589ddba117cea0f277da2d92f",
     "semantic_hash": ""
   },
@@ -990,9 +990,9 @@
     "semantic_hash": "f04b5a2e3c9fa7fb8188cbd1bac50bf6"
   },
   "scripts/smoke/admin.mjs": {
-    "mtime": 1784364014.4881802,
-    "ast_hash": "87c8e5741e87ce2624e0e19180dab78f",
-    "semantic_hash": "87c8e5741e87ce2624e0e19180dab78f"
+    "mtime": 1788428679.2394488,
+    "ast_hash": "aa9dcd2a6e2f506de9e91fd3ef9e0b47",
+    "semantic_hash": ""
   },
   "scripts/smoke/catalog-media.mjs": {
     "mtime": 1783494203.1971796,
@@ -2120,7 +2120,7 @@
     "semantic_hash": ""
   },
   "components/mobile-nav-menu.tsx": {
-    "mtime": 1785419055.5558565,
+    "mtime": 1785429712.5964744,
     "ast_hash": "0b8fce295d662d670af0971917068c9f",
     "semantic_hash": ""
   },
@@ -2154,24 +2154,29 @@
     "ast_hash": "4b5528c5c4dc2edeff46b059a94264f8",
     "semantic_hash": ""
   },
-  ".superpowers/sdd/2026-07-30-mobile-header-overflow/progress.md": {
-    "mtime": 1785418926.2934735,
-    "ast_hash": "6344a56268fabcc6812770df204a7e9d",
-    "semantic_hash": ""
-  },
-  ".superpowers/sdd/2026-07-30-mobile-header-overflow/task-1-brief.md": {
-    "mtime": 1785418926.4178967,
-    "ast_hash": "5784a3c9c0aa114de9d4a43b535dbc4f",
-    "semantic_hash": ""
-  },
   "docs/superpowers/plans/2026-07-30-mobile-header-overflow.md": {
-    "mtime": 1785418105.2670257,
+    "mtime": 1785429712.59743,
     "ast_hash": "cee59f8ed88d8e8619d19c6794122127",
     "semantic_hash": ""
   },
   "docs/superpowers/specs/2026-07-30-mobile-header-overflow-design.md": {
-    "mtime": 1785416598.4940712,
+    "mtime": 1785429712.5984335,
     "ast_hash": "29d7f05452128f6f90807f0d05636583",
+    "semantic_hash": ""
+  },
+  "app/admin/items/items-table.tsx": {
+    "mtime": 1788428706.7091045,
+    "ast_hash": "4eb340c8145a55c5518e3f8a356e2fcd",
+    "semantic_hash": ""
+  },
+  "tests/app/admin/items/delete-actions.test.ts": {
+    "mtime": 1788428883.5763674,
+    "ast_hash": "763eb087e021b71842c9a5c19cc48377",
+    "semantic_hash": ""
+  },
+  "tests/lib/catalog-items/delete.test.ts": {
+    "mtime": 1788428894.2990441,
+    "ast_hash": "106be289109d4e2b8259e8c97fccf980",
     "semantic_hash": ""
   }
 }

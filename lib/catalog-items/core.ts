@@ -14,6 +14,9 @@ import {
   validatePersonalizationConfig,
   validateSubcategoryBelongsToCategory,
 } from '@/app/admin/items/item-form-parsing';
+import { getOpenAiClient } from '@/lib/openai-client';
+import { deleteSkillArtifact } from '@/lib/openai-skills';
+import { removeFromBucket } from '@/lib/storage';
 
 async function validateItemAndParseSizes(
   supabase: AdminSupabase,
@@ -158,4 +161,114 @@ export async function updateCatalogItemCore(
     await syncCatalogItemMarketRules(supabase, id, formData);
   }
   await upsertSeoMetadata(supabase, id, item, user.id);
+}
+
+export interface CatalogItemDeleteRow {
+  id: string;
+  title: string;
+  thumbnail_path: string | null;
+  gallery_paths: string[] | null;
+  skill_id: string | null;
+}
+
+export interface DeleteCatalogItemsResult {
+  deleted: number;
+  /** Items kept because an order references them, in the order they were selected. */
+  blocked: { id: string; title: string }[];
+}
+
+/** Storage paths are only removable when they are bucket-relative, not already public URLs. */
+function collectStoragePaths(
+  items: CatalogItemDeleteRow[],
+  media: { storage_path: string | null }[],
+) {
+  const paths = [
+    ...items.flatMap((item) => [item.thumbnail_path, ...(item.gallery_paths ?? [])]),
+    ...media.map((entry) => entry.storage_path),
+  ];
+
+  return [
+    ...new Set(
+      paths.filter(
+        (path): path is string => Boolean(path) && !/^(https?:\/\/|\/)/i.test(path as string),
+      ),
+    ),
+  ];
+}
+
+/**
+ * Hard-deletes catalog items, skipping any that an order references.
+ *
+ * `order_items.catalog_item_id` carries no `ON DELETE` clause, so it defaults
+ * to NO ACTION: including a referenced id in the single `.in()` delete would
+ * raise 23503 and roll back the whole batch. Hence the pre-check — the
+ * unreferenced items still go, and the caller reports the rest back.
+ *
+ * Child rows (media, translations, SEO, market rules, boilerplates) cascade;
+ * cart and generated-item references are set to NULL by the schema.
+ */
+export async function deleteCatalogItemsCore(
+  supabase: AdminSupabase,
+  ids: string[],
+): Promise<DeleteCatalogItemsResult> {
+  if (ids.length === 0) return { deleted: 0, blocked: [] };
+
+  const { data: items, error: itemsError } = await supabase
+    .from('catalog_items')
+    .select('id, title, thumbnail_path, gallery_paths, skill_id')
+    .in('id', ids);
+  if (itemsError) throw new Error(itemsError.message);
+
+  // Postgres does not promise a row order for `.in()`, so re-order by the
+  // caller's selection to keep the reported "kept" list stable.
+  const byId = new Map(((items ?? []) as CatalogItemDeleteRow[]).map((item) => [item.id, item]));
+  const found = ids
+    .map((id) => byId.get(id))
+    .filter((item): item is CatalogItemDeleteRow => item !== undefined);
+  if (found.length === 0) return { deleted: 0, blocked: [] };
+  const foundIds = found.map((item) => item.id);
+
+  const { data: orderRefs, error: orderError } = await supabase
+    .from('order_items')
+    .select('catalog_item_id')
+    .in('catalog_item_id', foundIds);
+  if (orderError) throw new Error(orderError.message);
+
+  const blockedIds = new Set((orderRefs ?? []).map((ref) => ref.catalog_item_id as string));
+  const deletable = found.filter((item) => !blockedIds.has(item.id));
+  const blocked = found
+    .filter((item) => blockedIds.has(item.id))
+    .map((item) => ({ id: item.id, title: item.title }));
+
+  if (deletable.length === 0) return { deleted: 0, blocked };
+  const deletableIds = deletable.map((item) => item.id);
+
+  // Media rows cascade away with the item, so their paths must be read first.
+  const { data: media } = await supabase
+    .from('catalog_item_media')
+    .select('catalog_item_id, storage_path')
+    .in('catalog_item_id', deletableIds);
+
+  const { error: deleteError } = await supabase
+    .from('catalog_items')
+    .delete()
+    .in('id', deletableIds);
+  if (deleteError) throw new Error(deleteError.message);
+
+  // Cleanup is best-effort and runs only after the delete has committed.
+  try {
+    const paths = collectStoragePaths(
+      deletable,
+      (media ?? []) as { storage_path: string | null }[],
+    );
+    await removeFromBucket(supabase, 'catalog-assets', paths);
+
+    for (const item of deletable) {
+      if (item.skill_id) await deleteSkillArtifact(getOpenAiClient(), item.skill_id);
+    }
+  } catch (error) {
+    console.error('[catalog-items] cleanup after delete failed', error);
+  }
+
+  return { deleted: deletable.length, blocked };
 }

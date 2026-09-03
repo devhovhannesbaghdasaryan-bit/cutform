@@ -4,19 +4,11 @@ import Image from 'next/image';
 import { Play } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCardHover } from '@/components/catalog-card-hover';
+import { isSvgPath } from '@/lib/catalog-media';
 import type { CatalogItemMedia } from '@/lib/marketplace';
 import { resolvePublicStorageUrl } from '@/lib/storage';
 
 const SLIDE_INTERVAL_MS = 2200;
-
-// next/image can't rasterize SVG markup, and admin-uploaded catalog media is
-// occasionally SVG (see app/admin/items/item-form-parsing.ts), so those still
-// need a plain <img>. Everything else (the common case: PNG/JPG/WEBP product
-// photos) goes through next/image for resizing, format negotiation, and lazy
-// loading instead of shipping the full-resolution original to every card.
-function isSvgPath(path: string) {
-  return /\.svg$/i.test(path);
-}
 
 export function CatalogMediaSlider({
   media,
