@@ -19,7 +19,11 @@ for (const route of requiredRoutes) {
 }
 
 const catalogActions = readFileSync('app/admin/items/actions.ts', 'utf8');
-for (const action of ['createCatalogItemAction', 'updateCatalogItemAction']) {
+for (const action of [
+  'createCatalogItemAction',
+  'updateCatalogItemAction',
+  'deleteCatalogItemsAction',
+]) {
   if (!catalogActions.includes(action)) throw new Error(`Missing admin action: ${action}`);
 }
 
