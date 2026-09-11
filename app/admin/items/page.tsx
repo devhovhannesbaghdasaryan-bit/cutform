@@ -3,6 +3,12 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { hasAdminPermission, requireAdmin } from '@/lib/admin';
 import { getCatalogPreviewPath } from '@/lib/catalog-media';
+import {
+  applyExchangeRate,
+  getActiveCurrency,
+  getExchangeRates,
+  normalizeCurrency,
+} from '@/lib/currency';
 import { type AdminItemRow, ItemsTable } from './items-table';
 
 export const dynamic = 'force-dynamic';
@@ -23,6 +29,7 @@ export default async function AdminItemsPage({
         title,
         slug,
         price_cents,
+        currency,
         status,
         is_popular,
         is_customizable,
@@ -46,18 +53,34 @@ export default async function AdminItemsPage({
   if (params.category) query = query.eq('categories.slug', params.category);
   if (params.q) query = query.ilike('title', `%${params.q}%`);
 
-  const [{ data: items, error }, { data: categories }, canDelete] = await Promise.all([
-    query,
-    supabase.from('categories').select('slug, name').order('sort_order', { ascending: true }),
-    hasAdminPermission(user.id, 'catalog_manage'),
-  ]);
+  const [{ data: items, error }, { data: categories }, canDelete, activeCurrency] =
+    await Promise.all([
+      query,
+      supabase.from('categories').select('slug, name').order('sort_order', { ascending: true }),
+      hasAdminPermission(user.id, 'catalog_manage'),
+      getActiveCurrency(),
+    ]);
 
-  const rows = (items ?? [])
-    .filter((item) => !params.category || item.category?.slug === params.category)
-    .map((item) => ({
+  const filtered = (items ?? []).filter(
+    (item) => !params.category || item.category?.slug === params.category,
+  );
+  // Prices are stored in each item's own currency; show them in the currency
+  // the admin picked in the header, the same way the storefront does.
+  const exchangeRates = await getExchangeRates(
+    filtered.map((item) => normalizeCurrency(item.currency) ?? 'AMD'),
+    activeCurrency,
+  );
+
+  const rows = filtered.map((item) => {
+    const fromCurrency = normalizeCurrency(item.currency) ?? 'AMD';
+    // biome-ignore lint/style/noNonNullAssertion: exchangeRates was built from these same items' currencies
+    const rate = exchangeRates.get(fromCurrency)!;
+    return {
       ...item,
       previewPath: getCatalogPreviewPath(item),
-    })) as AdminItemRow[];
+      displayPrice: applyExchangeRate(item.price_cents, rate),
+    };
+  }) as AdminItemRow[];
 
   return (
     <main className="container space-y-6 py-10">
