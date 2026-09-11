@@ -28,9 +28,16 @@ function baseItem(overrides: Partial<z.infer<typeof itemSchema>> = {}): z.infer<
   };
 }
 
-function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean } = {}) {
-  const { categoryExists = true, slugTaken = false } = options;
+function fakeSupabase(
+  options: {
+    categoryExists?: boolean;
+    slugTaken?: boolean;
+    previousThumbnail?: string | null;
+  } = {},
+) {
+  const { categoryExists = true, slugTaken = false, previousThumbnail = null } = options;
   const inserted: Record<string, unknown>[] = [];
+  const mediaInserted: Record<string, unknown>[] = [];
   const touchedTables = new Set<string>();
   const client = {
     from(table: string) {
@@ -71,6 +78,16 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
                 }),
               };
             }
+            if (columns === 'thumbnail_path') {
+              return {
+                eq: () => ({
+                  maybeSingle: async () => ({
+                    data: { thumbnail_path: previousThumbnail },
+                    error: null,
+                  }),
+                }),
+              };
+            }
             return { single: async () => ({ data: { id: 'new-id' }, error: null }) };
           },
           insert: (values: Record<string, unknown>) => {
@@ -106,7 +123,10 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
             },
           }),
           delete: () => ({ eq: () => ({ in: async () => ({ error: null }) }) }),
-          insert: async () => ({ error: null }),
+          insert: async (rows: Record<string, unknown>[]) => {
+            mediaInserted.push(...rows);
+            return { error: null };
+          },
           update: () => ({ eq: () => ({ eq: async () => ({ error: null }) }) }),
         };
       }
@@ -119,7 +139,7 @@ function fakeSupabase(options: { categoryExists?: boolean; slugTaken?: boolean }
       throw new Error(`Unexpected table in test: ${table}`);
     },
   };
-  return { client: client as never, inserted, touchedTables };
+  return { client: client as never, inserted, mediaInserted, touchedTables };
 }
 
 describe('createCatalogItemCore', () => {
@@ -181,6 +201,35 @@ describe('updateCatalogItemCore', () => {
         'user-1/thumb.jpg',
       ),
     ).resolves.toBeUndefined();
+  });
+
+  it('adds a changed thumbnail to the gallery', async () => {
+    const { client, mediaInserted } = fakeSupabase({ previousThumbnail: 'user-1/old.jpg' });
+    await updateCatalogItemCore(
+      client,
+      'existing-id',
+      { id: 'user-1' },
+      baseItem(),
+      'user-1/new.jpg',
+    );
+    expect(mediaInserted).toEqual([
+      expect.objectContaining({
+        storage_path: 'user-1/new.jpg',
+        metadata: { source: 'thumbnail' },
+      }),
+    ]);
+  });
+
+  it('does not re-add an unchanged thumbnail the admin removed from the gallery', async () => {
+    const { client, mediaInserted } = fakeSupabase({ previousThumbnail: 'user-1/thumb.jpg' });
+    await updateCatalogItemCore(
+      client,
+      'existing-id',
+      { id: 'user-1' },
+      baseItem(),
+      'user-1/thumb.jpg',
+    );
+    expect(mediaInserted).toEqual([]);
   });
 
   it('re-syncs boilerplates and market rules by default (syncAssociations unset)', async () => {

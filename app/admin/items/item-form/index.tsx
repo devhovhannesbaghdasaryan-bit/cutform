@@ -95,7 +95,7 @@ export function ItemForm({
 
         <ThumbnailFields item={item} />
 
-        <MediaSection media={media} />
+        <MediaSection itemId={item?.id} media={media} />
 
         <ManufacturingNotesField item={item} />
 
