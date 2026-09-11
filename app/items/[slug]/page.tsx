@@ -7,7 +7,7 @@ import { CatalogMediaSlider } from '@/components/catalog-media-slider';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
+import { convertDisplayMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { sortCatalogMedia } from '@/lib/catalog-media';
 import { getCatalogItem, getCatalogItemSeoMetadata } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
@@ -62,7 +62,7 @@ export default async function CatalogItemDetailPage({
   const locale = await getRequestLocale();
   const t = await getTranslations();
   const activeCurrency = await getActiveCurrency();
-  const convertedPrice = await convertMoney(
+  const convertedPrice = await convertDisplayMoney(
     item.price_cents,
     normalizeCurrency(item.currency) ?? 'AMD',
     activeCurrency,

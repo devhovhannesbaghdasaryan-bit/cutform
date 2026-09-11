@@ -37,7 +37,7 @@ export interface ExchangeRateContext extends Record<string, Json | undefined> {
   rateDate: string;
   fetchedAt: string;
   isStale: boolean;
-  source: 'identity' | 'cache' | 'provider' | 'inverse_cache';
+  source: 'identity' | 'cache' | 'provider' | 'inverse_cache' | 'cross_cache' | 'unconverted';
 }
 
 export interface ConvertedMoney {
@@ -212,6 +212,58 @@ async function findInverseCachedRate(
   } satisfies ExchangeRateRow;
 }
 
+async function findCachedPairRate(
+  supabase: SupabaseClient,
+  baseCurrency: AppCurrency,
+  targetCurrency: AppCurrency,
+  rateDate?: string,
+) {
+  const direct = await findCachedRate(supabase, baseCurrency, targetCurrency, rateDate);
+  if (direct) return { row: direct, source: 'cache' as const };
+
+  const inverse = await findInverseCachedRate(supabase, baseCurrency, targetCurrency, rateDate);
+  if (inverse) return { row: inverse, source: 'inverse_cache' as const };
+
+  return null;
+}
+
+// Chains two cached legs through a third app currency (e.g. USD→AMD→EUR), for
+// pairs that were never cached directly in either direction. The result is as
+// old as its older leg.
+async function findCrossCachedRate(
+  supabase: SupabaseClient,
+  baseCurrency: AppCurrency,
+  targetCurrency: AppCurrency,
+): Promise<ExchangeRateRow | null> {
+  for (const pivot of APP_CURRENCIES) {
+    if (pivot === baseCurrency || pivot === targetCurrency) continue;
+
+    const first = await findCachedPairRate(supabase, baseCurrency, pivot);
+    if (!first) continue;
+    const second = await findCachedPairRate(supabase, pivot, targetCurrency);
+    if (!second) continue;
+
+    const older =
+      Date.parse(first.row.fetched_at) <= Date.parse(second.row.fetched_at)
+        ? first.row
+        : second.row;
+    return {
+      base_currency: baseCurrency,
+      target_currency: targetCurrency,
+      rate: Number(first.row.rate) * Number(second.row.rate),
+      provider:
+        first.row.provider === second.row.provider
+          ? first.row.provider
+          : `${first.row.provider}+${second.row.provider}`,
+      rate_date: older.rate_date,
+      fetched_at: older.fetched_at,
+      is_stale: true,
+    };
+  }
+
+  return null;
+}
+
 export function buildRateProviderUrl(
   template: string,
   apiKey: string | undefined,
@@ -226,10 +278,14 @@ export function buildRateProviderUrl(
 
 async function fetchProviderRate(baseCurrency: AppCurrency, targetCurrency: AppCurrency) {
   const env = getServerEnv();
-  const provider = env.EXCHANGE_RATE_PROVIDER ?? 'exchangerate-api';
-  const template =
-    env.EXCHANGE_RATE_API_URL ?? 'https://v6.exchangerate-api.com/v6/{apiKey}/latest/{base}';
-  const url = buildRateProviderUrl(template, env.EXCHANGE_RATE_API_KEY, baseCurrency, targetCurrency);
+  const provider = env.EXCHANGE_RATE_PROVIDER ?? 'open-er-api';
+  const template = env.EXCHANGE_RATE_API_URL ?? 'https://open.er-api.com/v6/latest/{base}';
+  const url = buildRateProviderUrl(
+    template,
+    env.EXCHANGE_RATE_API_KEY,
+    baseCurrency,
+    targetCurrency,
+  );
 
   const usesApiKeyInUrl = template.includes('{apiKey}');
   const response = await fetch(url, {
@@ -270,12 +326,13 @@ export async function getExchangeRate(
     return rowToContext(row, 'identity');
   }
 
-  const today = todayIsoDate();
-  const cachedToday = await findCachedRate(supabase, baseCurrency, targetCurrency, today);
-  if (cachedToday) return rowToContext(cachedToday, 'cache');
-
-  const inverseToday = await findInverseCachedRate(supabase, baseCurrency, targetCurrency, today);
-  if (inverseToday) return rowToContext(inverseToday, 'inverse_cache');
+  const cachedToday = await findCachedPairRate(
+    supabase,
+    baseCurrency,
+    targetCurrency,
+    todayIsoDate(),
+  );
+  if (cachedToday) return rowToContext(cachedToday.row, cachedToday.source);
 
   try {
     const fetched = await fetchProviderRate(baseCurrency, targetCurrency);
@@ -293,13 +350,58 @@ export async function getExchangeRate(
     );
     return rowToContext(row, 'provider');
   } catch (error) {
-    const cached = await findCachedRate(supabase, baseCurrency, targetCurrency);
-    if (cached) return { ...rowToContext(cached, 'cache'), isStale: true };
+    const cached = await findCachedPairRate(supabase, baseCurrency, targetCurrency);
+    const cross = cached ? null : await findCrossCachedRate(supabase, baseCurrency, targetCurrency);
+    const fallback = cached
+      ? rowToContext(cached.row, cached.source)
+      : cross
+        ? rowToContext(cross, 'cross_cache')
+        : null;
+    if (!fallback) throw error;
 
-    const inverse = await findInverseCachedRate(supabase, baseCurrency, targetCurrency);
-    if (inverse) return { ...rowToContext(inverse, 'inverse_cache'), isStale: true };
+    // Logged on every use so a dead provider shows up in runtime logs instead
+    // of silently serving ever-older rates.
+    console.warn(
+      `[currency] ${baseCurrency}->${targetCurrency} provider fetch failed; using stale ${fallback.source} rate from ${fallback.rateDate}`,
+      error instanceof Error ? error.message : error,
+    );
+    return { ...fallback, isStale: true };
+  }
+}
 
-    throw error;
+// Rate 1 back into the source currency, so the amount is shown as stored.
+function unconvertedContext(currency: AppCurrency): ExchangeRateContext {
+  const now = new Date().toISOString();
+  return {
+    baseCurrency: currency,
+    targetCurrency: currency,
+    rate: 1,
+    provider: 'none',
+    rateDate: now.slice(0, 10),
+    fetchedAt: now,
+    isStale: false,
+    source: 'unconverted',
+  };
+}
+
+/**
+ * Display-only variant of getExchangeRate: when no rate can be resolved, the
+ * amount stays in its source currency instead of failing the page. Never use it
+ * for amounts that are charged or persisted — use getExchangeRate/convertMoney.
+ */
+export async function getDisplayExchangeRate(
+  baseCurrency: AppCurrency,
+  targetCurrency: AppCurrency,
+  supabase: SupabaseClient = getServiceSupabase(),
+): Promise<ExchangeRateContext> {
+  try {
+    return await getExchangeRate(baseCurrency, targetCurrency, supabase);
+  } catch (error) {
+    console.error(
+      `[currency] no ${baseCurrency}->${targetCurrency} rate; showing ${baseCurrency} prices unconverted`,
+      error,
+    );
+    return unconvertedContext(baseCurrency);
   }
 }
 
@@ -351,7 +453,22 @@ export async function convertMoney(
   return applyExchangeRate(amountCents, exchangeRateContext);
 }
 
-/** Fetches one rate per distinct source currency instead of once per caller, for batch price conversion (e.g. catalog grids). */
+/** Display-only convertMoney; see getDisplayExchangeRate. */
+export async function convertDisplayMoney(
+  amountCents: number,
+  fromCurrency: AppCurrency,
+  toCurrency: AppCurrency,
+  supabase: SupabaseClient = getServiceSupabase(),
+): Promise<ConvertedMoney> {
+  const exchangeRateContext = await getDisplayExchangeRate(fromCurrency, toCurrency, supabase);
+  return applyExchangeRate(amountCents, exchangeRateContext);
+}
+
+/**
+ * Fetches one rate per distinct source currency instead of once per caller, for
+ * batch price display (e.g. catalog grids). Display-only: a currency with no
+ * resolvable rate maps to an unconverted context (see getDisplayExchangeRate).
+ */
 export async function getExchangeRates(
   fromCurrencies: AppCurrency[],
   toCurrency: AppCurrency,
@@ -361,7 +478,7 @@ export async function getExchangeRates(
   const entries = await Promise.all(
     uniqueFromCurrencies.map(
       async (fromCurrency) =>
-        [fromCurrency, await getExchangeRate(fromCurrency, toCurrency, supabase)] as const,
+        [fromCurrency, await getDisplayExchangeRate(fromCurrency, toCurrency, supabase)] as const,
     ),
   );
   return new Map(entries);

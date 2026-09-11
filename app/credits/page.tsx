@@ -3,7 +3,7 @@ import { Coins } from 'lucide-react';
 import { CreditPurchaseForm } from '@/components/credits/credit-purchase-form';
 import { SiteHeader } from '@/components/site-header';
 import { CREDIT_PACKS } from '@/lib/credit-packs';
-import { convertMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
+import { convertDisplayMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { getTranslations } from 'next-intl/server';
 import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
@@ -61,7 +61,7 @@ export default async function CreditsPage() {
   const activeCurrency = await getActiveCurrency();
   const displayPacks = await Promise.all(
     CREDIT_PACKS.map(async (pack) => {
-      const converted = await convertMoney(
+      const converted = await convertDisplayMoney(
         pack.priceCents,
         normalizeCurrency(pack.currency) ?? 'AMD',
         activeCurrency,
