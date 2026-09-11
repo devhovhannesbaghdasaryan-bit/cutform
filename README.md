@@ -133,6 +133,29 @@ guest storefront/cart, language switching, banner, personalized night light, and
 pnpm smoke:ui-workflows
 ```
 
+### Alternative: run against the hosted Supabase project
+
+Skip steps 2–3a (no Docker needed) and point `.env.local` at the cloud project
+instead, using the keys from **Dashboard → Project Settings → API Keys**:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://vyizcqfrcaxufskmmonp.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+SUPABASE_SECRET_KEY=sb_secret_...
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+- `pnpm dev`'s migration check detects the hosted URL and skips itself. The
+  hosted schema only gets migrations merged to `main` (via
+  `.github/workflows/supabase-migrations.yml`), so a branch that adds a
+  migration won't work here until it's merged.
+- Add `http://localhost:3000/auth/callback` under **Authentication → URL
+  Configuration → Redirect URLs**, or email confirmation and Google/Facebook
+  sign-in will redirect to the production site instead of localhost.
+- Auth emails go through the hosted project's SMTP settings, not Mailpit.
+- This is live data: signups, orders, and admin actions are real. Don't run
+  `pnpm smoke:db-workflows` or the other data-writing smoke scripts against it.
+
 ## Marketplace Setup Notes
 
 Run `supabase db reset` after pulling migration changes. The marketplace migrations seed:
