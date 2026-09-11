@@ -9,8 +9,8 @@ export type AdminSupabase = Awaited<ReturnType<typeof requireAdmin>>['supabase']
 
 export const localeSchema = z.enum(APP_LOCALES);
 
-const CATALOG_ASSET_MAX_BYTES = 50 * 1024 * 1024;
-const CATALOG_ASSET_EXTENSIONS: Record<string, string> = {
+export const CATALOG_ASSET_MAX_BYTES = 50 * 1024 * 1024;
+export const CATALOG_ASSET_EXTENSIONS: Record<string, string> = {
   ...IMAGE_EXTENSION_BY_MIME,
   'image/svg+xml': 'svg',
   'video/mp4': 'mp4',
@@ -150,6 +150,11 @@ export function getOptionalFiles(formData: FormData, name: string) {
     .filter((value): value is File => value instanceof File && value.size > 0);
 }
 
+/** Gallery uploads live under `<userId>/items/<itemId>/media/` in catalog-assets. */
+export function catalogItemMediaFolder(catalogItemId: string) {
+  return `items/${catalogItemId}/media`;
+}
+
 export async function uploadAdminCatalogAsset(
   supabase: AdminSupabase,
   userId: string,
@@ -231,7 +236,7 @@ export async function syncCatalogItemMedia(
       supabase,
       userId,
       file,
-      `items/${catalogItemId}/media`,
+      catalogItemMediaFolder(catalogItemId),
     );
     if (!path) continue;
     uploadedRows.push({

@@ -143,18 +143,29 @@ export async function updateCatalogItemCore(
   if (!slugAvailable) throw new Error('Slug is already used by another item.');
   const sizes = await validateItemAndParseSizes(supabase, item);
 
+  // Read before the update overwrites it. The thumbnail is mirrored into the
+  // gallery only when it changes; otherwise a gallery image the admin removed
+  // would be re-added from the unchanged thumbnail on every later save.
+  const { data: previous, error: previousError } = await supabase
+    .from('catalog_items')
+    .select('thumbnail_path')
+    .eq('id', id)
+    .maybeSingle<{ thumbnail_path: string | null }>();
+  if (previousError) throw new Error(previousError.message);
+
   const { error } = await supabase
     .from('catalog_items')
     .update(toCatalogItemRow(item, sizes, thumbnailPath))
     .eq('id', id);
   if (error) throw new Error(error.message);
 
+  const nextThumbnailPath = thumbnailPath ?? item.thumbnailPath ?? null;
   await syncCatalogItemMedia(
     supabase,
     user.id,
     id,
     formData,
-    thumbnailPath ?? item.thumbnailPath ?? null,
+    nextThumbnailPath !== (previous?.thumbnail_path ?? null) ? nextThumbnailPath : null,
   );
   if (syncAssociations) {
     await syncCatalogItemBoilerplates(supabase, id, item.boilerplateIds);
