@@ -240,7 +240,7 @@ pass = "env(RESEND_API_KEY)"
 admin_email = "no-reply@uniqraft.org"
 sender_name = "Uniqraft"
 
-# Custom confirmation email so it shows both the link and the 6-digit code.
+# Custom confirmation email so it shows both the link and the one-time code.
 # The link targets /auth/confirm (token_hash flow) rather than
 # {{ .ConfirmationURL }}, so it lands on the Site URL directly.
 [auth.email.template.confirmation]

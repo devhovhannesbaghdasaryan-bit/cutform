@@ -61,7 +61,7 @@
     "checkEmail": "Check your email",
     "verificationSentTo": "We sent a verification link to {email}. Click the link to activate your account.",
     "spamNotice": "Not seeing it? Check your spam folder. Links expire after 24 hours.",
-    "enterCode": "Enter the 6-digit code from your email",
+    "enterCode": "Enter the code from your email",
     "verifying": "Verifying…",
     "verify": "Verify",
     "orClickLink": "or click the link in the email",

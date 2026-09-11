@@ -55,10 +55,10 @@ export function VerifyEmailClient({
             id="token"
             name="token"
             inputMode="numeric"
-            pattern="[0-9]{6}"
-            maxLength={6}
+            pattern="[0-9]{6,10}"
+            maxLength={10}
             autoComplete="one-time-code"
-            placeholder="123456"
+            placeholder="12345678"
             required
             className="text-center tracking-[0.5em] text-lg"
           />

@@ -203,7 +203,8 @@ email lives in
 [`supabase/templates/confirmation.html`](./supabase/templates/confirmation.html)
 and contains both:
 
-- the 6-digit code (`{{ .Token }}`) entered on `/auth/verify-email`, and
+- the one-time code (`{{ .Token }}`, 6–10 digits per the project's Email OTP
+  Length setting) entered on `/auth/verify-email`, and
 - a link to `{{ .SiteURL }}/auth/confirm?token_hash=...`, which
   [`app/auth/confirm/route.ts`](./app/auth/confirm/route.ts) verifies
   server-side. Unlike `{{ .ConfirmationURL }}`, this doesn't bounce through
