@@ -228,21 +228,21 @@ otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
-# Use a production-ready SMTP server
-# Temporarily disabled: local Resend key is sandboxed (can only send to the
-# account owner's own address) and its failed sends were still burning the
-# local auth.rate_limit.email_sent quota, blocking registration entirely.
-# Re-enable once a verified Resend domain is set up for non-sandbox sending.
+# Resend SMTP. Disabled locally so auth emails land in Mailpit; the hosted
+# project is configured in the Dashboard (see README "Email delivery"), since
+# config.toml doesn't reach it.
 [auth.email.smtp]
 enabled = false
 host = "smtp.resend.com"
 port = 465
 user = "resend"
 pass = "env(RESEND_API_KEY)"
-admin_email = "onboarding@resend.dev"
+admin_email = "no-reply@uniqraft.org"
 sender_name = "Uniqraft"
 
 # Custom confirmation email so it shows both the link and the 6-digit code.
+# The link targets /auth/confirm (token_hash flow) rather than
+# {{ .ConfirmationURL }}, so it lands on the Site URL directly.
 [auth.email.template.confirmation]
 subject = "Confirm your Uniqraft account"
 content_path = "./supabase/templates/confirmation.html"

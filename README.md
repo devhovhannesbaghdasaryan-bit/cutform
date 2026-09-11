@@ -52,7 +52,7 @@ Useful local URLs:
 Auth redirect URLs (`http://localhost:3000/auth/callback`, plus the 127.0.0.1
 variant) are pre-configured in `supabase/config.toml`. Email confirmation is
 enabled (`enable_confirmations = true`), so signups land in Mailpit and the
-verification link redirects to `/auth/callback`.
+verification link goes to `/auth/confirm`.
 
 ### 3. Wire env vars
 
@@ -197,53 +197,38 @@ CLI or the connected Supabase integration before starting the app.
 
 ## Email delivery
 
-Auth emails (sign-up confirmation, resend) are sent through **Resend's SMTP
-relay** instead of Supabase's built-in sender, configured in
-[`supabase/config.toml`](./supabase/config.toml) under `[auth.email.smtp]`.
-The confirmation email content lives in
+Auth emails (sign-up confirmation, resend) go through **Resend's SMTP relay**
+from `no-reply@uniqraft.org` (domain verified in Resend). The confirmation
+email lives in
 [`supabase/templates/confirmation.html`](./supabase/templates/confirmation.html)
-and includes both the confirmation link and the 6-digit code shown on
-`/auth/verify-email`.
+and contains both:
 
-Local dev picks this up automatically via `supabase start`, as long as
-`RESEND_API_KEY` is set in a plain `.env` file at the repo root (Supabase
-CLI's `env()` substitution reads `.env`, not `.env.local` — see
-`.env.local.example`).
+- the 6-digit code (`{{ .Token }}`) entered on `/auth/verify-email`, and
+- a link to `{{ .SiteURL }}/auth/confirm?token_hash=...`, which
+  [`app/auth/confirm/route.ts`](./app/auth/confirm/route.ts) verifies
+  server-side. Unlike `{{ .ConfirmationURL }}`, this doesn't bounce through
+  Supabase's redirect allow-list, and it works on a different device from
+  the one that signed up.
 
-**Current limitation:** no custom sending domain is verified in Resend yet,
-so both local and production are configured with Resend's sandbox sender
-(`onboarding@resend.dev`), which only delivers to the Resend account's own
-email address. To send to real users:
+Local dev uses Mailpit (SMTP is disabled in `supabase/config.toml`), with the
+same template.
 
-1. Point a domain you control at Vercel (or elsewhere) and verify it in Resend
-   (`resend.com/domains`) — this adds SPF/DKIM DNS records.
-2. Update `admin_email`/`sender_name` in `supabase/config.toml` (local) and
-   the hosted project's SMTP settings (below) to use an address on that
-   domain.
+**Production (hosted project):** `config.toml` doesn't reach the hosted
+project, so set these in the Supabase Dashboard:
 
-**Production (hosted project):** apply the same SMTP settings via
-**Authentication → SMTP Settings** in the Supabase Dashboard, or the
-Management API:
+1. **Authentication → Emails → SMTP Settings** — enable custom SMTP:
+   host `smtp.resend.com`, port `465`, user `resend`, password = a Resend API
+   key with sending access for `uniqraft.org`, sender `no-reply@uniqraft.org`,
+   name `Uniqraft`.
+2. **Authentication → URL Configuration** — Site URL `https://uniqraft.org`;
+   Redirect URLs `https://uniqraft.org/**` and `http://localhost:3000/**`.
+3. **Authentication → Emails → Templates → Confirm signup** — subject
+   `Confirm your Uniqraft account`, body = the contents of
+   `supabase/templates/confirmation.html`. Repeat after editing that file.
 
-```bash
-curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "external_email_enabled": true,
-    "smtp_admin_email": "onboarding@resend.dev",
-    "smtp_host": "smtp.resend.com",
-    "smtp_port": 465,
-    "smtp_user": "resend",
-    "smtp_pass": "your-resend-api-key",
-    "smtp_sender_name": "Uniqraft"
-  }'
-```
-
-The confirmation email template itself is hosted-project-specific and must
-be set separately in **Authentication → Email Templates → Confirm signup**
-(paste the same subject/HTML as `supabase/templates/confirmation.html`) —
-local `config.toml` template paths don't apply to hosted projects.
+The Site URL must be the public domain: `*.vercel.app` deployment URLs sit
+behind Vercel Authentication, so email links pointing there land on a
+vercel.com login page.
 
 ## Deploy to Vercel
 
@@ -252,7 +237,8 @@ local `config.toml` template paths don't apply to hosted projects.
 3. Provision a cloud Supabase project; in its SQL Editor run `supabase/migrations/0001_init.sql`.
 4. Set all env vars from `.env.local.example` in Vercel **Project Settings → Environment Variables**.
 5. Update `NEXT_PUBLIC_SITE_URL` to the production URL.
-6. Add the production `/auth/callback` URL to Supabase **Authentication → URL Configuration**.
+6. Configure Supabase auth email (SMTP, Site URL, redirect URLs, confirmation
+   template) as described in [Email delivery](#email-delivery).
 
 ## Pricing
 
