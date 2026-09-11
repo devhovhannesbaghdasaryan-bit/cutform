@@ -46,7 +46,8 @@ const otpSchema = emailSchema.extend({
   token: z
     .string()
     .transform((value) => value.replace(/\s+/g, ''))
-    .refine((value) => /^\d{6}$/.test(value), 'Enter the 6-digit code from the email.'),
+    // Supabase's email OTP length is a project setting (6–10 digits).
+    .refine((value) => /^\d{6,10}$/.test(value), 'Enter the code from the email.'),
 });
 
 const socialSchema = z.object({
