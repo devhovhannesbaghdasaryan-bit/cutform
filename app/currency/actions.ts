@@ -129,6 +129,7 @@ export async function setCurrencyPreferenceAction(formData: FormData) {
   revalidatePath('/cart');
   revalidatePath('/checkout');
   revalidatePath('/credits');
+  revalidatePath('/admin/items');
 
   const next = parsed.data.next;
   if (next?.startsWith('/') && !next.startsWith('//')) redirect(next);

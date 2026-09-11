@@ -17,6 +17,9 @@ export interface AdminItemRow {
   title: string;
   slug: string;
   price_cents: number;
+  currency: string;
+  /** price_cents converted into the admin's active currency. */
+  displayPrice: { amountCents: number; currency: string };
   status: string;
   is_popular: boolean;
   is_customizable: boolean;
@@ -204,7 +207,9 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                   <p className="text-xs text-muted-foreground">{item.slug}</p>
                 </td>
                 <td className="px-4 py-3">{item.category?.name ?? '-'}</td>
-                <td className="px-4 py-3">{formatPrice(item.price_cents)}</td>
+                <td className="px-4 py-3">
+                  {formatPrice(item.displayPrice.amountCents, item.displayPrice.currency)}
+                </td>
                 <td className="px-4 py-3 capitalize">{item.status}</td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">
                   {[item.is_popular && 'popular', item.is_customizable && 'custom']
