@@ -58,6 +58,9 @@ function toCatalogItemRow(
     item_type: item.itemType,
     description: item.description ?? null,
     price_cents: item.priceCents,
+    // Only written when the caller states the currency, so a partial update
+    // that re-sends the existing price_cents can't relabel it.
+    ...(item.currency ? { currency: item.currency } : {}),
     status: item.status,
     is_popular: item.isPopular,
     is_customizable: item.isCustomizable,

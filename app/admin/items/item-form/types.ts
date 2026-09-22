@@ -28,6 +28,7 @@ export type ItemFormValue = Partial<
     | 'item_type'
     | 'description'
     | 'price_cents'
+    | 'currency'
     | 'status'
     | 'is_popular'
     | 'is_customizable'
@@ -41,6 +42,9 @@ export type ItemFormValue = Partial<
     | 'tags'
   >
 >;
+
+/** An item's price as stored in the database, before any display conversion. */
+export type StoredPriceFormValue = { amountCents: number; currency: string };
 
 export type BoilerplateOption = Pick<Tables<'personalization_boilerplates'>, 'id' | 'name'>;
 

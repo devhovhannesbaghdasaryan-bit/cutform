@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { ItemForm } from '@/app/admin/items/item-form';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
+import { applyExchangeRate, getDisplayExchangeRate, normalizeCurrency } from '@/lib/currency';
 import type { AppLocale } from '@/lib/i18n';
 import { getCountryDisplayName, listMarketGeography } from '@/lib/market';
 import type { CatalogItemMedia } from '@/lib/marketplace';
@@ -35,7 +36,7 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
     supabase
       .from('catalog_items')
       .select(
-        'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics, system_prompt, skill_id, skill_path, tags',
+        'id, title, slug, category_id, subcategory_id, item_type, description, price_cents, currency, status, is_popular, is_customizable, thumbnail_path, manufacturing_notes, sizes, characteristics, system_prompt, skill_id, skill_path, tags',
       )
       .eq('id', id)
       .maybeSingle(),
@@ -83,6 +84,17 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
 
   if (error || !item) notFound();
 
+  // The form edits the price in AMD. Items created before prices were
+  // standardised on AMD may still be stored in another currency, so convert
+  // those at today's display rate; saving then writes the AMD amount back.
+  const storedCurrency = normalizeCurrency(item.currency) ?? 'AMD';
+  const priceInAmd =
+    storedCurrency === 'AMD'
+      ? item.price_cents
+      : applyExchangeRate(item.price_cents, await getDisplayExchangeRate(storedCurrency, 'AMD'))
+          .amountCents;
+  const priceAmd = Math.round(priceInAmd / 100);
+
   return (
     <main className="container max-w-4xl space-y-6 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -102,6 +114,8 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
         categories={categories ?? []}
         subcategories={subcategories ?? []}
         item={item}
+        priceAmd={priceAmd}
+        storedPrice={{ amountCents: item.price_cents, currency: storedCurrency }}
         media={media ?? []}
         seoRecords={seoRecords ?? []}
         marketRegions={geography.regions}
