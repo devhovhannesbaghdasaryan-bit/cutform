@@ -6,6 +6,7 @@ import { useActionState, useEffect, useRef, useState } from 'react';
 import { ImageOff, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { idleState } from '@/lib/action-state';
 import { isSvgPath } from '@/lib/catalog-media';
 import { resolvePublicStorageUrl } from '@/lib/storage';
@@ -27,10 +28,15 @@ export interface AdminItemRow {
   previewPath: string | null;
 }
 
+// Rendered size of the hover preview; also passed to next/image as `sizes` so
+// the optimizer serves a candidate that matches instead of the full original.
+const PREVIEW_POPOVER_PX = 288;
+
 function ItemPreview({ item }: { item: AdminItemRow }) {
   const url = resolvePublicStorageUrl('catalog-assets', item.previewPath);
+  const isSvg = isSvgPath(item.previewPath ?? '');
 
-  return (
+  const thumbnail = (
     <Link
       href={`/admin/items/${item.id}`}
       // The title cell already names the item, so this is decorative for screen
@@ -40,7 +46,7 @@ function ItemPreview({ item }: { item: AdminItemRow }) {
       className="relative block h-10 w-10 overflow-hidden rounded-md border bg-muted"
     >
       {url ? (
-        isSvgPath(item.previewPath ?? '') ? (
+        isSvg ? (
           // biome-ignore lint/performance/noImgElement: next/image cannot rasterize SVG markup
           <img src={url} alt="" className="h-full w-full object-contain p-1" />
         ) : (
@@ -52,6 +58,36 @@ function ItemPreview({ item }: { item: AdminItemRow }) {
         </span>
       )}
     </Link>
+  );
+
+  if (!url) return thumbnail;
+
+  // Hovering the small thumbnail opens a larger copy beside it so an admin can
+  // check the product photo without opening the item. The tooltip provider in
+  // the root layout supplies the open delay.
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{thumbnail}</TooltipTrigger>
+      <TooltipContent side="right" align="start" sideOffset={8} className="p-1" aria-hidden="true">
+        <div
+          className="relative overflow-hidden rounded-sm bg-muted"
+          style={{ width: PREVIEW_POPOVER_PX, height: PREVIEW_POPOVER_PX }}
+        >
+          {isSvg ? (
+            // biome-ignore lint/performance/noImgElement: next/image cannot rasterize SVG markup
+            <img src={url} alt="" className="h-full w-full object-contain p-3" />
+          ) : (
+            <Image
+              src={url}
+              alt=""
+              fill
+              sizes={`${PREVIEW_POPOVER_PX}px`}
+              className="object-contain"
+            />
+          )}
+        </div>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

@@ -1,22 +1,47 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { formatPrice } from '@/lib/utils';
 import { AutogenerateButton } from './ai-context';
-import type { ItemFormValue } from './types';
+import type { ItemFormValue, StoredPriceFormValue } from './types';
 
-export function PriceField({ item }: { item?: Pick<ItemFormValue, 'price_cents'> }) {
+export function PriceField({
+  item,
+  priceAmd,
+  storedPrice,
+}: {
+  item?: Pick<ItemFormValue, 'price_cents' | 'currency'>;
+  /** Price to show, in whole drams. Falls back to the item's own price when it is already AMD. */
+  priceAmd?: number;
+  /** The price as currently stored, when it is not in AMD yet. */
+  storedPrice?: StoredPriceFormValue | null;
+}) {
+  const fallbackAmd =
+    item?.price_cents != null && (item.currency ?? 'AMD') === 'AMD'
+      ? Math.round(item.price_cents / 100)
+      : 0;
+  const defaultValue = priceAmd ?? fallbackAmd;
+  const needsConversion = storedPrice && storedPrice.currency !== 'AMD';
+
   return (
     <div className="space-y-2">
-      <Label htmlFor="priceCents">Price, cents</Label>
+      <Label htmlFor="priceAmd">Price, AMD</Label>
       <Input
-        id="priceCents"
-        name="priceCents"
+        id="priceAmd"
+        name="priceAmd"
         type="number"
+        inputMode="numeric"
         min="0"
         step="1"
-        defaultValue={item?.price_cents ?? 0}
+        defaultValue={defaultValue}
         required
       />
+      {needsConversion ? (
+        <p className="text-xs text-muted-foreground">
+          Stored as {formatPrice(storedPrice.amountCents, storedPrice.currency)}. Prefilled at
+          today&apos;s rate; saving stores the price in AMD.
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -30,6 +30,7 @@ import type {
   MarketRegionFormValue,
   MarketRuleFormValue,
   SeoFormValue,
+  StoredPriceFormValue,
   SubcategoryOption,
 } from './types';
 
@@ -37,6 +38,8 @@ export function ItemForm({
   categories,
   subcategories,
   item,
+  priceAmd,
+  storedPrice,
   media,
   seo,
   seoRecords,
@@ -49,6 +52,10 @@ export function ItemForm({
   categories: CategoryOption[];
   subcategories: SubcategoryOption[];
   item?: ItemFormValue;
+  /** The item's price converted to whole drams for editing. */
+  priceAmd?: number;
+  /** The item's price as stored, so the form can say when it is not AMD yet. */
+  storedPrice?: StoredPriceFormValue | null;
   media?: CatalogMediaFormValue[];
   seo?: SeoFormValue | null;
   seoRecords?: SeoFormValue[];
@@ -86,7 +93,7 @@ export function ItemForm({
         <ClassificationFields categories={categories} subcategories={subcategories} item={item} />
 
         <div className="grid gap-4 md:grid-cols-3">
-          <PriceField item={item} />
+          <PriceField item={item} priceAmd={priceAmd} storedPrice={storedPrice} />
           <StatusField item={item} />
         </div>
 

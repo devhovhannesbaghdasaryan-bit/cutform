@@ -161,6 +161,21 @@ describe('createCatalogItemCore', () => {
     });
   });
 
+  it('writes the currency only when the item states one', async () => {
+    const withCurrency = fakeSupabase();
+    await createCatalogItemCore(
+      withCurrency.client,
+      { id: 'user-1' },
+      baseItem({ currency: 'AMD' }),
+      null,
+    );
+    expect(withCurrency.inserted[0]).toMatchObject({ price_cents: 1000, currency: 'AMD' });
+
+    const withoutCurrency = fakeSupabase();
+    await createCatalogItemCore(withoutCurrency.client, { id: 'user-1' }, baseItem(), null);
+    expect(withoutCurrency.inserted[0]).not.toHaveProperty('currency');
+  });
+
   it('rejects an unknown category', async () => {
     const { client } = fakeSupabase({ categoryExists: false });
     await expect(createCatalogItemCore(client, { id: 'user-1' }, baseItem(), null)).rejects.toThrow(

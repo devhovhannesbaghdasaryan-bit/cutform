@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { requireAdmin } from '@/lib/admin';
 import { getCatalogMediaKind } from '@/lib/catalog-media';
+import { APP_CURRENCIES } from '@/lib/currency';
 import { APP_LOCALES, type AppLocale } from '@/lib/i18n';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
 import type { Json } from '@/lib/supabase/types';
@@ -57,6 +58,10 @@ export const itemSchema = z.object({
   ]),
   description: z.string().trim().optional(),
   priceCents: z.coerce.number().int().min(0, 'Price cannot be negative.'),
+  // Currency that priceCents is denominated in. Optional so callers that only
+  // patch other fields (the MCP update tool) leave the stored currency alone;
+  // the admin form always submits AMD.
+  currency: z.enum(APP_CURRENCIES).optional(),
   status: z.enum(['draft', 'published', 'archived']),
   isPopular: z.boolean(),
   isCustomizable: z.boolean(),
@@ -90,6 +95,17 @@ export function readSeoLocale(
   };
 }
 
+// The admin form collects the price in whole drams (AMD) while the row stores
+// luma (1/100 AMD) in price_cents. Anything that isn't a finite number is
+// passed through untouched so the schema reports it as an invalid price.
+export function amdToCents(value: FormDataEntryValue | null): number | FormDataEntryValue | null {
+  if (typeof value !== 'string') return value;
+  const trimmed = value.trim();
+  if (trimmed === '') return value;
+  const amd = Number(trimmed);
+  return Number.isFinite(amd) ? Math.round(amd * 100) : value;
+}
+
 export function parseItemForm(formData: FormData) {
   return itemSchema.safeParse({
     title: formData.get('title'),
@@ -98,7 +114,8 @@ export function parseItemForm(formData: FormData) {
     subcategoryId: formData.get('subcategoryId') || '',
     itemType: formData.get('itemType') || 'standard',
     description: formData.get('description') || undefined,
-    priceCents: formData.get('priceCents'),
+    priceCents: amdToCents(formData.get('priceAmd')),
+    currency: 'AMD',
     status: formData.get('status'),
     isPopular: formData.get('isPopular') === 'on',
     isCustomizable: formData.get('isCustomizable') === 'on',
