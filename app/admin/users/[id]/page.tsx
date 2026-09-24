@@ -1,13 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import {
-  adjustAdminUserCreditsAction,
-  updateAdminUserProfileAction,
-} from '@/app/admin/users/actions';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import { getAdminUserDetail } from '@/lib/admin-users';
 import { formatDate, formatPrice } from '@/lib/utils';
+import { CreditAdjustmentForm, UserProfileForm } from './user-forms';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,56 +36,13 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         <section className="space-y-6">
           <div className="rounded-lg border p-5">
             <h2 className="font-semibold">Profile</h2>
-            <form action={updateAdminUserProfileAction} className="mt-4 grid gap-4 md:grid-cols-2">
-              <input type="hidden" name="userId" value={profile.user_id} />
-              <label className="space-y-2 text-sm">
-                <span className="font-medium">Role</span>
-                <select
-                  name="role"
-                  defaultValue={profile.role}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-sm">
-                <span className="font-medium">Status</span>
-                <select
-                  name="status"
-                  defaultValue={profile.status}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3"
-                >
-                  <option value="active">Active</option>
-                  <option value="suspended">Suspended</option>
-                  <option value="disabled">Disabled</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-sm">
-                <span className="font-medium">Preferred locale</span>
-                <select
-                  name="preferredLocale"
-                  defaultValue={profile.preferred_locale ?? ''}
-                  className="h-10 w-full rounded-md border border-input bg-background px-3"
-                >
-                  <option value="">Auto</option>
-                  <option value="en">English</option>
-                  <option value="ru">Russian</option>
-                  <option value="am">Armenian</option>
-                </select>
-              </label>
-              <label className="space-y-2 text-sm md:col-span-2">
-                <span className="font-medium">Internal notes</span>
-                <textarea
-                  name="internalNotes"
-                  defaultValue={profile.internal_notes ?? ''}
-                  className="min-h-28 w-full rounded-md border border-input bg-background px-3 py-2"
-                />
-              </label>
-              <div className="md:col-span-2">
-                <Button type="submit">Save user changes</Button>
-              </div>
-            </form>
+            <UserProfileForm
+              userId={profile.user_id}
+              role={profile.role}
+              status={profile.status}
+              preferredLocale={profile.preferred_locale}
+              internalNotes={profile.internal_notes}
+            />
           </div>
 
           <AdminTable
@@ -126,40 +80,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             )}
           </div>
 
-          <form action={adjustAdminUserCreditsAction} className="space-y-4 rounded-lg border p-5">
-            <input type="hidden" name="userId" value={profile.user_id} />
-            <h2 className="font-semibold">Manual credit adjustment</h2>
-            <div>
-              <select
-                name="direction"
-                defaultValue="credit"
-                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
-              >
-                <option value="credit">Credit</option>
-                <option value="debit">Debit</option>
-              </select>
-            </div>
-            <div>
-              <input
-                name="amount"
-                type="number"
-                min="1"
-                step="1"
-                required
-                placeholder="Amount"
-                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              />
-            </div>
-            <textarea
-              name="reason"
-              required
-              placeholder="Reason"
-              className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            />
-            <Button type="submit" variant="outline">
-              Apply adjustment
-            </Button>
-          </form>
+          <CreditAdjustmentForm userId={profile.user_id} />
 
           <AdminTable
             title="Transactions"

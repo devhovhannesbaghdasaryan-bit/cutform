@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/site-header';
 import { ProductCard } from '@/components/product-card';
@@ -44,6 +45,37 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(6);
+
+  // Personalized items keep their previews in personalized_preview_options,
+  // not on generated_items.preview_path, so look them up for the listed items
+  // and show the selected option (or the first one) as the card thumbnail.
+  const generatedIds = (generatedItems ?? []).map((item) => item.id);
+  const { data: previewOptions } = generatedIds.length
+    ? await supabase
+        .from('personalized_preview_options')
+        .select('generated_item_id, option_index, preview_image_path, status')
+        .in('generated_item_id', generatedIds)
+        .order('option_index', { ascending: true })
+    : { data: [] as never[] };
+  const optionPathByItem = new Map<string, string>();
+  for (const option of previewOptions ?? []) {
+    const current = optionPathByItem.get(option.generated_item_id);
+    if (!current || option.status === 'selected') {
+      optionPathByItem.set(option.generated_item_id, option.preview_image_path);
+    }
+  }
+  const previewUrlByItem = new Map<string, string>();
+  await Promise.all(
+    (generatedItems ?? []).map(async (item) => {
+      const path =
+        item.selected_preview_path ?? item.preview_path ?? optionPathByItem.get(item.id) ?? null;
+      if (!path) return;
+      const { data } = await supabase.storage
+        .from('generated-assets')
+        .createSignedUrl(path, 60 * 60);
+      if (data?.signedUrl) previewUrlByItem.set(item.id, data.signedUrl);
+    }),
+  );
 
   if (error) {
     return (
@@ -144,10 +176,19 @@ export default async function DashboardPage() {
                       href={`/generated/${item.id}`}
                       className="rounded-lg border p-4 transition-colors hover:bg-accent"
                     >
-                      <div className="flex aspect-[4/3] items-center justify-center rounded-md border bg-muted text-sm text-muted-foreground">
-                        {item.selected_preview_path || item.preview_path
-                          ? t('dashboard.previewSaved')
-                          : t('dashboard.noPreview')}
+                      <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border bg-muted text-sm text-muted-foreground">
+                        {previewUrlByItem.has(item.id) ? (
+                          <Image
+                            src={previewUrlByItem.get(item.id) as string}
+                            alt={item.title ?? item.id.slice(0, 8)}
+                            fill
+                            unoptimized
+                            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                            className="object-cover"
+                          />
+                        ) : (
+                          t('dashboard.noPreview')
+                        )}
                       </div>
                       <div className="mt-4 space-y-1">
                         <p className="font-medium">{item.title ?? item.id.slice(0, 8)}</p>

@@ -1,5 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { extractGeneratedImage, generateOpenAiImage } from '@/lib/openai-image';
+import {
+  describeImageResponse,
+  extractGeneratedImage,
+  generateOpenAiImage,
+} from '@/lib/openai-image';
 
 describe('extractGeneratedImage', () => {
   it('decodes the base64 result from the image_generation_call output item', () => {
@@ -21,6 +25,31 @@ describe('extractGeneratedImage', () => {
     expect(() =>
       extractGeneratedImage({ output: [{ type: 'image_generation_call', result: null }] }),
     ).toThrow('OpenAI did not return a generated image.');
+  });
+});
+
+describe('describeImageResponse', () => {
+  it('reports the call status, refusal text, and assistant text when no image came back', () => {
+    const response = {
+      status: 'completed',
+      output: [
+        { type: 'image_generation_call', status: 'failed', result: null },
+        {
+          type: 'message',
+          status: 'completed',
+          content: [
+            { type: 'refusal', refusal: 'I cannot help with that.' },
+            { type: 'output_text', text: 'Please upload a different photo.' },
+          ],
+        },
+      ],
+    };
+    const description = describeImageResponse(response);
+    expect(description).toContain('status=completed');
+    expect(description).toContain('image_generation_call:failed');
+    expect(description).toContain('refusal="I cannot help with that."');
+    expect(description).toContain('text="Please upload a different photo."');
+    expect(() => extractGeneratedImage(response)).toThrow('I cannot help with that.');
   });
 });
 
@@ -49,6 +78,7 @@ describe('generateOpenAiImage', () => {
     const requestBody = (create.mock.calls[0] as any[])[0];
     expect(requestBody.model).toBe('gpt-5-mini');
     expect(requestBody.store).toBe(false);
+    expect(requestBody.tool_choice).toEqual({ type: 'image_generation' });
     expect(requestBody.tools).toEqual([
       { type: 'image_generation', model: 'gpt-image-2', size: '1024x1024', quality: 'low' },
     ]);
@@ -86,7 +116,11 @@ describe('generateOpenAiImage', () => {
     const requestBody = (create.mock.calls[0] as any[])[0];
     const [message] = requestBody.input;
     expect(message.content).toHaveLength(2);
-    expect(message.content.some((part: { type: string }) => part.type === 'input_image' && 'file_id' in part)).toBe(false);
+    expect(
+      message.content.some(
+        (part: { type: string }) => part.type === 'input_image' && 'file_id' in part,
+      ),
+    ).toBe(false);
   });
 
   it('injects skill texts as input_text parts before the prompt', async () => {
