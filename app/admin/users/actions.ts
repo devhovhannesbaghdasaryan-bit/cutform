@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
+import { actionError, actionSuccess, zodErrorToState, type ActionState } from '@/lib/action-state';
 import { requireAdminPermission } from '@/lib/admin';
 import { adjustCredits } from '@/lib/credits';
 import { getServiceSupabase } from '@/lib/supabase/server';
@@ -19,10 +20,13 @@ const creditAdjustmentSchema = z.object({
   userId: z.uuid(),
   direction: z.enum(['credit', 'debit']),
   amount: z.coerce.number().int().positive('Amount must be positive.'),
-  reason: z.string().trim().min(3, 'Reason is required.'),
+  reason: z.string().trim().min(3, 'Reason must be at least 3 characters.'),
 });
 
-export async function updateAdminUserProfileAction(formData: FormData) {
+export async function updateAdminUserProfileAction(
+  _prev: ActionState<null>,
+  formData: FormData,
+): Promise<ActionState<null>> {
   const parsed = userProfileSchema.safeParse({
     userId: formData.get('userId'),
     role: formData.get('role'),
@@ -31,7 +35,7 @@ export async function updateAdminUserProfileAction(formData: FormData) {
     internalNotes: formData.get('internalNotes') ?? undefined,
   });
 
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid user update.');
+  if (!parsed.success) return zodErrorToState(parsed.error);
 
   const { supabase, user } = await requireAdminPermission('users_manage');
   const values = parsed.data;
@@ -57,23 +61,31 @@ export async function updateAdminUserProfileAction(formData: FormData) {
     })
     .eq('user_id', values.userId);
 
-  if (error) throw new Error(error.message);
+  if (error) return actionError(error.message);
 
-  await writeAdminAuditLog(supabase, {
-    actorUserId: user.id,
-    targetUserId: values.userId,
-    action: 'admin_user_profile_updated',
-    entityType: 'profile',
-    entityId: values.userId,
-    reason: 'Admin profile update',
-    metadata: { before, after: values },
-  });
+  try {
+    await writeAdminAuditLog(supabase, {
+      actorUserId: user.id,
+      targetUserId: values.userId,
+      action: 'admin_user_profile_updated',
+      entityType: 'profile',
+      entityId: values.userId,
+      reason: 'Admin profile update',
+      metadata: { before, after: values },
+    });
+  } catch (err) {
+    return actionError(err instanceof Error ? err.message : 'Unable to write audit log.');
+  }
 
   revalidatePath('/admin/users');
   revalidatePath(`/admin/users/${values.userId}`);
+  return actionSuccess(null, 'User changes saved.');
 }
 
-export async function adjustAdminUserCreditsAction(formData: FormData) {
+export async function adjustAdminUserCreditsAction(
+  _prev: ActionState<null>,
+  formData: FormData,
+): Promise<ActionState<null>> {
   const parsed = creditAdjustmentSchema.safeParse({
     userId: formData.get('userId'),
     direction: formData.get('direction'),
@@ -81,47 +93,50 @@ export async function adjustAdminUserCreditsAction(formData: FormData) {
     reason: formData.get('reason'),
   });
 
-  if (!parsed.success) {
-    throw new Error(parsed.error.issues[0]?.message ?? 'Invalid credit adjustment.');
-  }
+  if (!parsed.success) return zodErrorToState(parsed.error);
 
   const { supabase, user } = await requireAdminPermission('balances_adjust');
   const values = parsed.data;
   const delta = values.direction === 'credit' ? values.amount : -values.amount;
 
-  // credit_accounts/credit_ledger have no write RLS policy for any
-  // authenticated role (including admins) — only the service-role client
-  // bypasses RLS, so the balance mutation must go through it.
-  const result = await adjustCredits(getServiceSupabase(), {
-    userId: values.userId,
-    delta,
-    reason: 'admin_adjustment',
-    createdBy: user.id,
-    transactionType: 'manual_adjustment',
-    transactionStatus: 'succeeded',
-    metadata: {
-      adminReason: values.reason,
-      direction: values.direction,
-      balanceType: 'credits',
-    },
-  });
-
-  await writeAdminAuditLog(supabase, {
-    actorUserId: user.id,
-    targetUserId: values.userId,
-    action: 'admin_credit_balance_adjusted',
-    entityType: 'credit_account',
-    entityId: values.userId,
-    reason: values.reason,
-    metadata: {
+  try {
+    // credit_accounts/credit_ledger have no write RLS policy for any
+    // authenticated role (including admins) — only the service-role client
+    // bypasses RLS, so the balance mutation must go through it.
+    const result = await adjustCredits(getServiceSupabase(), {
+      userId: values.userId,
       delta,
-      balanceType: 'credits',
-      balance: result.balance,
-      ledgerId: result.ledgerId,
-    },
-  });
+      reason: 'admin_adjustment',
+      createdBy: user.id,
+      transactionType: 'manual_adjustment',
+      transactionStatus: 'succeeded',
+      metadata: {
+        adminReason: values.reason,
+        direction: values.direction,
+        balanceType: 'credits',
+      },
+    });
+
+    await writeAdminAuditLog(supabase, {
+      actorUserId: user.id,
+      targetUserId: values.userId,
+      action: 'admin_credit_balance_adjusted',
+      entityType: 'credit_account',
+      entityId: values.userId,
+      reason: values.reason,
+      metadata: {
+        delta,
+        balanceType: 'credits',
+        balance: result.balance,
+        ledgerId: result.ledgerId,
+      },
+    });
+  } catch (err) {
+    return actionError(err instanceof Error ? err.message : 'Unable to adjust credits.');
+  }
 
   revalidatePath('/admin/users');
   revalidatePath(`/admin/users/${values.userId}`);
   revalidatePath('/admin/transactions');
+  return actionSuccess(null, 'Credit adjustment applied.');
 }

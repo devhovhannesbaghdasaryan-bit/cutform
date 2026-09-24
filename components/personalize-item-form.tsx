@@ -58,9 +58,14 @@ export function PersonalizeItemForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState('');
   const [html, setHtml] = useState('');
+  const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState('');
+  const [color, setColor] = useState(DEFAULT_COLOR_VALUE);
   const [filePreview, setFilePreview] = useState<string | null>(null);
-  const [selected, setSelected] = useState<string[]>([]);
+  // Preselect the first template so the form is ready to generate on arrival.
+  const [selected, setSelected] = useState<string[]>(() =>
+    boilerplates[0] ? [boilerplates[0].id] : [],
+  );
   const [creditDialogDismissed, setCreditDialogDismissed] = useState(false);
   const [state, formAction, pending] = useActionState(generatePersonalizedItemAction, initialState);
   const remaining = MAX_PERSONALIZED_TEXT_LENGTH - text.length;
@@ -75,6 +80,23 @@ export function PersonalizeItemForm({
     },
     [filePreview],
   );
+
+  // React resets uncontrolled fields once a form action settles, which empties
+  // the file input while our preview state still shows the photo. Put the
+  // chosen file back so the input and the preview agree on a retry.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-run after every action result
+  useEffect(() => {
+    const input = fileInputRef.current;
+    if (!input || !file || input.files?.length) return;
+    try {
+      const transfer = new DataTransfer();
+      transfer.items.add(file);
+      input.files = transfer.files;
+    } catch {
+      // DataTransfer is unavailable in some environments; submitAction still
+      // sends the file from state.
+    }
+  }, [file, state]);
 
   function syncEditor() {
     const editor = editorRef.current;
@@ -101,15 +123,26 @@ export function PersonalizeItemForm({
     );
   }
 
-  function updateFile(file?: File) {
+  function updateFile(nextFile?: File) {
     if (filePreview) URL.revokeObjectURL(filePreview);
-    setFileName(file?.name ?? '');
-    setFilePreview(file ? URL.createObjectURL(file) : null);
+    setFile(nextFile ?? null);
+    setFileName(nextFile?.name ?? '');
+    setFilePreview(nextFile ? URL.createObjectURL(nextFile) : null);
+  }
+
+  function submitAction(formData: FormData) {
+    // The file lives in state; if the (possibly reset) input sent nothing,
+    // attach the stored file so a retry after the credits dialog works.
+    const sent = formData.get('images');
+    if (showPhoto && file && !(sent instanceof File && sent.size > 0)) {
+      formData.set('images', file, file.name);
+    }
+    formAction(formData);
   }
 
   return (
     <form
-      action={formAction}
+      action={submitAction}
       onSubmit={(event) => {
         setCreditDialogDismissed(false);
         if (!canSubmit) event.preventDefault();
@@ -188,7 +221,6 @@ export function PersonalizeItemForm({
               name="images"
               type="file"
               accept="image/png,image/jpeg,image/webp"
-              required
               className="sr-only"
               onChange={(event) => updateFile(event.target.files?.[0])}
             />
@@ -216,22 +248,23 @@ export function PersonalizeItemForm({
         <section className="space-y-3">
           <Label htmlFor="color">{copy.color}</Label>
           <div className="grid grid-cols-3 gap-2">
-            {colors.map((color) => (
+            {colors.map((option) => (
               <label
-                key={color.value}
+                key={option.value}
                 className="flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5"
               >
                 <input
                   type="radio"
                   name="color"
-                  value={color.value}
-                  defaultChecked={color.value === DEFAULT_COLOR_VALUE}
+                  value={option.value}
+                  checked={color === option.value}
+                  onChange={() => setColor(option.value)}
                 />
                 <span
                   className="h-4 w-4 rounded-full border shadow-inner"
-                  style={{ backgroundColor: color.hex }}
+                  style={{ backgroundColor: option.hex }}
                 />
-                {color.label}
+                {option.label}
               </label>
             ))}
           </div>

@@ -1,0 +1,8 @@
+Engraving treatment — LINE MODE. This directive is mandatory and overrides the default artwork treatment; everything else follows the product prompt without deviation.
+
+Render the subjects on the acrylic as engraved contour line art, exactly as if the laser file were an SVG whose <path> elements use a single stroke and no fill:
+- Every mark is a clean continuous line of one uniform weight, about 1% of the artwork width. No thick strokes, no variable-weight brush lines.
+- Forbidden inside the artwork: solid filled regions, photographic tones, sepia or grayscale shading, gradients, halftone dots, stippling, hatching or cross-hatching.
+- Lines follow only the real edges and features of the uploaded photo: outer silhouette, hair mass, facial features (eyes, brows, nose, mouth, beard), hands, and the main clothing folds, seams and pockets.
+- One uniform engraving tone: every line glows the same warm amber; untouched acrylic stays clear.
+- Do not add, beautify or reinterpret anything; do not introduce any element that is not visible in the photo.

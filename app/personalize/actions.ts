@@ -132,6 +132,18 @@ export async function generatePersonalizedItemAction(
     : [null];
 
   const creditCost = Math.max(callTargets.length, 1);
+
+  // Resolve the AI client before touching credits: a missing OPENAI_API_KEY
+  // used to debit, create an empty generated item, then refund — surfacing as
+  // a generic "could not generate" message with no server-side log.
+  let openAiClient: ReturnType<typeof getOpenAiClient>;
+  try {
+    openAiClient = getOpenAiClient();
+  } catch (error) {
+    console.error('[personalized-item] OpenAI client unavailable', error);
+    return errorState('Image generation is not configured on this server. Please contact support.');
+  }
+
   let debited = false;
   let generatedId: string | null = null;
   let creditSupabase: ReturnType<typeof getServiceSupabase> | null = null;
@@ -166,7 +178,8 @@ export async function generatePersonalizedItemAction(
 
   try {
     const originalImagePaths: string[] = [];
-    for (const file of files) originalImagePaths.push(await uploadUserImage(supabase, user.id, file));
+    for (const file of files)
+      originalImagePaths.push(await uploadUserImage(supabase, user.id, file));
 
     const selectedColor = tags.has('personal_color')
       ? (COMFORTABLE_COLORS.find((option) => option.value === color) ?? null)
@@ -194,7 +207,6 @@ export async function generatePersonalizedItemAction(
     });
     generatedId = generated.id;
 
-    const openAiClient = getOpenAiClient();
     // Skill text comes from the private uploads-bucket copies (OpenAI forbids
     // downloading user_data file content). Copies live under the uploading
     // admin's folder, so the customer's session client cannot read them —
@@ -247,6 +259,12 @@ export async function generatePersonalizedItemAction(
     }
     await createPersonalizedPreviewOptions(supabase, options);
   } catch (error) {
+    console.error('[personalized-item] generation failed', {
+      userId: user.id,
+      catalogItemId: item.id,
+      generatedId,
+      error,
+    });
     if (debited && creditSupabase) {
       try {
         await refundCredits(creditSupabase, {
@@ -263,9 +281,12 @@ export async function generatePersonalizedItemAction(
         console.error('[personalized-item] credit refund failed', refundError);
       }
     }
-    return errorState(error instanceof Error ? friendlyGenerationError(error) : t('errorGeneration'));
+    return errorState(
+      error instanceof Error ? friendlyGenerationError(error) : t('errorGeneration'),
+    );
   }
 
-  if (!generatedId) return errorState('We could not save the generated previews. Please try again.');
+  if (!generatedId)
+    return errorState('We could not save the generated previews. Please try again.');
   redirect(`/generated/${generatedId}`);
 }
