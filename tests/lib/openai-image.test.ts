@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  CUSTOMER_PHOTO_LABEL,
   describeImageResponse,
   extractGeneratedImage,
   generateOpenAiImage,
+  PRODUCT_TEMPLATE_LABEL,
 } from '@/lib/openai-image';
 
 describe('extractGeneratedImage', () => {
@@ -85,9 +87,11 @@ describe('generateOpenAiImage', () => {
     const [message] = requestBody.input;
     expect(message.role).toBe('user');
     expect(message.content[0]).toEqual({ type: 'input_text', text: 'Generate a night light' });
-    expect(message.content[1]).toMatchObject({ type: 'input_image', detail: 'auto' });
-    expect(message.content[1].image_url).toMatch(/^data:image\/jpeg;base64,/);
-    expect(message.content[2]).toEqual({
+    expect(message.content[1]).toEqual({ type: 'input_text', text: CUSTOMER_PHOTO_LABEL });
+    expect(message.content[2]).toMatchObject({ type: 'input_image', detail: 'auto' });
+    expect(message.content[2].image_url).toMatch(/^data:image\/jpeg;base64,/);
+    expect(message.content[3]).toEqual({ type: 'input_text', text: PRODUCT_TEMPLATE_LABEL });
+    expect(message.content[4]).toEqual({
       type: 'input_image',
       detail: 'auto',
       file_id: 'file-boilerplate-1',
@@ -115,7 +119,11 @@ describe('generateOpenAiImage', () => {
     // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
     const requestBody = (create.mock.calls[0] as any[])[0];
     const [message] = requestBody.input;
-    expect(message.content).toHaveLength(2);
+    expect(message.content).toHaveLength(3);
+    expect(message.content).not.toContainEqual({
+      type: 'input_text',
+      text: PRODUCT_TEMPLATE_LABEL,
+    });
     expect(
       message.content.some(
         (part: { type: string }) => part.type === 'input_image' && 'file_id' in part,
@@ -147,7 +155,8 @@ describe('generateOpenAiImage', () => {
     expect(message.content[0]).toEqual({ type: 'input_text', text: 'product skill guidance' });
     expect(message.content[1]).toEqual({ type: 'input_text', text: 'boilerplate skill guidance' });
     expect(message.content[2]).toEqual({ type: 'input_text', text: 'Generate a night light' });
-    expect(message.content[3]).toEqual({
+    expect(message.content[3]).toEqual({ type: 'input_text', text: PRODUCT_TEMPLATE_LABEL });
+    expect(message.content[4]).toEqual({
       type: 'input_image',
       detail: 'auto',
       file_id: 'file-boilerplate-1',

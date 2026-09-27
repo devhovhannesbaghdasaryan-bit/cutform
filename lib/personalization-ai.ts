@@ -37,7 +37,7 @@ export function composePersonalizationPrompt(input: PersonalizationPromptInput):
       ? `Use color: ${input.colorLabel}${input.colorHex ? ` (${input.colorHex})` : ''}.`
       : null,
     input.hasPhoto
-      ? 'A user photo is attached as the subject reference; preserve its recognizable identity and defining features.'
+      ? 'A customer photo is attached and is the only source of the subject: keep the result as similar to it as the product style allows, with exactly the same number of people, the same pose, identity and defining features. Never add, remove or duplicate a subject, and never copy subjects from the product template image.'
       : null,
   ];
   return parts.filter((part): part is string => Boolean(part)).join('\n\n');

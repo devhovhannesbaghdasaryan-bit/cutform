@@ -31,7 +31,7 @@ describe('composePersonalizationPrompt', () => {
         'Rectangular UV-printed acrylic panel.',
         'Personalized text: Happy Birthday (styling: bold emphasis, center aligned).',
         'Use color: Warm white (#f7d7a1).',
-        'A user photo is attached as the subject reference; preserve its recognizable identity and defining features.',
+        'A customer photo is attached and is the only source of the subject: keep the result as similar to it as the product style allows, with exactly the same number of people, the same pose, identity and defining features. Never add, remove or duplicate a subject, and never copy subjects from the product template image.',
       ].join('\n\n'),
     );
   });

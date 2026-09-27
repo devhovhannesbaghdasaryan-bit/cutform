@@ -26,6 +26,15 @@ function getResponsesModel() {
   return getServerEnv().OPENAI_RESPONSES_MODEL ?? 'gpt-5-mini';
 }
 
+/**
+ * Text labels placed directly before each attached image so the model cannot
+ * confuse the customer's subject with the sample artwork shown in the template.
+ */
+export const CUSTOMER_PHOTO_LABEL =
+  'CUSTOMER PHOTO (next image(s)): the only source of the subject. Reproduce exactly the people or objects shown here — same number of people, same pose, same identity — and nothing from any other image.';
+export const PRODUCT_TEMPLATE_LABEL =
+  'PRODUCT TEMPLATE (next image): reference for product construction, materials and rendering style only. Any people or artwork shown on it are placeholder samples and must not appear in the result, nor influence how many subjects are shown.';
+
 async function toInputImagePart(file: File) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const base64 = Buffer.from(bytes).toString('base64');
@@ -103,9 +112,13 @@ export async function generateOpenAiImage(
         content: [
           ...(input.skillTexts ?? []).map((text) => ({ type: 'input_text' as const, text })),
           { type: 'input_text', text: input.prompt },
+          ...(userImageParts.length > 0
+            ? [{ type: 'input_text' as const, text: CUSTOMER_PHOTO_LABEL }]
+            : []),
           ...userImageParts,
           ...(input.referenceFileId
             ? [
+                { type: 'input_text' as const, text: PRODUCT_TEMPLATE_LABEL },
                 {
                   type: 'input_image' as const,
                   detail: 'auto' as const,

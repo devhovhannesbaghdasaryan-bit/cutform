@@ -34,7 +34,7 @@ export function AssetPreviewCard({
           {url ? (
             isSvg ? (
               // biome-ignore lint/performance/noImgElement: sanitized SVG rendered inline; next/image cannot render SVG markup
-              <img src={url} alt="" className="h-full w-full object-contain p-1" />
+              <img src={url} alt="" className="h-full w-full bg-white object-contain p-1" />
             ) : (
               <Image src={url} alt="" fill unoptimized sizes="80px" className="object-cover" />
             )
@@ -101,7 +101,7 @@ export function AssetPreviewCard({
           <div className="grid max-h-[75dvh] min-h-48 place-items-center overflow-auto bg-muted/50 p-2 sm:min-h-72 sm:p-4">
             {isSvg ? (
               // biome-ignore lint/performance/noImgElement: sanitized SVG rendered inline; next/image cannot render SVG markup
-              <img src={url} alt={title} className="max-h-[70vh] max-w-full object-contain" />
+              <img src={url} alt={title} className="max-h-[70vh] max-w-full bg-white object-contain" />
             ) : (
               <Image
                 src={url}
