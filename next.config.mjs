@@ -29,7 +29,9 @@ const nextConfig = {
   },
   // jsdom (pulled in by isomorphic-dompurify) ships its own asset files;
   // bundling breaks it. Load these as Node externals at runtime.
-  serverExternalPackages: ['isomorphic-dompurify', 'jsdom'],
+  // potrace checks `instanceof Jimp`; bundling mangles the jimp import and
+  // that check throws, so keep both external too.
+  serverExternalPackages: ['isomorphic-dompurify', 'jsdom', 'potrace', 'jimp'],
   // The legacy token-priced /products/[id] route is gone (Phase 17); send any
   // inbound links to the live catalog. Single-segment :id only, so static
   // assets under /products/night-lights/... are unaffected.

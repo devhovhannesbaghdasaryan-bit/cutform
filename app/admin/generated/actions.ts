@@ -137,7 +137,10 @@ export async function generateManufacturingFileAction(
           quality: 'high',
           background: 'opaque',
           outputFormat: 'png',
-          inputFidelity: 'high',
+          // gpt-image-2 and gpt-image-1-mini reject the input_fidelity parameter.
+          ...(settings.model === 'gpt-image-1' || settings.model === 'gpt-image-1.5'
+            ? { inputFidelity: 'high' as const }
+            : {}),
         } satisfies OpenAIImageModelEditOptions,
       },
     });

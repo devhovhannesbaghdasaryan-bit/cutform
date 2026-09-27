@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Uniqraft Pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #12141f;
+    --card: #1b1e2d;
+    --line: #2b2f42;
+    --ink: #f3f0e6;
+    --muted: #b5b8c6;
+    --dim: #8b8fa3;
+    --accent: #f2e800;
+    --accent-ink: #12141f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: "DM Sans", "Segoe UI", Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { size: 13.333in 7.5in; margin: 0; }
+  .slide {
+    width: 13.333in; height: 7.5in; padding: 0.9in 0.9in 0.7in; position: relative;
+    page-break-after: always; break-after: page; overflow: hidden; background: var(--bg);
+    display: flex; flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .kicker { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin: 0 0 22px; }
+  h1 { font-family: "Space Grotesk", "DM Sans", sans-serif; font-size: 44px; line-height: 1.12; font-weight: 700; margin: 0 0 34px; letter-spacing: -0.01em; }
+  h1.tight { margin-bottom: 26px; }
+  .body { flex: 1; display: flex; flex-direction: column; }
+  .foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 13px; color: var(--dim); margin-top: auto; padding-top: 18px; }
+  .foot .src { max-width: 80%; }
+  .grid { display: grid; gap: 22px; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g4 { grid-template-columns: repeat(4, 1fr); }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 26px 26px 28px; }
+  .card h3 { font-size: 20px; margin: 0 0 10px; font-weight: 600; }
+  .card p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--muted); }
+  .card .tag { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+  .card.hi { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .card.hi h3, .card.hi p, .card.hi .tag { color: var(--accent-ink); }
+  .card.hi .tag { color: #5c5800; }
+  .big { font-family: "Space Grotesk", sans-serif; font-size: 54px; font-weight: 700; line-height: 1; margin: 0 0 12px; }
+  .card.hi .big { color: var(--accent-ink); }
+  .card .big { color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; font-size: 17px; }
+  th { background: var(--accent); color: var(--accent-ink); text-align: left; font-weight: 700; padding: 12px 14px; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--line); color: var(--ink); vertical-align: top; }
+  td.m { color: var(--muted); }
+  td.y { color: var(--accent); font-weight: 600; }
+  .lead { font-size: 26px; line-height: 1.35; margin: 0; }
+  .note { font-size: 20px; line-height: 1.4; color: var(--ink); margin: 34px 0 0; }
+  .flow { display: flex; align-items: stretch; gap: 10px; }
+  .flow .step { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 22px 20px; }
+  .flow .step .n { color: var(--accent); font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+  .flow .step h3 { font-size: 20px; margin: 0 0 8px; font-weight: 600; }
+  .flow .step p { margin: 0; font-size: 14.5px; line-height: 1.45; color: var(--muted); }
+  .flow .step.hi { background: var(--accent); border-color: var(--accent); }
+  .flow .step.hi .n, .flow .step.hi h3, .flow .step.hi p { color: var(--accent-ink); }
+  .flow .arrow { align-self: center; color: var(--accent); font-size: 26px; font-weight: 700; padding: 0 2px; }
+  .stat { display: flex; gap: 40px; align-items: flex-start; }
+  .stat .main { flex: 1; }
+  .stat .main .huge { font-family: "Space Grotesk", sans-serif; font-size: 84px; font-weight: 700; color: var(--accent); line-height: 1; margin: 0 0 14px; }
+  .stat .main p { font-size: 20px; margin: 0; max-width: 460px; line-height: 1.35; }
+  .stat .side { flex: 1; }
+  .stat .side .row { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .stat .side .row:first-child { border-top: 1px solid var(--line); }
+  .stat .side .row b { font-family: "Space Grotesk", sans-serif; font-size: 26px; font-weight: 700; }
+  .stat .side .row span { color: var(--muted); font-size: 16px; text-align: right; max-width: 60%; }
+  .cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+  .cols .col { border-top: 3px solid var(--accent); padding-top: 14px; }
+  .cols .col h3 { font-size: 19px; margin: 0 0 8px; font-weight: 600; }
+  .cols .col p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--muted); }
+  .cover { justify-content: space-between; }
+  .cover .kicker { margin-bottom: 120px; }
+  .cover h1 { font-size: 92px; margin: 0 0 24px; }
+  .cover .lead { font-size: 30px; max-width: 7.2in; }
+  .cover .art { position: absolute; right: 1.1in; top: 1.4in; width: 3.5in; }
+  .cover .url { font-size: 15px; color: var(--dim); }
+  .founders { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+  .founders .card h3 { font-family: "Space Grotesk", sans-serif; font-size: 26px; margin-bottom: 6px; }
+  .founders .card .role { color: var(--accent); font-weight: 600; font-size: 17px; margin-bottom: 12px; }
+  .contact { font-size: 26px; margin-top: 40px; }
+  ul.clean { margin: 0; padding-left: 20px; font-size: 16px; line-height: 1.55; color: var(--muted); }
+  ul.clean li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- 1. Cover -->
+<section class="slide cover">
+  <div>
+    <p class="kicker">Pre-seed investor pitch · September 2026</p>
+    <h1>Uniqraft</h1>
+    <p class="lead">From a customer's photo to a reviewed, manufacturable product, made at a factory near them.</p>
+  </div>
+  <svg class="art" viewBox="0 0 340 380" fill="none" stroke="#f2e800" stroke-width="5" aria-hidden="true">
+    <path d="M40 300 V140 a130 130 0 0 1 260 0 V300" />
+    <path d="M78 300 V150 a92 92 0 0 1 184 0 V300" stroke-opacity="0.45" stroke-width="3" />
+    <circle cx="170" cy="160" r="40" />
+    <path d="M100 262 a70 70 0 0 1 140 0" />
+    <path d="M128 288 H212" stroke-width="4" />
+    <path d="M14 300 H326 L308 356 H32 Z" fill="#f2e800" stroke="none" />
+    <path d="M2 372 H338" stroke="#3a3e55" stroke-width="3" />
+  </svg>
+  <div class="url">uniqraft.org</div>
+</section>
+
+<!-- 2. Problem -->
+<section class="slide">
+  <p class="kicker">The problem</p>
+  <h1>Custom products still break between the buyer and the machine</h1>
+  <div class="body">
+    <div class="grid g3" style="margin-top:auto">
+      <div class="card"><h3>Uncontrolled input</h3><p>A phone photo or a vague idea is not a file a laser, router or printer can run.</p></div>
+      <div class="card"><h3>Manual translation</h3><p>A designer redraws it, a shop quotes it, and proofs travel back and forth by email for days.</p></div>
+      <div class="card"><h3>Preview is not product</h3><p>What looks right on screen can fail on a specific machine, material and thickness, and someone pays for the remake.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>2</span></div>
+</section>
+
+<!-- 3. Solution -->
+<section class="slide">
+  <p class="kicker">The solution</p>
+  <h1>One loop from photo to delivered object</h1>
+  <div class="body">
+    <div class="flow">
+      <div class="step"><div class="n">01</div><h3>Photo</h3><p>Upload, confirm rights, pick a template.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step"><div class="n">02</div><h3>AI design</h3><p>Line art proposed and refined in chat.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step"><div class="n">03</div><h3>Machine rules</h3><p>Templates fix size, layers and safe zones.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step"><div class="n">04</div><h3>Human gate</h3><p>Buyer approves a proof; production reviews it.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step hi"><div class="n">05</div><h3>Factory</h3><p>Made and shipped from a qualified shop.</p></div>
+    </div>
+    <p class="note" style="margin-top:auto">AI proposes the design. Deterministic templates decide what a machine can make.</p>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>3</span></div>
+</section>
+
+<!-- 4. Product today -->
+<section class="slide">
+  <p class="kicker">The product today</p>
+  <h1>A working product, live at uniqraft.org since July 2026</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><h3>Image-to-SVG studio</h3><p>Upload, chat, and watch a sanitized cutting file stream into a live preview.</p></div>
+      <div class="card"><h3>Personalized night lights</h3><p>Template-based personalization that ends in an orderable product.</p></div>
+      <div class="card"><h3>Full commerce</h3><p>Catalog, cart, checkout, orders and card payments through Ameriabank.</p></div>
+      <div class="card"><h3>Built for many markets</h3><p>Three languages, four currencies, availability and shipping rules by country and region.</p></div>
+      <div class="card"><h3>Production review gate</h3><p>Admins review every generated design before manufacturing, with an audit trail.</p></div>
+      <div class="card"><h3>Partner workshop data</h3><p>14 machines profiled at our partner workshop: CO2 and fiber laser, CNC router, flatbed UV, 3D printing.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>4</span></div>
+</section>
+
+<!-- 5. Target customer -->
+<section class="slide">
+  <p class="kicker">Target customer</p>
+  <h1>People and businesses who need a custom physical product made from a photo, name or idea</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card hi"><div class="tag">First</div><h3>Gift and home shoppers</h3><p>Buy personalized night lights, wall decor, toys, constructors and banners for gifts, homes, kids and events. Today they choose between generic print-on-demand or slow email orders from a local shop.</p></div>
+      <div class="card"><div class="tag">Core repeat</div><h3>Professionals who order for clients</h3><p>Photographers, event planners, realtors and gift shops. One consumer buys once a year; a photographer with forty sessions a month orders every week.</p></div>
+      <div class="card"><div class="tag">Later</div><h3>Merchants and workshops</h3><p>Etsy and Shopify sellers of custom cut, engraved or printed goods who use our workflow as software, and regional factories that receive validated jobs.</p></div>
+    </div>
+    <p class="note">Geography: Armenia first as production base and test market, then English-speaking online demand in the EU and the US with a partner factory in each region. Digital files sell worldwide from day one.</p>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>5</span></div>
+</section>
+
+<!-- 6. Wedge -->
+<section class="slide">
+  <p class="kicker">The wedge</p>
+  <h1>One hero product: the personalized acrylic LED light</h1>
+  <div class="body">
+    <table>
+      <tr><th style="width:30%">Launch spec</th><th>Kept deliberately narrow</th></tr>
+      <tr><td>Input</td><td>A portrait, pet or home photo, plus optional name, date or message</td></tr>
+      <tr><td>Styles</td><td>Three visual styles with deterministic safe zones</td></tr>
+      <tr><td>Hardware</td><td>One acrylic thickness, one repairable base, two sizes</td></tr>
+      <tr><td>Light</td><td>Warm white or multicolor on one low-voltage power design</td></tr>
+      <tr><td>Approval</td><td>Buyer signs off a proof before anything is cut</td></tr>
+      <tr><td>Shipping</td><td>Flat, tested packaging with favorable dimensional weight</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>6</span></div>
+</section>
+
+<!-- 7. Traction -->
+<section class="slide">
+  <p class="kicker">Traction · as of 23 September 2026</p>
+  <h1>Around 370 paid orders, fulfilled offline before the platform launched</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card hi"><div class="big">~370</div><h3>Paid customer orders</h3><p>All produced at our partner workshop in Armenia and sold through our own channels over the last two years.</p></div>
+      <div class="card"><div class="big">~15 / mo</div><h3>Personalized night lights</h3><p>Steady for two years. About 360 units and 3.6M AMD (~$9,300) in revenue.</p></div>
+      <div class="card"><div class="big">~10</div><h3>Banners and wall decor</h3><p>Over the last six months, totalling 500,000 AMD (~$1,300) in revenue.</p></div>
+    </div>
+    <p class="note">The online platform went live in July 2026 and has not yet processed paid orders. Its first milestone is 100 paid orders from 3 countries within 90 days of funding.</p>
+  </div>
+  <div class="foot"><span class="src">Offline orders from workshop records. Approximate USD at 385 AMD per USD.</span><span>7</span></div>
+</section>
+
+<!-- 8. Why now -->
+<section class="slide">
+  <p class="kicker">Why now</p>
+  <h1>Design got cheap while cross-border parcels got expensive</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><div class="tag">Technology</div><h3>Generative models can draft line art</h3><p>Skilled design minutes per order fall, while machines are already digitally controlled.</p></div>
+      <div class="card"><div class="tag">United States · 29 Aug 2025</div><h3>Duty-free de minimis suspended</h3><p>Small parcels from every country now face duties on entry.</p></div>
+      <div class="card"><div class="tag">European Union · 1 Jul 2026</div><h3>€3 duty per low-value item</h3><p>The €150 customs exemption is gone for e-commerce imports.</p></div>
+    </div>
+    <p class="note">Software that routes a validated job to a factory near the buyer becomes more valuable with every new border cost.</p>
+  </div>
+  <div class="foot"><span class="src">Sources: U.S. CBP de minimis factsheet; European Commission</span><span>8</span></div>
+</section>
+
+<!-- 9. Market -->
+<section class="slide">
+  <p class="kicker">The market</p>
+  <h1>Buyers already pay billions for made-to-order goods</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><div class="tag">TAM</div><div class="big">~$31B</div><h3>Global personalized gifts, 2025</h3><p>Third-party estimates cluster between $28B and $34B. The hardest public anchor is Etsy alone: about 30% of $10.46B marketplace sales, or ~$3.14B, is custom or made-to-order.</p></div>
+      <div class="card"><div class="tag">SAM</div><div class="big">~$1.5B</div><h3>Our category, our regions</h3><p>Personalized acrylic and wood lights, wall decor, toys and constructors sold online in Armenia, the EU and the US. Products that fit constrained templates, ship flat and carry customization margin.</p></div>
+      <div class="card hi"><div class="tag">SOM</div><div class="big">$0.75M → $4M</div><h3>Year one to year three</h3><p>Year one: 10,000 orders of the hero product at a $75 average order. Year three: add professional reorders, 1,000 merchants at $149/month and a routing fee on partner-factory jobs.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="src">Sources: Etsy 2025 Form 10-K; Technavio, SkyQuest and The Business Research Company personalized-gifts reports. SAM is a bottom-up estimate; SOM figures are targets, not forecasts.</span><span>9</span></div>
+</section>
+
+<!-- 10. Business model -->
+<section class="slide">
+  <p class="kicker">Business model</p>
+  <h1>Revenue arrives in a deliberate sequence</h1>
+  <div class="body">
+    <div class="flow">
+      <div class="step hi"><div class="n">Now</div><h3>Direct to buyer</h3><p>Product gross profit, with the first design included in the price.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step"><div class="n">Next</div><h3>Professionals</h3><p>Wholesale margin from photographers, realtors and event planners who reorder.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step"><div class="n">Then</div><h3>Merchant platform</h3><p>Per-order fee first, subscription tiers once recurring value is proven.</p></div>
+      <div class="arrow">➜</div>
+      <div class="step"><div class="n">At scale</div><h3>Factory network</h3><p>A routing fee on every job sent to a certified regional partner.</p></div>
+    </div>
+    <p class="note" style="margin-top:auto">Alongside every stage: licensed digital files sold worldwide, with high margin and no freight.</p>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>10</span></div>
+</section>
+
+<!-- 11. Defensibility -->
+<section class="slide">
+  <p class="kicker">Defensibility</p>
+  <h1>Every order teaches the system how things really get made</h1>
+  <div class="body">
+    <div class="cols" style="margin-top:auto">
+      <div class="col"><h3>Versioned templates</h3><p>Geometry, tolerances, safe zones, parts lists and process rules per product.</p></div>
+      <div class="col"><h3>Production outcomes</h3><p>What was requested, generated, corrected, produced, remade and loved.</p></div>
+      <div class="col"><h3>Factory capability</h3><p>Machines, materials, calibration, cost, capacity and quality history by partner.</p></div>
+      <div class="col"><h3>Closed-loop quoting</h3><p>Estimates sharpen from real machine time, labor and remake data.</p></div>
+    </div>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>11</span></div>
+</section>
+
+<!-- 12. Competition -->
+<section class="slide">
+  <p class="kicker">Competition</p>
+  <h1>Strong players own every layer except the join</h1>
+  <div class="body">
+    <table style="font-size:16px">
+      <tr><th style="width:24%">Layer</th><th style="width:30%">Who is there</th><th>Where Uniqraft sits</th></tr>
+      <tr><td>Demand marketplaces</td><td class="m">Etsy, Amazon Custom, Zazzle</td><td>We use them as launch channels and own the production workflow</td></tr>
+      <tr><td>Personalization software</td><td class="m">Customily, Zakeke, Twikit</td><td>We go where personalization changes geometry, not artwork placement</td></tr>
+      <tr><td>Print-on-demand networks</td><td class="m">Printful, Printify, Gelato</td><td>We integrate for commodity items and stay out of shirts and mugs</td></tr>
+      <tr><td>On-demand manufacturing</td><td class="m">Ponoko, SendCutSend, Xometry</td><td>We own buyer and merchant intent plus the product templates</td></tr>
+      <tr><td>Maker ecosystems</td><td class="m">xTool, Glowforge, Cricut</td><td>We route across machines and add the order and quality layer</td></tr>
+      <tr><td>The manual workflow</td><td class="m">Canva, email and a local laser shop</td><td>We win on measured time to an approved order and fewer remakes</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>12</span></div>
+</section>
+
+<!-- 13. Partnerships & going global -->
+<section class="slide">
+  <p class="kicker">Partnerships and going global</p>
+  <h1>Asset-light from day one: we write the production package, partners execute it</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card hi"><div class="tag">Today</div><h3>Partner workshop, Armenia</h3><p>Not owned by us. Our co-founder runs production there with working access to 14 profiled machines. It has produced all ~370 orders to date.</p></div>
+      <div class="card"><div class="tag">Today</div><h3>Local manufacturers</h3><p>Electronics, bases and finishing are delegated to other Armenian shops per order. Our first live test of writing a package another shop can execute.</p></div>
+      <div class="card"><div class="tag">Next</div><h3>One EU and one US partner</h3><p>Formalize the Armenian workshop as the first certified producer of the hero product, then qualify a partner factory near buyers in each region.</p></div>
+    </div>
+    <p class="note">Three lanes: global digital files and merchant software sold everywhere; standardized physical products made regionally; bespoke banners, furniture and metal kept local and quoted.</p>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>13</span></div>
+</section>
+
+<!-- 14. Proof plan -->
+<section class="slide">
+  <p class="kicker">Proof plan · 90 days</p>
+  <h1>The gates we hold ourselves to</h1>
+  <div class="body">
+    <table>
+      <tr><th style="width:40%">Metric</th><th style="width:30%">Go gate</th><th>Today · 23 Sep 2026</th></tr>
+      <tr><td>Paid orders</td><td>100+, from 3+ countries</td><td class="y">~370 offline, 1 country; 0 online</td></tr>
+      <tr><td>Contribution margin</td><td>35% or more</td><td class="m">Not yet measured per order</td></tr>
+      <tr><td>First-pass design approval</td><td>85% or more</td><td class="m">Instrumentation ships with funding</td></tr>
+      <tr><td>Median human correction</td><td>Under 10 minutes</td><td class="m">Instrumentation ships with funding</td></tr>
+      <tr><td>Remake and refund rate</td><td>Under 5%</td><td class="m">Not yet measured</td></tr>
+      <tr><td>On-time dispatch</td><td>95% or more</td><td class="m">Not yet measured</td></tr>
+      <tr><td>External partner, same product</td><td>95% to spec</td><td class="m">Partner not yet certified</td></tr>
+    </table>
+  </div>
+  <div class="foot"><span class="src">Status: working product with offline demand, pre-validation online</span><span>14</span></div>
+</section>
+
+<!-- 15. Ask -->
+<section class="slide">
+  <p class="kicker">The ask</p>
+  <h1>Raising $250,000 pre-seed to remove risk in tranches</h1>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card hi"><div class="big">25%</div><p>Product, manufacturability rules and production telemetry · $62,500</p></div>
+      <div class="card hi"><div class="big">25%</div><p>Demand experiments across channels and countries · $62,500</p></div>
+      <div class="card"><div class="big">20%</div><p>Partner factory qualification and quality assurance · $50,000</p></div>
+      <div class="card"><div class="big">15%</div><p>Compliance, product testing and insurance · $37,500</p></div>
+      <div class="card"><div class="big">10%</div><p>Key hire: supplier quality and compliance owner · $25,000</p></div>
+      <div class="card"><div class="big">5%</div><p>Contingency · $12,500</p></div>
+    </div>
+  </div>
+  <div class="foot"><span class="src">15 to 18 months of runway. Released against paid-order, margin, correction-time and partner-quality gates.</span><span>15</span></div>
+</section>
+
+<!-- 16. Founders -->
+<section class="slide">
+  <p class="kicker">Co-founders</p>
+  <h1>Two founders who cover the software and the factory floor</h1>
+  <div class="body">
+    <div class="founders">
+      <div class="card"><h3>Hovhannes Baghdasaryan</h3><div class="role">Co-founder · Software engineer</div><p>Builds the platform: AI design generation, commerce, payments and the production review tools.</p></div>
+      <div class="card"><h3>Vahe Nshanyan</h3><div class="role">Co-founder · Factory and manufacturing expert</div><p>Runs production at the partner workshop: machines, materials, production quality and partner factory standards.</p></div>
+    </div>
+    <p class="contact">uniqraft.org · hovhannesbaghdasaryan@gmail.com</p>
+  </div>
+  <div class="foot"><span>Uniqraft</span><span>16</span></div>
+</section>
+
+</body>
+</html>
