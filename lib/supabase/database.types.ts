@@ -1339,6 +1339,7 @@ export type Database = {
           image_path: string
           is_active: boolean
           manufacturing_process: string
+          manufacturing_prompt: string | null
           name: string
           openai_file_id: string
           price_adjustment_percent: number | null
@@ -1355,6 +1356,7 @@ export type Database = {
           image_path: string
           is_active?: boolean
           manufacturing_process?: string
+          manufacturing_prompt?: string | null
           name: string
           openai_file_id: string
           price_adjustment_percent?: number | null
@@ -1371,6 +1373,7 @@ export type Database = {
           image_path?: string
           is_active?: boolean
           manufacturing_process?: string
+          manufacturing_prompt?: string | null
           name?: string
           openai_file_id?: string
           price_adjustment_percent?: number | null

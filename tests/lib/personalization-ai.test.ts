@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { composePersonalizationPrompt, friendlyGenerationError } from '@/lib/personalization-ai';
+import {
+  composeManufacturingPrompt,
+  composePersonalizationPrompt,
+  friendlyGenerationError,
+  MANUFACTURING_ARTWORK_NOTE,
+} from '@/lib/personalization-ai';
 
 describe('composePersonalizationPrompt', () => {
   it('joins only the parts that are present', () => {
@@ -60,6 +65,53 @@ describe('composePersonalizationPrompt', () => {
       hasPhoto: false,
     });
     expect(prompt).toBe('');
+  });
+});
+
+describe('composePersonalizationPrompt from manufacturing artwork', () => {
+  it('replaces the customer photo note with the artwork note', () => {
+    const prompt = composePersonalizationPrompt({
+      systemPrompt: 'Base instructions.',
+      boilerplateInstruction: null,
+      personalizedText: null,
+      personalizedTextFormatting: null,
+      colorLabel: null,
+      colorHex: null,
+      hasPhoto: true,
+      fromManufacturingArtwork: true,
+    });
+    expect(prompt).toBe(['Base instructions.', MANUFACTURING_ARTWORK_NOTE].join('\n\n'));
+  });
+});
+
+describe('composeManufacturingPrompt', () => {
+  it('substitutes customer text only where the placeholder is', () => {
+    expect(composeManufacturingPrompt('Line art. Add the name "{{text}}" below.', 'Ani')).toBe(
+      'Line art. Add the name "Ani" below.',
+    );
+  });
+
+  it('does not leak customer text into a prompt without the placeholder', () => {
+    expect(composeManufacturingPrompt('  Line art only.  ', 'Ani')).toBe('Line art only.');
+  });
+
+  const sectioned =
+    'Print the photo.\n\n{{#text}}Add "{{text}}" ({{textStyle}}).{{/text}}\n\nNo frame.';
+
+  it('keeps the text section with text and styling when text is given', () => {
+    expect(composeManufacturingPrompt(sectioned, 'Ani', 'bold emphasis')).toBe(
+      'Print the photo.\n\nAdd "Ani" (bold emphasis).\n\nNo frame.',
+    );
+  });
+
+  it('falls back to the default text style when no formatting is given', () => {
+    expect(composeManufacturingPrompt(sectioned, 'Ani')).toBe(
+      'Print the photo.\n\nAdd "Ani" (regular weight, centered).\n\nNo frame.',
+    );
+  });
+
+  it('drops the text section entirely when there is no text', () => {
+    expect(composeManufacturingPrompt(sectioned, null)).toBe('Print the photo.\n\nNo frame.');
   });
 });
 

@@ -6,6 +6,8 @@ export interface PersonalizationBoilerplate {
   image_path: string;
   openai_file_id: string;
   manufacturing_process: string;
+  /** When set, generation produces the manufacturing PNG first and renders the preview from it. */
+  manufacturing_prompt: string | null;
   generation_instruction: string;
   generate_hidden_svg: boolean;
   is_active: boolean;
@@ -28,7 +30,7 @@ export async function listCatalogItemBoilerplates(
   const { data, error } = await supabase
     .from('catalog_item_boilerplates')
     .select(
-      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path)',
+      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, manufacturing_prompt, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path)',
     )
     .eq('catalog_item_id', catalogItemId)
     .order('sort_order', { ascending: true })

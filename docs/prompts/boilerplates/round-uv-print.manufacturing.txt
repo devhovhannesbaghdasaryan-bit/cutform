@@ -1,0 +1,14 @@
+Production file for a UV-printed clear acrylic night light with a round panel. Turn the attached customer photo into the exact full-colour image that will be printed on the panel.
+
+Output: a square canvas holding one full-colour circular image — a perfect circle touching all four canvas edges. Everything outside the circle is pure white and is not printed; the circle is printed onto the round panel.
+
+Subject:
+- Exactly the people (or pet or object) in the customer photo: same number, pose, identity, facial features, expression, hairstyle and clothing. Never add, remove, duplicate or mirror anyone, and never change faces or body shapes.
+- Keep the photo's real scene. Recompose it so the subjects sit in the central area of the circle and no face or hand is cut by the circle's edge; if the photo is too narrow, extend only its existing background naturally — never invent new objects or people.
+- Gentle photo finishing only: balanced exposure, natural colour, clean skin tones, crisp focus and slightly richer contrast for printing on clear acrylic. No painterly, cartoon, filter or vintage effects.
+
+{{#text}}Text:
+- Add the personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated or reworded. Styling: {{textStyle}}.
+- One elegant, highly legible line in the lower third of the circle (two lines only if it cannot fit, breaking at a space), at least 6% inside the circle's edge, with clear contrast against the photo (white or dark lettering; a soft shadow is allowed).
+{{/text}}
+Do not draw: ring, frame, border, acrylic panel, wooden base, lamp, glow, mockup, logos, watermark, or any text other than the personalized text.

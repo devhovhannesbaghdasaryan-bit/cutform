@@ -18,7 +18,7 @@ export default async function BoilerplateLibraryPage() {
   const { data: boilerplates } = await supabase
     .from('personalization_boilerplates')
     .select(
-      'id, name, image_path, openai_file_id, manufacturing_process, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path',
+      'id, name, image_path, openai_file_id, manufacturing_process, manufacturing_prompt, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path',
     )
     .order('sort_order')
     .returns<PersonalizationBoilerplate[]>();
@@ -70,7 +70,9 @@ async function BoilerplateForm({ boilerplate }: { boilerplate?: PersonalizationB
             // biome-ignore lint/performance/noImgElement: admin uploads can be SVG; next/image cannot render SVG markup
             <img
               src={currentUrl}
-              alt={t('personalization.currentImageAlt', { label: t('personalization.templateImage').toLowerCase() })}
+              alt={t('personalization.currentImageAlt', {
+                label: t('personalization.templateImage').toLowerCase(),
+              })}
               className="h-full w-full object-contain"
             />
           ) : (
@@ -106,6 +108,21 @@ async function BoilerplateForm({ boilerplate }: { boilerplate?: PersonalizationB
           defaultValue={boilerplate?.generation_instruction ?? ''}
           required
         />
+      </div>
+      <div className="space-y-1.5 md:col-span-3">
+        <Label>{t('personalization.manufacturingPrompt')}</Label>
+        <Textarea
+          name="manufacturingPrompt"
+          defaultValue={boilerplate?.manufacturing_prompt ?? ''}
+          rows={6}
+        />
+        <p className="text-xs text-muted-foreground">
+          {t('personalization.manufacturingPromptHelp')}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          <code>{'{{#text}} … {{/text}}'}</code> · <code>{'{{text}}'}</code> ·{' '}
+          <code>{'{{textStyle}}'}</code>
+        </p>
       </div>
       <div className="space-y-1.5">
         <Label>{t('personalization.displayOrder')}</Label>

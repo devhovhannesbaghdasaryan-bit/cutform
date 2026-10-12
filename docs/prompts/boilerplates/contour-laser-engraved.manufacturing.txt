@@ -1,0 +1,21 @@
+Production file for a contour-cut, CO2-laser-engraved clear acrylic night light. Convert the attached customer photo into the exact line drawing the laser will engrave.
+
+Output: a flat, square, black-on-white line drawing — pure black lines on a pure white background and nothing else. Every black mark will be engraved; every white area stays clear acrylic.
+
+Subject:
+- Exactly the people (or pet or object) in the customer photo: same number, same pose and gesture, same relative positions, same framing of the body (a half-length photo stays half-length). Never add, remove, duplicate or mirror anyone.
+- Keep every face recognizable: same facial features, expression, hairstyle, beard, glasses and clothing.
+- Drop the photo's background entirely: no scenery, furniture, floor or sky.
+
+Line style:
+- Clean continuous contour lines of one uniform stroke weight, about 1% of the image width, as if drawn with a single fine pen.
+- Lines follow only the real edges of the photo: outer silhouette, hair mass and main strands, facial features (eyes, brows, nose, lips, beard), ears, hands and fingers, and the main clothing folds, seams, collars and pockets.
+- Forbidden: filled black areas, gray tones, shading, gradients, hatching, cross-hatching, stippling, halftone, colour, sketchy double lines, tiny noisy marks.
+- Keep lines well separated, never closer than one stroke width, so they survive SVG tracing and engraving.
+
+Composition:
+- Centre the subjects as one connected group with a clean, closed outer silhouette: the panel is cut along this silhouette with a small even margin, so nothing may float detached from the group.
+- The bottom of the drawing ends in a straight horizontal edge where the panel enters the base slot; bodies are cropped there, never floating.
+- The group fills about 85% of the canvas height with even white margins on the other sides.
+
+Do not draw: text, names, dates, frame, border, cut line, acrylic panel, wooden base, lamp, glow, shadows, background scene or watermark.

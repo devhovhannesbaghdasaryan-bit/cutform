@@ -8,9 +8,15 @@ export interface OpenAiImageInput {
   /** Skill document texts injected as input_text parts before the prompt, in given order. */
   skillTexts?: string[];
   userImages: File[];
+  /**
+   * Finished manufacturing artwork (PNG bytes) the result must reproduce line
+   * for line. Sent after the customer photos, before the product template.
+   */
+  artworkImages?: Uint8Array[];
   referenceFileId?: string | null;
   size?: '1024x1024' | '1536x1024' | '1024x1536' | 'auto';
   quality?: 'low' | 'medium' | 'high' | 'auto';
+  background?: 'opaque' | 'transparent' | 'auto';
 }
 
 export interface GeneratedImage {
@@ -32,6 +38,8 @@ function getResponsesModel() {
  */
 export const CUSTOMER_PHOTO_LABEL =
   'CUSTOMER PHOTO (next image(s)): the only source of the subject. Reproduce exactly the people or objects shown here — same number of people, same pose, same identity — and nothing from any other image.';
+export const MANUFACTURING_ARTWORK_LABEL =
+  'MANUFACTURING ARTWORK (next image): the exact file the laser will engrave. It is the only source of the artwork: reproduce its lines one-to-one on the product — same subjects, same strokes, same proportions and placement. Do not redraw, simplify, add or remove any line.';
 export const PRODUCT_TEMPLATE_LABEL =
   'PRODUCT TEMPLATE (next image): reference for product construction, materials and rendering style only. Any people or artwork shown on it are placeholder samples and must not appear in the result, nor influence how many subjects are shown.';
 
@@ -102,6 +110,14 @@ export async function generateOpenAiImage(
   const quality = input.quality ?? 'low';
   const size = input.size ?? '1024x1024';
   const userImageParts = await Promise.all(input.userImages.map(toInputImagePart));
+  const artworkParts = (input.artworkImages ?? []).flatMap((bytes) => [
+    { type: 'input_text' as const, text: MANUFACTURING_ARTWORK_LABEL },
+    {
+      type: 'input_image' as const,
+      detail: 'high' as const,
+      image_url: `data:image/png;base64,${Buffer.from(bytes).toString('base64')}`,
+    },
+  ]);
 
   const response = await client.responses.create({
     model: getResponsesModel(),
@@ -116,6 +132,7 @@ export async function generateOpenAiImage(
             ? [{ type: 'input_text' as const, text: CUSTOMER_PHOTO_LABEL }]
             : []),
           ...userImageParts,
+          ...artworkParts,
           ...(input.referenceFileId
             ? [
                 { type: 'input_text' as const, text: PRODUCT_TEMPLATE_LABEL },
@@ -129,7 +146,15 @@ export async function generateOpenAiImage(
         ],
       },
     ],
-    tools: [{ type: 'image_generation', model: getImageModel(), size, quality }],
+    tools: [
+      {
+        type: 'image_generation',
+        model: getImageModel(),
+        size,
+        quality,
+        ...(input.background ? { background: input.background } : {}),
+      },
+    ],
     // Force the tool call: without this the responses model may answer with
     // text (a question or a refusal) and return no image_generation_call.
     tool_choice: { type: 'image_generation' },
