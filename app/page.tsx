@@ -1,18 +1,35 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ArrowRight, BadgeCheck, PackageCheck, Sparkles } from 'lucide-react';
-import { CategoryNavigation } from '@/components/category-navigation';
+import type { ComponentType } from 'react';
+import { ArrowRight, Blocks, Check, Gift, Lamp, Megaphone, Puzzle, Scissors } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CatalogItemCard } from '@/components/catalog-item-card';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { getTranslations } from 'next-intl/server';
-import { listCategories, listPopularCatalogItems, listSubcategories } from '@/lib/marketplace';
+import { tDynamic } from '@/lib/i18n-dynamic';
+import { listCategories, listPopularCatalogItems } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { resolveCatalogMetadata } from '@/lib/seo';
-import { applyExchangeRate, getActiveCurrency, getExchangeRates, normalizeCurrency } from '@/lib/currency';
+import {
+  applyExchangeRate,
+  getActiveCurrency,
+  getExchangeRates,
+  normalizeCurrency,
+} from '@/lib/currency';
 
 export const dynamic = 'force-dynamic';
+
+const CATEGORY_ICONS: Record<string, ComponentType<{ className?: string }>> = {
+  toys: Gift,
+  constructors: Puzzle,
+  decorations: Blocks,
+  'night-lights': Lamp,
+  banners: Megaphone,
+};
+
+/** The category whose items are generated from a customer photo. */
+const CUSTOM_CATEGORY_SLUG = 'night-lights';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getRequestLocale();
@@ -30,10 +47,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LandingPage() {
   const locale = await getRequestLocale();
-  const [popularItems, categories, subcategories, t] = await Promise.all([
+  const [popularItems, categories, t] = await Promise.all([
     listPopularCatalogItems(4).catch(() => []),
     listCategories().catch(() => []),
-    listSubcategories().catch(() => []),
     getTranslations(),
   ]);
   const activeCurrency = await getActiveCurrency();
@@ -41,75 +57,205 @@ export default async function LandingPage() {
     popularItems.map((item) => normalizeCurrency(item.currency) ?? 'AMD'),
     activeCurrency,
   );
+  const trustLines = [
+    t('landing.trust_preview'),
+    t('landing.trust_review'),
+    t('landing.trust_workshop'),
+  ];
+  const steps = [
+    { title: t('landing.step1_title'), body: t('landing.step1_body') },
+    { title: t('landing.step2_title'), body: t('landing.step2_body') },
+    { title: t('landing.step3_title'), body: t('landing.step3_body') },
+  ];
 
   return (
     <>
       <MarketplaceHeader />
       <main>
-        <section className="cyber-grid-surface overflow-hidden border-b">
-          <div className="storefront-container grid min-h-[calc(100vh-5rem)] gap-10 py-12 lg:grid-cols-[minmax(0,1fr)_560px] lg:items-center lg:py-14">
-            <div className="min-w-0 space-y-7 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-card/80 px-3 py-1 text-sm text-foreground shadow-sm">
-                <Sparkles className="h-4 w-4 text-cyber-magenta" />
-                {t('landing.eyebrow')}
-              </div>
-              <div className="space-y-4">
-                <h1 className="mx-auto max-w-3xl break-words text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:mx-0 lg:text-6xl">
-                  {t('landing.title')}
-                </h1>
-                <p className="mx-auto max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg lg:mx-0 md:text-xl">
-                  {t('landing.subtitle')}
-                </p>
-              </div>
-              <div className="flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-                <Button asChild size="lg">
+        {/* Hero */}
+        <section className="overflow-hidden border-b">
+          <div className="storefront-container flex flex-wrap items-center gap-x-12 gap-y-8 py-12 lg:py-14">
+            <div className="flex min-w-0 max-w-[600px] flex-[1_1_440px] flex-col gap-6">
+              <span className="inline-flex items-center gap-2 self-start rounded-full border border-primary/40 bg-card px-3 py-1.5 text-sm font-semibold">
+                <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
+                {t('landing.badge')}
+              </span>
+              <h1 className="break-words text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[56px]">
+                {t('landing.title')}
+              </h1>
+              <p className="max-w-[520px] text-lg leading-relaxed text-muted-foreground sm:text-xl">
+                {t('landing.subtitle')}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button asChild size="lg" className="h-13 px-6 text-base font-bold">
                   <Link href="/catalog">
                     {t('landing.browse_catalog')}
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <ArrowRight className="ml-2 size-4" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="h-13 px-5 text-base">
+                  <Link href={`/catalog?category=${CUSTOM_CATEGORY_SLUG}`}>
+                    <Lamp className="mr-2 size-4" />
+                    {t('landing.cta_custom')}
                   </Link>
                 </Button>
               </div>
-              <div className="grid gap-3 text-left sm:grid-cols-2 lg:max-w-xl">
-                <div className="flex items-start gap-3 rounded-lg border bg-card/75 p-3 shadow-sm">
-                  <PackageCheck className="mt-0.5 h-5 w-5 shrink-0 text-cyber-yellow" />
-                  <p className="text-sm text-muted-foreground">{t('catalog.subtitle')}</p>
-                </div>
-                <div className="flex items-start gap-3 rounded-lg border bg-card/75 p-3 shadow-sm">
-                  <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-                  <p className="text-sm text-muted-foreground">
-                    {t('generation.preview_disclaimer')}
-                  </p>
-                </div>
-              </div>
+              <ul className="mt-1 flex flex-wrap gap-x-6 gap-y-2.5 text-sm font-medium text-muted-foreground">
+                {trustLines.map((line) => (
+                  <li key={line} className="flex items-center gap-2">
+                    <Check className="size-4 shrink-0 text-success" aria-hidden="true" />
+                    {line}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="relative mx-auto aspect-square w-full max-w-[560px] overflow-hidden rounded-lg border shadow-xl shadow-cyber-cyan/10">
+
+            <figure className="relative m-0 min-w-0 flex-[1_1_520px]">
               <Image
-                src="/landing/landing.jpg"
-                alt={t('landing.title')}
-                fill
+                src="/landing/hero.webp"
+                alt={t('landing.hero_alt')}
+                width={1536}
+                height={1024}
                 priority
-                sizes="(min-width: 1024px) 560px, 100vw"
-                className="object-contain"
+                sizes="(min-width: 1024px) 640px, 100vw"
+                className="aspect-[3/2] w-full rounded-2xl border object-cover"
               />
+              <figcaption className="absolute bottom-4 left-4 flex items-center gap-3 rounded-xl border bg-background/85 py-2.5 pl-2.5 pr-3.5 backdrop-blur">
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"
+                >
+                  <Scissors className="size-4" />
+                </span>
+                <span className="flex flex-col leading-tight">
+                  <span className="text-[13px] font-bold">{t('landing.chip_title')}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t('landing.chip_subtitle')}
+                  </span>
+                </span>
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+
+        {/* How custom night lights work */}
+        <section id="custom" className="border-b bg-muted/30">
+          <div className="storefront-container py-14">
+            <div className="mb-7 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+              <div className="min-w-0 max-w-[620px]">
+                <p className="mb-1.5 text-[13px] font-extrabold uppercase tracking-wider text-primary">
+                  {t('landing.how_eyebrow')}
+                </p>
+                <h2 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-[34px]">
+                  {t('landing.how_title')}
+                </h2>
+              </div>
+              <p className="max-w-[360px] text-[15px] text-muted-foreground">
+                {t('landing.how_note')}
+              </p>
+            </div>
+            <ol className="grid gap-4 md:grid-cols-3">
+              {steps.map((step, index) => (
+                <li
+                  key={step.title}
+                  className="flex flex-col gap-3.5 rounded-xl border bg-card p-5 sm:p-6"
+                >
+                  <span className="grid size-10 place-items-center rounded-lg bg-muted text-[15px] font-extrabold text-primary">
+                    {index + 1}
+                  </span>
+                  <span className="text-lg font-extrabold leading-snug">{step.title}</span>
+                  <span className="text-[15px] text-muted-foreground">{step.body}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* Categories */}
+        <section id="categories" className="border-b">
+          <div className="storefront-container py-14">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
+              <h2 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-[34px]">
+                {t('landing.categories_title')}
+              </h2>
+              <Link
+                href="/catalog"
+                className="inline-flex items-center gap-1.5 text-[15px] font-bold hover:text-primary"
+              >
+                {t('landing.categories_all')}
+                <ArrowRight className="size-4" />
+              </Link>
+            </div>
+            <div className="grid gap-3.5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {categories.map((category) => {
+                const Icon = CATEGORY_ICONS[category.slug] ?? Gift;
+                const isCustom = category.slug === CUSTOM_CATEGORY_SLUG;
+                const name = tDynamic(t, `category.${category.slug}.name`, category.name);
+                const description = tDynamic(
+                  t,
+                  `category.${category.slug}.description`,
+                  category.description ?? '',
+                );
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/catalog?category=${category.slug}`}
+                    className={`group flex min-w-0 flex-col gap-3 rounded-xl border p-3.5 transition hover:-translate-y-0.5 hover:shadow-md ${
+                      isCustom ? 'border-2 border-primary bg-primary/5' : 'bg-card'
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`grid aspect-square place-items-center rounded-lg text-primary ${
+                        isCustom
+                          ? 'bg-gradient-to-br from-primary/25 to-muted'
+                          : 'bg-gradient-to-br from-muted to-muted/40'
+                      }`}
+                    >
+                      <Icon className="size-11" />
+                    </span>
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="break-words font-extrabold">{name}</span>
+                      {isCustom ? (
+                        <span className="shrink-0 rounded-full bg-primary px-2 py-0.5 text-[11px] font-extrabold text-primary-foreground">
+                          {t('landing.custom_tag')}
+                        </span>
+                      ) : null}
+                    </span>
+                    {description ? (
+                      <span className="line-clamp-2 text-[13px] text-muted-foreground">
+                        {description}
+                      </span>
+                    ) : null}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <CategoryNavigation categories={categories} subcategories={subcategories} />
-
-        <section className="storefront-section bg-muted/30">
-          <div className="storefront-container space-y-8">
-            <div className="flex items-end justify-between gap-4">
+        {/* Popular items */}
+        <section className="border-b bg-muted/30">
+          <div className="storefront-container py-14">
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
               <div>
-                <h2 className="storefront-heading">{t('landing.popular_title')}</h2>
-                <p className="text-sm text-muted-foreground">{t('landing.popular_subtitle')}</p>
+                <h2 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-[34px]">
+                  {t('landing.popular_title')}
+                </h2>
+                <p className="mt-1.5 text-[15px] text-muted-foreground">
+                  {t('landing.popular_subtitle')}
+                </p>
               </div>
-              <Button asChild variant="outline">
-                <Link href="/catalog">{t('common.view_all')}</Link>
-              </Button>
+              <Link
+                href="/catalog"
+                className="inline-flex items-center gap-1.5 text-[15px] font-bold hover:text-primary"
+              >
+                {t('common.view_all')}
+                <ArrowRight className="size-4" />
+              </Link>
             </div>
             {popularItems.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-8 text-sm text-muted-foreground">
+              <div className="rounded-xl border border-dashed p-8 text-sm text-muted-foreground">
                 {t('landing.popular_empty')}
               </div>
             ) : (
@@ -129,6 +275,25 @@ export default async function LandingPage() {
                 })}
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Credits */}
+        <section>
+          <div className="storefront-container py-14">
+            <div className="flex flex-wrap items-center justify-between gap-x-10 gap-y-5 rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 to-card px-6 py-7 sm:px-8">
+              <div className="min-w-0 max-w-[640px]">
+                <h2 className="text-2xl font-extrabold leading-tight tracking-tight sm:text-[26px]">
+                  {t('landing.credits_title')}
+                </h2>
+                <p className="mt-2 text-[15px] text-muted-foreground">
+                  {t('landing.credits_body')}
+                </p>
+              </div>
+              <Button asChild size="lg" className="h-12 px-6 text-[15px] font-bold">
+                <Link href="/credits">{t('landing.credits_cta')}</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </main>
