@@ -13,6 +13,8 @@ export interface PersonalizationBoilerplate {
   is_active: boolean;
   sort_order: number;
   price_adjustment_percent: number | null;
+  /** Physical width of the manufacturing canvas; sets the traced SVG's units to mm. */
+  artwork_width_mm: number | null;
   skill_openai_file_id: string | null;
   skill_path: string | null;
 }
@@ -30,7 +32,7 @@ export async function listCatalogItemBoilerplates(
   const { data, error } = await supabase
     .from('catalog_item_boilerplates')
     .select(
-      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, manufacturing_prompt, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path)',
+      'sort_order, boilerplate:personalization_boilerplates(id, name, image_path, openai_file_id, manufacturing_process, manufacturing_prompt, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, artwork_width_mm, skill_openai_file_id, skill_path)',
     )
     .eq('catalog_item_id', catalogItemId)
     .order('sort_order', { ascending: true })

@@ -7,7 +7,8 @@ import { z } from 'zod';
 import { type requireAdmin, requireAdminPermission } from '@/lib/admin';
 import { updateGeneratedReviewStatus } from '@/lib/generated-items';
 import { downloadFromBucket, uploadToBucket } from '@/lib/storage';
-import { tracePngToSvg } from '@/lib/svg-trace';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { traceImageToSvg } from '@/lib/svg-trace';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 const reviewSchema = z.object({
@@ -213,6 +214,21 @@ export async function generateManufacturingFileAction(
   }
 }
 
+/** Physical canvas width configured on the option's boilerplate, if any. */
+async function loadArtworkWidthMm(
+  supabase: SupabaseClient,
+  boilerplateId: string | null,
+): Promise<number | null> {
+  if (!boilerplateId) return null;
+  const { data, error } = await supabase
+    .from('personalization_boilerplates')
+    .select('artwork_width_mm')
+    .eq('id', boilerplateId)
+    .maybeSingle<{ artwork_width_mm: number | null }>();
+  if (error) throw new Error(error.message);
+  return data?.artwork_width_mm ?? null;
+}
+
 export async function generateManufacturingSvgAction(
   _previousState: ManufacturingSvgGenerationState,
   formData: FormData,
@@ -241,7 +257,7 @@ export async function generateManufacturingSvgAction(
           .maybeSingle<{ id: string; user_id: string }>(),
         supabase
           .from('personalized_preview_options')
-          .select('id, generated_item_id, manufacturing_file_path, metadata')
+          .select('id, generated_item_id, manufacturing_file_path, metadata, boilerplate_id')
           .eq('id', settings.optionId)
           .eq('generated_item_id', settings.generatedItemId)
           .maybeSingle<{
@@ -249,6 +265,7 @@ export async function generateManufacturingSvgAction(
             generated_item_id: string;
             manufacturing_file_path: string | null;
             metadata: Record<string, unknown>;
+            boilerplate_id: string | null;
           }>(),
       ]);
     if (itemError || !item) throw new Error(itemError?.message ?? 'Generated item was not found.');
@@ -264,13 +281,18 @@ export async function generateManufacturingSvgAction(
       option.manufacturing_file_path,
       'Unable to load the manufacturing PNG.',
     );
-    const svg = await tracePngToSvg(Buffer.from(await pngBlob.arrayBuffer()));
+    const artworkWidthMm = await loadArtworkWidthMm(supabase, option.boilerplate_id);
+    // A quality-check failure propagates as the form error: the admin needs
+    // to see that the PNG, not the tracer, is the problem.
+    const traced = await traceImageToSvg(new Uint8Array(await pngBlob.arrayBuffer()), {
+      widthMm: artworkWidthMm,
+    });
 
     const storagePath = `${item.user_id}/personalized-night-lights/manufacturing-svg/${crypto.randomUUID()}.svg`;
     await uploadToBucket(supabase, {
       bucket: 'generated-assets',
       path: storagePath,
-      body: Buffer.from(svg, 'utf8'),
+      body: Buffer.from(traced.svg, 'utf8'),
       contentType: 'image/svg+xml',
     });
 
@@ -279,8 +301,16 @@ export async function generateManufacturingSvgAction(
       .update({
         metadata: {
           ...option.metadata,
+          manufacturingSvgStatus: 'generated',
+          manufacturingSvgError: null,
           manufacturingSvgPath: storagePath,
           manufacturingSvgGeneratedAt: new Date().toISOString(),
+          manufacturingSvgTrace: {
+            inkCoverage: traced.inkCoverage,
+            pathCount: traced.pathCount,
+            units: artworkWidthMm ? 'mm' : 'px',
+            source: 'admin_regeneration',
+          },
         },
       })
       .eq('id', option.id);

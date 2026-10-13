@@ -18,7 +18,7 @@ export default async function BoilerplateLibraryPage() {
   const { data: boilerplates } = await supabase
     .from('personalization_boilerplates')
     .select(
-      'id, name, image_path, openai_file_id, manufacturing_process, manufacturing_prompt, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, skill_openai_file_id, skill_path',
+      'id, name, image_path, openai_file_id, manufacturing_process, manufacturing_prompt, generation_instruction, generate_hidden_svg, is_active, sort_order, price_adjustment_percent, artwork_width_mm, skill_openai_file_id, skill_path',
     )
     .order('sort_order')
     .returns<PersonalizationBoilerplate[]>();
@@ -137,6 +137,17 @@ async function BoilerplateForm({ boilerplate }: { boilerplate?: PersonalizationB
           defaultValue={boilerplate?.price_adjustment_percent ?? ''}
         />
         <p className="text-xs text-muted-foreground">{t('personalization.priceAdjustmentHelp')}</p>
+      </div>
+      <div className="space-y-1.5">
+        <Label>{t('personalization.artworkWidthMm')}</Label>
+        <Input
+          name="artworkWidthMm"
+          type="number"
+          min={1}
+          step={0.1}
+          defaultValue={boilerplate?.artwork_width_mm ?? ''}
+        />
+        <p className="text-xs text-muted-foreground">{t('personalization.artworkWidthMmHelp')}</p>
       </div>
       <div className="space-y-1.5 md:col-span-2">
         <Label htmlFor={`boilerplate-skill-${boilerplate?.id ?? 'new'}`}>

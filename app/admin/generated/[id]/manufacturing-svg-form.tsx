@@ -1,6 +1,6 @@
 'use client';
 
-import { FileImage, Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import { useActionState } from 'react';
 import {
   generateManufacturingSvgAction,
@@ -11,6 +11,8 @@ interface ManufacturingSvgFormProps {
   generatedItemId: string;
   optionId: string;
   hasExistingSvg: boolean;
+  /** Primary styling when tracing is the next step rather than a redo. */
+  primary?: boolean;
 }
 
 const initialState: ManufacturingSvgGenerationState = { status: 'idle', message: null };
@@ -19,13 +21,34 @@ export function ManufacturingSvgForm({
   generatedItemId,
   optionId,
   hasExistingSvg,
+  primary = false,
 }: ManufacturingSvgFormProps) {
   const [state, action, pending] = useActionState(generateManufacturingSvgAction, initialState);
+  const buttonStyle = primary
+    ? 'bg-primary text-primary-foreground'
+    : 'border text-foreground hover:bg-muted';
 
   return (
-    <form action={action} className="min-w-0 space-y-3">
+    <form action={action} className="flex min-w-0 flex-wrap items-center gap-3">
       <input type="hidden" name="generatedItemId" value={generatedItemId} />
       <input type="hidden" name="optionId" value={optionId} />
+
+      <button
+        type="submit"
+        disabled={pending}
+        className={`inline-flex h-9 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold disabled:opacity-60 ${buttonStyle}`}
+      >
+        {pending ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        ) : (
+          <RefreshCw className="size-4" aria-hidden="true" />
+        )}
+        {pending
+          ? 'Tracing PNG to SVG…'
+          : hasExistingSvg
+            ? 'Re-trace from PNG'
+            : 'Trace PNG to SVG'}
+      </button>
 
       {state.message ? (
         <p
@@ -35,23 +58,6 @@ export function ManufacturingSvgForm({
           {state.message}
         </p>
       ) : null}
-
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex min-h-9 w-full items-center justify-center gap-2 rounded-md border px-4 py-2 text-center text-sm font-medium hover:bg-muted disabled:opacity-60 sm:w-auto"
-      >
-        {pending ? (
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-        ) : (
-          <FileImage className="size-4" aria-hidden="true" />
-        )}
-        {pending
-          ? 'Tracing PNG to SVG…'
-          : hasExistingSvg
-            ? 'Regenerate manufacturing SVG'
-            : 'Convert manufacturing PNG to SVG'}
-      </button>
     </form>
   );
 }

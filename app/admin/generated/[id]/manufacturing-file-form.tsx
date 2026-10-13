@@ -31,31 +31,19 @@ export function ManufacturingFileForm({
   const fieldPrefix = `manufacturing-file-${optionId}`;
 
   return (
-    <form
-      action={action}
-      className="min-w-0 space-y-4 rounded-lg border border-dashed bg-muted/20 p-3 sm:p-4"
-    >
+    <form action={action} className="min-w-0 space-y-4">
       <input type="hidden" name="generatedItemId" value={generatedItemId} />
       <input type="hidden" name="optionId" value={optionId} />
-      <div>
-        <p className="font-medium">Manufacturing PNG generator</p>
-        {previewLinked ? (
-          <p className="text-sm text-muted-foreground">
-            Generated for {optionName} during customer generation, and the customer preview was
-            rendered from it. Regenerating replaces the production file, so the produced item may no
-            longer match the preview the customer approved.
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            Admin-only production step for {optionName}. The customer preview flow does not generate
-            this file.
-          </p>
-        )}
-      </div>
+      {previewLinked ? null : (
+        <p className="text-sm text-muted-foreground">
+          Admin-only production step for {optionName}. The customer preview flow did not generate
+          this file.
+        </p>
+      )}
 
       <div className="space-y-2">
         <label htmlFor={`${fieldPrefix}-prompt`} className="text-sm font-medium">
-          Prompt
+          {previewLinked ? 'Prompt used for the current PNG' : 'Prompt'}
         </label>
         <textarea
           id={`${fieldPrefix}-prompt`}
@@ -103,7 +91,11 @@ export function ManufacturingFileForm({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground disabled:opacity-60 sm:w-auto"
+        className={`inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-md px-4 py-2 text-center text-sm font-semibold disabled:opacity-60 sm:w-auto ${
+          previewLinked
+            ? 'border border-destructive text-destructive hover:bg-destructive/10'
+            : 'bg-primary text-primary-foreground'
+        }`}
       >
         {pending ? (
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
@@ -112,9 +104,11 @@ export function ManufacturingFileForm({
         )}
         {pending
           ? 'Generating production PNG…'
-          : hasExistingFile
-            ? 'Regenerate manufacturing PNG'
-            : 'Generate manufacturing PNG'}
+          : previewLinked
+            ? 'Regenerate and break preview link'
+            : hasExistingFile
+              ? 'Regenerate manufacturing PNG'
+              : 'Generate manufacturing PNG'}
       </button>
     </form>
   );
