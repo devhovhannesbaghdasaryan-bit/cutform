@@ -12,7 +12,11 @@ import { createGeneratedItem, createPersonalizedPreviewOptions } from '@/lib/gen
 import { mapCatalogItemTypeToProductType } from '@/lib/marketplace-constants';
 import { getOpenAiClient } from '@/lib/openai-client';
 import { generateOpenAiImage } from '@/lib/openai-image';
-import { composePersonalizationPrompt, friendlyGenerationError } from '@/lib/personalization-ai';
+import {
+  composeManufacturingPrompt,
+  composePersonalizationPrompt,
+  friendlyGenerationError,
+} from '@/lib/personalization-ai';
 import { COMFORTABLE_COLORS } from '@/lib/personalization-constants';
 import {
   adjustedPriceCents,
@@ -25,6 +29,7 @@ import {
   hasInjectableSkill,
 } from '@/lib/personalization-skills';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
+import { tracePngToSvg } from '@/lib/svg-trace';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 // Sanctioned exception to the ActionState convention (lib/action-state.ts):
@@ -36,6 +41,11 @@ export type PersonalizedGenerationState = {
   requiredCredits?: number;
   availableCredits?: number;
 };
+
+// The manufacturing PNG is the production file, so it is generated at the
+// highest quality; the preview only has to reproduce it on the product.
+const MANUFACTURING_PNG_SIZE = '1024x1024';
+const MANUFACTURING_PNG_QUALITY = 'high';
 
 function errorState(message: string): PersonalizedGenerationState {
   return { code: 'error', message };
@@ -61,13 +71,38 @@ async function uploadGeneratedPng(
   supabase: Awaited<ReturnType<typeof getServerSupabase>>,
   userId: string,
   bytes: Uint8Array,
+  folder: 'previews' | 'manufacturing',
 ) {
   return uploadToBucket(supabase, {
     bucket: 'generated-assets',
-    path: `${userId}/personalized-items/previews/${crypto.randomUUID()}.png`,
+    path: `${userId}/personalized-items/${folder}/${crypto.randomUUID()}.png`,
     body: bytes,
     contentType: 'image/png',
   });
+}
+
+/**
+ * Traces the manufacturing PNG into the production SVG and stores it next to
+ * the PNG. A failed trace must not fail the customer's generation: it is
+ * logged and returns null, leaving the admin "Generate SVG" button as fallback.
+ */
+async function traceManufacturingSvg(
+  supabase: Awaited<ReturnType<typeof getServerSupabase>>,
+  userId: string,
+  pngBytes: Uint8Array,
+): Promise<string | null> {
+  try {
+    const svg = await tracePngToSvg(Buffer.from(pngBytes));
+    return await uploadToBucket(supabase, {
+      bucket: 'generated-assets',
+      path: `${userId}/personalized-items/manufacturing/${crypto.randomUUID()}.svg`,
+      body: Buffer.from(svg, 'utf8'),
+      contentType: 'image/svg+xml',
+    });
+  } catch (error) {
+    console.error('[personalized-item] manufacturing SVG trace failed', { userId, error });
+    return null;
+  }
 }
 
 export async function generatePersonalizedItemAction(
@@ -212,51 +247,107 @@ export async function generatePersonalizedItemAction(
     // admin's folder, so the customer's session client cannot read them —
     // the service client can.
     const loadSkillText = createSkillTextLoader(getServiceSupabase());
-    const options = [];
-    let optionIndex = 0;
-    for (const reference of callTargets) {
-      optionIndex += 1;
-      const prompt = composePersonalizationPrompt({
-        systemPrompt: item.system_prompt,
-        boilerplateInstruction: reference?.generation_instruction ?? null,
-        personalizedText,
-        personalizedTextFormatting: customTextFormatting || null,
-        colorLabel: selectedColor?.label ?? null,
-        colorHex: selectedColor?.hex ?? null,
-        hasPhoto,
-      });
-      const skillTexts = await Promise.all(collectSkillPaths(item, reference).map(loadSkillText));
-      const image = await generateOpenAiImage(openAiClient, {
-        prompt,
-        skillTexts,
-        userImages: files,
-        referenceFileId: reference?.openai_file_id ?? null,
-        size: '1024x1024',
-        quality: 'low',
-      });
-      const previewPath = await uploadGeneratedPng(supabase, user.id, image.bytes);
-      options.push({
-        generatedItemId: generated.id,
-        optionIndex,
-        previewImagePath: previewPath,
-        manufacturingFilePath: null,
-        boilerplateId: reference?.id ?? null,
-        metadata: {
+    // Styles are independent, so they generate in parallel: a two-step style
+    // makes two sequential image calls and would otherwise multiply latency.
+    const options = await Promise.all(
+      callTargets.map(async (reference, index) => {
+        // Two-step styles generate the manufacturing PNG first and render the
+        // preview from it, so the customer sees exactly what will be produced.
+        const manufacturingPrompt = hasPhoto ? reference?.manufacturing_prompt?.trim() : null;
+        let manufacturing: {
+          path: string;
+          bytes: Uint8Array;
+          prompt: string;
+          svgPath: Promise<string | null>;
+        } | null = null;
+        if (manufacturingPrompt) {
+          const prompt = composeManufacturingPrompt(
+            manufacturingPrompt,
+            personalizedText,
+            customTextFormatting || null,
+          );
+          const artwork = await generateOpenAiImage(openAiClient, {
+            prompt,
+            userImages: files,
+            size: MANUFACTURING_PNG_SIZE,
+            quality: MANUFACTURING_PNG_QUALITY,
+            background: 'opaque',
+          });
+          manufacturing = {
+            path: await uploadGeneratedPng(supabase, user.id, artwork.bytes, 'manufacturing'),
+            bytes: artwork.bytes,
+            prompt,
+            // Only styles that need a vector file (laser engraving) are traced;
+            // it runs while the preview renders, so it adds no wait time.
+            svgPath: reference?.generate_hidden_svg
+              ? traceManufacturingSvg(supabase, user.id, artwork.bytes)
+              : Promise.resolve(null),
+          };
+        }
+
+        const prompt = composePersonalizationPrompt({
+          systemPrompt: item.system_prompt,
+          boilerplateInstruction: reference?.generation_instruction ?? null,
+          personalizedText,
+          personalizedTextFormatting: customTextFormatting || null,
+          colorLabel: selectedColor?.label ?? null,
+          colorHex: selectedColor?.hex ?? null,
+          hasPhoto,
+          fromManufacturingArtwork: Boolean(manufacturing),
+        });
+        const skillTexts = await Promise.all(collectSkillPaths(item, reference).map(loadSkillText));
+        const image = await generateOpenAiImage(openAiClient, {
+          prompt,
+          skillTexts,
+          // The preview is rendered from the manufacturing artwork only; the raw
+          // photo would let the model redraw the subject and drift from the file.
+          userImages: manufacturing ? [] : files,
+          artworkImages: manufacturing ? [manufacturing.bytes] : [],
+          referenceFileId: reference?.openai_file_id ?? null,
+          size: '1024x1024',
+          quality: manufacturing ? 'medium' : 'low',
+        });
+        const previewPath = await uploadGeneratedPng(supabase, user.id, image.bytes, 'previews');
+        const manufacturingSvgPath = manufacturing ? await manufacturing.svgPath : null;
+        return {
+          generatedItemId: generated.id,
+          optionIndex: index + 1,
+          previewImagePath: previewPath,
+          manufacturingFilePath: manufacturing?.path ?? null,
           boilerplateId: reference?.id ?? null,
-          boilerplateName: reference?.name ?? null,
-          manufacturingProcess: reference?.manufacturing_process ?? null,
-          requiresManufacturingSvg: reference?.generate_hidden_svg ?? false,
-          manufacturingSvgStatus: 'pending_admin_generation',
-          revisedPrompt: image.revisedPrompt,
-          validationWarnings: [],
-          unitPriceCents: adjustedPriceCents(
-            item.price_cents,
-            reference?.price_adjustment_percent ?? null,
-          ),
-          unitCurrency: item.currency,
-        },
-      });
-    }
+          metadata: {
+            boilerplateId: reference?.id ?? null,
+            boilerplateName: reference?.name ?? null,
+            manufacturingProcess: reference?.manufacturing_process ?? null,
+            requiresManufacturingSvg: reference?.generate_hidden_svg ?? false,
+            manufacturingSvgStatus: manufacturingSvgPath ? 'generated' : 'pending_admin_generation',
+            ...(manufacturingSvgPath
+              ? { manufacturingSvgPath, manufacturingSvgGeneratedAt: new Date().toISOString() }
+              : {}),
+            ...(manufacturing
+              ? {
+                  manufacturingPngStatus: 'generated',
+                  manufacturingPngGeneration: {
+                    source: 'customer_generation',
+                    prompt: manufacturing.prompt,
+                    quality: MANUFACTURING_PNG_QUALITY,
+                    format: 'png',
+                    generatedAt: new Date().toISOString(),
+                  },
+                  previewRenderedFromManufacturingPng: true,
+                }
+              : {}),
+            revisedPrompt: image.revisedPrompt,
+            validationWarnings: [],
+            unitPriceCents: adjustedPriceCents(
+              item.price_cents,
+              reference?.price_adjustment_percent ?? null,
+            ),
+            unitCurrency: item.currency,
+          },
+        };
+      }),
+    );
     await createPersonalizedPreviewOptions(supabase, options);
   } catch (error) {
     console.error('[personalized-item] generation failed', {

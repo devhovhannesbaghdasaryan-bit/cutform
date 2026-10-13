@@ -9,12 +9,11 @@ const NIGHT_LIGHT_BOILERPLATE_NAMES = [
   'Round UV print',
   'Contour laser engraved',
 ];
-const DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT = [
-  'Create a personalized acrylic LED night light product preview.',
-  'Preserve the selected boilerplate shape, base, and manufacturing process.',
-  'Use customer text, photo, and color selections only when provided.',
-  'Keep the result suitable for UV printing or CO2 laser engraving on clear acrylic.',
-].join(' ');
+// Shared with the live night-light items; see docs/prompts/README.md.
+const DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT = readFileSync(
+  resolve('docs/prompts/items/night-light.system-prompt.txt'),
+  'utf8',
+).trim();
 // Without a market rule, resolveCatalogMarkets() treats an item as unavailable
 // once a visitor's region resolves (no shipping rate to quote) — items silently
 // vanish from /catalog in prod. Seed a flat rate for every region so nothing

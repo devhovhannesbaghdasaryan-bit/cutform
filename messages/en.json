@@ -439,6 +439,8 @@
     "templateImage": "Template image",
     "manufacturingProcess": "Manufacturing process",
     "generationInstruction": "AI generation instruction",
+    "manufacturingPrompt": "Manufacturing PNG prompt",
+    "manufacturingPromptHelp": "Optional. When filled, the customer photo is first turned into the manufacturing PNG with this prompt, then the preview is rendered from that PNG, so the preview matches the produced item. Customer text reaches the PNG only through the placeholders below; the text section is dropped when no text is entered. Leave empty to keep single-step previews.",
     "displayOrder": "Display order",
     "requiresSvg": "Requires manufacturing file",
     "openaiFileId": "OpenAI file ID",

@@ -1,0 +1,14 @@
+Production file for a UV-printed clear acrylic night light with a square panel. Turn the attached customer photo into the exact full-colour image that will be printed on the panel.
+
+Output: a flat, square, print-ready full-colour image that fills the whole canvas edge to edge. The entire canvas is printed onto the panel.
+
+Subject:
+- Exactly the people (or pet or object) in the customer photo: same number, pose, identity, facial features, expression, hairstyle and clothing. Never add, remove, duplicate or mirror anyone, and never change faces or body shapes.
+- Keep the photo's real scene. Recompose it into a square crop centred on the subjects; if the photo is too narrow, extend only its existing background naturally — never invent new objects or people.
+- Gentle photo finishing only: balanced exposure, natural colour, clean skin tones, crisp focus and slightly richer contrast for printing on clear acrylic. No painterly, cartoon, filter or vintage effects.
+
+{{#text}}Text:
+- Add the personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated or reworded. Styling: {{textStyle}}.
+- One elegant, highly legible line (two lines only if it cannot fit, breaking at a space) in the lower part of the image, at least 6% away from every edge, with clear contrast against the photo (white or dark lettering; a soft shadow is allowed).
+{{/text}}
+Do not draw: frame, border, rounded corners, acrylic panel, wooden base, lamp, glow, mockup, logos, watermark, or any text other than the personalized text.

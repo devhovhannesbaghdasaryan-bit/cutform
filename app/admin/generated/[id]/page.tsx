@@ -117,6 +117,7 @@ export default async function AdminGeneratedDetailPage({
                       optionName={getOptionName(option)}
                       defaultPrompt={buildManufacturingPrompt(item, option)}
                       hasExistingFile={Boolean(option.manufacturing_file_path)}
+                      previewLinked={option.metadata.previewRenderedFromManufacturingPng === true}
                     />
                     {option.manufacturing_file_path ? (
                       <div className="min-w-0 space-y-3 rounded-lg border border-dashed bg-muted/20 p-3 sm:p-4">
@@ -270,7 +271,16 @@ function buildManufacturingPrompt(
   option: AdminGeneratedPreviewOption,
 ) {
   void item;
-  void option;
+  const generation = option.metadata.manufacturingPngGeneration;
+  if (
+    generation &&
+    typeof generation === 'object' &&
+    'prompt' in generation &&
+    typeof generation.prompt === 'string' &&
+    generation.prompt.length >= 40
+  ) {
+    return generation.prompt;
+  }
   return 'Transform the source photo into clean black-on-white pencil line art for laser engraving on a clear acrylic glass night light. Preserve the people’s recognizable likeness, pose, facial expressions, hairstyle, clothing outlines, hands, and important personal details. Draw elegant, realistic contour lines with a hand-sketched pencil or fine-ink appearance: crisp solid black strokes on a pure white background, with varied line weight and only sparse black hatching where essential for facial definition. Keep faces attractive and clearly readable while simplifying photographic detail into engravable outlines. Use continuous, well-separated lines with no tiny noisy marks, no filled dark areas, and no soft gray shading. Center and crop the subjects as one cohesive engraving composition with a clean outer silhouette suitable for display on an acrylic panel. Output only the flat engraving artwork. No color, gradients, skin tones, lighting effects, glow, shadows, grayscale wash, background scene, frame, acrylic panel, wooden base, lamp mockup, text, watermark, or extra elements.';
 }
 

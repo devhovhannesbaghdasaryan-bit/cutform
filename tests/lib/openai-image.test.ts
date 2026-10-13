@@ -4,6 +4,7 @@ import {
   describeImageResponse,
   extractGeneratedImage,
   generateOpenAiImage,
+  MANUFACTURING_ARTWORK_LABEL,
   PRODUCT_TEMPLATE_LABEL,
 } from '@/lib/openai-image';
 
@@ -185,5 +186,70 @@ describe('generateOpenAiImage', () => {
     const requestBody = (create.mock.calls[0] as any[])[0];
     const [message] = requestBody.input;
     expect(message.content).toEqual([{ type: 'input_text', text: 'Generate a preview' }]);
+  });
+
+  it('sends manufacturing artwork as a labeled high-detail PNG before the template', async () => {
+    const base64 = Buffer.from('generated-bytes').toString('base64');
+    const create = vi.fn(async () => ({
+      output: [{ type: 'image_generation_call', result: base64 }],
+    }));
+    const client = { responses: { create } } as unknown as Parameters<
+      typeof generateOpenAiImage
+    >[0];
+
+    await generateOpenAiImage(client, {
+      prompt: 'Render the lamp preview',
+      userImages: [],
+      artworkImages: [new Uint8Array([1, 2, 3])],
+      referenceFileId: 'file-boilerplate-1',
+      size: '1024x1024',
+      quality: 'medium',
+    });
+
+    // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
+    const requestBody = (create.mock.calls[0] as any[])[0];
+    const [message] = requestBody.input;
+    expect(message.content).toHaveLength(5);
+    expect(message.content[0]).toEqual({ type: 'input_text', text: 'Render the lamp preview' });
+    expect(message.content[1]).toEqual({ type: 'input_text', text: MANUFACTURING_ARTWORK_LABEL });
+    expect(message.content[2]).toEqual({
+      type: 'input_image',
+      detail: 'high',
+      image_url: `data:image/png;base64,${Buffer.from([1, 2, 3]).toString('base64')}`,
+    });
+    expect(message.content[3]).toEqual({ type: 'input_text', text: PRODUCT_TEMPLATE_LABEL });
+    expect(message.content).not.toContainEqual({
+      type: 'input_text',
+      text: CUSTOMER_PHOTO_LABEL,
+    });
+  });
+
+  it('passes the requested background to the image tool', async () => {
+    const base64 = Buffer.from('generated-bytes').toString('base64');
+    const create = vi.fn(async () => ({
+      output: [{ type: 'image_generation_call', result: base64 }],
+    }));
+    const client = { responses: { create } } as unknown as Parameters<
+      typeof generateOpenAiImage
+    >[0];
+
+    await generateOpenAiImage(client, {
+      prompt: 'Manufacturing artwork',
+      userImages: [],
+      quality: 'high',
+      background: 'opaque',
+    });
+
+    // biome-ignore lint/suspicious/noExplicitAny: test double for the Responses API request body
+    const requestBody = (create.mock.calls[0] as any[])[0];
+    expect(requestBody.tools).toEqual([
+      {
+        type: 'image_generation',
+        model: 'gpt-image-2',
+        size: '1024x1024',
+        quality: 'high',
+        background: 'opaque',
+      },
+    ]);
   });
 });

@@ -13,6 +13,8 @@ interface ManufacturingFileFormProps {
   optionName: string;
   defaultPrompt: string;
   hasExistingFile: boolean;
+  /** The customer preview was rendered from the current manufacturing PNG. */
+  previewLinked?: boolean;
 }
 
 const initialState: ManufacturingFileGenerationState = { status: 'idle', message: null };
@@ -23,6 +25,7 @@ export function ManufacturingFileForm({
   optionName,
   defaultPrompt,
   hasExistingFile,
+  previewLinked = false,
 }: ManufacturingFileFormProps) {
   const [state, action, pending] = useActionState(generateManufacturingFileAction, initialState);
   const fieldPrefix = `manufacturing-file-${optionId}`;
@@ -36,10 +39,18 @@ export function ManufacturingFileForm({
       <input type="hidden" name="optionId" value={optionId} />
       <div>
         <p className="font-medium">Manufacturing PNG generator</p>
-        <p className="text-sm text-muted-foreground">
-          Admin-only production step for {optionName}. The customer preview flow does not generate
-          this file.
-        </p>
+        {previewLinked ? (
+          <p className="text-sm text-muted-foreground">
+            Generated for {optionName} during customer generation, and the customer preview was
+            rendered from it. Regenerating replaces the production file, so the produced item may no
+            longer match the preview the customer approved.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Admin-only production step for {optionName}. The customer preview flow does not generate
+            this file.
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
