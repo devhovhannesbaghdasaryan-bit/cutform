@@ -29,7 +29,7 @@ import {
   hasInjectableSkill,
 } from '@/lib/personalization-skills';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
-import { tracePngToSvg } from '@/lib/svg-trace';
+import { SvgTraceQualityError, traceImageToSvg } from '@/lib/svg-trace';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 // Sanctioned exception to the ActionState convention (lib/action-state.ts):
@@ -81,27 +81,58 @@ async function uploadGeneratedPng(
   });
 }
 
+type ManufacturingSvgOutcome =
+  | {
+      status: 'generated';
+      path: string;
+      trace: { inkCoverage: number; pathCount: number; units: 'mm' | 'px' };
+    }
+  | { status: 'quality_check_failed'; inkCoverage: number; message: string }
+  | { status: 'trace_failed'; message: string };
+
 /**
  * Traces the manufacturing PNG into the production SVG and stores it next to
  * the PNG. A failed trace must not fail the customer's generation: it is
- * logged and returns null, leaving the admin "Generate SVG" button as fallback.
+ * logged and reported in the option metadata, leaving the admin "Generate SVG"
+ * button as fallback. A quality-check failure means the PNG itself is off
+ * (shading, blank page), so the admin should look at it before regenerating.
  */
 async function traceManufacturingSvg(
   supabase: Awaited<ReturnType<typeof getServerSupabase>>,
   userId: string,
   pngBytes: Uint8Array,
-): Promise<string | null> {
+  artworkWidthMm: number | null,
+): Promise<ManufacturingSvgOutcome> {
   try {
-    const svg = await tracePngToSvg(Buffer.from(pngBytes));
-    return await uploadToBucket(supabase, {
+    const traced = await traceImageToSvg(pngBytes, { widthMm: artworkWidthMm });
+    const path = await uploadToBucket(supabase, {
       bucket: 'generated-assets',
       path: `${userId}/personalized-items/manufacturing/${crypto.randomUUID()}.svg`,
-      body: Buffer.from(svg, 'utf8'),
+      body: Buffer.from(traced.svg, 'utf8'),
       contentType: 'image/svg+xml',
     });
+    return {
+      status: 'generated',
+      path,
+      trace: {
+        inkCoverage: traced.inkCoverage,
+        pathCount: traced.pathCount,
+        units: artworkWidthMm ? 'mm' : 'px',
+      },
+    };
   } catch (error) {
     console.error('[personalized-item] manufacturing SVG trace failed', { userId, error });
-    return null;
+    if (error instanceof SvgTraceQualityError) {
+      return {
+        status: 'quality_check_failed',
+        inkCoverage: error.inkCoverage,
+        message: error.message,
+      };
+    }
+    return {
+      status: 'trace_failed',
+      message: error instanceof Error ? error.message : String(error),
+    };
   }
 }
 
@@ -258,7 +289,7 @@ export async function generatePersonalizedItemAction(
           path: string;
           bytes: Uint8Array;
           prompt: string;
-          svgPath: Promise<string | null>;
+          svg: Promise<ManufacturingSvgOutcome | null>;
         } | null = null;
         if (manufacturingPrompt) {
           const prompt = composeManufacturingPrompt(
@@ -279,8 +310,13 @@ export async function generatePersonalizedItemAction(
             prompt,
             // Only styles that need a vector file (laser engraving) are traced;
             // it runs while the preview renders, so it adds no wait time.
-            svgPath: reference?.generate_hidden_svg
-              ? traceManufacturingSvg(supabase, user.id, artwork.bytes)
+            svg: reference?.generate_hidden_svg
+              ? traceManufacturingSvg(
+                  supabase,
+                  user.id,
+                  artwork.bytes,
+                  reference.artwork_width_mm ?? null,
+                )
               : Promise.resolve(null),
           };
         }
@@ -308,7 +344,7 @@ export async function generatePersonalizedItemAction(
           quality: manufacturing ? 'medium' : 'low',
         });
         const previewPath = await uploadGeneratedPng(supabase, user.id, image.bytes, 'previews');
-        const manufacturingSvgPath = manufacturing ? await manufacturing.svgPath : null;
+        const manufacturingSvg = manufacturing ? await manufacturing.svg : null;
         return {
           generatedItemId: generated.id,
           optionIndex: index + 1,
@@ -320,9 +356,21 @@ export async function generatePersonalizedItemAction(
             boilerplateName: reference?.name ?? null,
             manufacturingProcess: reference?.manufacturing_process ?? null,
             requiresManufacturingSvg: reference?.generate_hidden_svg ?? false,
-            manufacturingSvgStatus: manufacturingSvgPath ? 'generated' : 'pending_admin_generation',
-            ...(manufacturingSvgPath
-              ? { manufacturingSvgPath, manufacturingSvgGeneratedAt: new Date().toISOString() }
+            manufacturingSvgStatus: manufacturingSvg?.status ?? 'pending_admin_generation',
+            ...(manufacturingSvg?.status === 'generated'
+              ? {
+                  manufacturingSvgPath: manufacturingSvg.path,
+                  manufacturingSvgGeneratedAt: new Date().toISOString(),
+                  manufacturingSvgTrace: manufacturingSvg.trace,
+                }
+              : {}),
+            ...(manufacturingSvg && manufacturingSvg.status !== 'generated'
+              ? {
+                  manufacturingSvgError: manufacturingSvg.message,
+                  ...(manufacturingSvg.status === 'quality_check_failed'
+                    ? { manufacturingSvgTrace: { inkCoverage: manufacturingSvg.inkCoverage } }
+                    : {}),
+                }
               : {}),
             ...(manufacturing
               ? {

@@ -25,6 +25,7 @@ const boilerplateSchema = z.object({
   generateHiddenSvg: z.boolean(),
   isActive: z.boolean(),
   priceAdjustmentPercent: z.coerce.number().int().optional(),
+  artworkWidthMm: z.coerce.number().positive().max(5000).optional(),
   removeSkill: z.boolean(),
 });
 
@@ -45,6 +46,7 @@ export async function saveBoilerplateAction(formData: FormData) {
     generateHiddenSvg: formData.get('generateHiddenSvg') === 'on',
     isActive: formData.get('isActive') === 'on',
     priceAdjustmentPercent: formData.get('priceAdjustmentPercent') || undefined,
+    artworkWidthMm: formData.get('artworkWidthMm') || undefined,
     removeSkill: formData.get('removeSkill') === 'on',
   });
   if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid boilerplate.');
@@ -119,6 +121,7 @@ export async function saveBoilerplateAction(formData: FormData) {
     generate_hidden_svg: values.generateHiddenSvg,
     is_active: values.isActive,
     price_adjustment_percent: values.priceAdjustmentPercent ?? null,
+    artwork_width_mm: values.artworkWidthMm ?? null,
     skill_openai_file_id: skill.skillOpenaiFileId,
     skill_path: skill.skillPath,
   };
@@ -154,7 +157,8 @@ export async function removeBoilerplateAction(formData: FormData) {
     .eq('id', parsed.data.id);
   if (error) throw new Error(error.message);
 
-  if (existing?.openai_file_id) await deleteReferenceFile(getOpenAiClient(), existing.openai_file_id);
+  if (existing?.openai_file_id)
+    await deleteReferenceFile(getOpenAiClient(), existing.openai_file_id);
   if (existing?.skill_openai_file_id)
     await deleteSkillArtifact(getOpenAiClient(), existing.skill_openai_file_id);
 

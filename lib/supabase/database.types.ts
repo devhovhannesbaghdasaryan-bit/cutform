@@ -1332,6 +1332,7 @@ export type Database = {
       }
       personalization_boilerplates: {
         Row: {
+          artwork_width_mm: number | null
           created_at: string
           generate_hidden_svg: boolean
           generation_instruction: string
@@ -1349,6 +1350,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          artwork_width_mm?: number | null
           created_at?: string
           generate_hidden_svg?: boolean
           generation_instruction?: string
@@ -1366,6 +1368,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          artwork_width_mm?: number | null
           created_at?: string
           generate_hidden_svg?: boolean
           generation_instruction?: string
