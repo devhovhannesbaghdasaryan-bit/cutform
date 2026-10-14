@@ -1,0 +1,4 @@
+Style: tic-tac-toe card.
+- The MANUFACTURING ARTWORK is the black-on-white engraving of the card face: the names and date header and a 3×3 grid. On the card every black mark is burnt into the pale birch plywood as dark burnt-brown engraving; reproduce it one-to-one in letterforms, lines, sizes and placement, nothing added, removed or re-typeset.
+- Construction from the PRODUCT TEMPLATE: one pale birch plywood card with rounded corners lying flat, and its loose pieces: five small dark walnut hearts and four small dark walnut rings, each about one cell wide and about 3 mm thick. Show a game in progress: four or five pieces placed in some of the cells, the remaining pieces lying on the table beside the card. The template's names and date are placeholders and must not appear.
+- The names and date are already engraved in the artwork's header; never add them a second time, and engrave nothing else.

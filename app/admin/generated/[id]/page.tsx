@@ -434,6 +434,7 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
       : null;
   const status = option.metadata.manufacturingSvgStatus;
   const hasSvg = Boolean(option.manufacturingSvgUrl && option.manufacturingSvgPath);
+  const hasStrokeSvg = Boolean(option.manufacturingSvgStrokeDownloadUrl);
   const qualityFailed = status === 'quality_check_failed';
   const generatedAt =
     typeof option.metadata.manufacturingSvgGeneratedAt === 'string'
@@ -472,7 +473,7 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
         <div className="min-w-0 flex-[1_1_320px] space-y-4">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
             <div>
-              <h2 className="font-semibold">Manufacturing SVG</h2>
+              <h2 className="font-semibold">Manufacturing SVGs</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {hasSvg
                   ? `Traced from the PNG${generatedAt ? ` · ${generatedAt}` : ''}${
@@ -539,6 +540,13 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
             </dl>
           ) : null}
 
+          {hasSvg && !hasStrokeSvg ? (
+            <p className="text-sm text-muted-foreground">
+              Only the fill SVG exists for this option. Re-trace from the PNG to also get the stroke
+              (cut line) version.
+            </p>
+          ) : null}
+
           <div className="flex flex-wrap items-center gap-2">
             {hasSvg && option.manufacturingSvgDownloadUrl ? (
               <a
@@ -546,7 +554,16 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
                 className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3.5 text-sm font-semibold text-primary-foreground"
               >
                 <Download className="size-4" aria-hidden="true" />
-                Download SVG for the laser
+                Fill SVG · engrave
+              </a>
+            ) : null}
+            {hasSvg && option.manufacturingSvgStrokeDownloadUrl ? (
+              <a
+                href={option.manufacturingSvgStrokeDownloadUrl}
+                className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3.5 text-sm font-semibold text-primary-foreground"
+              >
+                <Download className="size-4" aria-hidden="true" />
+                Stroke SVG · cut lines
               </a>
             ) : null}
             <ManufacturingSvgForm

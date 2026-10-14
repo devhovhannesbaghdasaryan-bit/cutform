@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function LandingPage() {
   const locale = await getRequestLocale();
   const [popularItems, categories, t] = await Promise.all([
-    listPopularCatalogItems(4).catch(() => []),
+    listPopularCatalogItems(8).catch(() => []),
     listCategories().catch(() => []),
     getTranslations(),
   ]);

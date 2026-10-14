@@ -5,7 +5,7 @@
 -- Safe to re-run: upserts by name. Prompt text mirrors docs/prompts/boilerplates/.
 --
 -- Boilerplates are a shared library (see catalog_item_boilerplates).
--- The generated product seed attaches all three to every seeded night-light item.
+-- The generated product seed attaches all of them to every seeded night-light item.
 
 insert into public.personalization_boilerplates (
   name, image_path, openai_file_id, manufacturing_process, generation_instruction,
@@ -93,6 +93,40 @@ Composition:
 
 Do not draw: text, names, dates, frame, border, cut line, acrylic panel, wooden base, lamp, glow, shadows, background scene or watermark.$prompt$,
     true, true, 30
+  ),
+  (
+    'Contour laser stroked',
+    '/product-references/night-lights/contour-laser-stroked.jpg', 'file-EQDfh97h75q2VTGkRcXZUB',
+    'contour-cut CO2-laser-scored acrylic (stroke lines)',
+    $prompt$Style: contour-cut clear acrylic with CO2-laser-scored stroke lines.
+- The MANUFACTURING ARTWORK is a black-on-white drawing made of thin single strokes. On the lamp every black stroke is one fine scored line glowing evenly in the LED colour (warm amber when no colour is given), crisp and hairline-thin like a scratched vector line, all of the same weight; every white area is clear, transparent acrylic, never a white, printed or frosted surface.
+- Reproduce every stroke one-to-one at the same position, proportion and thin weight: same people, faces, hair, clothing and crop. Do not add, remove, thicken, bolden, smooth or redraw any stroke, and add no shading, fill, glow halo wider than a hairline, or engraved areas.
+- The acrylic panel is cut along the artwork's outer silhouette with a small even margin; its straight bottom edge sits in the slot of the base.
+- Construction from the PRODUCT TEMPLATE: an oval light-wood (beech) base with a slot and a thin white USB cable leaving the base on the right. The template's sample couple is a placeholder and must not appear.
+- Personalized text, if given, is laser-engraved once on the front face of the wooden base: centred, one line, dark burnt-brown lettering cut into the wood grain. It does not glow and never appears on the acrylic. Without text the base stays plain.$prompt$,
+    $prompt$Production file for a contour-cut clear acrylic night light whose artwork the CO2 laser scores as vector lines: the laser follows each drawn line once, so the drawing must consist of thin, single-stroke lines only. Convert the attached customer photo into the exact line drawing the laser will score.
+
+Output: a flat, square, black-on-white stroke drawing — pure black hairline strokes on a pure white background and nothing else. Every black stroke becomes one scored line; every white area stays clear acrylic.
+
+Subject:
+- Exactly the people (or pet or object) in the customer photo: same number, same pose and gesture, same relative positions, same framing of the body (a half-length photo stays half-length). Never add, remove, duplicate or mirror anyone.
+- Keep every face recognizable: same facial features, expression, hairstyle, beard, glasses and clothing.
+- Drop the photo's background entirely: no scenery, furniture, floor or sky.
+
+Stroke style:
+- Thin, crisp, fully black hairline strokes of one constant width, about 0.3% of the image width (3 px on a 1024 px canvas), as if drawn with a single fine technical pen. Never thicker, never tapered, never varying in weight.
+- Each stroke is a single continuous path with sharp, solid edges: no soft, blurred, grey or anti-aliased lines. One line per edge; never trace an edge twice or draw outlines around a stroke.
+- Strokes follow only the real edges of the photo: outer silhouette, hair mass and main strands, facial features (eyes, brows, nose, lips, beard), ears, hands and fingers, and the main clothing folds, seams, collars and pockets.
+- Forbidden: filled black areas, thick or bold lines, gray tones, shading, gradients, hatching, cross-hatching, stippling, halftone, colour, sketchy double lines, tiny noisy marks.
+- Keep strokes well separated, never closer than three stroke widths, so every line stays an individual path after SVG tracing.
+
+Composition:
+- Centre the subjects as one connected group with a clean, closed outer silhouette drawn as one continuous stroke: the panel is cut along this silhouette with a small even margin, so nothing may float detached from the group.
+- The bottom of the drawing ends in a straight horizontal edge where the panel enters the base slot; bodies are cropped there, never floating.
+- The group fills about 85% of the canvas height with even white margins on the other sides.
+
+Do not draw: text, names, dates, frame, border, cut line, acrylic panel, wooden base, lamp, glow, shadows, background scene or watermark.$prompt$,
+    true, true, 40
   )
 on conflict (name) do update set
   image_path = excluded.image_path,

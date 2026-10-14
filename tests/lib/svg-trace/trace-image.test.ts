@@ -1,10 +1,13 @@
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import {
+  DEFAULT_STROKE_WIDTH,
   DEFAULT_TRACE_OPTIONS,
   inkCoverageOf,
+  renderTracedSvg,
   SvgTraceQualityError,
   thresholdImage,
+  traceImage,
   traceImageToSvg,
 } from '@/lib/svg-trace';
 
@@ -181,5 +184,66 @@ describe('traceImageToSvg', () => {
 
   it('rejects data that is not an image', async () => {
     await expect(traceImageToSvg(Buffer.from('not a png'))).rejects.toThrow();
+  });
+
+  it('paints with fill by default and reports it', async () => {
+    const result = await traceImageToSvg(await squarePng());
+    expect(result.paint).toBe('fill');
+    expect(result.svg).not.toContain('stroke-width');
+  });
+
+  it('emits the same outlines as stroke-only lines when asked', async () => {
+    const png = await squarePng();
+    const fill = await traceImageToSvg(png, { alphaMax: 0 });
+    const stroke = await traceImageToSvg(png, { alphaMax: 0, paint: 'stroke' });
+    expect(stroke.paint).toBe('stroke');
+    expect(stroke.svg).toContain(
+      `fill="none" stroke="#000000" stroke-width="${DEFAULT_STROKE_WIDTH.px}" stroke-linecap="round" stroke-linejoin="round"`,
+    );
+    expect(stroke.svg).not.toContain('fill-rule');
+    expect(pathData(stroke.svg)).toBe(pathData(fill.svg));
+    expect(stroke.pathCount).toBe(fill.pathCount);
+  });
+
+  it('uses a hairline stroke in millimetres and honours a custom width', async () => {
+    const png = await squarePng();
+    const stroke = await traceImageToSvg(png, { widthMm: 150, paint: 'stroke' });
+    expect(stroke.svg).toContain('width="150mm" height="150mm"');
+    expect(stroke.svg).toContain(`stroke-width="${DEFAULT_STROKE_WIDTH.mm}"`);
+    const custom = await traceImageToSvg(png, { widthMm: 150, paint: 'stroke', strokeWidth: 0.25 });
+    expect(custom.svg).toContain('stroke-width="0.25"');
+  });
+});
+
+describe('traceImage / renderTracedSvg', () => {
+  it('traces once and renders both paint variants from the same geometry', async () => {
+    const traced = await traceImage(await squarePng(), { widthMm: 100 });
+    expect(traced.units).toBe('mm');
+    expect(traced.viewWidth).toBe(100);
+    expect(traced.viewHeight).toBe(100);
+    expect(traced.pathCount).toBe(1);
+    expect(traced.pathData).toMatch(/^M/);
+
+    const fill = renderTracedSvg(traced);
+    const stroke = renderTracedSvg(traced, { paint: 'stroke' });
+    expect(fill).toContain('fill="#000000" fill-rule="evenodd" stroke="none"');
+    expect(stroke).toContain('fill="none" stroke="#000000"');
+    expect(pathData(fill)).toBe(traced.pathData);
+    expect(pathData(stroke)).toBe(traced.pathData);
+    expect(fill).toContain('width="100mm" height="100mm" viewBox="0 0 100 100"');
+    expect(stroke).toContain('width="100mm" height="100mm" viewBox="0 0 100 100"');
+  });
+
+  it('reports pixel units without a physical size', async () => {
+    const traced = await traceImage(await squarePng());
+    expect(traced.units).toBe('px');
+    expect(renderTracedSvg(traced)).toContain('width="64" height="64"');
+  });
+
+  it('rejects a non-positive stroke width', async () => {
+    const traced = await traceImage(await squarePng());
+    expect(() => renderTracedSvg(traced, { paint: 'stroke', strokeWidth: 0 })).toThrow(
+      'strokeWidth',
+    );
   });
 });

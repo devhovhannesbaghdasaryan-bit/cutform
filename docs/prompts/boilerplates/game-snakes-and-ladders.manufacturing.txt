@@ -1,0 +1,20 @@
+Production file for the face of a laser-engraved wooden table game card: snakes and ladders. Draw the exact engraving artwork the CO2 laser will raster-engrave into the pale plywood. There is no customer photo. The pawns and die are separate parts and are not drawn.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Canvas: the card is a portrait rectangle; its engraving area is a centred portrait area spanning 70% of the canvas width and 94% of the canvas height. Keep every mark inside this area and leave the rest of the canvas pure white. Do not draw the card outline.
+
+{{#text}}Header:
+- At the top of the card area, the personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- The first line (the couple's names) in wide-spaced classic serif capitals, centred, about 4% of the canvas height tall; the second line (the date) centred beneath it in the same serif, about 2.5% tall. Letterforms are solid filled black with smooth, closed edges. The header occupies the top 18% of the card area; everything below belongs to the game.
+{{/text}}
+Game artwork:
+- A board of 5 by 5 equal square cells drawn with straight lines of one uniform weight (about 0.8% of the image width), filling about 85% of the card area's width, centred in the game space (the card area below the header, or the whole card area when there is no header).
+- The cells are numbered 1 to 25 in a serpentine path, one number per cell in a clean serif about 2.2% of the canvas height tall, placed in the upper part of each cell: the bottom row runs 1 to 5 from left to right, the row above runs 6 to 10 from right to left, then 11 to 15 left to right, 16 to 20 right to left, and the top row 21 to 25 left to right, so 25 is the top-right cell.
+- The word START in small serif capitals just below the bottom-left cell and FINISH just above the top-right cell, both about 1.8% of the canvas height tall.
+- Three ladders, each drawn as two parallel lines with short rungs, leading diagonally upwards from a lower cell to a higher cell (one from 3 to 13, one from 8 to 23, one from 11 to 22), and two slides, each a single smooth S-curved line about 1% of the image width thick with a small round head, leading downwards (one from 24 to 15, one from 19 to 6). Lines pass over cell lines but never cover a number.
+
+Composition:
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures, wood grain or background.
+
+Do not draw: the card outline, pawns, a die, ornaments, borders, frames, mockups, logos, watermarks, or any text other than the header, the numbers, START and FINISH.

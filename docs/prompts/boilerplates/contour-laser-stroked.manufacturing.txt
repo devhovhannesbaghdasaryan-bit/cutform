@@ -1,0 +1,22 @@
+Production file for a contour-cut clear acrylic night light whose artwork the CO2 laser scores as vector lines: the laser follows each drawn line once, so the drawing must consist of thin, single-stroke lines only. Convert the attached customer photo into the exact line drawing the laser will score.
+
+Output: a flat, square, black-on-white stroke drawing — pure black hairline strokes on a pure white background and nothing else. Every black stroke becomes one scored line; every white area stays clear acrylic.
+
+Subject:
+- Exactly the people (or pet or object) in the customer photo: same number, same pose and gesture, same relative positions, same framing of the body (a half-length photo stays half-length). Never add, remove, duplicate or mirror anyone.
+- Keep every face recognizable: same facial features, expression, hairstyle, beard, glasses and clothing.
+- Drop the photo's background entirely: no scenery, furniture, floor or sky.
+
+Stroke style:
+- Thin, crisp, fully black hairline strokes of one constant width, about 0.3% of the image width (3 px on a 1024 px canvas), as if drawn with a single fine technical pen. Never thicker, never tapered, never varying in weight.
+- Each stroke is a single continuous path with sharp, solid edges: no soft, blurred, grey or anti-aliased lines. One line per edge; never trace an edge twice or draw outlines around a stroke.
+- Strokes follow only the real edges of the photo: outer silhouette, hair mass and main strands, facial features (eyes, brows, nose, lips, beard), ears, hands and fingers, and the main clothing folds, seams, collars and pockets.
+- Forbidden: filled black areas, thick or bold lines, gray tones, shading, gradients, hatching, cross-hatching, stippling, halftone, colour, sketchy double lines, tiny noisy marks.
+- Keep strokes well separated, never closer than three stroke widths, so every line stays an individual path after SVG tracing.
+
+Composition:
+- Centre the subjects as one connected group with a clean, closed outer silhouette drawn as one continuous stroke: the panel is cut along this silhouette with a small even margin, so nothing may float detached from the group.
+- The bottom of the drawing ends in a straight horizontal edge where the panel enters the base slot; bodies are cropped there, never floating.
+- The group fills about 85% of the canvas height with even white margins on the other sides.
+
+Do not draw: text, names, dates, frame, border, cut line, acrylic panel, wooden base, lamp, glow, shadows, background scene or watermark.
