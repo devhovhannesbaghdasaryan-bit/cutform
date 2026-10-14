@@ -1,0 +1,4 @@
+Style: dice drinking-game card.
+- The MANUFACTURING ARTWORK is the black-on-white engraving of the card face: the names and date header, six die faces with their rules, and a small bottle-and-glass illustration. On the card every black mark is burnt into the pale birch plywood as dark burnt-brown engraving; reproduce it one-to-one in letterforms, pips, lines and placement, nothing added, removed or re-typeset.
+- Construction from the PRODUCT TEMPLATE: one pale birch plywood card with rounded corners lying flat, and its single loose piece: one small white die with black pips, resting on the card in a clear spot without covering any rule. The template's names and date are placeholders and must not appear.
+- The names and date are already engraved in the artwork's header; never add them a second time, and engrave nothing else.

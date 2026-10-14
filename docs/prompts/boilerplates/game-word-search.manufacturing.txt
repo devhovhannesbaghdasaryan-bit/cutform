@@ -1,0 +1,19 @@
+Production file for the face of a laser-engraved wooden table game card: word search. Draw the exact engraving artwork the CO2 laser will raster-engrave into the pale plywood. There is no customer photo.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Canvas: the card is a portrait rectangle; its engraving area is a centred portrait area spanning 70% of the canvas width and 94% of the canvas height. Keep every mark inside this area and leave the rest of the canvas pure white. Do not draw the card outline.
+
+{{#text}}Header:
+- At the top of the card area, the personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- The first line (the couple's names) in wide-spaced classic serif capitals, centred, about 4% of the canvas height tall; the second line (the date) centred beneath it in the same serif, about 2.5% tall. Letterforms are solid filled black with smooth, closed edges. The header occupies the top 18% of the card area; everything below belongs to the game.
+{{/text}}
+Game artwork:
+- Word list: directly below the header (or at the top of the card area when there is no header), these words in small serif capitals about 1.8% of the canvas height tall, centred, on two or three lines separated by commas: LOVE, KISS, CAKE, PARTY, CHEERS, DANCE, FOREVER, TOGETHER, ALWAYS, MARRIAGE{{#text}}, followed by each name from the first line of the personalized text written in capitals (the names only, never the date){{/text}}.
+- Grid: beneath the list, a 10 by 10 word-search grid of single capital letters in a clean, even sans-serif, aligned in 10 rows and 10 columns with equal spacing and no cell lines, filling about 85% of the card area's width and the remaining height. Every listed word{{#text}} and every name{{/text}} is hidden in the grid exactly once, spelled correctly, reading left to right, top to bottom or diagonally downwards; all other cells hold random capital letters. No highlighting, circles or grid lines.
+- All letters are solid filled black with crisp edges and clear gaps between neighbouring letters.
+
+Composition:
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures, wood grain or background.
+
+Do not draw: the card outline, ornaments, borders, frames, mockups, logos, watermarks, or any text other than the header, the word list and the grid.

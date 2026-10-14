@@ -1,0 +1,19 @@
+Production file for the face of a laser-engraved wooden table game card: dice drinking game. Draw the exact engraving artwork the CO2 laser will raster-engrave into the pale plywood. There is no customer photo. The die is a separate part and is not drawn as an object.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Canvas: the card is a portrait rectangle; its engraving area is a centred portrait area spanning 70% of the canvas width and 94% of the canvas height. Keep every mark inside this area and leave the rest of the canvas pure white. Do not draw the card outline.
+
+{{#text}}Header:
+- At the top of the card area, the personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- The first line (the couple's names) in wide-spaced classic serif capitals, centred, about 4% of the canvas height tall; the second line (the date) centred beneath it in the same serif, about 2.5% tall. Letterforms are solid filled black with smooth, closed edges. The header occupies the top 18% of the card area; everything below belongs to the game.
+{{/text}}
+Game artwork:
+- Six rules, one per row, evenly spaced down the game space (the card area below the header, or the whole card area when there is no header), left-aligned at the left edge of the card area.
+- Each row starts with a die face drawn as a rounded-square outline (stroke about 0.8% of the image width, about 9% of the card area's width across) containing solid black pips in the standard pattern, from one pip in the first row to six pips in the sixth; to its right, one line in small serif capitals about 1.8% of the canvas height tall. The rows read, top to bottom: YOU DRINK; OLDEST DRINKS; PERSON TO YOUR LEFT DRINKS; PERSON TO YOUR RIGHT DRINKS; YOUR CHOICE DRINKS; EVERYONE DRINKS. Spell them exactly so.
+- In the lower-right corner of the game space, a small line-art illustration of a champagne bottle beside a coupe glass, drawn with one uniform stroke weight of about 0.6% of the image width, about 28% of the card area's width wide, not overlapping the rows.
+
+Composition:
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures, wood grain or background.
+
+Do not draw: the card outline, a loose die, ornaments, borders, frames, mockups, logos, watermarks, or any text other than the header and the six rules.

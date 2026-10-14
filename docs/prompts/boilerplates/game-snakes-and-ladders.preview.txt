@@ -1,0 +1,4 @@
+Style: snakes-and-ladders card.
+- The MANUFACTURING ARTWORK is the black-on-white engraving of the card face: the names and date header and a numbered 5×5 board with ladders and slides. On the card every black mark is burnt into the pale birch plywood as dark burnt-brown engraving; reproduce it one-to-one, every number, line and rung in its place, nothing added, removed or re-typeset.
+- Construction from the PRODUCT TEMPLATE: one pale birch plywood card with rounded corners lying flat, and its loose pieces: two small pawns (one dark walnut, one pale wood) standing on two different cells, and one small white die with black pips resting on the card without covering a number. The template's names and date are placeholders and must not appear.
+- The names and date are already engraved in the artwork's header; never add them a second time, and engrave nothing else.

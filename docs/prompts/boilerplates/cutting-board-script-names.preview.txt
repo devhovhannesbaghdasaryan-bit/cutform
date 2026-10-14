@@ -1,0 +1,4 @@
+Style: script names.
+- The MANUFACTURING ARTWORK is a black-on-white image of the nested pair's front: two script names, one low on each board. On the boards every black mark is burnt into the wood as dark burnt-brown engraving; reproduce each name one-to-one in letterforms, size and position, nothing added, removed or re-typeset.
+- Construction from the PRODUCT TEMPLATE: two solid hardwood boards standing nested together, the taller one on the left with a round handle hole, the shorter one on the right with a smaller handle hole, a wavy joint between them and a heart cut through where they meet, oiled satin finish, one board paler and one more honey-toned. The template's names are placeholders and must not appear.
+- The names are already in the artwork; never engrave them a second time, and engrave nothing else.

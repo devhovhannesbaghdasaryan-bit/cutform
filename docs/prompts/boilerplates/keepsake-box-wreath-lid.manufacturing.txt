@@ -1,0 +1,18 @@
+Production file for the inside of the lid of a laser-engraved wooden keepsake box. Draw the exact engraving artwork the CO2 laser will raster-engrave into the wood: a botanical line-art wreath.{{#text}} The customer's personalized text sits inside it.{{/text}} There is no customer photo, and nothing but this artwork is engraved inside the lid.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Wreath:
+- One oval wreath made of two mirrored eucalyptus or olive branches, drawn as clean line art: every stem one continuous line, every leaf one simple closed outline, all strokes one uniform weight of about 0.5% of the image width. The branches start at the bottom centre, curve up both sides and leave an open gap at the top centre.
+- Strokes are solid black with crisp edges and stay well separated (never closer than one stroke width); no leaf overlaps another, no leaf is filled black, and any berry is at least 1% of the image width across.
+- The inside of the wreath holds only the personalized text described below; when no text is described, it stays empty white wood.
+
+{{#text}}Text inside the wreath:
+- The personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- Set it in a flowing calligraphic script, the text block centred inside the wreath, broken into lines only where the customer broke it; with several lines the first line is the largest. Letterforms are solid filled black with smooth, closed edges, and the thinnest hairline is at least 0.4% of the image width thick. The text fills about 60% of the wreath's inner width and never touches a leaf.
+{{/text}}
+Composition:
+- Keep every mark inside a centred landscape area spanning 88% of the canvas width and 56% of the canvas height; the canvas outside this area stays pure white. Centre the wreath in the area with its height filling the area's height.
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures, wood grain or background.
+
+Do not draw: any text other than the personalized text, quotation marks, names or dates that were not entered, rings, hearts, borders, frames, the lid outline, the box itself, hinges, mockups, logos or watermarks.

@@ -1,0 +1,14 @@
+Production file for the engraving on a pair of nesting solid-wood cutting boards. Draw the exact engraving artwork the CO2 laser will raster-engrave: the two names only. There is no customer photo.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Canvas: the square canvas is the pair of boards nested together, seen from the front at true scale: the canvas width is the pair's full width, and the boards occupy the middle three quarters of the canvas height. The boards themselves are never drawn: no outlines, handle holes, joint line or heart.
+
+{{#text}}Names:
+- The personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- The first line is engraved on the left board and the second line on the right board; a single line goes on the left board only. Each name is set in one flowing calligraphic script, horizontal, solid filled black with smooth closed edges, hairlines at least 0.4% of the image width thick, about 8% of the canvas height tall; a long name may be narrower but never taller.
+- Positions: the left name is centred horizontally within the left 46% of the canvas and the right name within the right 46%; both sit low on the boards, with their baselines about 22% of the canvas height above the bottom edge of the canvas.
+{{/text}}
+Composition:
+- Nothing else is drawn: no board outlines, heart, date, ornaments, borders, frames, mockup, logos or watermarks. When no names are described above, the canvas stays entirely white.
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures or wood grain.

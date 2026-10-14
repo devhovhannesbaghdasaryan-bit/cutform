@@ -1,0 +1,19 @@
+Production file for the inside of the lid of a laser-engraved wooden keepsake box. Draw the exact engraving artwork the CO2 laser will raster-engrave into the wood: a typographic composition of one fixed wedding quote. There is no customer photo, and nothing but this artwork is engraved inside the lid.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Artwork:
+- The quote, set in four centred lines in exactly this order and wording:
+  line 1: Two souls
+  line 2: WITH BUT A SINGLE THOUGHT
+  line 3: two hearts
+  line 4: THAT BEAT AS ONE
+- Lines 1 and 3 are a large, flowing calligraphic script with smooth, confident strokes. Lines 2 and 4 are a classic serif in capital letters with wide letter spacing, about one third of the script's height. Use the same two typefaces on every line of their kind.
+- Spell every word exactly as written above, each word once: no extra words, no quotation marks, no author name, no punctuation.
+- Letterforms are solid filled black with clean, smooth, closed edges. The thinnest script hairline is at least 0.4% of the image width thick so it survives engraving and vector tracing.
+
+Composition:
+- Keep every mark inside a centred landscape area spanning 88% of the canvas width and 56% of the canvas height; the canvas outside this area stays pure white. Centre the composition in the area, space the four lines evenly, and let the widest line fill about 80% of the area's width.
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures, wood grain or background.
+
+Do not draw: names, dates, initials, any customer text, ornaments, rings, hearts, flourishes, wreaths, borders, frames, the lid outline, the box itself, hinges, mockups, logos or watermarks.

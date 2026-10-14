@@ -1,0 +1,4 @@
+Style: word-search card.
+- The MANUFACTURING ARTWORK is the black-on-white engraving of the card face: the names and date header, the word list and a 10×10 letter grid. On the card every black mark is burnt into the pale birch plywood as dark burnt-brown engraving; reproduce it one-to-one, every letter in its place, nothing added, removed, re-typeset or re-shuffled.
+- Construction from the PRODUCT TEMPLATE: one pale birch plywood card with rounded corners lying flat; this game has no loose pieces, so nothing lies on the card. The template's names, date, words and letters are placeholders and must not appear.
+- The names and date are already engraved in the artwork's header; never add them a second time, and engrave nothing else.

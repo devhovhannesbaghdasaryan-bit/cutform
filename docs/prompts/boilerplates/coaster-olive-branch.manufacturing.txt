@@ -1,0 +1,18 @@
+Production file for the engraving on a pair of interlocking walnut jigsaw-piece coasters. Draw the exact engraving artwork the CO2 laser will raster-engrave on both pieces. There is no customer photo.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the walnut; every white pixel stays untouched wood.
+
+Canvas: the square canvas is the two coasters lying joined side by side at true scale: the left piece fills the left half of the canvas, the right piece the right half, and the pair occupies the middle half of the canvas height. The pieces themselves are never drawn: no outlines, tabs or notches.
+
+Artwork on each piece, same layout on both:
+- The upper part of the piece is the name space (see Names below); when no names are described, it stays empty white.
+- Below the name space, centred within the piece's half of the canvas, a small olive branch in clean line art: one gently curving stem with paired narrow leaves and a few berries, all drawn as outlines of one uniform stroke weight of about 0.5% of the image width, the branch about 60% of the piece's width and about 12% of the canvas height tall.
+- In the lower-right corner of the left piece the word his and in the lower-right corner of the right piece the word hers, in a small lowercase serif about 3% of the canvas height tall.
+
+{{#text}}Names:
+- The personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- The first line is the left piece's name and the second line the right piece's name; a single line goes on the left piece only. Each name is set in one flowing calligraphic script, horizontal, centred within its piece's half of the canvas in the name space, about 10% of the canvas height tall; a long name may be narrower but never taller. Letterforms solid filled black with smooth closed edges, hairlines at least 0.4% of the image width thick.
+{{/text}}
+Composition:
+- Keep every mark inside its piece's half with an even margin of at least 8% of the piece's width to the piece's edges. Nothing else is drawn: no outlines, hearts, dates, borders, frames, mockup, logos or watermarks.
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures or wood grain.

@@ -305,6 +305,18 @@
       "name": "Night lights",
       "description": "Acrylic and wooden LED gifts, including personalized designs."
     },
+    "keepsake-boxes": {
+      "name": "Keepsake boxes",
+      "description": "Engraved wooden memory boxes with your names, date and a message inside the lid."
+    },
+    "anniversary-gifts": {
+      "name": "Anniversary gifts",
+      "description": "Engraved wooden gifts for couples: games, coasters and wall plaques with your names and dates."
+    },
+    "kitchen-and-dining": {
+      "name": "Kitchen & dining",
+      "description": "Engraved wooden cutting and serving boards for your kitchen and table."
+    },
     "banners": {
       "name": "Banners",
       "description": "Marketing banners for stores, campaigns, and promotions."
@@ -314,6 +326,26 @@
     "personalized": {
       "name": "Personalized",
       "description": "Personalized products generated from your images and text."
+    },
+    "wedding": {
+      "name": "Wedding",
+      "description": "Wedding memory boxes engraved with the names of the couple and their wedding date."
+    },
+    "table-games": {
+      "name": "Table games",
+      "description": "Engraved wooden table games for couples and their guests."
+    },
+    "cutting-boards": {
+      "name": "Cutting boards",
+      "description": "Engraved hardwood cutting and serving boards."
+    },
+    "coasters": {
+      "name": "Coasters",
+      "description": "Engraved wooden coasters."
+    },
+    "wall-plaques": {
+      "name": "Wall plaques",
+      "description": "Engraved wooden wall plaques and timeline boards."
     }
   },
   "product": {

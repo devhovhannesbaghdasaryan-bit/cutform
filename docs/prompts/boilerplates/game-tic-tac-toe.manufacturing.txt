@@ -1,0 +1,18 @@
+Production file for the face of a laser-engraved wooden table game card: tic-tac-toe. Draw the exact engraving artwork the CO2 laser will raster-engrave into the pale plywood. There is no customer photo. The loose game pieces (wooden hearts and rings) are separate parts and are not drawn.
+
+Output: a flat, square, black-on-white image — solid pure black marks on a pure white background and nothing else. Every black pixel is burnt into the wood; every white pixel stays untouched wood.
+
+Canvas: the card is a portrait rectangle; its engraving area is a centred portrait area spanning 70% of the canvas width and 94% of the canvas height. Keep every mark inside this area and leave the rest of the canvas pure white. Do not draw the card outline.
+
+{{#text}}Header:
+- At the top of the card area, the personalized text "{{text}}" exactly as written: same spelling, punctuation and capitalisation, never translated, reworded or abbreviated, each word once. Styling: {{textStyle}}.
+- The first line (the couple's names) in wide-spaced classic serif capitals, centred, about 4% of the canvas height tall; the second line (the date) centred beneath it in the same serif, about 2.5% tall. Letterforms are solid filled black with smooth, closed edges. The header occupies the top 18% of the card area; everything below belongs to the game.
+{{/text}}
+Game artwork:
+- A tic-tac-toe grid: two vertical and two horizontal straight lines of one uniform weight (about 1% of the image width) forming nine equal square cells, the grid about 80% of the card area's width, centred in the game space (the card area below the header, or the whole card area when there is no header).
+- The cells stay empty: no marks, hearts, rings, crosses or circles inside them.
+
+Composition:
+- Pure black and pure white only: no grey, anti-aliasing haze, gradients, shadows, textures, wood grain or background.
+
+Do not draw: the card outline, game pieces, ornaments, borders, frames, mockups, logos, watermarks, or any text other than the header.
