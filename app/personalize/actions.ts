@@ -29,7 +29,8 @@ import {
   hasInjectableSkill,
 } from '@/lib/personalization-skills';
 import { IMAGE_EXTENSION_BY_MIME, uploadToBucket } from '@/lib/storage';
-import { SvgTraceQualityError, traceImageToSvg } from '@/lib/svg-trace';
+import { traceAndStoreManufacturingSvgs } from '@/lib/manufacturing-svg';
+import { SvgTraceQualityError } from '@/lib/svg-trace';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 
 // Sanctioned exception to the ActionState convention (lib/action-state.ts):
@@ -84,15 +85,18 @@ async function uploadGeneratedPng(
 type ManufacturingSvgOutcome =
   | {
       status: 'generated';
+      /** Filled SVG (engrave layer). */
       path: string;
+      /** Stroke-only SVG (cut/score layer). */
+      strokePath: string;
       trace: { inkCoverage: number; pathCount: number; units: 'mm' | 'px' };
     }
   | { status: 'quality_check_failed'; inkCoverage: number; message: string }
   | { status: 'trace_failed'; message: string };
 
 /**
- * Traces the manufacturing PNG into the production SVG and stores it next to
- * the PNG. A failed trace must not fail the customer's generation: it is
+ * Traces the manufacturing PNG into the production SVGs (fill and stroke) and
+ * stores them next to the PNG. A failed trace must not fail the customer's generation: it is
  * logged and reported in the option metadata, leaving the admin "Generate SVG"
  * button as fallback. A quality-check failure means the PNG itself is off
  * (shading, blank page), so the admin should look at it before regenerating.
@@ -104,21 +108,16 @@ async function traceManufacturingSvg(
   artworkWidthMm: number | null,
 ): Promise<ManufacturingSvgOutcome> {
   try {
-    const traced = await traceImageToSvg(pngBytes, { widthMm: artworkWidthMm });
-    const path = await uploadToBucket(supabase, {
-      bucket: 'generated-assets',
-      path: `${userId}/personalized-items/manufacturing/${crypto.randomUUID()}.svg`,
-      body: Buffer.from(traced.svg, 'utf8'),
-      contentType: 'image/svg+xml',
+    const files = await traceAndStoreManufacturingSvgs(supabase, {
+      pngBytes,
+      artworkWidthMm,
+      directory: `${userId}/personalized-items/manufacturing`,
     });
     return {
       status: 'generated',
-      path,
-      trace: {
-        inkCoverage: traced.inkCoverage,
-        pathCount: traced.pathCount,
-        units: artworkWidthMm ? 'mm' : 'px',
-      },
+      path: files.fillPath,
+      strokePath: files.strokePath,
+      trace: files.trace,
     };
   } catch (error) {
     console.error('[personalized-item] manufacturing SVG trace failed', { userId, error });
@@ -284,7 +283,11 @@ export async function generatePersonalizedItemAction(
       callTargets.map(async (reference, index) => {
         // Two-step styles generate the manufacturing PNG first and render the
         // preview from it, so the customer sees exactly what will be produced.
-        const manufacturingPrompt = hasPhoto ? reference?.manufacturing_prompt?.trim() : null;
+        // Items without a photo tag (e.g. engraved keepsake boxes) run the step
+        // too: their manufacturing prompt builds the artwork from the
+        // customer's text alone. Photo items always have their photo here,
+        // since it is validated as mandatory above.
+        const manufacturingPrompt = reference?.manufacturing_prompt?.trim() || null;
         let manufacturing: {
           path: string;
           bytes: Uint8Array;
@@ -360,6 +363,7 @@ export async function generatePersonalizedItemAction(
             ...(manufacturingSvg?.status === 'generated'
               ? {
                   manufacturingSvgPath: manufacturingSvg.path,
+                  manufacturingSvgStrokePath: manufacturingSvg.strokePath,
                   manufacturingSvgGeneratedAt: new Date().toISOString(),
                   manufacturingSvgTrace: manufacturingSvg.trace,
                 }

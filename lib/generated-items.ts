@@ -200,9 +200,15 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
         typeof option.metadata.manufacturingSvgPath === 'string'
           ? option.metadata.manufacturingSvgPath
           : null;
+      // Options traced before the stroke variant existed only have the fill SVG.
+      const manufacturingSvgStrokePath =
+        typeof option.metadata.manufacturingSvgStrokePath === 'string'
+          ? option.metadata.manufacturingSvgStrokePath
+          : null;
       return {
         ...option,
         manufacturingSvgPath,
+        manufacturingSvgStrokePath,
         previewUrl:
           (
             await supabase.storage
@@ -246,6 +252,15 @@ export async function getGeneratedItemAdminDetail(supabase: SupabaseClient, id: 
                 .from('generated-assets')
                 .createSignedUrl(manufacturingSvgPath, 60 * 60, {
                   download: fileName(manufacturingSvgPath),
+                })
+            ).data?.signedUrl ?? null)
+          : null,
+        manufacturingSvgStrokeDownloadUrl: manufacturingSvgStrokePath
+          ? ((
+              await supabase.storage
+                .from('generated-assets')
+                .createSignedUrl(manufacturingSvgStrokePath, 60 * 60, {
+                  download: fileName(manufacturingSvgStrokePath),
                 })
             ).data?.signedUrl ?? null)
           : null,

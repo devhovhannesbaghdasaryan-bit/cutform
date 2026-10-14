@@ -8,6 +8,7 @@ const NIGHT_LIGHT_BOILERPLATE_NAMES = [
   'Rectangular UV print',
   'Round UV print',
   'Contour laser engraved',
+  'Contour laser stroked',
 ];
 // Shared with the live night-light items; see docs/prompts/README.md.
 const DEFAULT_NIGHT_LIGHT_SYSTEM_PROMPT = readFileSync(

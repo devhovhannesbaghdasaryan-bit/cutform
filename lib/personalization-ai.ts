@@ -26,7 +26,7 @@ export interface PersonalizationPromptInput {
 }
 
 export const MANUFACTURING_ARTWORK_NOTE =
-  'The customer photo has already been converted into the final production artwork, attached as MANUFACTURING ARTWORK. Wherever the instructions above refer to the customer photo as the source of the subject or artwork, use the manufacturing artwork instead: put exactly its content on the product the way the selected style produces it, without redrawing, restyling, recropping, simplifying, adding or removing anything. The preview must show precisely the item that will be produced.';
+  "The customer's input has already been converted into the final production artwork, attached as MANUFACTURING ARTWORK. Wherever the instructions above refer to the customer photo as the source of the subject or artwork, use the manufacturing artwork instead: put exactly its content on the product the way the selected style produces it, without redrawing, restyling, recropping, simplifying, adding or removing anything. Personalized text that the style puts inside the artwork is already there and must not be added again; otherwise place it only where the style instruction says. The preview must show precisely the item that will be produced.";
 
 /**
  * Manufacturing prompt placeholders. `{{#text}}…{{/text}}` keeps its content

@@ -32,10 +32,39 @@ export interface TraceImageOptions extends Partial<PotraceParams> {
    * {@link SvgTraceQualityError}. `false` disables the check.
    */
   inkCoverage?: { min: number; max: number } | false;
+  /**
+   * How the traced outlines are painted. `fill` closes every outline and fills
+   * it, which laser software reads as an engrave (fill) layer. `stroke` draws
+   * the same outlines as thin lines with no fill, which it reads as a cut or
+   * score (line) layer. Defaults to `fill`.
+   */
+  paint?: SvgPaint;
+  /**
+   * Line width of a `stroke` SVG in user units: millimetres when `widthMm` is
+   * set, otherwise source pixels. Laser software mostly ignores it and cuts
+   * along the centre of the line; it only needs to be visible on screen.
+   * Defaults to {@link DEFAULT_STROKE_WIDTH}.
+   */
+  strokeWidth?: number;
 }
 
-export interface TraceImageResult {
-  svg: string;
+export type SvgPaint = 'fill' | 'stroke';
+
+/** Default stroke width per unit system for `stroke` SVGs. */
+export const DEFAULT_STROKE_WIDTH = { mm: 0.1, px: 1 } as const;
+
+/**
+ * Geometry of a traced image, independent of how it is painted. Render it
+ * with {@link renderTracedSvg}, as often as needed, without tracing again.
+ */
+export interface TracedImage {
+  /** SVG path data for every traced outline, already in user units. */
+  pathData: string;
+  /** User unit of `pathData` and the canvas: real millimetres or source pixels. */
+  units: 'mm' | 'px';
+  /** Canvas size in user units. */
+  viewWidth: number;
+  viewHeight: number;
   /** Share of ink pixels after thresholding, 0–1. */
   inkCoverage: number;
   /** Closed curves in the SVG (outer boundaries and holes). */
@@ -45,6 +74,16 @@ export interface TraceImageResult {
   sourceHeight: number;
   threshold: number;
   scale: number;
+}
+
+export interface TraceImageResult extends TracedImage {
+  svg: string;
+  paint: SvgPaint;
+}
+
+export interface RenderTracedSvgOptions {
+  paint?: SvgPaint;
+  strokeWidth?: number;
 }
 
 export const DEFAULT_TRACE_OPTIONS = {
@@ -140,16 +179,49 @@ function formatNumber(value: number): string {
 }
 
 /**
- * Traces a raster line drawing into a single-colour SVG for laser work.
+ * Serialises a trace as an SVG document. The `fill` variant paints every
+ * closed outline black (engrave layer); the `stroke` variant draws the same
+ * outlines as thin black lines with no fill (cut/score layer).
+ */
+export function renderTracedSvg(traced: TracedImage, options: RenderTracedSvgOptions = {}): string {
+  const paint = options.paint ?? 'fill';
+  const strokeWidth = options.strokeWidth ?? DEFAULT_STROKE_WIDTH[traced.units];
+  if (!(strokeWidth > 0)) throw new Error('strokeWidth must be positive.');
+
+  const width = formatNumber(traced.viewWidth);
+  const height = formatNumber(traced.viewHeight);
+  const sizeAttrs =
+    traced.units === 'mm'
+      ? `width="${width}mm" height="${height}mm"`
+      : `width="${width}" height="${height}"`;
+  const paintAttrs =
+    paint === 'fill'
+      ? 'fill="#000000" fill-rule="evenodd" stroke="none"'
+      : `fill="none" stroke="#000000" stroke-width="${formatNumber(strokeWidth)}" ` +
+        'stroke-linecap="round" stroke-linejoin="round"';
+
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ${sizeAttrs} ` +
+    `viewBox="0 0 ${width} ${height}">
+` +
+    `	<path d="${traced.pathData}" ${paintAttrs}/>
+` +
+    '</svg>'
+  );
+}
+
+/**
+ * Traces a raster line drawing into outlines for laser work, without
+ * committing to a paint style.
  *
  * Coordinates are in millimetres when `widthMm` is given (1 user unit = 1 mm,
  * which is what Inkscape and laser software expect), otherwise in source-image
  * pixels.
  */
-export async function traceImageToSvg(
+export async function traceImage(
   image: Uint8Array | Buffer,
   options: TraceImageOptions = {},
-): Promise<TraceImageResult> {
+): Promise<TracedImage> {
   const threshold = options.threshold ?? DEFAULT_TRACE_OPTIONS.threshold;
   const scale = options.scale ?? DEFAULT_TRACE_OPTIONS.scale;
   const minSpeckleArea = options.minSpeckleArea ?? DEFAULT_TRACE_OPTIONS.minSpeckleArea;
@@ -182,26 +254,35 @@ export async function traceImageToSvg(
 
   // User units: millimetres when a physical size is known, else source pixels.
   const unitsPerPixel = widthMm ? widthMm / bitmap.width : 1 / scale;
-  const viewWidth = widthMm ?? sourceWidth;
-  const viewHeight = heightMm ?? sourceHeight;
-  const sizeAttrs = widthMm
-    ? `width="${formatNumber(viewWidth)}mm" height="${formatNumber(viewHeight)}mm"`
-    : `width="${formatNumber(viewWidth)}" height="${formatNumber(viewHeight)}"`;
-
-  const pathData = paths.map((path) => curveToPathData(path.curve, unitsPerPixel)).join(' ');
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ${sizeAttrs} ` +
-    `viewBox="0 0 ${formatNumber(viewWidth)} ${formatNumber(viewHeight)}">\n` +
-    `\t<path d="${pathData}" fill="#000000" fill-rule="evenodd" stroke="none"/>\n` +
-    '</svg>';
 
   return {
-    svg,
+    pathData: paths.map((path) => curveToPathData(path.curve, unitsPerPixel)).join(' '),
+    units: widthMm ? 'mm' : 'px',
+    viewWidth: widthMm ?? sourceWidth,
+    viewHeight: heightMm ?? sourceHeight,
     inkCoverage,
     pathCount: paths.length,
     sourceWidth,
     sourceHeight,
     threshold,
     scale,
+  };
+}
+
+/**
+ * Traces a raster line drawing into a single-colour SVG for laser work: a
+ * filled SVG by default, or a stroke-only one with `paint: 'stroke'`. To get
+ * both from one trace, use {@link traceImage} and {@link renderTracedSvg}.
+ */
+export async function traceImageToSvg(
+  image: Uint8Array | Buffer,
+  options: TraceImageOptions = {},
+): Promise<TraceImageResult> {
+  const traced = await traceImage(image, options);
+  const paint = options.paint ?? 'fill';
+  return {
+    ...traced,
+    svg: renderTracedSvg(traced, { paint, strokeWidth: options.strokeWidth }),
+    paint,
   };
 }

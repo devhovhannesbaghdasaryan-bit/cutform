@@ -8,7 +8,7 @@ import { type requireAdmin, requireAdminPermission } from '@/lib/admin';
 import { updateGeneratedReviewStatus } from '@/lib/generated-items';
 import { downloadFromBucket, uploadToBucket } from '@/lib/storage';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { traceImageToSvg } from '@/lib/svg-trace';
+import { traceAndStoreManufacturingSvgs } from '@/lib/manufacturing-svg';
 import { writeAdminAuditLog } from '@/lib/transactions';
 
 const reviewSchema = z.object({
@@ -284,16 +284,10 @@ export async function generateManufacturingSvgAction(
     const artworkWidthMm = await loadArtworkWidthMm(supabase, option.boilerplate_id);
     // A quality-check failure propagates as the form error: the admin needs
     // to see that the PNG, not the tracer, is the problem.
-    const traced = await traceImageToSvg(new Uint8Array(await pngBlob.arrayBuffer()), {
-      widthMm: artworkWidthMm,
-    });
-
-    const storagePath = `${item.user_id}/personalized-night-lights/manufacturing-svg/${crypto.randomUUID()}.svg`;
-    await uploadToBucket(supabase, {
-      bucket: 'generated-assets',
-      path: storagePath,
-      body: Buffer.from(traced.svg, 'utf8'),
-      contentType: 'image/svg+xml',
+    const files = await traceAndStoreManufacturingSvgs(supabase, {
+      pngBytes: new Uint8Array(await pngBlob.arrayBuffer()),
+      artworkWidthMm,
+      directory: `${item.user_id}/personalized-night-lights/manufacturing-svg`,
     });
 
     const { error: updateOptionError } = await supabase
@@ -303,14 +297,10 @@ export async function generateManufacturingSvgAction(
           ...option.metadata,
           manufacturingSvgStatus: 'generated',
           manufacturingSvgError: null,
-          manufacturingSvgPath: storagePath,
+          manufacturingSvgPath: files.fillPath,
+          manufacturingSvgStrokePath: files.strokePath,
           manufacturingSvgGeneratedAt: new Date().toISOString(),
-          manufacturingSvgTrace: {
-            inkCoverage: traced.inkCoverage,
-            pathCount: traced.pathCount,
-            units: artworkWidthMm ? 'mm' : 'px',
-            source: 'admin_regeneration',
-          },
+          manufacturingSvgTrace: { ...files.trace, source: 'admin_regeneration' },
         },
       })
       .eq('id', option.id);
@@ -324,13 +314,17 @@ export async function generateManufacturingSvgAction(
         : 'manufacturing_svg_generated',
       entityType: 'personalized_preview_option',
       entityId: option.id,
-      metadata: { storagePath, tracedFrom: option.manufacturing_file_path },
+      metadata: {
+        storagePath: files.fillPath,
+        strokeStoragePath: files.strokePath,
+        tracedFrom: option.manufacturing_file_path,
+      },
     });
 
     revalidatePath(`/admin/generated/${settings.generatedItemId}`);
     return {
       status: 'success',
-      message: 'Manufacturing SVG generated and attached to this option.',
+      message: 'Fill and stroke SVGs generated and attached to this option.',
     };
   } catch (error) {
     return {
