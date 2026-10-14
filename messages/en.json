@@ -480,7 +480,19 @@
     "skillFile": "Skill file (optional)",
     "skillFileHelp": "Upload a .md or .txt document up to 1 MB. Its content is injected into AI generation instructions.",
     "skillAttached": "Attached skill",
-    "removeSkill": "Remove skill"
+    "removeSkill": "Remove skill",
+    "categoryTabsLabel": "Boilerplate categories",
+    "categoryTabsHelp": "Grouped by the category of the catalog items each boilerplate is attached to. Attach or detach boilerplates from the item form; one attached to items in several categories shows in each.",
+    "tabAll": "All",
+    "tabUnattached": "Unattached",
+    "emptyCategoryTitle": "Nothing in {category}",
+    "emptyCategoryHelp": "No boilerplate is attached to a catalog item in this category yet. Add one below, then attach it from the item form.",
+    "emptyUnattachedHelp": "Every boilerplate is attached to at least one catalog item. A boilerplate detached from its last item shows up here.",
+    "attachedTo": "Attached to",
+    "notAttached": "Not attached to any catalog item",
+    "inactive": "Inactive",
+    "newBoilerplate": "New boilerplate",
+    "newBoilerplateHelp": "Saved to the shared library. It appears under a category once a catalog item attaches it."
   },
   "legal": {
     "privacy": {
