@@ -3,14 +3,26 @@ import type { z } from 'zod';
 /**
  * Shared result type for server actions consumed by `useActionState`.
  *
- * Convention: form-rendering actions return `ActionState<T>`; imperative
- * flows that end in `redirect()` (checkout, cart, credits) keep throwing
- * instead — converting those would change their UX.
+ * Convention: form-rendering actions return `ActionState<T>`. Imperative flows
+ * that end in `redirect()` (checkout, cart, credits) also return `ActionState`
+ * for *validation* failures so the form can show them — `redirect()` throws, so
+ * the success path composes with `useActionState` unchanged. Only genuine
+ * infrastructure errors (database, payment provider) keep throwing.
  */
 export type ActionState<T = null> =
   | { status: 'idle' }
   | { status: 'success'; data: T; message?: string }
-  | { status: 'error'; error: string; fieldErrors?: Record<string, string[]> };
+  | {
+      status: 'error';
+      error: string;
+      fieldErrors?: Record<string, string[]>;
+      /**
+       * Submitted values to re-populate the form with. React resets a form once
+       * its action settles, so a form that wants to keep the buyer's input on a
+       * validation error echoes it back here and feeds it to `defaultValue`.
+       */
+      values?: Record<string, string>;
+    };
 
 export const idleState: ActionState<never> = { status: 'idle' };
 

@@ -1,5 +1,7 @@
+import { Download } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { OrderStatusForm } from '@/app/admin/order-status-form';
+import { productionPackHrefs, ProductionSummary } from '@/app/admin/production-pack-links';
 import { requireAdmin } from '@/lib/admin';
 import {
   getOrderDetailForAdmin,
@@ -8,6 +10,7 @@ import {
   type CatalogProductionInfo,
   type GeneratedOrderInfo,
 } from '@/lib/orders';
+import { loadOrderProductionPacks, type ProductionPack } from '@/lib/production-pack/load';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { generateBannerManufacturingInstructionAction } from './actions';
 
@@ -34,11 +37,35 @@ export default async function AdminOrderDetailPage({
     latestInstructionByItemId,
   } = detail;
 
+  // Technical documentation per item: the same data the download routes pack,
+  // so the page can show what the workshop would receive before it is sent.
+  const packs = (await loadOrderProductionPacks(supabase, id).catch(() => null)) ?? [];
+  const packByItemId = new Map(packs.map((pack) => [pack.orderItemId, pack]));
+  const readyCount = packs.filter((pack) => pack.sheet.status === 'ready').length;
+
   return (
     <main className="container max-w-5xl space-y-8 py-10">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Order {order.id.slice(0, 8)}</h1>
-        <p className="text-muted-foreground">Created {formatDate(order.created_at)}</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Order {order.id.slice(0, 8)}</h1>
+          <p className="text-muted-foreground">Created {formatDate(order.created_at)}</p>
+        </div>
+        {packs.length ? (
+          <div className="text-right">
+            <a
+              href={`/admin/orders/${order.id}/production-pack`}
+              className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Production pack · all items (.zip)
+            </a>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Tech sheets and production files for {packs.length} item
+              {packs.length === 1 ? '' : 's'} · {readyCount} ready
+              {readyCount !== packs.length ? `, ${packs.length - readyCount} need review` : ''}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -69,6 +96,7 @@ export default async function AdminOrderDetailPage({
                     }
                     latestInstruction={latestInstructionByItemId.get(item.id) ?? null}
                     orderId={order.id}
+                    pack={packByItemId.get(item.id) ?? null}
                   />
                 ))}
               </div>
@@ -164,14 +192,19 @@ function OrderItemDetail({
   generatedInfo,
   latestInstruction,
   orderId,
+  pack,
 }: {
   item: AdminOrderItem;
   catalogInfo: CatalogProductionInfo | null;
   generatedInfo: GeneratedOrderInfo | null;
   latestInstruction: BannerManufacturingInstruction | null;
   orderId: string;
+  pack: ProductionPack | null;
 }) {
   const isBanner = Boolean(item.banner_size_key || generatedInfo?.product_type === 'banner');
+  const packHrefs = productionPackHrefs(
+    `/admin/orders/${orderId}/items/${item.id}/production-pack`,
+  );
 
   return (
     <div className="grid gap-4 p-4 sm:grid-cols-[1fr_auto]">
@@ -200,6 +233,8 @@ function OrderItemDetail({
             <Info label="Manufacturing status" value={latestInstruction?.status ?? 'not_started'} />
           ) : null}
         </div>
+
+        {pack ? <ProductionSummary sheet={pack.sheet} hrefs={packHrefs} /> : null}
 
         {isBanner ? (
           <div className="rounded-md border p-3">

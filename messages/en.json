@@ -423,7 +423,17 @@
     "select_destination": "Select destination",
     "resolve_issues": "Resolve cart issues before creating an order.",
     "create_order": "Create order",
-    "country": "Country"
+    "country": "Country",
+    "creating_order": "Creating order…",
+    "error": {
+      "form": "Check the highlighted fields and try again.",
+      "too_long": "This value is too long.",
+      "contact_email": "Enter a valid contact email.",
+      "recipient": "Enter the recipient name (at least {min} characters).",
+      "phone": "Enter a phone number with at least {min} characters.",
+      "address1": "Enter a street address (at least {min} characters).",
+      "city": "Enter a city (at least {min} characters)."
+    }
   },
   "order": {
     "title": "Order",

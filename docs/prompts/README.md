@@ -72,6 +72,29 @@ hairline strokes instead of ~1%-width contour lines, and the preview renders
 them as fine scored lines. Its production file is the stroke variant of the
 traced SVG; the engraved style uses the fill variant.
 
+### Music plaque night light
+
+Fourth night-light item (*Music Plaque Acrylic Night Light*, 30,000 AMD):
+a portrait UV-printed clear plaque styled as a music player, with the
+customer's photo as album art, the song title and artist, player glyphs and
+a decorative code strip. Created directly in the production database on
+2026-10-14; spec and live ids in
+`docs/requirements/music-plaque-night-light-requirements.md`.
+
+| File | Attached to |
+| --- | --- |
+| `items/night-light.system-prompt.txt` (shared) | *Music Plaque Acrylic Night Light* |
+| `skills/music-plaque-night-light-preview/SKILL.md` | *Music Plaque Acrylic Night Light* |
+
+One style, `music-plaque-uv-print` (Music plaque UV print), with
+`public/product-references/night-lights/music-plaque-uv-print.jpg` as
+template. Text convention: line 1 the song title, line 2 the artist, both
+set into the print file through the placeholders. Print convention, stated
+in the manufacturing prompt: solid black is clear unprinted acrylic, the
+photo prints in full colour inside its rounded square, every other element
+is white ink. The item has its own skill because the generic night-light
+skill assumes an edge-to-edge print.
+
 ## Keepsake boxes
 
 Item family: laser-engraved wooden keepsake boxes (`keepsake-boxes` category;

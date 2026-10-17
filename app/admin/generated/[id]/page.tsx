@@ -2,6 +2,7 @@ import { AlertTriangle, Check, Download, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { reviewGeneratedItemAction } from '@/app/admin/generated/actions';
+import { ProductionPackLinks, productionPackHrefs } from '@/app/admin/production-pack-links';
 import { AssetFigure } from './asset-figure';
 import { AssetPreviewCard } from './asset-preview-card';
 import { ManufacturingFileForm } from './manufacturing-file-form';
@@ -226,6 +227,25 @@ export default async function AdminGeneratedDetailPage({
           </form>
 
           <div className="rounded-xl border bg-card p-5">
+            <h2 className="font-semibold">Technical documentation</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {optionAssets.length > 1
+                ? `Tech sheets, materials, sizes and operator instructions for all ${optionAssets.length} options, with their production files.`
+                : 'Tech sheet with materials, sizes and operator instructions, packed with the production files.'}
+            </p>
+            <div className="mt-3">
+              <ProductionPackLinks
+                hrefs={productionPackHrefs(`/admin/generated/${item.id}/production-pack`)}
+                packLabel={
+                  optionAssets.length > 1
+                    ? 'Production pack · all options'
+                    : 'Production pack (.zip)'
+                }
+              />
+            </div>
+          </div>
+
+          <div className="rounded-xl border bg-card p-5">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Timeline
             </h2>
@@ -331,6 +351,17 @@ function OptionReview({
             </span>
           ) : null}
         </div>
+
+        {optionCount > 1 ? (
+          <div className="mt-3">
+            <ProductionPackLinks
+              hrefs={productionPackHrefs(`/admin/generated/${item.id}/production-pack`, {
+                option: option.id,
+              })}
+              packLabel="Production pack · this option"
+            />
+          </div>
+        ) : null}
 
         <div className="mt-4 grid gap-3.5 min-[560px]:grid-cols-3">
           {source ? (

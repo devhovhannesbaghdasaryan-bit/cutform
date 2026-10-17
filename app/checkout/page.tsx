@@ -1,10 +1,8 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { createCheckoutOrderAction } from '@/app/checkout/actions';
+import { CheckoutForm } from '@/app/checkout/checkout-form';
 import { MarketplaceHeader } from '@/components/marketplace-header';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { listCartItems, validateCartBeforeCheckout } from '@/lib/cart';
 import { normalizeCurrency } from '@/lib/currency';
 import { tDynamic } from '@/lib/i18n-dynamic';
@@ -94,98 +92,43 @@ export default async function CheckoutPage() {
           </section>
 
           <aside className="space-y-4">
-            <form action={createCheckoutOrderAction} className="space-y-4 rounded-lg border p-5">
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="countryCode" value="AM" />
-              <div>
-                <h2 className="font-semibold">{t('order.summary')}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{t('checkout.payment_note')}</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactEmail">{t('checkout.contact_email')}</Label>
-                <Input
-                  id="contactEmail"
-                  name="contactEmail"
-                  type="email"
-                  defaultValue={user.email ?? ''}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="recipientName">{t('checkout.recipient')}</Label>
-                <Input id="recipientName" name="recipientName" autoComplete="name" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">{t('checkout.phone')}</Label>
-                <Input id="phone" name="phone" type="tel" autoComplete="tel" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="addressLine1">{t('checkout.address1')}</Label>
-                <Input
-                  id="addressLine1"
-                  name="addressLine1"
-                  autoComplete="address-line1"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="addressLine2">{t('checkout.address2')}</Label>
-                <Input id="addressLine2" name="addressLine2" autoComplete="address-line2" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="countryDisplay">{t('checkout.country')}</Label>
-                <Input
-                  id="countryDisplay"
-                  value={getCountryDisplayName('AM', locale)}
-                  disabled
-                  readOnly
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="city">{t('checkout.city')}</Label>
-                <Input id="city" name="city" autoComplete="address-level2" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="administrativeArea">{t('checkout.region')}</Label>
-                <Input
-                  id="administrativeArea"
-                  name="administrativeArea"
-                  autoComplete="address-level1"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="postalCode">{t('checkout.postal')}</Label>
-                <Input id="postalCode" name="postalCode" autoComplete="postal-code" />
-              </div>
-              <div className="flex justify-between border-t pt-4">
-                <span className="text-muted-foreground">{t('cart.subtotal')}</span>
-                <span className="font-semibold">{formatPrice(subtotal, subtotalCurrency)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">{t('cart.shipping')}</span>
-                <span className="font-semibold">
-                  {totals
-                    ? formatPrice(totals.shippingCents, totals.currency)
-                    : t('checkout.select_destination')}
-                </span>
-              </div>
-              <div className="flex justify-between border-t pt-4 text-lg">
-                <span>{t('cart.total')}</span>
-                <span className="font-bold">
-                  {totals
-                    ? formatPrice(totals.totalCents, totals.currency)
-                    : formatPrice(subtotal, subtotalCurrency)}
-                </span>
-              </div>
-              {issues.length ? (
-                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                  {t('checkout.resolve_issues')}
-                </div>
-              ) : null}
-              <Button type="submit" className="w-full" disabled={issues.length > 0 || !totals}>
-                {t('checkout.create_order')}
-              </Button>
-            </form>
+            <CheckoutForm
+              locale={locale}
+              defaultEmail={user.email ?? ''}
+              countryName={getCountryDisplayName('AM', locale)}
+              subtotalText={formatPrice(subtotal, subtotalCurrency)}
+              shippingText={
+                totals
+                  ? formatPrice(totals.shippingCents, totals.currency)
+                  : t('checkout.select_destination')
+              }
+              totalText={
+                totals
+                  ? formatPrice(totals.totalCents, totals.currency)
+                  : formatPrice(subtotal, subtotalCurrency)
+              }
+              hasIssues={issues.length > 0}
+              canSubmit={issues.length === 0 && totals !== null}
+              copy={{
+                summary: t('order.summary'),
+                paymentNote: t('checkout.payment_note'),
+                contactEmail: t('checkout.contact_email'),
+                recipient: t('checkout.recipient'),
+                phone: t('checkout.phone'),
+                address1: t('checkout.address1'),
+                address2: t('checkout.address2'),
+                country: t('checkout.country'),
+                city: t('checkout.city'),
+                region: t('checkout.region'),
+                postal: t('checkout.postal'),
+                subtotal: t('cart.subtotal'),
+                shipping: t('cart.shipping'),
+                total: t('cart.total'),
+                resolveIssues: t('checkout.resolve_issues'),
+                createOrder: t('checkout.create_order'),
+                creatingOrder: t('checkout.creating_order'),
+              }}
+            />
           </aside>
         </div>
       </main>

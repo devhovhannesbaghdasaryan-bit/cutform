@@ -2,38 +2,81 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
+import { CHECKOUT_FIELD_LIMITS as LIMITS } from '@/app/checkout/checkout-fields';
+import type { ActionState } from '@/lib/action-state';
 import { createOrderFromCart } from '@/lib/orders';
 import { initiateAmeriaPayment } from '@/lib/payments/ameria';
 import { initiatePolarCheckout } from '@/lib/payments/polar';
 import { getCurrentUser, getServerSupabase, getServiceSupabase } from '@/lib/supabase/server';
 import { createTransactionRecord } from '@/lib/transactions';
 
+const optionalText = (max: number) => z.string().trim().max(max).optional().or(z.literal(''));
+
 const checkoutSchema = z.object({
-  contactEmail: z.string().email().optional().or(z.literal('')),
+  contactEmail: z.string().trim().email().optional().or(z.literal('')),
   locale: z.enum(['en', 'ru', 'am']).optional().or(z.literal('')),
-  recipientName: z.string().trim().min(2).max(120),
-  phone: z.string().trim().min(5).max(40),
-  addressLine1: z.string().trim().min(3).max(160),
-  addressLine2: z.string().trim().max(160).optional().or(z.literal('')),
-  city: z.string().trim().min(2).max(100),
-  administrativeArea: z.string().trim().max(100).optional().or(z.literal('')),
-  postalCode: z.string().trim().max(30).optional().or(z.literal('')),
+  recipientName: z.string().trim().min(LIMITS.recipientName.min).max(LIMITS.recipientName.max),
+  phone: z.string().trim().min(LIMITS.phone.min).max(LIMITS.phone.max),
+  addressLine1: z.string().trim().min(LIMITS.addressLine1.min).max(LIMITS.addressLine1.max),
+  addressLine2: optionalText(LIMITS.addressLine2.max),
+  city: z.string().trim().min(LIMITS.city.min).max(LIMITS.city.max),
+  administrativeArea: optionalText(LIMITS.administrativeArea.max),
+  postalCode: optionalText(LIMITS.postalCode.max),
 });
 
-export async function createCheckoutOrderAction(formData: FormData) {
-  const parsed = checkoutSchema.safeParse({
-    contactEmail: formData.get('contactEmail') || '',
-    locale: formData.get('locale') || '',
-    recipientName: formData.get('recipientName'),
-    phone: formData.get('phone'),
-    addressLine1: formData.get('addressLine1'),
-    addressLine2: formData.get('addressLine2') || '',
-    city: formData.get('city'),
-    administrativeArea: formData.get('administrativeArea') || '',
-    postalCode: formData.get('postalCode') || '',
-  });
-  if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? 'Invalid checkout data.');
+const CHECKOUT_FIELDS = [
+  'contactEmail',
+  'locale',
+  'recipientName',
+  'phone',
+  'addressLine1',
+  'addressLine2',
+  'city',
+  'administrativeArea',
+  'postalCode',
+] as const;
+
+export type CheckoutActionState = ActionState<null>;
+
+function readField(formData: FormData, name: string): string {
+  const value = formData.get(name);
+  return typeof value === 'string' ? value : '';
+}
+
+export async function createCheckoutOrderAction(
+  _prev: CheckoutActionState,
+  formData: FormData,
+): Promise<CheckoutActionState> {
+  const values = Object.fromEntries(
+    CHECKOUT_FIELDS.map((name) => [name, readField(formData, name)]),
+  ) as Record<(typeof CHECKOUT_FIELDS)[number], string>;
+
+  const parsed = checkoutSchema.safeParse(values);
+  if (!parsed.success) {
+    // Validation failures come back as form state (never thrown): the browser
+    // only enforces `required`, so a 3-digit phone or a one-letter city reaches
+    // us and must render as a field error, not a server crash.
+    const t = await getTranslations();
+    const tooShort: Record<string, string> = {
+      contactEmail: t('checkout.error.contact_email'),
+      recipientName: t('checkout.error.recipient', { min: LIMITS.recipientName.min }),
+      phone: t('checkout.error.phone', { min: LIMITS.phone.min }),
+      addressLine1: t('checkout.error.address1', { min: LIMITS.addressLine1.min }),
+      city: t('checkout.error.city', { min: LIMITS.city.min }),
+    };
+    const tooLong = t('checkout.error.too_long');
+
+    const fieldErrors: Record<string, string[]> = {};
+    for (const issue of parsed.error.issues) {
+      const field = String(issue.path[0] ?? '_root');
+      const message = issue.code === 'too_big' ? tooLong : (tooShort[field] ?? issue.message);
+      fieldErrors[field] ??= [];
+      fieldErrors[field].push(message);
+    }
+    return { status: 'error', error: t('checkout.error.form'), fieldErrors, values };
+  }
 
   const supabase = await getServerSupabase();
   const user = await getCurrentUser();
