@@ -30,7 +30,7 @@ export function ThemeToggle({ className, label }: { className?: string; label: s
       aria-label={label}
       title={label}
       className={cn(
-        'relative shrink-0 text-cyber-cyan hover:bg-secondary hover:text-secondary-foreground',
+        'relative shrink-0 text-muted-foreground hover:bg-accent hover:text-foreground',
         className,
       )}
     >

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Manrope, Sora } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { getTranslations } from 'next-intl/server';
 import { Toaster } from 'sonner';
@@ -6,6 +7,23 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { getLocaleForFormatting } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import './globals.css';
+
+// Manrope carries body and UI copy (Latin + Cyrillic); Sora is the display
+// face for headings. Armenian falls back to the system stack declared in
+// globals.css (`--font-sans`), neither Google family covers it.
+const manrope = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-manrope',
+  display: 'swap',
+});
+
+const sora = Sora({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-sora',
+  display: 'swap',
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations();
@@ -26,7 +44,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = await getRequestLocale();
 
   return (
-    <html lang={getLocaleForFormatting(locale)} suppressHydrationWarning>
+    <html
+      lang={getLocaleForFormatting(locale)}
+      suppressHydrationWarning
+      className={`${manrope.variable} ${sora.variable}`}
+    >
       <head>
         <script
           // biome-ignore lint/security/noDangerouslySetInnerHtml: static inline theme bootstrap script; no user input
@@ -35,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="min-h-screen bg-background">
+      <body className="min-h-screen bg-background font-sans">
         <TooltipProvider delayDuration={150}>
           {children}
           <Toaster richColors position="top-right" />

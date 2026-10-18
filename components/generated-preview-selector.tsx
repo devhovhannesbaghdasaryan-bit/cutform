@@ -108,7 +108,7 @@ export function GeneratedPreviewSelector({
                     selected
                       ? 'border-primary bg-primary/5'
                       : active
-                        ? 'border-cyber-cyan/60'
+                        ? 'border-primary/60'
                         : 'border-border hover:border-primary/50'
                   }`}
                 >
