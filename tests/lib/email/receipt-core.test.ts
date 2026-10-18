@@ -24,9 +24,7 @@ describe('buildOrderReceiptModel', () => {
   const input = {
     locale: 'en' as const,
     orderId: 'abcd1234-0000-0000-0000-000000000000',
-    items: [
-      { title: 'Neon sign', quantity: 2, total_price_cents: 5000000, currency: 'AMD' },
-    ],
+    items: [{ title: 'Neon sign', quantity: 2, total_price_cents: 5000000, currency: 'AMD' }],
     subtotalCents: 5000000,
     shippingCents: 200000,
     totalCents: 5200000,
@@ -79,5 +77,19 @@ describe('buildCreditsReceiptModel', () => {
     });
     expect(model.packName).toBe('Credits');
     expect(model.creditAmount).toBe(0);
+  });
+
+  it('localizes known packs by key and the fallback by locale', () => {
+    const base = { amountCents: 500000, currency: 'AMD', siteUrl: 'https://uniqraft.example' };
+    expect(
+      buildCreditsReceiptModel({
+        ...base,
+        locale: 'ru',
+        metadata: { packKey: 'starter', packName: 'Starter pack' },
+      }).packName,
+    ).toBe('Пакет «Старт»');
+    expect(buildCreditsReceiptModel({ ...base, locale: 'am', metadata: {} }).packName).toBe(
+      'Կրեդիտներ',
+    );
   });
 });

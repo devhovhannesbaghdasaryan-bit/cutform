@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2, RefreshCw } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useActionState } from 'react';
 import {
   generateManufacturingSvgAction,
@@ -23,6 +24,7 @@ export function ManufacturingSvgForm({
   hasExistingSvg,
   primary = false,
 }: ManufacturingSvgFormProps) {
+  const t = useTranslations();
   const [state, action, pending] = useActionState(generateManufacturingSvgAction, initialState);
   const buttonStyle = primary
     ? 'bg-primary text-primary-foreground'
@@ -44,10 +46,10 @@ export function ManufacturingSvgForm({
           <RefreshCw className="size-4" aria-hidden="true" />
         )}
         {pending
-          ? 'Tracing PNG to SVG…'
+          ? t('adminGenerated.svgForm.tracing')
           : hasExistingSvg
-            ? 'Re-trace from PNG'
-            : 'Trace PNG to SVG'}
+            ? t('adminGenerated.svgForm.retrace')
+            : t('adminGenerated.svgForm.trace')}
       </button>
 
       {state.message ? (

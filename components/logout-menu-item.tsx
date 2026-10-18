@@ -4,7 +4,7 @@ import { LogOut } from 'lucide-react';
 import { logoutAction } from '@/app/(auth)/actions';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 
-export function LogoutMenuItem({ label = 'Log out' }: { label?: string }) {
+export function LogoutMenuItem({ label }: { label: string }) {
   return (
     <form action={logoutAction}>
       <DropdownMenuItem asChild onSelect={(event) => event.preventDefault()}>

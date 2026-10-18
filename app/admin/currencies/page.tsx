@@ -1,8 +1,13 @@
-import { refreshExchangeRatesAction, updateCurrencySettingsAction } from '@/app/admin/currencies/actions';
+import { getTranslations } from 'next-intl/server';
+import {
+  refreshExchangeRatesAction,
+  updateCurrencySettingsAction,
+} from '@/app/admin/currencies/actions';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import type { AppCurrency } from '@/lib/currency';
 import { APP_CURRENCIES } from '@/lib/currency';
+import { getRequestLocale } from '@/lib/i18n-server';
 import { PAYMENT_ROUTES, type PaymentRoute } from '@/lib/payments/types';
 import { formatDate } from '@/lib/utils';
 
@@ -30,6 +35,7 @@ interface RateRow {
 
 export default async function AdminCurrenciesPage() {
   const { supabase } = await requireAdmin();
+  const [t, locale] = await Promise.all([getTranslations(), getRequestLocale()]);
   const [{ data: currencies, error }, { data: rates }] = await Promise.all([
     supabase
       .from('currencies')
@@ -57,11 +63,8 @@ export default async function AdminCurrenciesPage() {
   return (
     <main className="container max-w-5xl space-y-8 py-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Currencies</h1>
-        <p className="text-muted-foreground">
-          Manage enabled storefront currencies, payment routes, and daily exchange-rate cache
-          status.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('adminCurrencies.title')}</h1>
+        <p className="text-muted-foreground">{t('adminCurrencies.subtitle')}</p>
       </div>
 
       {error ? (
@@ -72,11 +75,11 @@ export default async function AdminCurrenciesPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Enabled</th>
-                  <th className="px-4 py-3 font-medium">Currency</th>
-                  <th className="px-4 py-3 font-medium">Payment route</th>
-                  <th className="px-4 py-3 font-medium">Latest AMD rate</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">{t('adminCurrencies.enabled')}</th>
+                  <th className="px-4 py-3 font-medium">{t('adminCurrencies.currency')}</th>
+                  <th className="px-4 py-3 font-medium">{t('adminCurrencies.paymentRoute')}</th>
+                  <th className="px-4 py-3 font-medium">{t('adminCurrencies.latestRate')}</th>
+                  <th className="px-4 py-3 font-medium">{t('adminCurrencies.status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -91,6 +94,7 @@ export default async function AdminCurrenciesPage() {
                           value={currency.code}
                           defaultChecked={currency.is_enabled}
                           disabled={currency.is_default}
+                          aria-label={t('adminCurrencies.enableCurrency', { code: currency.code })}
                           className="h-4 w-4"
                         />
                         {currency.is_default ? (
@@ -103,12 +107,13 @@ export default async function AdminCurrenciesPage() {
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {currency.name}
-                          {currency.is_default ? ' · default' : ''}
+                          {currency.is_default ? ` · ${t('adminCurrencies.default')}` : ''}
                         </p>
                       </td>
                       <td className="px-4 py-3">
                         <select
                           name={`paymentRoute:${currency.code}`}
+                          aria-label={t('adminCurrencies.paymentRouteFor', { code: currency.code })}
                           defaultValue={
                             PAYMENT_ROUTES.includes(currency.payment_route as PaymentRoute)
                               ? currency.payment_route
@@ -117,7 +122,9 @@ export default async function AdminCurrenciesPage() {
                           className="h-9 rounded-md border border-input bg-background px-2"
                         >
                           <option value="ameria">Ameriabank</option>
-                          <option value="bank_manual">Bank / manual</option>
+                          <option value="bank_manual">
+                            {t('adminCurrencies.routeBankManual')}
+                          </option>
                         </select>
                       </td>
                       <td className="px-4 py-3">
@@ -125,25 +132,27 @@ export default async function AdminCurrenciesPage() {
                           <>
                             <p className="font-medium">{Number(rate.rate).toFixed(6)}</p>
                             <p className="text-xs text-muted-foreground">
-                              {rate.provider} · {formatDate(rate.fetched_at)}
+                              {rate.provider} · {formatDate(rate.fetched_at, locale)}
                             </p>
                           </>
                         ) : (
-                          <span className="text-muted-foreground">Missing</span>
+                          <span className="text-muted-foreground">
+                            {t('adminCurrencies.missing')}
+                          </span>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         {rate?.is_stale ? (
                           <span className="bg-warning text-warning-foreground rounded-full px-2 py-1 text-xs font-medium">
-                            Stale fallback
+                            {t('adminCurrencies.staleFallback')}
                           </span>
                         ) : rate ? (
                           <span className="bg-success/15 text-success rounded-full px-2 py-1 text-xs font-medium">
-                            Cached
+                            {t('adminCurrencies.cached')}
                           </span>
                         ) : (
                           <span className="rounded-full bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive">
-                            No rate
+                            {t('adminCurrencies.noRate')}
                           </span>
                         )}
                       </td>
@@ -155,17 +164,18 @@ export default async function AdminCurrenciesPage() {
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit">Save currency settings</Button>
+            <Button type="submit">{t('adminCurrencies.save')}</Button>
           </div>
         </form>
       )}
 
-      <form action={refreshExchangeRatesAction} className="flex items-center justify-between rounded-lg border p-4">
-        <p className="text-sm text-muted-foreground">
-          Pull the latest AMD→currency rates from the exchange-rate provider now.
-        </p>
+      <form
+        action={refreshExchangeRatesAction}
+        className="flex items-center justify-between rounded-lg border p-4"
+      >
+        <p className="text-sm text-muted-foreground">{t('adminCurrencies.refreshHelp')}</p>
         <Button type="submit" variant="outline">
-          Refresh rates
+          {t('adminCurrencies.refresh')}
         </Button>
       </form>
     </main>

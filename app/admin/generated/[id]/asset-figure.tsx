@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Download, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 interface AssetFigureProps {
@@ -30,6 +31,7 @@ export function AssetFigure({
   tag,
   emphasized = false,
 }: AssetFigureProps) {
+  const t = useTranslations();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const frame = emphasized ? 'border-2 border-primary' : 'border';
   const surface = isSvg || emphasized ? 'bg-white' : 'bg-muted';
@@ -40,7 +42,7 @@ export function AssetFigure({
         type="button"
         onClick={() => dialogRef.current?.showModal()}
         disabled={!url}
-        aria-label={`Preview ${title}`}
+        aria-label={t('adminGenerated.asset.previewAria', { title })}
         className={`relative block aspect-square w-full overflow-hidden rounded-lg ${frame} ${surface} transition-opacity hover:opacity-90 disabled:cursor-default disabled:hover:opacity-100`}
       >
         {url ? (
@@ -59,7 +61,7 @@ export function AssetFigure({
           )
         ) : (
           <span className="grid h-full place-items-center px-2 text-xs text-muted-foreground">
-            Unavailable
+            {t('adminGenerated.asset.unavailable')}
           </span>
         )}
       </button>
@@ -86,7 +88,7 @@ export function AssetFigure({
               className="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               <Download className="size-3.5" aria-hidden="true" />
-              Download
+              {t('adminGenerated.asset.download')}
             </a>
           ) : null}
         </div>
@@ -96,7 +98,7 @@ export function AssetFigure({
         // biome-ignore lint/a11y/useKeyWithClickEvents: native <dialog> closes on Escape; onClick only handles backdrop dismiss
         <dialog
           ref={dialogRef}
-          aria-label={`${title} preview`}
+          aria-label={t('adminGenerated.asset.dialogAria', { title })}
           onClick={(event) => {
             if (event.target === event.currentTarget) event.currentTarget.close();
           }}
@@ -111,7 +113,7 @@ export function AssetFigure({
               type="button"
               onClick={() => dialogRef.current?.close()}
               className="grid size-9 shrink-0 place-items-center rounded-md border hover:bg-muted"
-              aria-label="Close preview"
+              aria-label={t('adminGenerated.asset.closePreview')}
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -142,7 +144,7 @@ export function AssetFigure({
                 className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:w-auto"
               >
                 <Download className="size-4" aria-hidden="true" />
-                Download
+                {t('adminGenerated.asset.download')}
               </a>
             </div>
           ) : null}

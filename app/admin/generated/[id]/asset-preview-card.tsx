@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Download, Eye, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 interface AssetPreviewCardProps {
@@ -19,6 +20,7 @@ export function AssetPreviewCard({
   downloadUrl,
   isSvg = false,
 }: AssetPreviewCardProps) {
+  const t = useTranslations();
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   return (
@@ -29,7 +31,7 @@ export function AssetPreviewCard({
           onClick={() => dialogRef.current?.showModal()}
           disabled={!url}
           className="relative h-36 w-full shrink-0 overflow-hidden rounded-md border bg-muted transition-opacity hover:opacity-80 disabled:cursor-default min-[420px]:h-20 min-[420px]:w-20"
-          aria-label={`Preview ${title}`}
+          aria-label={t('adminGenerated.asset.previewAria', { title })}
         >
           {url ? (
             isSvg ? (
@@ -40,7 +42,7 @@ export function AssetPreviewCard({
             )
           ) : (
             <span className="grid h-full place-items-center px-2 text-xs text-muted-foreground">
-              Unavailable
+              {t('adminGenerated.asset.unavailable')}
             </span>
           )}
         </button>
@@ -58,7 +60,7 @@ export function AssetPreviewCard({
                 className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted"
               >
                 <Eye className="size-3.5" aria-hidden="true" />
-                Preview
+                {t('common.preview')}
               </button>
               {downloadUrl ? (
                 <a
@@ -66,7 +68,7 @@ export function AssetPreviewCard({
                   className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium hover:bg-muted"
                 >
                   <Download className="size-3.5" aria-hidden="true" />
-                  Download
+                  {t('adminGenerated.asset.download')}
                 </a>
               ) : null}
             </div>
@@ -78,7 +80,7 @@ export function AssetPreviewCard({
         // biome-ignore lint/a11y/useKeyWithClickEvents: native <dialog> closes on Escape; onClick only handles backdrop dismiss
         <dialog
           ref={dialogRef}
-          aria-label={`${title} preview`}
+          aria-label={t('adminGenerated.asset.dialogAria', { title })}
           onClick={(event) => {
             if (event.target === event.currentTarget) event.currentTarget.close();
           }}
@@ -93,7 +95,7 @@ export function AssetPreviewCard({
               type="button"
               onClick={() => dialogRef.current?.close()}
               className="grid size-9 shrink-0 place-items-center rounded-md border hover:bg-muted"
-              aria-label="Close preview"
+              aria-label={t('adminGenerated.asset.closePreview')}
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -101,7 +103,11 @@ export function AssetPreviewCard({
           <div className="grid max-h-[75dvh] min-h-48 place-items-center overflow-auto bg-muted/50 p-2 sm:min-h-72 sm:p-4">
             {isSvg ? (
               // biome-ignore lint/performance/noImgElement: sanitized SVG rendered inline; next/image cannot render SVG markup
-              <img src={url} alt={title} className="max-h-[70vh] max-w-full bg-white object-contain" />
+              <img
+                src={url}
+                alt={title}
+                className="max-h-[70vh] max-w-full bg-white object-contain"
+              />
             ) : (
               <Image
                 src={url}
@@ -120,7 +126,7 @@ export function AssetPreviewCard({
                 className="inline-flex h-9 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:w-auto"
               >
                 <Download className="size-4" aria-hidden="true" />
-                Download
+                {t('adminGenerated.asset.download')}
               </a>
             ) : null}
           </div>

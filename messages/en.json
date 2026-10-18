@@ -14,7 +14,33 @@
     "manual": "Bank/manual pending",
     "buy": "Buy pack",
     "pending": "Pending manual requests",
-    "packFallback": "Credit pack"
+    "packFallback": "Credit pack",
+    "amount": "{count, plural, one {# credit} other {# credits}}",
+    "reason": {
+      "purchase": "Credit purchase",
+      "generation_spend": "Spent on generation",
+      "generation_refund": "Generation refund",
+      "admin_adjustment": "Adjustment by support"
+    },
+    "referenceType": {
+      "payment_transaction": "Payment",
+      "personalized_item": "Personalized design",
+      "banner_generation": "Banner generation"
+    },
+    "pack": {
+      "starter": {
+        "name": "Starter pack",
+        "description": "Enough for a few small AI generation attempts."
+      },
+      "maker": {
+        "name": "Maker pack",
+        "description": "Best for iterating on night lights and 2D designs."
+      },
+      "studio": {
+        "name": "Studio pack",
+        "description": "For repeated product experiments and banner work."
+      }
+    }
   },
   "banners": {
     "eyebrow": "Marketing banners",
@@ -35,13 +61,14 @@
     "previewText": "Your banner text",
     "custom": "Custom banner",
     "review": "Review customized banner",
-    "unavailable": "Publish an admin banner sample and size preset before ordering a customized sample.",
+    "unavailable": "Choose a published sample, a size and your text to continue.",
     "advancedPrompt": "Advanced AI prompt",
     "promptPlaceholder": "Describe the store, offer, brand colors, attached references, and desired banner style.",
     "reference": "Reference image",
     "rights": "I have the rights to use the uploaded reference image.",
     "generate": "Generate with credits",
-    "disclaimer": "Generated banner previews are approximations and require admin production review before manufacturing."
+    "disclaimer": "Generated banner previews are approximations and require admin production review before manufacturing.",
+    "defaultText": "Grand opening sale"
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -75,7 +102,19 @@
     "signedIn": "Signed in",
     "email": "Email",
     "password": "Password",
-    "login_required": "Log in or create an account to continue."
+    "login_required": "Log in or create an account to continue.",
+    "errorEmailPasswordRequired": "Email and password are required.",
+    "errorPasswordLength": "Password must be at least 8 characters.",
+    "errorEmailRequired": "Email is required.",
+    "errorCode": "Enter the code from the email.",
+    "errorProvider": "Unsupported login provider.",
+    "errorProviderStart": "The login provider could not be started.",
+    "errorLinkInvalid": "This sign-in link is invalid or has expired. Log in or request a new link.",
+    "errorInvalidCredentials": "Incorrect email or password.",
+    "errorUserExists": "An account with this email already exists. Log in instead.",
+    "errorWeakPassword": "This password is too weak. Choose a stronger one.",
+    "errorRateLimit": "Too many attempts. Please wait a minute and try again.",
+    "errorCodeExpired": "This code is invalid or has expired. Request a new email."
   },
   "dashboard": {
     "title": "Your products",
@@ -91,7 +130,9 @@
     "generatedItems": "Generated items",
     "approvedProducts": "Approved products",
     "previewSaved": "Preview saved",
-    "noPreview": "No preview"
+    "noPreview": "No preview",
+    "loadFailed": "Failed to load products: {message}",
+    "productPreview": "Product preview"
   },
   "empty": {
     "title": "Nothing here yet",
@@ -142,7 +183,14 @@
     "orders": "Orders",
     "home": "Uniqraft home",
     "menu": "Menu",
-    "theme": "Theme"
+    "theme": "Theme",
+    "cartCount": "Cart, {count, plural, one {# item} other {# items}}",
+    "creditsCount": "Credits: {count}",
+    "language": "Language",
+    "currency": "Currency",
+    "shippingCountry": "Shipping country",
+    "country": "Country",
+    "toggleTheme": "Toggle color theme"
   },
   "personalize": {
     "back": "Back to item",
@@ -177,7 +225,21 @@
     "errorItem": "This item is not available for personalization right now.",
     "errorStyle": "One or more selected styles are no longer available. Refresh and try again.",
     "errorBalance": "We could not verify your credit balance. Please try again.",
-    "errorGeneration": "We could not generate your designs. Please try again. Your credits were refunded."
+    "errorGeneration": "We could not generate your designs. Please try again. Your credits were refunded.",
+    "removeImage": "Remove image",
+    "textFormatting": "Text formatting",
+    "bold": "Bold",
+    "italic": "Italic",
+    "alignLeft": "Align left",
+    "alignCenter": "Align center",
+    "generateOne": "Generate design",
+    "creditTotalOne": "1 credit total",
+    "errorNotConfigured": "Image generation is not available right now. Please contact support.",
+    "insufficientCredits": "You need {required, plural, one {# credit} other {# credits}} to generate these previews, but you have {available}.",
+    "insufficientCreditsGeneric": "You do not have enough credits to generate these previews.",
+    "errorSave": "We could not save the generated previews. Please try again.",
+    "errorBillingLimit": "Image generation is temporarily unavailable. Please try again later or contact support. Your credits were refunded.",
+    "errorBusy": "The image service is busy right now. Please wait a moment and try again. Your credits were refunded."
   },
   "generated": {
     "created": "Generated {date}",
@@ -206,7 +268,8 @@
       "laser_cut_2d_toy": "Laser-cut toy",
       "laser_cut_2d_decoration": "Laser-cut decoration",
       "laser_cut_2d_constructor": "Laser-cut constructor",
-      "banner": "Banner"
+      "banner": "Banner",
+      "standard": "Personalized product"
     },
     "color": {
       "warm_white": "Warm white",
@@ -214,6 +277,14 @@
       "soft_peach": "Soft peach",
       "mint": "Mint",
       "sky_blue": "Sky blue"
+    },
+    "sizeReview": "Size requires review",
+    "placement": {
+      "center": "Center",
+      "left": "Left",
+      "right": "Right",
+      "top": "Top",
+      "bottom": "Bottom"
     }
   },
   "common": {
@@ -231,7 +302,8 @@
     "all": "All",
     "view_all": "View all",
     "each": "each",
-    "custom": "Custom"
+    "custom": "Custom",
+    "dimensionsMm": "{width}×{height} mm"
   },
   "landing": {
     "meta_title": "Uniqraft marketplace",
@@ -243,7 +315,7 @@
     "generate_custom": "Generate custom item",
     "popular_title": "Popular right now",
     "popular_subtitle": "Picked from the catalog by the Uniqraft team.",
-    "popular_empty": "Popular marketplace items will appear here after the catalog migration is applied.",
+    "popular_empty": "Popular items will appear here soon.",
     "hero_night_lights": "Night lights",
     "hero_banners": "Banners",
     "hero_laser_gifts": "Laser-cut gifts",
@@ -269,7 +341,9 @@
     "custom_tag": "Custom",
     "credits_title": "Custom designs run on credits.",
     "credits_body": "One credit is one generated preview. Buy a few, try a couple of photos, and only order the one you love.",
-    "credits_cta": "Get credits"
+    "credits_cta": "Get credits",
+    "siteTitle": "Uniqraft - Personalized Products, Made Yours",
+    "siteDescription": "Customize meaningful products and create personalized designs made uniquely for you."
   },
   "catalog": {
     "title": "Marketplace catalog",
@@ -282,7 +356,8 @@
     "all_category": "All {name}",
     "generate_custom": "Generate custom item",
     "previous_page": "Previous",
-    "next_page": "Next"
+    "next_page": "Next",
+    "metaTitleCategory": "{name} — Marketplace catalog"
   },
   "categories": {
     "title": "Explore categories",
@@ -358,9 +433,11 @@
     "customizable": "Customizable",
     "personalize": "Personalize with AI",
     "buy": "Buy",
-    "buy_tooltip": "Checkout arrives with the orders milestone.",
+    "buy_tooltip": "Buy now is coming soon. Add the item to your cart to order it.",
     "production_notes": "Production notes",
-    "exchange_rate_note": "Using latest cached exchange rate."
+    "exchange_rate_note": "Using latest cached exchange rate.",
+    "addToCartLabel": "Add {name} to cart",
+    "showMedia": "Show media {number}"
   },
   "cart": {
     "title": "Shopping cart",
@@ -419,7 +496,7 @@
     "review": "Checkout review",
     "review_help": "Confirm the saved cart snapshot before creating an order.",
     "back_to_cart": "Back to cart",
-    "payment_note": "Payment provider checkout will attach to this order in the payment slice.",
+    "payment_note": "After you create the order, you'll continue to secure payment.",
     "select_destination": "Select destination",
     "resolve_issues": "Resolve cart issues before creating an order.",
     "create_order": "Create order",
@@ -481,7 +558,9 @@
     "ready_to_ship": "Ready to ship",
     "shipped": "Shipped",
     "cancelled": "Cancelled",
-    "refunded": "Refunded"
+    "refunded": "Refunded",
+    "unpaid": "Unpaid",
+    "failed": "Failed"
   },
   "admin": {
     "title": "Admin",
@@ -571,7 +650,671 @@
       "changes_title": "Changes to This Policy",
       "changes_body": "We may update this policy from time to time. We will revise the date at the top of this page when we do.",
       "contact_title": "Contact Us",
-      "contact_body": "Questions about this policy or your personal information? Email us at support@uniqraft.com."
+      "contact_body": "Questions about this policy or your personal information? Email us at support@uniqraft.org."
     }
+  },
+  "adminOrders": {
+    "title": "Orders",
+    "subtitle": "See order queue, payment state, and production status.",
+    "allProductionStatuses": "All production statuses",
+    "allPaymentStatuses": "All payment statuses",
+    "filter": "Filter",
+    "noOrders": "No orders found.",
+    "noEmail": "No email",
+    "columns": {
+      "order": "Order",
+      "buyer": "Buyer",
+      "total": "Total",
+      "payment": "Payment",
+      "production": "Production",
+      "created": "Created"
+    },
+    "paymentStatus": {
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "refunded": "Refunded",
+      "failed": "Failed",
+      "pending": "Pending"
+    },
+    "detail": {
+      "title": "Order {id}",
+      "created": "Created {date}",
+      "productionPackAll": "Production pack · all items (.zip)",
+      "packSummary": "Tech sheets and production files for {count, plural, one {# item} other {# items}} · {ready} ready",
+      "packNeedsReview": "{count} need review",
+      "items": "Items",
+      "noItems": "No order items found.",
+      "buyer": "Buyer",
+      "userId": "User ID",
+      "contactEmail": "Contact email",
+      "shippingAddress": "Shipping address",
+      "noShippingAddress": "No shipping address yet.",
+      "total": "Total",
+      "merchandise": "Merchandise",
+      "shipping": "Shipping",
+      "currency": "Currency",
+      "paymentRoute": "Payment route",
+      "payment": "Payment",
+      "production": "Production",
+      "updated": "Updated",
+      "exchangeRateContext": "Exchange-rate context",
+      "shippingRateContext": "Shipping-rate context"
+    },
+    "item": {
+      "catalogItem": "Catalog item",
+      "generatedItem": "Generated item",
+      "quantity": "Qty {quantity}",
+      "unitPrice": "{price} each",
+      "image": "Image",
+      "selectedPreview": "Selected preview",
+      "manufacturingFile": "Manufacturing file",
+      "originalImages": "Original images",
+      "text": "Text",
+      "led": "LED",
+      "multiColor": "Multi color",
+      "bannerSize": "Banner size",
+      "manufacturingStatus": "Manufacturing status",
+      "bannerManufacturing": "Banner manufacturing",
+      "latestArtifact": "Latest artifact {date}",
+      "noInstructionArtifact": "No instruction artifact generated yet.",
+      "generateInstructions": "Generate instructions",
+      "regenerateInstructions": "Regenerate instructions",
+      "sourceImage": "Source image",
+      "drawingFiles": "Drawing files",
+      "itemSnapshot": "Item snapshot",
+      "exchangeRateContext": "Exchange-rate context",
+      "personalizationSnapshot": "Personalization snapshot",
+      "productionSnapshot": "Production snapshot",
+      "adminCatalogCharacteristics": "Admin catalog characteristics",
+      "bannerManufacturingInstructions": "Banner manufacturing instructions"
+    },
+    "manufacturingStatus": {
+      "not_started": "Not started",
+      "generating": "Generating",
+      "ready": "Ready",
+      "review_required": "Review required",
+      "failed": "Failed"
+    },
+    "statusForm": {
+      "productionStatus": "Production status",
+      "paymentStatus": "Payment status",
+      "updating": "Updating...",
+      "submit": "Update order"
+    }
+  },
+  "adminUsers": {
+    "title": "Users",
+    "subtitle": "Search accounts, review status, and open support details.",
+    "searchPlaceholder": "Search name or user ID",
+    "allRoles": "All roles",
+    "allStatuses": "All statuses",
+    "filter": "Filter",
+    "noUsers": "No users found.",
+    "unnamedUser": "Unnamed user",
+    "credits": "{count, plural, one {# credit} other {# credits}}",
+    "columns": {
+      "user": "User",
+      "role": "Role",
+      "status": "Status",
+      "locale": "Locale",
+      "orders": "Orders",
+      "balance": "Balance",
+      "created": "Created"
+    },
+    "roles": {
+      "user": "User",
+      "admin": "Admin"
+    },
+    "statuses": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "disabled": "Disabled"
+    },
+    "detail": {
+      "fallbackTitle": "User detail",
+      "back": "Back to users",
+      "profile": "Profile",
+      "recentOrders": "Recent orders",
+      "noOrders": "No orders found.",
+      "generatedItems": "Generated items",
+      "noGeneratedItems": "No generated items found.",
+      "balance": "Balance",
+      "updated": "Updated {date}",
+      "transactions": "Transactions",
+      "noTransactions": "No transactions found.",
+      "auditHistory": "Audit history",
+      "noAuditHistory": "No audit history found.",
+      "noReason": "No reason"
+    },
+    "form": {
+      "role": "Role",
+      "status": "Status",
+      "preferredLocale": "Preferred locale",
+      "localeAuto": "Auto",
+      "localeEn": "English",
+      "localeRu": "Russian",
+      "localeAm": "Armenian",
+      "internalNotes": "Internal notes",
+      "saving": "Saving...",
+      "save": "Save user changes"
+    },
+    "creditForm": {
+      "title": "Manual credit adjustment",
+      "direction": "Direction",
+      "credit": "Credit",
+      "debit": "Debit",
+      "amount": "Amount",
+      "reason": "Reason (at least 3 characters)",
+      "applying": "Applying...",
+      "apply": "Apply adjustment"
+    }
+  },
+  "adminTransactions": {
+    "title": "Transactions",
+    "subtitle": "Inspect payments, credit activity, refunds, and manual adjustments.",
+    "searchPlaceholder": "Search IDs or provider reference",
+    "allTypes": "All types",
+    "allStatuses": "All statuses",
+    "providerPlaceholder": "Provider",
+    "allCurrencies": "All currencies",
+    "filter": "Filter",
+    "userIdPlaceholder": "User ID",
+    "orderIdPlaceholder": "Order ID",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "noTransactions": "No transactions found.",
+    "orderRef": "Order {id}",
+    "columns": {
+      "transaction": "Transaction",
+      "user": "User",
+      "type": "Type",
+      "amount": "Amount",
+      "providerRoute": "Provider route",
+      "status": "Status",
+      "created": "Created"
+    },
+    "types": {
+      "payment": "Payment",
+      "refund": "Refund",
+      "credit_purchase": "Credit purchase",
+      "credit_spend": "Credit spend",
+      "credit_refund": "Credit refund",
+      "manual_adjustment": "Manual adjustment",
+      "reversal": "Reversal"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "succeeded": "Succeeded",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "reversed": "Reversed"
+    },
+    "detail": {
+      "title": "Transaction {id}",
+      "created": "Created {date}",
+      "back": "Back to transactions",
+      "details": "Details",
+      "type": "Type",
+      "status": "Status",
+      "amount": "Amount",
+      "provider": "Provider",
+      "paymentRoute": "Payment route",
+      "providerReference": "Provider reference",
+      "creditLedger": "Credit ledger",
+      "createdBy": "Created by",
+      "updated": "Updated",
+      "exchangeRateContext": "Exchange-rate context",
+      "safeMetadata": "Safe metadata",
+      "auditHistory": "Audit history",
+      "noAuditRows": "No audit rows for this transaction.",
+      "noReason": "No reason",
+      "linkedRecords": "Linked records",
+      "user": "User",
+      "order": "Order",
+      "open": "Open",
+      "adminReason": "Admin reason",
+      "noAdminReason": "No admin reason recorded."
+    },
+    "action": {
+      "title": "Transaction action",
+      "label": "Action",
+      "note": "Add review note",
+      "manualRefund": "Record manual refund",
+      "reversal": "Create reversal",
+      "reconcile": "Reconcile status",
+      "ameriaCheck": "Check with Ameriabank",
+      "reconciliationStatus": "Reconciliation status",
+      "noStatusChange": "No status change",
+      "amountCents": "Amount, cents",
+      "noteReason": "Note / reason",
+      "submit": "Save transaction action"
+    }
+  },
+  "adminGenerated": {
+    "list": {
+      "title": "Generated items",
+      "subtitle": "Review generated previews and manufacturing files before production.",
+      "allStatuses": "All review statuses",
+      "allTypes": "All product types",
+      "filter": "Filter",
+      "empty": "No generated items yet.",
+      "colItem": "Item",
+      "colUser": "User",
+      "colType": "Type",
+      "colStatus": "Status",
+      "colCost": "Cost",
+      "colCreated": "Created"
+    },
+    "credits": "{count, plural, one {# credit} other {# credits}}",
+    "reviewStatus": {
+      "draft": "Draft",
+      "previewReady": "Preview ready · awaiting review",
+      "reviewRequired": "Changes requested",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "detail": {
+      "breadcrumbLabel": "Breadcrumb",
+      "breadcrumb": "Generations",
+      "meta": "Generated {date} · user <mono>{user}</mono> · {count, plural, one {# credit} other {# credits}}",
+      "sourceAssets": "Source assets",
+      "sourceImage": "Source image {number}",
+      "noSourceImage": "No source image was stored.",
+      "generatedPreview": "Generated preview",
+      "manufacturingPng": "Manufacturing PNG",
+      "customerRequest": "Customer request",
+      "engravedText": "Engraved text",
+      "ledColour": "LED colour",
+      "multiColor": "Multi color",
+      "notChosen": "Not chosen",
+      "customerPrompt": "Customer prompt",
+      "none": "None",
+      "manufacturingMetadata": "Manufacturing metadata",
+      "generationOptions": "Generation options",
+      "validationWarnings": "Validation warnings",
+      "rawSvg": "Raw manufacturing SVG",
+      "artifact": "Artifact · {type}",
+      "optionMetadata": "Option metadata"
+    },
+    "review": {
+      "title": "Review decision",
+      "help": "Approving releases the production file to the workshop.",
+      "decision": "Decision",
+      "approve": "Approve",
+      "approveHint": "Production file is correct and matches the preview",
+      "requestChanges": "Request changes",
+      "requestChangesHint": "Customer must upload a different photo or text",
+      "reject": "Reject",
+      "rejectHint": "Cannot be produced",
+      "note": "Internal note",
+      "notePlaceholder": "Reason, production concerns, or change request.",
+      "save": "Save review"
+    },
+    "docs": {
+      "title": "Technical documentation",
+      "helpMultiple": "Tech sheets, materials, sizes and operator instructions for all {count} options, with their production files.",
+      "helpSingle": "Tech sheet with materials, sizes and operator instructions, packed with the production files.",
+      "packAllOptions": "Production pack · all options",
+      "packThisOption": "Production pack · this option"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "updated": "Updated {date}",
+      "submitted": "Submitted",
+      "debited": "{date} · {count, plural, one {# credit} other {# credits}} debited"
+    },
+    "option": {
+      "matchTitle": "Will the produced item match the preview?",
+      "previewAndFile": "Preview and production file",
+      "optionNumber": "Option {number}",
+      "personalizedOption": "Personalized option {number}",
+      "linkedNote": "the customer preview was rendered from this manufacturing PNG.",
+      "separateNote": "the manufacturing PNG was generated separately from the preview.",
+      "noPngNote": "no manufacturing PNG yet.",
+      "linkedBadge": "Preview linked to production file",
+      "mayDifferBadge": "Preview may differ from production file",
+      "customerPhoto": "Customer photo",
+      "customerPreview": "Customer preview",
+      "engravedTag": "Engraved",
+      "generateBelow": "Generate it below to get a production file.",
+      "photosUploaded": "{count, plural, one {# customer photo was uploaded; it is shown.} other {# customer photos were uploaded; the first is shown.}}",
+      "regenerateTitle": "Regenerate the manufacturing PNG",
+      "generateTitle": "Generate the manufacturing PNG",
+      "regenerateWarning": "Replaces the production file. The preview the customer approved will no longer match it.",
+      "adminOnly": "Admin-only production step; the customer preview is not affected.",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "trace": {
+      "title": "Manufacturing SVGs",
+      "tracedFromPng": "Traced from the PNG",
+      "byAdmin": "by an admin",
+      "automatically": "automatically",
+      "qualityFailed": "Not produced: the PNG failed the trace quality check.",
+      "traceFailed": "The automatic trace failed; the PNG itself looks fine.",
+      "notTraced": "Not traced yet.",
+      "healthy": "Trace healthy",
+      "notProduced": "Not produced",
+      "pending": "Pending",
+      "qualityFailedHint": "Regenerate the PNG; re-tracing the same file will fail again.",
+      "retryHint": "Try tracing it again.",
+      "inkCoverage": "Ink coverage",
+      "inkAccepted": "accepted {min}–{max}%",
+      "paths": "Paths",
+      "pathsHint": "outlines + holes",
+      "units": "Units",
+      "unitsMm": "real size for the laser",
+      "unitsOther": "set artwork width in mm",
+      "fillOnly": "Only the fill SVG exists for this option. Re-trace from the PNG to also get the stroke (cut line) version.",
+      "fillSvg": "Fill SVG · engrave",
+      "strokeSvg": "Stroke SVG · cut lines"
+    },
+    "asset": {
+      "previewAria": "Preview {title}",
+      "dialogAria": "{title} preview",
+      "unavailable": "Unavailable",
+      "download": "Download",
+      "closePreview": "Close preview"
+    },
+    "fileForm": {
+      "adminOnly": "Admin-only production step for {name}. The customer preview flow did not generate this file.",
+      "promptCurrent": "Prompt used for the current PNG",
+      "prompt": "Prompt",
+      "promptHelp": "Prefilled from the customer request and this option’s manufacturing settings. Edit before generating.",
+      "model": "Model",
+      "modelBest": "best quality",
+      "modelBalanced": "balanced",
+      "modelPrevious": "previous generation",
+      "modelFaster": "faster",
+      "modelHelp": "The selected OpenAI image model edits the original source image at high fidelity and returns the production PNG directly.",
+      "generating": "Generating production PNG…",
+      "regenerateBreak": "Regenerate and break preview link",
+      "regenerate": "Regenerate manufacturing PNG",
+      "generate": "Generate manufacturing PNG"
+    },
+    "svgForm": {
+      "tracing": "Tracing PNG to SVG…",
+      "retrace": "Re-trace from PNG",
+      "trace": "Trace PNG to SVG"
+    }
+  },
+  "adminProductionPack": {
+    "techSheet": "Tech sheet",
+    "packZip": "Production pack (.zip)",
+    "title": "Technical documentation",
+    "ready": "Ready for production",
+    "reviewRequired": "Review required",
+    "materialNotRecorded": "material not recorded",
+    "artwork": "artwork {width} mm",
+    "productionInputs": "Production inputs in the pack",
+    "noneYet": "None yet",
+    "referenceMaterial": "Reference material",
+    "moreWarnings": "{count} more in the tech sheet.",
+    "confirmations": "{count, plural, one {# point} other {# points}} for the operator to confirm before starting (listed in the sheet)."
+  },
+  "adminItems": {
+    "list": {
+      "title": "Items",
+      "subtitle": "Create, publish, and manage marketplace products.",
+      "newItem": "New item",
+      "searchPlaceholder": "Search title",
+      "allCategories": "All categories",
+      "allStatuses": "All statuses",
+      "filter": "Filter",
+      "empty": "No items found."
+    },
+    "table": {
+      "deleteConfirm": "Delete {count, plural, one {# item} other {# items}}? This cannot be undone.",
+      "selectedCount": "{count} selected",
+      "deleting": "Deleting...",
+      "confirmDelete": "Confirm delete",
+      "deleteSelected": "Delete selected",
+      "selectAll": "Select all items",
+      "selectItem": "Select {title}",
+      "columnItem": "Item",
+      "columnCategory": "Category",
+      "columnStatus": "Status",
+      "columnFlags": "Flags",
+      "flagPopular": "popular",
+      "flagCustom": "custom"
+    },
+    "newPage": {
+      "title": "New item",
+      "subtitle": "Create a marketplace catalog item."
+    },
+    "editPage": {
+      "title": "Edit item",
+      "viewStorefront": "View storefront page"
+    },
+    "form": {
+      "saving": "Saving...",
+      "saveItem": "Save item",
+      "createItem": "Create item"
+    },
+    "basics": {
+      "title": "Title",
+      "slug": "Slug",
+      "category": "Category",
+      "subcategory": "Subcategory",
+      "none": "None",
+      "itemType": "Item type",
+      "itemTypes": {
+        "standard": "Standard",
+        "toy": "Toy",
+        "decoration": "Decoration",
+        "nightLight": "Night light",
+        "personalizedNightLight": "Personalized night light",
+        "banner": "Banner"
+      },
+      "status": "Status",
+      "description": "Description",
+      "popular": "Popular",
+      "customizable": "Customizable"
+    },
+    "pricing": {
+      "priceAmd": "Price, AMD",
+      "storedAs": "Stored as {price}. Prefilled at today's rate; saving stores the price in AMD.",
+      "manufacturingNotes": "Manufacturing notes",
+      "sizesJson": "Sizes JSON",
+      "characteristics": "Admin-only characteristics",
+      "characteristicsPlaceholder": "Materials, specifications, finish, production assumptions."
+    },
+    "markets": {
+      "heading": "Markets & shipping",
+      "help": "Items are globally visible by default. Country settings override their region. Shipping is per unit in AMD; blank means unavailable and 0 means free.",
+      "countryCount": "({count, plural, one {# country} other {# countries}})",
+      "regionDefault": "{region} default",
+      "visibility": "Visibility",
+      "inherit": "Inherit",
+      "show": "Show",
+      "hide": "Hide",
+      "shipping": "Shipping, AMD minor units",
+      "unavailable": "Unavailable"
+    },
+    "personalization": {
+      "systemPrompt": "System prompt",
+      "systemPromptPlaceholder": "Base generation instructions for this item's AI personalization.",
+      "skillFile": "Skill file",
+      "skillFileHelp": "Optional .md or .txt document (max 1 MB) injected into AI generation instructions.",
+      "attachedSkill": "Attached skill:",
+      "removeSkill": "Remove skill",
+      "tags": "Tags",
+      "tagLabels": {
+        "personalColor": "Personal Color",
+        "personalText": "Personal Text",
+        "personalPhoto": "Personal Photo"
+      },
+      "boilerplates": "Boilerplates",
+      "noBoilerplates": "No boilerplates yet. Add some in the <link>boilerplate library</link> first.",
+      "requirement": "At least one of System prompt, a skill file, or a selected boilerplate is required when Customizable is checked."
+    },
+    "seo": {
+      "heading": "SEO metadata",
+      "subtitle": "Manage indexed metadata for English, Russian, and Armenian storefront pages.",
+      "previewTitle": "SEO title preview",
+      "previewDescription": "Meta description preview appears here.",
+      "generatedByAi": "Generated by AI",
+      "manualMetadata": "Manual metadata",
+      "reviewed": "reviewed",
+      "needsReview": "needs review",
+      "seoTitle": "SEO title",
+      "keywords": "Keywords",
+      "keywordsPlaceholder": "wooden gift, night light",
+      "metaDescription": "Meta description",
+      "ogTitle": "Open Graph title",
+      "socialImagePath": "Social image path",
+      "socialImageHelp": "Recommended 1200x630 px for Open Graph sharing.",
+      "ogDescription": "Open Graph description",
+      "warnings": {
+        "missingTitle": "SEO title is missing.",
+        "missingDescription": "Meta description is missing.",
+        "shortTitle": "SEO title is shorter than recommended.",
+        "longTitle": "SEO title is longer than recommended.",
+        "shortDescription": "Meta description is shorter than recommended.",
+        "longDescription": "Meta description is longer than recommended.",
+        "missingSocialImage": "Social image is missing.",
+        "missingLocalizedMetadata": "Localized SEO metadata is incomplete.",
+        "privateFieldRisk": "Private/admin-only fields must not be exposed in structured data."
+      }
+    },
+    "ai": {
+      "enterDescriptionFirst": "Enter a description first.",
+      "autogenerate": "Autogenerate",
+      "fillAll": "Fill all fields from description"
+    }
+  },
+  "adminItemMedia": {
+    "thumbnail": {
+      "label": "Thumbnail path",
+      "hint": "Recommended 4:3 image, at least 1200x900 px. Accepted: PNG, JPG, WEBP, SVG up to 50 MB.",
+      "placeholder": "Optional storage path or URL"
+    },
+    "title": "Product gallery",
+    "descriptionSaved": "Uploads, replacements and removals apply immediately. Order, alt text and the primary image are saved with the item.",
+    "descriptionNew": "Images and videos for the product slider, uploaded when the item is created.",
+    "fileCount": "{count, plural, one {# file} other {# files}}",
+    "empty": "No gallery media yet. Add files below to create the product slider.",
+    "addMedia": "Add images or videos",
+    "dropHint": "Click or drop files. PNG, JPG, WEBP, SVG, MP4, WEBM up to 50 MB each.",
+    "skipped": "Skipped {names}: use PNG, JPG, WEBP, SVG, MP4, or WEBM up to 50 MB.",
+    "invalidFile": "{name}: use PNG, JPG, WEBP, SVG, MP4, or WEBM up to 50 MB.",
+    "orderPending": "New order is applied when you save the item.",
+    "mediaLabel": "Gallery media {position}",
+    "video": "Video",
+    "new": "New",
+    "uploading": "Uploading…",
+    "removing": "Removing…",
+    "confirmRemove": "Remove this file?",
+    "remove": "Remove",
+    "replace": "Replace",
+    "moveEarlier": "Move {label} earlier",
+    "moveLater": "Move {label} later",
+    "discard": "Discard {name}",
+    "altText": "Alt text",
+    "primary": "Primary",
+    "toast": {
+      "added": "Added to the gallery.",
+      "uploadFailed": "Failed to upload gallery media.",
+      "replaced": "Gallery media replaced.",
+      "replaceFailed": "Failed to replace gallery media.",
+      "removed": "Removed from the gallery.",
+      "removeFailed": "Failed to remove gallery media.",
+      "unexpectedResponse": "Unexpected response."
+    }
+  },
+  "adminNav": {
+    "ariaLabel": "Admin sections",
+    "overview": "Overview",
+    "create": "Create",
+    "items": "Items",
+    "personalization": "Personalization",
+    "generations": "Generations",
+    "orders": "Orders",
+    "users": "Users",
+    "transactions": "Transactions",
+    "currencies": "Currencies",
+    "markets": "Markets",
+    "connectors": "Connected apps",
+    "storefront": "Storefront"
+  },
+  "adminOverview": {
+    "title": "Admin panel",
+    "subtitle": "Manage marketplace items, orders, and production review.",
+    "newItem": "New item",
+    "catalogItems": "Catalog items",
+    "orders": "Orders",
+    "needsReview": "Needs review",
+    "users": "Users",
+    "transactions": "Transactions"
+  },
+  "adminCreate": {
+    "title": "Create",
+    "subtitle": "Choose the admin workflow for new marketplace content or generated assets.",
+    "open": "Open",
+    "catalogItemTitle": "Catalog item",
+    "catalogItemHelp": "Create toys, decorations, constructors, night lights, and standard products.",
+    "boilerplatesTitle": "Boilerplate library",
+    "boilerplatesHelp": "Manage the shared boilerplate images used for AI personalization.",
+    "reviewTitle": "Review generated items",
+    "reviewHelp": "Approve, reject, and inspect AI-generated user assets before ordering.",
+    "draftTitle": "Generate toy or decoration draft",
+    "draftHelp": "Create a draft catalog item with editable name, description, sizes, image, and admin-only characteristics.",
+    "target": "Target",
+    "targetToys": "Toys",
+    "targetDecorations": "Decorations",
+    "prompt": "Prompt",
+    "promptPlaceholder": "Describe the item shape, style, intended use, material direction, and finishing expectations.",
+    "referenceImage": "Reference image",
+    "referenceImageHelp": "Uploading only an image generates editable metadata from the image path and marks uncertain materials/specs as review-required.",
+    "generateDraft": "Generate editable draft"
+  },
+  "adminConnectors": {
+    "title": "Connected apps",
+    "subtitle": "Apps you've authorized to create and edit catalog items on your behalf via ChatGPT or Claude. To connect a new one, add {endpoint} as a custom connector in Claude or ChatGPT and sign in when prompted.",
+    "yourUrl": "your Uniqraft URL",
+    "empty": "No apps connected yet.",
+    "app": "App",
+    "accessExpires": "Access expires",
+    "connectionExpires": "Connection expires",
+    "actions": "Actions",
+    "revoke": "Revoke"
+  },
+  "adminCurrencies": {
+    "title": "Currencies",
+    "subtitle": "Manage enabled storefront currencies, payment routes, and daily exchange-rate cache status.",
+    "enabled": "Enabled",
+    "currency": "Currency",
+    "paymentRoute": "Payment route",
+    "latestRate": "Latest AMD rate",
+    "status": "Status",
+    "default": "default",
+    "enableCurrency": "Enable {code}",
+    "paymentRouteFor": "Payment route for {code}",
+    "routeBankManual": "Bank / manual",
+    "missing": "Missing",
+    "staleFallback": "Stale fallback",
+    "cached": "Cached",
+    "noRate": "No rate",
+    "save": "Save currency settings",
+    "refreshHelp": "Pull the latest AMD→currency rates from the exchange-rate provider now.",
+    "refresh": "Refresh rates"
+  },
+  "adminMarkets": {
+    "title": "Markets",
+    "subtitle": "Group countries, set geographic currency defaults, and prepare item shipping rules.",
+    "createRegion": "Create region",
+    "regionName": "Region name",
+    "regionSlug": "Region slug",
+    "addRegion": "Add region",
+    "defaultCurrency": "Default currency",
+    "globalDefault": "Global default",
+    "disabledCurrency": "{code} (disabled)",
+    "sortOrder": "Sort order",
+    "active": "Active",
+    "saveRegion": "Save region",
+    "assignedDisabled": "Assigned currency is disabled; storefronts fall back automatically.",
+    "countryRegion": "Region for {country}",
+    "countryCurrency": "Default currency for {country}",
+    "inheritRegion": "Inherit region"
   }
 }

@@ -69,6 +69,7 @@ export function CatalogMediaSlider({
   media,
   fallbackTitle,
   fallbackCategory,
+  showMediaLabel,
   compact = false,
   // Matches the catalog grid card width by default (up to 4 columns at
   // desktop width); the item-detail page passes a wider value since its
@@ -78,6 +79,8 @@ export function CatalogMediaSlider({
   media: CatalogItemMedia[];
   fallbackTitle: string;
   fallbackCategory?: string | null;
+  /** Localized "Show media {number}" template; the slider interpolates {number}. */
+  showMediaLabel: string;
   compact?: boolean;
   sizes?: string;
 }) {
@@ -325,7 +328,7 @@ export function CatalogMediaSlider({
                   event.preventDefault();
                   showSlide(itemIndex);
                 }}
-                aria-label={`Show media ${itemIndex + 1}`}
+                aria-label={showMediaLabel.replace('{number}', String(itemIndex + 1))}
               >
                 <span
                   className="block h-full rounded-full bg-background ease-linear"

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
+import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { hasAdminPermission, requireAdmin } from '@/lib/admin';
 import { getCatalogPreviewPath } from '@/lib/catalog-media';
@@ -19,6 +20,7 @@ export default async function AdminItemsPage({
   searchParams: Promise<{ status?: string; category?: string; q?: string }>;
 }) {
   const params = await searchParams;
+  const t = await getTranslations();
   const { supabase, user } = await requireAdmin();
 
   let query = supabase
@@ -86,13 +88,13 @@ export default async function AdminItemsPage({
     <main className="container space-y-6 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Items</h1>
-          <p className="text-muted-foreground">Create, publish, and manage marketplace products.</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('adminItems.list.title')}</h1>
+          <p className="text-muted-foreground">{t('adminItems.list.subtitle')}</p>
         </div>
         <Button asChild>
           <Link href="/admin/items/new">
             <Plus className="mr-2 h-4 w-4" />
-            New item
+            {t('adminItems.list.newItem')}
           </Link>
         </Button>
       </div>
@@ -100,7 +102,7 @@ export default async function AdminItemsPage({
       <form className="grid gap-3 rounded-lg border p-4 md:grid-cols-[1fr_180px_180px_auto]">
         <input
           name="q"
-          placeholder="Search title"
+          placeholder={t('adminItems.list.searchPlaceholder')}
           defaultValue={params.q ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
@@ -109,7 +111,7 @@ export default async function AdminItemsPage({
           defaultValue={params.category ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All categories</option>
+          <option value="">{t('adminItems.list.allCategories')}</option>
           {(categories ?? []).map((category) => (
             <option key={category.slug} value={category.slug}>
               {category.name}
@@ -121,13 +123,13 @@ export default async function AdminItemsPage({
           defaultValue={params.status ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All statuses</option>
-          <option value="draft">Draft</option>
-          <option value="published">Published</option>
-          <option value="archived">Archived</option>
+          <option value="">{t('adminItems.list.allStatuses')}</option>
+          <option value="draft">{t('status.draft')}</option>
+          <option value="published">{t('status.published')}</option>
+          <option value="archived">{t('status.archived')}</option>
         </select>
         <Button type="submit" variant="outline">
-          Filter
+          {t('adminItems.list.filter')}
         </Button>
       </form>
 
@@ -135,7 +137,7 @@ export default async function AdminItemsPage({
         <p className="text-sm text-destructive">{error.message}</p>
       ) : rows.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-sm text-muted-foreground">
-          No items found.
+          {t('adminItems.list.empty')}
         </div>
       ) : (
         <ItemsTable items={rows} canDelete={canDelete} />

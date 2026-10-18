@@ -7,14 +7,16 @@ import type { AppCurrency } from '@/lib/currency';
 export function CurrencySwitcherClient({
   activeCurrency,
   currencies,
+  label,
 }: {
   activeCurrency: AppCurrency;
   currencies: { code: AppCurrency }[];
+  label: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
   return (
-    <form ref={formRef} action={setCurrencyPreferenceAction} aria-label="Currency">
+    <form ref={formRef} action={setCurrencyPreferenceAction} aria-label={label}>
       <select
         name="currency"
         defaultValue={activeCurrency}

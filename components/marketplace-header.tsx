@@ -34,7 +34,7 @@ export async function MarketplaceHeader() {
         <nav className="flex min-w-0 items-center gap-3 sm:gap-5">
           <Link
             href="/"
-            aria-label="Uniqraft home"
+            aria-label={t('nav.home')}
             className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <BrandLogo />
@@ -48,18 +48,18 @@ export async function MarketplaceHeader() {
         </nav>
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">
           <CurrencySwitcher />
-          <LanguageSwitcher activeLocale={locale} />
-          <ThemeToggle className="hidden sm:inline-flex" />
+          <LanguageSwitcher activeLocale={locale} label={t('nav.language')} />
+          <ThemeToggle className="hidden sm:inline-flex" label={t('nav.toggleTheme')} />
           {user ? (
             <>
               <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
-                <Link href="/credits">
+                <Link href="/credits" aria-label={t('nav.creditsCount', { count: creditBalance })}>
                   <Coins className="mr-1 h-4 w-4" />
                   {creditBalance}
                 </Link>
               </Button>
               <Button asChild variant="ghost" size="sm">
-                <Link href="/cart">
+                <Link href="/cart" aria-label={t('nav.cartCount', { count: cartCount })}>
                   <ShoppingCart className="mr-1 h-4 w-4" />
                   {cartCount}
                 </Link>
@@ -87,7 +87,7 @@ export async function MarketplaceHeader() {
           ) : (
             <>
               <Button asChild variant="ghost" size="sm">
-                <Link href="/cart">
+                <Link href="/cart" aria-label={t('nav.cartCount', { count: cartCount })}>
                   <ShoppingCart className="mr-1 h-4 w-4" />
                   {cartCount}
                 </Link>

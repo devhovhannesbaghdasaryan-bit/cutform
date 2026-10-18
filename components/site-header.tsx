@@ -46,19 +46,19 @@ export async function SiteHeader({ email }: { email: string }) {
         </Link>
         <div className="flex items-center gap-2">
           <CurrencySwitcher />
-          <LanguageSwitcher activeLocale={locale} />
+          <LanguageSwitcher activeLocale={locale} label={t('nav.language')} />
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link href="/catalog">
               <Store className="mr-1 h-4 w-4" /> {t('nav.catalog')}
             </Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link href="/credits">
+            <Link href="/credits" aria-label={t('nav.creditsCount', { count: creditBalance })}>
               <Coins className="mr-1 h-4 w-4" /> {creditBalance}
             </Link>
           </Button>
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-            <Link href="/cart">
+            <Link href="/cart" aria-label={t('nav.cartCount', { count: cartCount })}>
               <ShoppingCart className="mr-1 h-4 w-4" /> {cartCount}
             </Link>
           </Button>

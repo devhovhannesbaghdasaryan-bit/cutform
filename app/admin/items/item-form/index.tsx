@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useActionState, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { createCatalogItemAction, updateCatalogItemAction } from '@/app/admin/items/actions';
@@ -65,6 +66,7 @@ export function ItemForm({
   boilerplateOptions?: BoilerplateOption[];
   selectedBoilerplateIds?: string[];
 }) {
+  const t = useTranslations();
   const actionFn = item?.id ? updateCatalogItemAction : createCatalogItemAction;
   const [state, action, pending] = useActionState(actionFn, idleState);
   const error = errorOf(state);
@@ -137,7 +139,11 @@ export function ItemForm({
         )}
 
         <Button type="submit" disabled={pending}>
-          {pending ? 'Saving...' : item?.id ? 'Save item' : 'Create item'}
+          {pending
+            ? t('adminItems.form.saving')
+            : item?.id
+              ? t('adminItems.form.saveItem')
+              : t('adminItems.form.createItem')}
         </Button>
       </ItemFormAiProvider>
     </form>

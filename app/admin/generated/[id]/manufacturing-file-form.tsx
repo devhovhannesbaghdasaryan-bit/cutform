@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useActionState } from 'react';
 import {
   generateManufacturingFileAction,
@@ -27,6 +28,7 @@ export function ManufacturingFileForm({
   hasExistingFile,
   previewLinked = false,
 }: ManufacturingFileFormProps) {
+  const t = useTranslations();
   const [state, action, pending] = useActionState(generateManufacturingFileAction, initialState);
   const fieldPrefix = `manufacturing-file-${optionId}`;
 
@@ -36,14 +38,15 @@ export function ManufacturingFileForm({
       <input type="hidden" name="optionId" value={optionId} />
       {previewLinked ? null : (
         <p className="text-sm text-muted-foreground">
-          Admin-only production step for {optionName}. The customer preview flow did not generate
-          this file.
+          {t('adminGenerated.fileForm.adminOnly', { name: optionName })}
         </p>
       )}
 
       <div className="space-y-2">
         <label htmlFor={`${fieldPrefix}-prompt`} className="text-sm font-medium">
-          {previewLinked ? 'Prompt used for the current PNG' : 'Prompt'}
+          {previewLinked
+            ? t('adminGenerated.fileForm.promptCurrent')
+            : t('adminGenerated.fileForm.prompt')}
         </label>
         <textarea
           id={`${fieldPrefix}-prompt`}
@@ -53,29 +56,33 @@ export function ManufacturingFileForm({
           required
           className="min-h-64 w-full min-w-0 max-w-full resize-y rounded-md border border-input bg-background px-3 py-2 font-mono text-xs leading-relaxed"
         />
-        <p className="text-xs text-muted-foreground">
-          Prefilled from the customer request and this option’s manufacturing settings. Edit before
-          generating.
-        </p>
+        <p className="text-xs text-muted-foreground">{t('adminGenerated.fileForm.promptHelp')}</p>
       </div>
 
       <div className="grid min-w-0 gap-3 md:grid-cols-2">
-        <Field label="Model" htmlFor={`${fieldPrefix}-model`}>
+        <Field label={t('adminGenerated.fileForm.model')} htmlFor={`${fieldPrefix}-model`}>
           <select
             id={`${fieldPrefix}-model`}
             name="model"
             defaultValue="gpt-image-2"
             className="h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm"
           >
-            <option value="gpt-image-2">GPT Image 2 · best quality</option>
-            <option value="gpt-image-1.5">GPT Image 1.5 · balanced</option>
-            <option value="gpt-image-1">GPT Image 1 · previous generation</option>
-            <option value="gpt-image-1-mini">GPT Image 1 mini · faster</option>
+            <option value="gpt-image-2">
+              GPT Image 2 · {t('adminGenerated.fileForm.modelBest')}
+            </option>
+            <option value="gpt-image-1.5">
+              GPT Image 1.5 · {t('adminGenerated.fileForm.modelBalanced')}
+            </option>
+            <option value="gpt-image-1">
+              GPT Image 1 · {t('adminGenerated.fileForm.modelPrevious')}
+            </option>
+            <option value="gpt-image-1-mini">
+              GPT Image 1 mini · {t('adminGenerated.fileForm.modelFaster')}
+            </option>
           </select>
         </Field>
         <p className="self-end text-xs text-muted-foreground">
-          The selected OpenAI image model edits the original source image at high fidelity and
-          returns the production PNG directly.
+          {t('adminGenerated.fileForm.modelHelp')}
         </p>
       </div>
 
@@ -103,12 +110,12 @@ export function ManufacturingFileForm({
           <Sparkles className="size-4" aria-hidden="true" />
         )}
         {pending
-          ? 'Generating production PNG…'
+          ? t('adminGenerated.fileForm.generating')
           : previewLinked
-            ? 'Regenerate and break preview link'
+            ? t('adminGenerated.fileForm.regenerateBreak')
             : hasExistingFile
-              ? 'Regenerate manufacturing PNG'
-              : 'Generate manufacturing PNG'}
+              ? t('adminGenerated.fileForm.regenerate')
+              : t('adminGenerated.fileForm.generate')}
       </button>
     </form>
   );

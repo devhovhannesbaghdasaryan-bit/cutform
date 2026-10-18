@@ -26,7 +26,7 @@ export function OrderReceiptEmail({
   strings: ReceiptStrings;
 }) {
   return (
-    <Html lang={model.locale}>
+    <Html lang={model.locale === 'am' ? 'hy' : model.locale}>
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Head />
         <Body className="bg-gray-100 font-sans">
@@ -41,9 +41,7 @@ export function OrderReceiptEmail({
             </Text>
             <Hr className="my-4 border-solid border-gray-200" />
             <Row>
-              <Column className="text-xs font-bold uppercase text-gray-500">
-                {strings.item}
-              </Column>
+              <Column className="text-xs font-bold uppercase text-gray-500">{strings.item}</Column>
               <Column align="center" className="w-16 text-xs font-bold uppercase text-gray-500">
                 {strings.qty}
               </Column>

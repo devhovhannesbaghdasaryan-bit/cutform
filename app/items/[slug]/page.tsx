@@ -12,6 +12,7 @@ import { sortCatalogMedia } from '@/lib/catalog-media';
 import { getCatalogItem, getCatalogItemSeoMetadata } from '@/lib/marketplace';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getTranslations } from 'next-intl/server';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { listCatalogItemBoilerplates } from '@/lib/personalization-boilerplates';
 import { createProductStructuredData, resolveCatalogMetadata } from '@/lib/seo';
 import { resolvePublicStorageUrl } from '@/lib/storage';
@@ -29,6 +30,7 @@ export async function generateMetadata({
   const locale = await getRequestLocale();
   const item = await getCatalogItem(slug).catch(() => null);
   if (!item) return {};
+  const t = await getTranslations();
 
   const seo = await getCatalogItemSeoMetadata(item.id, locale).catch(() => null);
 
@@ -39,7 +41,7 @@ export async function generateMetadata({
     fallback: {
       title: item.title,
       slug: item.slug,
-      description: item.description,
+      description: item.description || t('landing.meta_description'),
       imagePath: resolvePublicStorageUrl('catalog-assets', item.thumbnail_path),
     },
   });
@@ -76,6 +78,9 @@ export default async function CatalogItemDetailPage({
     priceCents: item.price_cents,
     currency: item.currency,
   });
+  const categoryName = item.category
+    ? tDynamic(t, `category.${item.category.slug}.name`, item.category.name)
+    : null;
   const media = sortCatalogMedia(item.media ?? []);
   const sliderMedia = media.length
     ? media
@@ -114,7 +119,8 @@ export default async function CatalogItemDetailPage({
             <CatalogMediaSlider
               media={sliderMedia}
               fallbackTitle={item.title}
-              fallbackCategory={item.category?.name}
+              fallbackCategory={categoryName}
+              showMediaLabel={t.raw('product.showMedia')}
               sizes="(min-width: 1024px) 55vw, 100vw"
             />
           </div>
@@ -122,9 +128,9 @@ export default async function CatalogItemDetailPage({
           <section className="space-y-6">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                {item.category?.name && (
+                {categoryName && (
                   <span className="rounded-full border px-3 py-1 text-sm text-muted-foreground">
-                    {item.category.name}
+                    {categoryName}
                   </span>
                 )}
                 {item.is_customizable && (
@@ -143,7 +149,7 @@ export default async function CatalogItemDetailPage({
             <div className="rounded-lg border p-5">
               <p className="text-sm text-muted-foreground">{t('common.price')}</p>
               <p className="text-4xl font-bold">
-                {formatPrice(convertedPrice.amountCents, convertedPrice.currency)}
+                {formatPrice(convertedPrice.amountCents, convertedPrice.currency, locale)}
               </p>
               {convertedPrice.exchangeRateContext.isStale ? (
                 <p className="mt-1 text-xs text-muted-foreground">

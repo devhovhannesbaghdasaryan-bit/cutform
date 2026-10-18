@@ -1,6 +1,7 @@
 'use client';
 
 import { Loader2, Sparkles } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { createContext, useCallback, useContext, useState, useTransition } from 'react';
 import type { RefObject } from 'react';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ export function ItemFormAiProvider({
   initialDescription: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations();
   const [pendingFields, setPendingFields] = useState<Set<string>>(new Set());
   const [isFillAllPending, setIsFillAllPending] = useState(false);
   const [fieldError, setFieldError] = useState<FieldError | null>(null);
@@ -77,7 +79,7 @@ export function ItemFormAiProvider({
       setFillAllError(null);
 
       if (!sourceDescription) {
-        const message = 'Enter a description first.';
+        const message = t('adminItems.ai.enterDescriptionFirst');
         if (isFillAll) setFillAllError(message);
         else setFieldError({ field: availableFields[0], message });
         return;
@@ -112,7 +114,7 @@ export function ItemFormAiProvider({
         setIsFillAllPending(false);
       });
     },
-    [formRef, categories],
+    [formRef, categories, t],
   );
 
   const value: ItemFormAiContextValue = {
@@ -138,6 +140,7 @@ export function useItemFormAi() {
 }
 
 export function AutogenerateButton({ field }: { field: string }) {
+  const t = useTranslations();
   const { generateField, pendingFields, fieldError, hasDescription } = useItemFormAi();
   const isPending = pendingFields.has(field);
   const disabled = pendingFields.size > 0 || !hasDescription;
@@ -149,7 +152,7 @@ export function AutogenerateButton({ field }: { field: string }) {
         variant="ghost"
         size="sm"
         disabled={disabled}
-        title={hasDescription ? undefined : 'Enter a description first.'}
+        title={hasDescription ? undefined : t('adminItems.ai.enterDescriptionFirst')}
         onClick={() => generateField(field)}
       >
         {isPending ? (
@@ -157,7 +160,7 @@ export function AutogenerateButton({ field }: { field: string }) {
         ) : (
           <Sparkles className="size-3.5" aria-hidden="true" />
         )}
-        Autogenerate
+        {t('adminItems.ai.autogenerate')}
       </Button>
       {fieldError?.field === field ? (
         <span role="alert" className="text-xs text-destructive">
@@ -169,6 +172,7 @@ export function AutogenerateButton({ field }: { field: string }) {
 }
 
 export function FillAllButton() {
+  const t = useTranslations();
   const { generateAll, pendingFields, isFillAllPending, fillAllError, hasDescription } =
     useItemFormAi();
   const disabled = pendingFields.size > 0 || !hasDescription;
@@ -180,7 +184,7 @@ export function FillAllButton() {
         variant="outline"
         size="sm"
         disabled={disabled}
-        title={hasDescription ? undefined : 'Enter a description first.'}
+        title={hasDescription ? undefined : t('adminItems.ai.enterDescriptionFirst')}
         onClick={generateAll}
       >
         {isFillAllPending ? (
@@ -188,7 +192,7 @@ export function FillAllButton() {
         ) : (
           <Sparkles className="size-4" aria-hidden="true" />
         )}
-        Fill all fields from description
+        {t('adminItems.ai.fillAll')}
       </Button>
       {fillAllError ? (
         <span role="alert" className="text-xs text-destructive">

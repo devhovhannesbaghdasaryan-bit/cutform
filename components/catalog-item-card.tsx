@@ -59,6 +59,7 @@ export async function CatalogItemCard({
               media={sliderMedia}
               fallbackTitle={item.title}
               fallbackCategory={categoryName}
+              showMediaLabel={t.raw('product.showMedia')}
               compact
             />
           </div>
@@ -85,7 +86,7 @@ export async function CatalogItemCard({
             </p>
             <AddToCartButton
               itemId={item.id}
-              ariaLabel={`Add ${item.title} to cart`}
+              ariaLabel={t('product.addToCartLabel', { name: item.title })}
               className="shadow-sm"
             />
           </div>

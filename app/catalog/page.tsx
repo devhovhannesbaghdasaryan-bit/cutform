@@ -9,7 +9,12 @@ import { listCategories, listPublishedCatalogItems, listSubcategories } from '@/
 import { getRequestLocale } from '@/lib/i18n-server';
 import { resolveCatalogMetadata } from '@/lib/seo';
 import { cn } from '@/lib/utils';
-import { applyExchangeRate, getActiveCurrency, getExchangeRates, normalizeCurrency } from '@/lib/currency';
+import {
+  applyExchangeRate,
+  getActiveCurrency,
+  getExchangeRates,
+  normalizeCurrency,
+} from '@/lib/currency';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +31,9 @@ export async function generateMetadata({
   ]);
   const activeCategory = categories.find((item) => item.slug === category);
   const title = activeCategory
-    ? `${tDynamic(t, `category.${activeCategory.slug}.name`, activeCategory.name)} ${t('catalog.meta_title')}`
+    ? t('catalog.metaTitleCategory', {
+        name: tDynamic(t, `category.${activeCategory.slug}.name`, activeCategory.name),
+      })
     : t('catalog.meta_title');
 
   return resolveCatalogMetadata({

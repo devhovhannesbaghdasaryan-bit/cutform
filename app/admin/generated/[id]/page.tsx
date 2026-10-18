@@ -1,6 +1,8 @@
 import { AlertTriangle, Check, Download, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { reviewGeneratedItemAction } from '@/app/admin/generated/actions';
 import { ProductionPackLinks, productionPackHrefs } from '@/app/admin/production-pack-links';
 import { AssetFigure } from './asset-figure';
@@ -13,6 +15,9 @@ import {
   type AdminGeneratedPreviewOption,
   type GeneratedItemAdminDetail,
 } from '@/lib/generated-items';
+import type { AppLocale } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
+import { getRequestLocale } from '@/lib/i18n-server';
 import { DEFAULT_TRACE_OPTIONS } from '@/lib/svg-trace';
 import { formatDate } from '@/lib/utils';
 
@@ -24,7 +29,11 @@ export default async function AdminGeneratedDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { supabase } = await requireAdmin();
+  const [{ supabase }, t, locale] = await Promise.all([
+    requireAdmin(),
+    getTranslations(),
+    getRequestLocale(),
+  ]);
 
   const detail = await getGeneratedItemAdminDetail(supabase, id);
 
@@ -42,17 +51,27 @@ export default async function AdminGeneratedDetailPage({
     parentManufacturingFileDownloadUrl,
   } = detail;
   const validationWarnings = extractValidationWarnings(item.manufacturing_metadata);
-  const status = REVIEW_STATUS[item.review_status] ?? {
-    label: item.review_status,
-    className: 'border text-muted-foreground',
-  };
+  const knownStatus = REVIEW_STATUS[item.review_status];
+  const status = knownStatus
+    ? {
+        label: t(`adminGenerated.reviewStatus.${knownStatus.key}`),
+        className: knownStatus.className,
+      }
+    : {
+        label: tDynamic(t, `status.${item.review_status}`, item.review_status),
+        className: 'border text-muted-foreground',
+      };
+  const creditCount = { count: item.credit_cost };
 
   return (
     <main className="container max-w-6xl space-y-6 px-4 py-6 sm:space-y-7 sm:px-6 sm:py-8">
       <div className="min-w-0">
-        <nav aria-label="Breadcrumb" className="mb-2 flex gap-2 text-sm text-muted-foreground">
+        <nav
+          aria-label={t('adminGenerated.detail.breadcrumbLabel')}
+          className="mb-2 flex gap-2 text-sm text-muted-foreground"
+        >
           <Link href="/admin/generated" className="hover:text-foreground">
-            Generations
+            {t('adminGenerated.detail.breadcrumb')}
           </Link>
           <span aria-hidden="true">/</span>
           <span className="font-mono">{item.id.slice(0, 8)}</span>
@@ -68,12 +87,15 @@ export default async function AdminGeneratedDetailPage({
             {status.label}
           </span>
           <span className="rounded-full border px-2.5 py-0.5 text-xs font-medium">
-            {humanize(item.product_type)}
+            {tDynamic(t, `generated.productType.${item.product_type}`, humanize(item.product_type))}
           </span>
           <span>
-            Generated {formatDate(item.created_at)} · user{' '}
-            <span className="font-mono">{item.user_id.slice(0, 8)}</span> · {item.credit_cost}{' '}
-            {item.credit_cost === 1 ? 'credit' : 'credits'}
+            {t.rich('adminGenerated.detail.meta', {
+              date: formatDate(item.created_at, locale),
+              user: item.user_id.slice(0, 8),
+              ...creditCount,
+              mono: (chunks) => <span className="font-mono">{chunks}</span>,
+            })}
           </span>
         </div>
       </div>
@@ -88,17 +110,18 @@ export default async function AdminGeneratedDetailPage({
                 option={option}
                 sourceAssets={sourceAssets}
                 optionCount={optionAssets.length}
+                locale={locale}
               />
             ))
           ) : (
             <article className="rounded-xl border bg-card p-5">
-              <h2 className="font-semibold">Source assets</h2>
+              <h2 className="font-semibold">{t('adminGenerated.detail.sourceAssets')}</h2>
               {sourceAssets.length ? (
                 <div className="mt-4 grid min-w-0 gap-4 md:grid-cols-2">
                   {sourceAssets.map((asset, index) => (
                     <AssetPreviewCard
                       key={asset.storagePath}
-                      title={`Source image ${index + 1}`}
+                      title={t('adminGenerated.detail.sourceImage', { number: index + 1 })}
                       path={asset.storagePath}
                       url={asset.url}
                       downloadUrl={asset.downloadUrl}
@@ -106,19 +129,21 @@ export default async function AdminGeneratedDetailPage({
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-sm text-muted-foreground">No source image was stored.</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {t('adminGenerated.detail.noSourceImage')}
+                </p>
               )}
               {parentPreviewPath ? (
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   <AssetPreviewCard
-                    title="Generated preview"
+                    title={t('adminGenerated.detail.generatedPreview')}
                     path={parentPreviewPath}
                     url={parentPreviewUrl}
                     downloadUrl={parentPreviewDownloadUrl}
                   />
                   {item.manufacturing_file_path ? (
                     <AssetPreviewCard
-                      title="Manufacturing PNG"
+                      title={t('adminGenerated.detail.manufacturingPng')}
                       path={item.manufacturing_file_path}
                       url={parentManufacturingFileUrl}
                       downloadUrl={parentManufacturingFileDownloadUrl}
@@ -130,34 +155,57 @@ export default async function AdminGeneratedDetailPage({
           )}
 
           <article className="rounded-xl border bg-card p-5">
-            <h2 className="font-semibold">Customer request</h2>
+            <h2 className="font-semibold">{t('adminGenerated.detail.customerRequest')}</h2>
             <dl className="mt-3.5 grid gap-4 sm:grid-cols-3">
-              <Info label="Engraved text" value={item.custom_text} emphasize />
               <Info
-                label="LED colour"
-                value={item.multi_color ? 'Multi color' : item.color}
-                empty="Not chosen"
+                label={t('adminGenerated.detail.engravedText')}
+                value={item.custom_text}
+                emphasize
               />
-              <Info label="Customer prompt" value={item.prompt} empty="None" />
+              <Info
+                label={t('adminGenerated.detail.ledColour')}
+                value={
+                  item.multi_color
+                    ? t('adminGenerated.detail.multiColor')
+                    : item.color
+                      ? tDynamic(t, `generated.color.${item.color}`, item.color)
+                      : item.color
+                }
+                empty={t('adminGenerated.detail.notChosen')}
+              />
+              <Info
+                label={t('adminGenerated.detail.customerPrompt')}
+                value={item.prompt}
+                empty={t('adminGenerated.detail.none')}
+              />
             </dl>
           </article>
 
           <RawData
             entries={[
               hasContent(item.manufacturing_metadata)
-                ? { title: 'Manufacturing metadata', value: item.manufacturing_metadata }
+                ? {
+                    title: t('adminGenerated.detail.manufacturingMetadata'),
+                    value: item.manufacturing_metadata,
+                  }
                 : null,
               hasContent(item.generation_options)
-                ? { title: 'Generation options', value: item.generation_options }
+                ? {
+                    title: t('adminGenerated.detail.generationOptions'),
+                    value: item.generation_options,
+                  }
                 : null,
               validationWarnings.length
-                ? { title: 'Validation warnings', value: validationWarnings }
+                ? {
+                    title: t('adminGenerated.detail.validationWarnings'),
+                    value: validationWarnings,
+                  }
                 : null,
               item.svg_content.trim()
-                ? { title: 'Raw manufacturing SVG', value: item.svg_content }
+                ? { title: t('adminGenerated.detail.rawSvg'), value: item.svg_content }
                 : null,
               ...(artifacts ?? []).map((artifact) => ({
-                title: `Artifact · ${artifact.artifact_type}`,
+                title: t('adminGenerated.detail.artifact', { type: artifact.artifact_type }),
                 value: {
                   storagePath: artifact.storage_path,
                   metadata: artifact.metadata,
@@ -175,14 +223,16 @@ export default async function AdminGeneratedDetailPage({
           >
             <input type="hidden" name="generatedItemId" value={item.id} />
             <div>
-              <h2 className="font-semibold">Review decision</h2>
+              <h2 className="font-semibold">{t('adminGenerated.review.title')}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Approving releases the production file to the workshop.
+                {t('adminGenerated.review.help')}
               </p>
             </div>
 
             <fieldset className="m-0 space-y-2 border-0 p-0">
-              <legend className="mb-2 text-sm font-medium">Decision</legend>
+              <legend className="mb-2 text-sm font-medium">
+                {t('adminGenerated.review.decision')}
+              </legend>
               {DECISIONS.map((decision) => (
                 <label
                   key={decision.value}
@@ -199,8 +249,12 @@ export default async function AdminGeneratedDetailPage({
                     className="size-4 accent-primary"
                   />
                   <span className="min-w-0">
-                    <span className="block font-semibold">{decision.label}</span>
-                    <span className="block text-xs text-muted-foreground">{decision.hint}</span>
+                    <span className="block font-semibold">
+                      {t(`adminGenerated.review.${decision.key}`)}
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      {t(`adminGenerated.review.${decision.key}Hint`)}
+                    </span>
                   </span>
                 </label>
               ))}
@@ -208,38 +262,36 @@ export default async function AdminGeneratedDetailPage({
 
             <div className="space-y-2">
               <label htmlFor="note" className="text-sm font-medium">
-                Internal note
+                {t('adminGenerated.review.note')}
               </label>
               <textarea
                 id="note"
                 name="note"
                 rows={4}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Reason, production concerns, or change request."
+                placeholder={t('adminGenerated.review.notePlaceholder')}
               />
             </div>
             <button
               type="submit"
               className="h-11 w-full rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground"
             >
-              Save review
+              {t('adminGenerated.review.save')}
             </button>
           </form>
 
           <div className="rounded-xl border bg-card p-5">
-            <h2 className="font-semibold">Technical documentation</h2>
+            <h2 className="font-semibold">{t('adminGenerated.docs.title')}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {optionAssets.length > 1
-                ? `Tech sheets, materials, sizes and operator instructions for all ${optionAssets.length} options, with their production files.`
-                : 'Tech sheet with materials, sizes and operator instructions, packed with the production files.'}
+                ? t('adminGenerated.docs.helpMultiple', { count: optionAssets.length })
+                : t('adminGenerated.docs.helpSingle')}
             </p>
             <div className="mt-3">
               <ProductionPackLinks
                 hrefs={productionPackHrefs(`/admin/generated/${item.id}/production-pack`)}
                 packLabel={
-                  optionAssets.length > 1
-                    ? 'Production pack · all options'
-                    : 'Production pack (.zip)'
+                  optionAssets.length > 1 ? t('adminGenerated.docs.packAllOptions') : undefined
                 }
               />
             </div>
@@ -247,19 +299,22 @@ export default async function AdminGeneratedDetailPage({
 
           <div className="rounded-xl border bg-card p-5">
             <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Timeline
+              {t('adminGenerated.timeline.title')}
             </h2>
             <ol className="mt-3 space-y-3 text-sm">
               <TimelineEntry
                 active
                 title={status.label}
-                detail={`Updated ${formatDate(item.updated_at)}`}
+                detail={t('adminGenerated.timeline.updated', {
+                  date: formatDate(item.updated_at, locale),
+                })}
               />
               <TimelineEntry
-                title="Submitted"
-                detail={`${formatDate(item.created_at)} · ${item.credit_cost} ${
-                  item.credit_cost === 1 ? 'credit' : 'credits'
-                } debited`}
+                title={t('adminGenerated.timeline.submitted')}
+                detail={t('adminGenerated.timeline.debited', {
+                  date: formatDate(item.created_at, locale),
+                  ...creditCount,
+                })}
               />
             </ol>
           </div>
@@ -269,32 +324,21 @@ export default async function AdminGeneratedDetailPage({
   );
 }
 
-const REVIEW_STATUS: Record<string, { label: string; className: string }> = {
-  draft: { label: 'Draft', className: 'bg-muted text-muted-foreground' },
-  preview_ready: {
-    label: 'Preview ready · awaiting review',
-    className: 'bg-accent text-accent-foreground',
-  },
-  review_required: {
-    label: 'Changes requested',
-    className: 'bg-destructive/15 text-destructive',
-  },
-  approved: { label: 'Approved', className: 'bg-success/15 text-success' },
-  rejected: { label: 'Rejected', className: 'bg-destructive/15 text-destructive' },
+type ReviewStatusKey = 'draft' | 'previewReady' | 'reviewRequired' | 'approved' | 'rejected';
+
+const REVIEW_STATUS: Record<string, { key: ReviewStatusKey; className: string }> = {
+  draft: { key: 'draft', className: 'bg-muted text-muted-foreground' },
+  preview_ready: { key: 'previewReady', className: 'bg-accent text-accent-foreground' },
+  review_required: { key: 'reviewRequired', className: 'bg-destructive/15 text-destructive' },
+  approved: { key: 'approved', className: 'bg-success/15 text-success' },
+  rejected: { key: 'rejected', className: 'bg-destructive/15 text-destructive' },
 };
 
+/** `value` is sent to the server; `key` picks the label/hint under adminGenerated.review. */
 const DECISIONS = [
-  {
-    value: 'approved',
-    label: 'Approve',
-    hint: 'Production file is correct and matches the preview',
-  },
-  {
-    value: 'review_required',
-    label: 'Request changes',
-    hint: 'Customer must upload a different photo or text',
-  },
-  { value: 'rejected', label: 'Reject', hint: 'Cannot be produced' },
+  { value: 'approved', key: 'approve' },
+  { value: 'review_required', key: 'requestChanges' },
+  { value: 'rejected', key: 'reject' },
 ] as const;
 
 type SourceAsset = GeneratedItemAdminDetailAssets['sourceAssets'][number];
@@ -308,13 +352,18 @@ function OptionReview({
   option,
   sourceAssets,
   optionCount,
+  locale,
 }: {
   item: GeneratedItemAdminDetail;
   option: OptionAsset;
   sourceAssets: SourceAsset[];
   optionCount: number;
+  locale: AppLocale;
 }) {
-  const name = getOptionName(option);
+  const t = useTranslations();
+  const name =
+    getOptionName(option) ??
+    t('adminGenerated.option.personalizedOption', { number: option.option_index });
   const previewLinked = option.metadata.previewRenderedFromManufacturingPng === true;
   const source = sourceAssets[0];
   const requiresSvg = option.metadata.requiresManufacturingSvg === true;
@@ -326,28 +375,31 @@ function OptionReview({
           <div className="min-w-0">
             <h2 className="font-semibold">
               {previewLinked
-                ? 'Will the produced item match the preview?'
-                : 'Preview and production file'}
+                ? t('adminGenerated.option.matchTitle')
+                : t('adminGenerated.option.previewAndFile')}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {optionCount > 1 ? `Option ${option.option_index} · ` : ''}
+              {optionCount > 1
+                ? `${t('adminGenerated.option.optionNumber', { number: option.option_index })} · `
+                : ''}
               {name}
+              {' · '}
               {previewLinked
-                ? ' · the customer preview was rendered from this manufacturing PNG.'
+                ? t('adminGenerated.option.linkedNote')
                 : option.manufacturing_file_path
-                  ? ' · the manufacturing PNG was generated separately from the preview.'
-                  : ' · no manufacturing PNG yet.'}
+                  ? t('adminGenerated.option.separateNote')
+                  : t('adminGenerated.option.noPngNote')}
             </p>
           </div>
           {previewLinked ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-success">
               <Check className="size-3.5" aria-hidden="true" />
-              Preview linked to production file
+              {t('adminGenerated.option.linkedBadge')}
             </span>
           ) : option.manufacturing_file_path ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-destructive">
               <AlertTriangle className="size-3.5" aria-hidden="true" />
-              Preview may differ from production file
+              {t('adminGenerated.option.mayDifferBadge')}
             </span>
           ) : null}
         </div>
@@ -358,7 +410,7 @@ function OptionReview({
               hrefs={productionPackHrefs(`/admin/generated/${item.id}/production-pack`, {
                 option: option.id,
               })}
-              packLabel="Production pack · this option"
+              packLabel={t('adminGenerated.docs.packThisOption')}
             />
           </div>
         ) : null}
@@ -366,32 +418,35 @@ function OptionReview({
         <div className="mt-4 grid gap-3.5 min-[560px]:grid-cols-3">
           {source ? (
             <AssetFigure
-              title="Customer photo"
+              title={t('adminGenerated.option.customerPhoto')}
               path={source.storagePath}
               url={source.url}
               downloadUrl={source.downloadUrl}
               tag={extension(source.storagePath)}
             />
           ) : (
-            <EmptyFigure title="Customer photo" message="No source image was stored." />
+            <EmptyFigure
+              title={t('adminGenerated.option.customerPhoto')}
+              message={t('adminGenerated.detail.noSourceImage')}
+            />
           )}
           {option.manufacturing_file_path ? (
             <AssetFigure
-              title="Manufacturing PNG"
+              title={t('adminGenerated.detail.manufacturingPng')}
               path={option.manufacturing_file_path}
               url={option.manufacturingFileUrl}
               downloadUrl={option.manufacturingFileDownloadUrl}
-              tag="Engraved"
+              tag={t('adminGenerated.option.engravedTag')}
               emphasized
             />
           ) : (
             <EmptyFigure
-              title="Manufacturing PNG"
-              message="Generate it below to get a production file."
+              title={t('adminGenerated.detail.manufacturingPng')}
+              message={t('adminGenerated.option.generateBelow')}
             />
           )}
           <AssetFigure
-            title="Customer preview"
+            title={t('adminGenerated.option.customerPreview')}
             path={option.preview_image_path}
             url={option.previewUrl}
             downloadUrl={option.previewDownloadUrl}
@@ -400,13 +455,13 @@ function OptionReview({
         </div>
         {sourceAssets.length > 1 ? (
           <p className="mt-3 text-xs text-muted-foreground">
-            {sourceAssets.length} customer photos were uploaded; the first is shown.
+            {t('adminGenerated.option.photosUploaded', { count: sourceAssets.length })}
           </p>
         ) : null}
       </article>
 
       {option.manufacturing_file_path && (requiresSvg || option.manufacturingSvgPath) ? (
-        <TracePanel item={item} option={option} />
+        <TracePanel item={item} option={option} locale={locale} />
       ) : null}
 
       <details
@@ -426,18 +481,20 @@ function OptionReview({
           <span className="min-w-0 flex-[1_1_280px]">
             <span className="block font-semibold">
               {option.manufacturing_file_path
-                ? 'Regenerate the manufacturing PNG'
-                : 'Generate the manufacturing PNG'}
+                ? t('adminGenerated.option.regenerateTitle')
+                : t('adminGenerated.option.generateTitle')}
             </span>
             <span className="block text-sm text-muted-foreground">
               {previewLinked
-                ? 'Replaces the production file. The preview the customer approved will no longer match it.'
-                : 'Admin-only production step; the customer preview is not affected.'}
+                ? t('adminGenerated.option.regenerateWarning')
+                : t('adminGenerated.option.adminOnly')}
             </span>
           </span>
-          <span className="text-sm font-medium text-muted-foreground group-open:hidden">Show</span>
+          <span className="text-sm font-medium text-muted-foreground group-open:hidden">
+            {t('adminGenerated.option.show')}
+          </span>
           <span className="hidden text-sm font-medium text-muted-foreground group-open:inline">
-            Hide
+            {t('adminGenerated.option.hide')}
           </span>
         </summary>
         <div className="border-t p-4 sm:px-5">
@@ -452,12 +509,23 @@ function OptionReview({
         </div>
       </details>
 
-      <RawData entries={[{ title: 'Option metadata', value: option.metadata }]} />
+      <RawData
+        entries={[{ title: t('adminGenerated.detail.optionMetadata'), value: option.metadata }]}
+      />
     </div>
   );
 }
 
-function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: OptionAsset }) {
+function TracePanel({
+  item,
+  option,
+  locale,
+}: {
+  item: GeneratedItemAdminDetail;
+  option: OptionAsset;
+  locale: AppLocale;
+}) {
+  const t = useTranslations();
   const trace = readTrace(option.metadata);
   const error =
     typeof option.metadata.manufacturingSvgError === 'string'
@@ -469,7 +537,7 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
   const qualityFailed = status === 'quality_check_failed';
   const generatedAt =
     typeof option.metadata.manufacturingSvgGeneratedAt === 'string'
-      ? formatDate(option.metadata.manufacturingSvgGeneratedAt)
+      ? formatDate(option.metadata.manufacturingSvgGeneratedAt, locale)
       : null;
   const bounds = DEFAULT_TRACE_OPTIONS.inkCoverage;
 
@@ -504,17 +572,23 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
         <div className="min-w-0 flex-[1_1_320px] space-y-4">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
             <div>
-              <h2 className="font-semibold">Manufacturing SVGs</h2>
+              <h2 className="font-semibold">{t('adminGenerated.trace.title')}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {hasSvg
-                  ? `Traced from the PNG${generatedAt ? ` · ${generatedAt}` : ''}${
-                      trace?.source === 'admin_regeneration' ? ' · by an admin' : ' · automatically'
-                    }`
+                  ? [
+                      t('adminGenerated.trace.tracedFromPng'),
+                      generatedAt,
+                      trace?.source === 'admin_regeneration'
+                        ? t('adminGenerated.trace.byAdmin')
+                        : t('adminGenerated.trace.automatically'),
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')
                   : qualityFailed
-                    ? 'Not produced: the PNG failed the trace quality check.'
+                    ? t('adminGenerated.trace.qualityFailed')
                     : status === 'trace_failed'
-                      ? 'The automatic trace failed; the PNG itself looks fine.'
-                      : 'Not traced yet.'}
+                      ? t('adminGenerated.trace.traceFailed')
+                      : t('adminGenerated.trace.notTraced')}
               </p>
             </div>
             <span
@@ -529,42 +603,51 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
               {hasSvg ? (
                 <>
                   <Check className="size-3.5" aria-hidden="true" />
-                  Trace healthy
+                  {t('adminGenerated.trace.healthy')}
                 </>
               ) : qualityFailed ? (
-                'Not produced'
+                t('adminGenerated.trace.notProduced')
               ) : (
-                'Pending'
+                t('adminGenerated.trace.pending')
               )}
             </span>
           </div>
 
           {error ? (
             <p className="text-sm text-destructive">
-              <span className="font-semibold">{error}</span>
+              <span className="font-semibold">{error}</span>{' '}
               {qualityFailed
-                ? ' Regenerate the PNG; re-tracing the same file will fail again.'
-                : ' Try tracing it again.'}
+                ? t('adminGenerated.trace.qualityFailedHint')
+                : t('adminGenerated.trace.retryHint')}
             </p>
           ) : null}
 
           {trace ? (
             <dl className="grid gap-3 min-[480px]:grid-cols-2 lg:grid-cols-4">
               <Stat
-                label="Ink coverage"
+                label={t('adminGenerated.trace.inkCoverage')}
                 value={`${(trace.inkCoverage * 100).toFixed(1)}%`}
-                hint={`accepted ${bounds.min * 100}–${bounds.max * 100}%`}
+                hint={t('adminGenerated.trace.inkAccepted', {
+                  min: bounds.min * 100,
+                  max: bounds.max * 100,
+                })}
                 alert={qualityFailed}
               />
               {trace.pathCount !== null ? (
-                <Stat label="Paths" value={String(trace.pathCount)} hint="outlines + holes" />
+                <Stat
+                  label={t('adminGenerated.trace.paths')}
+                  value={String(trace.pathCount)}
+                  hint={t('adminGenerated.trace.pathsHint')}
+                />
               ) : null}
               {trace.units ? (
                 <Stat
-                  label="Units"
+                  label={t('adminGenerated.trace.units')}
                   value={trace.units}
                   hint={
-                    trace.units === 'mm' ? 'real size for the laser' : 'set artwork width in mm'
+                    trace.units === 'mm'
+                      ? t('adminGenerated.trace.unitsMm')
+                      : t('adminGenerated.trace.unitsOther')
                   }
                 />
               ) : null}
@@ -572,10 +655,7 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
           ) : null}
 
           {hasSvg && !hasStrokeSvg ? (
-            <p className="text-sm text-muted-foreground">
-              Only the fill SVG exists for this option. Re-trace from the PNG to also get the stroke
-              (cut line) version.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('adminGenerated.trace.fillOnly')}</p>
           ) : null}
 
           <div className="flex flex-wrap items-center gap-2">
@@ -585,7 +665,7 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
                 className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3.5 text-sm font-semibold text-primary-foreground"
               >
                 <Download className="size-4" aria-hidden="true" />
-                Fill SVG · engrave
+                {t('adminGenerated.trace.fillSvg')}
               </a>
             ) : null}
             {hasSvg && option.manufacturingSvgStrokeDownloadUrl ? (
@@ -594,7 +674,7 @@ function TracePanel({ item, option }: { item: GeneratedItemAdminDetail; option: 
                 className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3.5 text-sm font-semibold text-primary-foreground"
               >
                 <Download className="size-4" aria-hidden="true" />
-                Stroke SVG · cut lines
+                {t('adminGenerated.trace.strokeSvg')}
               </a>
             ) : null}
             <ManufacturingSvgForm
@@ -731,7 +811,7 @@ function extension(path: string) {
 function getOptionName(option: AdminGeneratedPreviewOption) {
   return typeof option.metadata.boilerplateName === 'string'
     ? option.metadata.boilerplateName
-    : `Personalized option ${option.option_index}`;
+    : null;
 }
 
 function buildManufacturingPrompt(

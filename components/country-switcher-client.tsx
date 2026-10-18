@@ -6,15 +6,19 @@ import { setCountryPreferenceAction } from '@/app/country/actions';
 export function CountrySwitcherClient({
   activeCountry,
   countries,
-  placeholder = 'Country',
+  placeholder,
+  label,
 }: {
   activeCountry: string;
   countries: { code: string; label: string }[];
-  placeholder?: string;
+  /** Localized "Country" placeholder option (nav.country). */
+  placeholder: string;
+  /** Localized form label (nav.shippingCountry). */
+  label: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   return (
-    <form ref={formRef} action={setCountryPreferenceAction} aria-label="Shipping country">
+    <form ref={formRef} action={setCountryPreferenceAction} aria-label={label}>
       <select
         name="country"
         defaultValue={activeCountry}

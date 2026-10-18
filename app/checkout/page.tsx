@@ -74,7 +74,11 @@ export default async function CheckoutPage() {
                       <p className="font-medium">{item.title}</p>
                       <p className="text-sm text-muted-foreground">
                         {t('order.qty', { count: item.quantity })} &middot;{' '}
-                        {item.generated_item_id ? t('cart.generated_item') : t('cart.catalog_item')}
+                        {item.generated_item_id
+                          ? t('cart.generated_item')
+                          : item.banner_sample_id
+                            ? t('cart.banner_item')
+                            : t('cart.catalog_item')}
                       </p>
                       {issue ? (
                         <p className="mt-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -83,7 +87,7 @@ export default async function CheckoutPage() {
                       ) : null}
                     </div>
                     <p className="font-medium">
-                      {formatPrice(item.unit_price_cents * item.quantity, item.currency)}
+                      {formatPrice(item.unit_price_cents * item.quantity, item.currency, locale)}
                     </p>
                   </div>
                 );
@@ -96,16 +100,16 @@ export default async function CheckoutPage() {
               locale={locale}
               defaultEmail={user.email ?? ''}
               countryName={getCountryDisplayName('AM', locale)}
-              subtotalText={formatPrice(subtotal, subtotalCurrency)}
+              subtotalText={formatPrice(subtotal, subtotalCurrency, locale)}
               shippingText={
                 totals
-                  ? formatPrice(totals.shippingCents, totals.currency)
+                  ? formatPrice(totals.shippingCents, totals.currency, locale)
                   : t('checkout.select_destination')
               }
               totalText={
                 totals
-                  ? formatPrice(totals.totalCents, totals.currency)
-                  : formatPrice(subtotal, subtotalCurrency)
+                  ? formatPrice(totals.totalCents, totals.currency, locale)
+                  : formatPrice(subtotal, subtotalCurrency, locale)
               }
               hasIssues={issues.length > 0}
               canSubmit={issues.length === 0 && totals !== null}

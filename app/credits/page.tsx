@@ -6,6 +6,7 @@ import { CREDIT_PACKS } from '@/lib/credit-packs';
 import { convertDisplayMoney, getActiveCurrency, normalizeCurrency } from '@/lib/currency';
 import { getTranslations } from 'next-intl/server';
 import { formatLocalizedCurrency, formatLocalizedDate } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { getRequestLocale } from '@/lib/i18n-server';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 
@@ -58,6 +59,13 @@ export default async function CreditsPage() {
         created_at: string;
       }[]
     >();
+  const pendingPackName = (metadata: Record<string, unknown>) => {
+    const fallback =
+      typeof metadata.packName === 'string' ? metadata.packName : t('credits.packFallback');
+    return typeof metadata.packKey === 'string'
+      ? tDynamic(t, `credits.pack.${metadata.packKey}.name`, fallback)
+      : fallback;
+  };
   const activeCurrency = await getActiveCurrency();
   const displayPacks = await Promise.all(
     CREDIT_PACKS.map(async (pack) => {
@@ -90,7 +98,7 @@ export default async function CreditsPage() {
             <div>
               <p className="text-sm text-muted-foreground">{t('credits.balance')}</p>
               <p className="text-3xl font-bold">
-                {account?.balance ?? 0} {t('credits.unit')}
+                {t('credits.amount', { count: account?.balance ?? 0 })}
               </p>
             </div>
           </div>
@@ -107,9 +115,17 @@ export default async function CreditsPage() {
               {ledger.map((entry) => (
                 <div key={entry.id} className="flex items-start justify-between gap-4 p-4 text-sm">
                   <div>
-                    <p className="font-medium">{entry.reason}</p>
+                    <p className="font-medium">
+                      {tDynamic(t, `credits.reason.${entry.reason}`, entry.reason)}
+                    </p>
                     <p className="text-xs text-muted-foreground">
-                      {entry.reference_type ?? t('credits.noReference')}
+                      {entry.reference_type
+                        ? tDynamic(
+                            t,
+                            `credits.referenceType.${entry.reference_type}`,
+                            entry.reference_type,
+                          )
+                        : t('credits.noReference')}
                     </p>
                   </div>
                   <div className="text-right">
@@ -142,15 +158,19 @@ export default async function CreditsPage() {
             {displayPacks.map((pack) => (
               <CreditPurchaseForm key={pack.key} packKey={pack.key} buyLabel={t('credits.buy')}>
                 <div>
-                  <h3 className="font-medium">{pack.name}</h3>
+                  <h3 className="font-medium">
+                    {tDynamic(t, `credits.pack.${pack.key}.name`, pack.name)}
+                  </h3>
                   <p className="text-2xl font-bold">
-                    {pack.creditAmount} {t('credits.unit')}
+                    {t('credits.amount', { count: pack.creditAmount })}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {formatLocalizedCurrency(locale, pack.displayPriceCents, pack.displayCurrency)}
                   </p>
                 </div>
-                <p className="min-h-10 text-xs text-muted-foreground">{pack.description}</p>
+                <p className="min-h-10 text-xs text-muted-foreground">
+                  {tDynamic(t, `credits.pack.${pack.key}.description`, pack.description)}
+                </p>
               </CreditPurchaseForm>
             ))}
           </div>
@@ -161,8 +181,10 @@ export default async function CreditsPage() {
                 {pendingRequests.map((request) => (
                   <div key={request.id} className="flex justify-between gap-4 text-sm">
                     <span>
-                      {String(request.metadata.packName ?? t('credits.packFallback'))} -{' '}
-                      {String(request.metadata.creditAmount ?? '?')} {t('credits.unit')}
+                      {pendingPackName(request.metadata)} -{' '}
+                      {Number.isFinite(Number(request.metadata.creditAmount ?? Number.NaN))
+                        ? t('credits.amount', { count: Number(request.metadata.creditAmount) })
+                        : '?'}
                     </span>
                     <span className="text-muted-foreground">
                       {formatLocalizedDate(locale, request.created_at)}

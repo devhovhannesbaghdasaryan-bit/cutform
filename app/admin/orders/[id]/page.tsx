@@ -1,8 +1,13 @@
 import { Download } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { OrderStatusForm } from '@/app/admin/order-status-form';
 import { productionPackHrefs, ProductionSummary } from '@/app/admin/production-pack-links';
 import { requireAdmin } from '@/lib/admin';
+import type { AppLocale } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
+import { getRequestLocale } from '@/lib/i18n-server';
 import {
   getOrderDetailForAdmin,
   type AdminOrderItem,
@@ -23,6 +28,7 @@ export default async function AdminOrderDetailPage({
 }) {
   const { id } = await params;
   const { supabase } = await requireAdmin();
+  const [t, locale] = await Promise.all([getTranslations(), getRequestLocale()]);
 
   const detail = await getOrderDetailForAdmin(supabase, id);
 
@@ -47,8 +53,12 @@ export default async function AdminOrderDetailPage({
     <main className="container max-w-5xl space-y-8 py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Order {order.id.slice(0, 8)}</h1>
-          <p className="text-muted-foreground">Created {formatDate(order.created_at)}</p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t('adminOrders.detail.title', { id: order.id.slice(0, 8) })}
+          </h1>
+          <p className="text-muted-foreground">
+            {t('adminOrders.detail.created', { date: formatDate(order.created_at, locale) })}
+          </p>
         </div>
         {packs.length ? (
           <div className="text-right">
@@ -57,12 +67,13 @@ export default async function AdminOrderDetailPage({
               className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <Download className="size-4" aria-hidden="true" />
-              Production pack · all items (.zip)
+              {t('adminOrders.detail.productionPackAll')}
             </a>
             <p className="mt-1 text-xs text-muted-foreground">
-              Tech sheets and production files for {packs.length} item
-              {packs.length === 1 ? '' : 's'} · {readyCount} ready
-              {readyCount !== packs.length ? `, ${packs.length - readyCount} need review` : ''}
+              {t('adminOrders.detail.packSummary', { count: packs.length, ready: readyCount })}
+              {readyCount !== packs.length
+                ? `, ${t('adminOrders.detail.packNeedsReview', { count: packs.length - readyCount })}`
+                : ''}
             </p>
           </div>
         ) : null}
@@ -72,12 +83,12 @@ export default async function AdminOrderDetailPage({
         <section className="space-y-6">
           <div className="rounded-lg border">
             <div className="border-b p-4">
-              <h2 className="font-semibold">Items</h2>
+              <h2 className="font-semibold">{t('adminOrders.detail.items')}</h2>
             </div>
             {itemsError ? (
               <p className="p-4 text-sm text-destructive">{itemsError.message}</p>
             ) : !items?.length ? (
-              <p className="p-4 text-sm text-muted-foreground">No order items found.</p>
+              <p className="p-4 text-sm text-muted-foreground">{t('adminOrders.detail.noItems')}</p>
             ) : (
               <div className="divide-y">
                 {items.map((item) => (
@@ -97,6 +108,7 @@ export default async function AdminOrderDetailPage({
                     latestInstruction={latestInstructionByItemId.get(item.id) ?? null}
                     orderId={order.id}
                     pack={packByItemId.get(item.id) ?? null}
+                    locale={locale}
                   />
                 ))}
               </div>
@@ -104,61 +116,69 @@ export default async function AdminOrderDetailPage({
           </div>
 
           <div className="rounded-lg border p-5">
-            <h2 className="font-semibold">Buyer</h2>
+            <h2 className="font-semibold">{t('adminOrders.detail.buyer')}</h2>
             <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-muted-foreground">User ID</dt>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.userId')}</dt>
                 <dd className="break-all">{order.user_id}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground">Contact email</dt>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.contactEmail')}</dt>
                 <dd>{order.contact_email ?? '-'}</dd>
               </div>
             </dl>
           </div>
 
           <div className="rounded-lg border p-5">
-            <h2 className="font-semibold">Shipping address</h2>
+            <h2 className="font-semibold">{t('adminOrders.detail.shippingAddress')}</h2>
             <pre className="mt-3 overflow-auto rounded-md bg-muted p-3 text-xs">
               {order.shipping_address
                 ? JSON.stringify(order.shipping_address, null, 2)
-                : 'No shipping address yet.'}
+                : t('adminOrders.detail.noShippingAddress')}
             </pre>
           </div>
         </section>
 
         <aside className="space-y-6">
           <div className="rounded-lg border p-5">
-            <p className="text-sm text-muted-foreground">Total</p>
-            <p className="text-4xl font-bold">{formatPrice(order.total_cents, order.currency)}</p>
+            <p className="text-sm text-muted-foreground">{t('adminOrders.detail.total')}</p>
+            <p className="text-4xl font-bold">
+              {formatPrice(order.total_cents, order.currency, locale)}
+            </p>
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Merchandise</dt>
-                <dd>{formatPrice(order.subtotal_cents, order.currency)}</dd>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.merchandise')}</dt>
+                <dd>{formatPrice(order.subtotal_cents, order.currency, locale)}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Shipping</dt>
-                <dd>{formatPrice(order.shipping_cents, order.currency)}</dd>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.shipping')}</dt>
+                <dd>{formatPrice(order.shipping_cents, order.currency, locale)}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Currency</dt>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.currency')}</dt>
                 <dd>{order.currency}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Payment route</dt>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.paymentRoute')}</dt>
                 <dd>{order.payment_provider_route ?? '-'}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Payment</dt>
-                <dd>{order.payment_status}</dd>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.payment')}</dt>
+                <dd>
+                  {tDynamic(
+                    t,
+                    `adminOrders.paymentStatus.${order.payment_status}`,
+                    order.payment_status,
+                  )}
+                </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Production</dt>
-                <dd>{order.status}</dd>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.production')}</dt>
+                <dd>{tDynamic(t, `status.${order.status}`, order.status)}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Updated</dt>
-                <dd>{formatDate(order.updated_at)}</dd>
+                <dt className="text-muted-foreground">{t('adminOrders.detail.updated')}</dt>
+                <dd>{formatDate(order.updated_at, locale)}</dd>
               </div>
             </dl>
           </div>
@@ -169,13 +189,13 @@ export default async function AdminOrderDetailPage({
             paymentStatus={order.payment_status}
           />
           <div className="rounded-lg border p-5">
-            <h2 className="font-semibold">Exchange-rate context</h2>
+            <h2 className="font-semibold">{t('adminOrders.detail.exchangeRateContext')}</h2>
             <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">
               {JSON.stringify(order.exchange_rate_context ?? {}, null, 2)}
             </pre>
           </div>
           <div className="rounded-lg border p-5">
-            <h2 className="font-semibold">Shipping-rate context</h2>
+            <h2 className="font-semibold">{t('adminOrders.detail.shippingRateContext')}</h2>
             <pre className="mt-3 max-h-72 overflow-auto rounded-md bg-muted p-3 text-xs">
               {JSON.stringify(order.shipping_rate_context ?? {}, null, 2)}
             </pre>
@@ -193,6 +213,7 @@ function OrderItemDetail({
   latestInstruction,
   orderId,
   pack,
+  locale,
 }: {
   item: AdminOrderItem;
   catalogInfo: CatalogProductionInfo | null;
@@ -200,7 +221,9 @@ function OrderItemDetail({
   latestInstruction: BannerManufacturingInstruction | null;
   orderId: string;
   pack: ProductionPack | null;
+  locale: AppLocale;
 }) {
+  const t = useTranslations();
   const isBanner = Boolean(item.banner_size_key || generatedInfo?.product_type === 'banner');
   const packHrefs = productionPackHrefs(
     `/admin/orders/${orderId}/items/${item.id}/production-pack`,
@@ -211,26 +234,50 @@ function OrderItemDetail({
       <div>
         <p className="font-medium">{item.title}</p>
         <p className="text-xs text-muted-foreground">
-          {item.catalog_item_id ? 'Catalog item' : 'Generated item'} - Qty {item.quantity}
+          {item.catalog_item_id
+            ? t('adminOrders.item.catalogItem')
+            : t('adminOrders.item.generatedItem')}{' '}
+          - {t('adminOrders.item.quantity', { quantity: item.quantity })}
         </p>
       </div>
       <div className="text-right">
-        <p className="font-medium">{formatPrice(item.total_price_cents, item.currency)}</p>
+        <p className="font-medium">{formatPrice(item.total_price_cents, item.currency, locale)}</p>
         <p className="text-xs text-muted-foreground">
-          {formatPrice(item.unit_price_cents, item.currency)} each
+          {t('adminOrders.item.unitPrice', {
+            price: formatPrice(item.unit_price_cents, item.currency, locale),
+          })}
         </p>
       </div>
       <div className="space-y-3 sm:col-span-2">
         <div className="grid gap-3 rounded-md bg-muted/40 p-3 text-xs sm:grid-cols-2">
-          <Info label="Image" value={item.image_path ?? '-'} />
-          <Info label="Selected preview" value={item.selected_preview_path ?? '-'} />
-          <Info label="Manufacturing file" value={item.manufacturing_file_path ?? '-'} />
-          <Info label="Original images" value={item.original_image_paths.join(', ') || '-'} />
-          <Info label="Text" value={item.custom_text ?? '-'} />
-          <Info label="LED" value={item.multi_color ? 'Multi color' : (item.led_color ?? '-')} />
-          <Info label="Banner size" value={item.banner_size_key ?? '-'} />
+          <Info label={t('adminOrders.item.image')} value={item.image_path ?? '-'} />
+          <Info
+            label={t('adminOrders.item.selectedPreview')}
+            value={item.selected_preview_path ?? '-'}
+          />
+          <Info
+            label={t('adminOrders.item.manufacturingFile')}
+            value={item.manufacturing_file_path ?? '-'}
+          />
+          <Info
+            label={t('adminOrders.item.originalImages')}
+            value={item.original_image_paths.join(', ') || '-'}
+          />
+          <Info label={t('adminOrders.item.text')} value={item.custom_text ?? '-'} />
+          <Info
+            label={t('adminOrders.item.led')}
+            value={item.multi_color ? t('adminOrders.item.multiColor') : (item.led_color ?? '-')}
+          />
+          <Info label={t('adminOrders.item.bannerSize')} value={item.banner_size_key ?? '-'} />
           {isBanner ? (
-            <Info label="Manufacturing status" value={latestInstruction?.status ?? 'not_started'} />
+            <Info
+              label={t('adminOrders.item.manufacturingStatus')}
+              value={tDynamic(
+                t,
+                `adminOrders.manufacturingStatus.${latestInstruction?.status ?? 'not_started'}`,
+                latestInstruction?.status ?? 'not_started',
+              )}
+            />
           ) : null}
         </div>
 
@@ -240,11 +287,13 @@ function OrderItemDetail({
           <div className="rounded-md border p-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-medium">Banner manufacturing</p>
+                <p className="text-sm font-medium">{t('adminOrders.item.bannerManufacturing')}</p>
                 <p className="text-xs text-muted-foreground">
                   {latestInstruction
-                    ? `Latest artifact ${formatDate(latestInstruction.created_at)}`
-                    : 'No instruction artifact generated yet.'}
+                    ? t('adminOrders.item.latestArtifact', {
+                        date: formatDate(latestInstruction.created_at, locale),
+                      })
+                    : t('adminOrders.item.noInstructionArtifact')}
                 </p>
               </div>
               <form action={generateBannerManufacturingInstructionAction}>
@@ -254,15 +303,20 @@ function OrderItemDetail({
                   type="submit"
                   className="rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
-                  {latestInstruction ? 'Regenerate instructions' : 'Generate instructions'}
+                  {latestInstruction
+                    ? t('adminOrders.item.regenerateInstructions')
+                    : t('adminOrders.item.generateInstructions')}
                 </button>
               </form>
             </div>
             {latestInstruction ? (
               <div className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
-                <Info label="Source image" value={latestInstruction.source_image_path} />
                 <Info
-                  label="Drawing files"
+                  label={t('adminOrders.item.sourceImage')}
+                  value={latestInstruction.source_image_path}
+                />
+                <Info
+                  label={t('adminOrders.item.drawingFiles')}
                   value={latestInstruction.drawing_paths.join(', ') || '-'}
                 />
               </div>
@@ -271,16 +325,28 @@ function OrderItemDetail({
         ) : null}
 
         <div className="grid gap-3 lg:grid-cols-2">
-          <Snapshot title="Item snapshot" value={item.item_snapshot} />
-          <Snapshot title="Exchange-rate context" value={item.exchange_rate_context} />
-          <Snapshot title="Personalization snapshot" value={item.personalization_snapshot} />
-          <Snapshot title="Production snapshot" value={item.production_snapshot} />
+          <Snapshot title={t('adminOrders.item.itemSnapshot')} value={item.item_snapshot} />
+          <Snapshot
+            title={t('adminOrders.item.exchangeRateContext')}
+            value={item.exchange_rate_context}
+          />
+          <Snapshot
+            title={t('adminOrders.item.personalizationSnapshot')}
+            value={item.personalization_snapshot}
+          />
+          <Snapshot
+            title={t('adminOrders.item.productionSnapshot')}
+            value={item.production_snapshot}
+          />
           {catalogInfo ? (
-            <Snapshot title="Admin catalog characteristics" value={catalogInfo} />
+            <Snapshot
+              title={t('adminOrders.item.adminCatalogCharacteristics')}
+              value={catalogInfo}
+            />
           ) : null}
           {latestInstruction ? (
             <Snapshot
-              title="Banner manufacturing instructions"
+              title={t('adminOrders.item.bannerManufacturingInstructions')}
               value={latestInstruction.instructions}
             />
           ) : null}

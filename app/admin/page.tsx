@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { Boxes, ClipboardList, CreditCard, Plus, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +9,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
   const { supabase } = await requireAdmin();
+  const t = await getTranslations();
   const [
     { count: itemCount },
     { count: orderCount },
@@ -29,36 +31,44 @@ export default async function AdminPage() {
     <main className="container space-y-8 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin panel</h1>
-          <p className="text-muted-foreground">
-            Manage marketplace items, orders, and production review.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('adminOverview.title')}</h1>
+          <p className="text-muted-foreground">{t('adminOverview.subtitle')}</p>
         </div>
         <Button asChild>
           <Link href="/admin/items/new">
             <Plus className="mr-2 h-4 w-4" />
-            New item
+            {t('adminOverview.newItem')}
           </Link>
         </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <MetricCard title="Catalog items" value={itemCount ?? 0} href="/admin/items" icon={Boxes} />
         <MetricCard
-          title="Orders"
+          title={t('adminOverview.catalogItems')}
+          value={itemCount ?? 0}
+          href="/admin/items"
+          icon={Boxes}
+        />
+        <MetricCard
+          title={t('adminOverview.orders')}
           value={orderCount ?? 0}
           href="/admin/orders"
           icon={ClipboardList}
         />
         <MetricCard
-          title="Needs review"
+          title={t('adminOverview.needsReview')}
           value={reviewCount ?? 0}
           href="/admin/generated"
           icon={ClipboardList}
         />
-        <MetricCard title="Users" value={userCount ?? 0} href="/admin/users" icon={Users} />
         <MetricCard
-          title="Transactions"
+          title={t('adminOverview.users')}
+          value={userCount ?? 0}
+          href="/admin/users"
+          icon={Users}
+        />
+        <MetricCard
+          title={t('adminOverview.transactions')}
           value={transactionCount ?? 0}
           href="/admin/transactions"
           icon={CreditCard}

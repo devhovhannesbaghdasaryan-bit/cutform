@@ -1,8 +1,23 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { requireAdmin } from '@/lib/admin';
+import { tDynamic } from '@/lib/i18n-dynamic';
+import { getRequestLocale } from '@/lib/i18n-server';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
+
+const TRANSACTION_TYPES = [
+  'payment',
+  'refund',
+  'credit_purchase',
+  'credit_spend',
+  'credit_refund',
+  'manual_adjustment',
+  'reversal',
+] as const;
+
+const TRANSACTION_STATUSES = ['pending', 'succeeded', 'failed', 'cancelled', 'reversed'] as const;
 
 interface AdminTransactionRow {
   id: string;
@@ -36,6 +51,7 @@ export default async function AdminTransactionsPage({
 }) {
   const params = await searchParams;
   const { supabase } = await requireAdmin();
+  const [t, locale] = await Promise.all([getTranslations(), getRequestLocale()]);
 
   let query = supabase
     .from('transactions')
@@ -72,74 +88,77 @@ export default async function AdminTransactionsPage({
   return (
     <main className="container space-y-6 py-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
-        <p className="text-muted-foreground">
-          Inspect payments, credit activity, refunds, and manual adjustments.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('adminTransactions.title')}</h1>
+        <p className="text-muted-foreground">{t('adminTransactions.subtitle')}</p>
       </div>
 
       <form className="grid gap-3 rounded-lg border p-4 md:grid-cols-[1fr_160px_160px_150px_150px_auto]">
         <input
           name="q"
-          placeholder="Search IDs or provider reference"
+          placeholder={t('adminTransactions.searchPlaceholder')}
+          aria-label={t('adminTransactions.searchPlaceholder')}
           defaultValue={params.q ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
         <select
           name="type"
           defaultValue={params.type ?? ''}
+          aria-label={t('adminTransactions.columns.type')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All types</option>
-          <option value="payment">Payment</option>
-          <option value="refund">Refund</option>
-          <option value="credit_purchase">Credit purchase</option>
-          <option value="credit_spend">Credit spend</option>
-          <option value="credit_refund">Credit refund</option>
-          <option value="manual_adjustment">Manual adjustment</option>
-          <option value="reversal">Reversal</option>
+          <option value="">{t('adminTransactions.allTypes')}</option>
+          {TRANSACTION_TYPES.map((value) => (
+            <option key={value} value={value}>
+              {t(`adminTransactions.types.${value}`)}
+            </option>
+          ))}
         </select>
         <select
           name="status"
           defaultValue={params.status ?? ''}
+          aria-label={t('adminTransactions.columns.status')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All statuses</option>
-          <option value="pending">Pending</option>
-          <option value="succeeded">Succeeded</option>
-          <option value="failed">Failed</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="reversed">Reversed</option>
+          <option value="">{t('adminTransactions.allStatuses')}</option>
+          {TRANSACTION_STATUSES.map((value) => (
+            <option key={value} value={value}>
+              {t(`adminTransactions.statuses.${value}`)}
+            </option>
+          ))}
         </select>
         <input
           name="provider"
-          placeholder="Provider"
+          placeholder={t('adminTransactions.providerPlaceholder')}
+          aria-label={t('adminTransactions.providerPlaceholder')}
           defaultValue={params.provider ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
         <select
           name="currency"
           defaultValue={params.currency ?? ''}
+          aria-label={t('adminTransactions.allCurrencies')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All currencies</option>
+          <option value="">{t('adminTransactions.allCurrencies')}</option>
           <option value="AMD">AMD</option>
           <option value="EUR">EUR</option>
           <option value="USD">USD</option>
           <option value="RUB">RUB</option>
         </select>
         <button className="h-10 rounded-md border border-input px-4 text-sm" type="submit">
-          Filter
+          {t('adminTransactions.filter')}
         </button>
         <input
           name="userId"
-          placeholder="User ID"
+          placeholder={t('adminTransactions.userIdPlaceholder')}
+          aria-label={t('adminTransactions.userIdPlaceholder')}
           defaultValue={params.userId ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
         <input
           name="orderId"
-          placeholder="Order ID"
+          placeholder={t('adminTransactions.orderIdPlaceholder')}
+          aria-label={t('adminTransactions.orderIdPlaceholder')}
           defaultValue={params.orderId ?? ''}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
@@ -147,12 +166,16 @@ export default async function AdminTransactionsPage({
           name="dateFrom"
           type="date"
           defaultValue={params.dateFrom ?? ''}
+          aria-label={t('adminTransactions.dateFrom')}
+          title={t('adminTransactions.dateFrom')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
         <input
           name="dateTo"
           type="date"
           defaultValue={params.dateTo ?? ''}
+          aria-label={t('adminTransactions.dateTo')}
+          title={t('adminTransactions.dateTo')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         />
       </form>
@@ -161,20 +184,24 @@ export default async function AdminTransactionsPage({
         <p className="text-sm text-destructive">{error.message}</p>
       ) : filteredTransactions.length === 0 ? (
         <div className="rounded-lg border border-dashed p-8 text-sm text-muted-foreground">
-          No transactions found.
+          {t('adminTransactions.noTransactions')}
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left">
               <tr>
-                <th className="px-4 py-3 font-medium">Transaction</th>
-                <th className="px-4 py-3 font-medium">User</th>
-                <th className="px-4 py-3 font-medium">Type</th>
-                <th className="px-4 py-3 font-medium">Amount</th>
-                <th className="px-4 py-3 font-medium">Provider route</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Created</th>
+                <th className="px-4 py-3 font-medium">
+                  {t('adminTransactions.columns.transaction')}
+                </th>
+                <th className="px-4 py-3 font-medium">{t('adminTransactions.columns.user')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminTransactions.columns.type')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminTransactions.columns.amount')}</th>
+                <th className="px-4 py-3 font-medium">
+                  {t('adminTransactions.columns.providerRoute')}
+                </th>
+                <th className="px-4 py-3 font-medium">{t('adminTransactions.columns.status')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminTransactions.columns.created')}</th>
               </tr>
             </thead>
             <tbody>
@@ -189,7 +216,7 @@ export default async function AdminTransactionsPage({
                     </Link>
                     {transaction.order_id && (
                       <p className="text-xs text-muted-foreground">
-                        Order {transaction.order_id.slice(0, 8)}
+                        {t('adminTransactions.orderRef', { id: transaction.order_id.slice(0, 8) })}
                       </p>
                     )}
                   </td>
@@ -205,9 +232,11 @@ export default async function AdminTransactionsPage({
                       '-'
                     )}
                   </td>
-                  <td className="px-4 py-3">{transaction.type}</td>
                   <td className="px-4 py-3">
-                    {formatPrice(transaction.amount_cents, transaction.currency)}
+                    {tDynamic(t, `adminTransactions.types.${transaction.type}`, transaction.type)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatPrice(transaction.amount_cents, transaction.currency, locale)}
                   </td>
                   <td className="px-4 py-3">
                     <p>{transaction.payment_provider_route ?? transaction.provider ?? '-'}</p>
@@ -215,8 +244,14 @@ export default async function AdminTransactionsPage({
                       {transaction.provider_reference ?? ''}
                     </p>
                   </td>
-                  <td className="px-4 py-3">{transaction.status}</td>
-                  <td className="px-4 py-3">{formatDate(transaction.created_at)}</td>
+                  <td className="px-4 py-3">
+                    {tDynamic(
+                      t,
+                      `adminTransactions.statuses.${transaction.status}`,
+                      transaction.status,
+                    )}
+                  </td>
+                  <td className="px-4 py-3">{formatDate(transaction.created_at, locale)}</td>
                 </tr>
               ))}
             </tbody>

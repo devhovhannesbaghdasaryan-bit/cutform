@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -5,11 +6,11 @@ import { PERSONALIZATION_TAGS } from '@/lib/personalization-constants';
 import { AutogenerateButton } from './ai-context';
 import type { BoilerplateOption, ItemFormValue } from './types';
 
-const TAG_LABELS: Record<(typeof PERSONALIZATION_TAGS)[number], string> = {
-  personal_color: 'Personal Color',
-  personal_text: 'Personal Text',
-  personal_photo: 'Personal Photo',
-};
+const TAG_LABEL_KEYS = {
+  personal_color: 'adminItems.personalization.tagLabels.personalColor',
+  personal_text: 'adminItems.personalization.tagLabels.personalText',
+  personal_photo: 'adminItems.personalization.tagLabels.personalPhoto',
+} as const satisfies Record<(typeof PERSONALIZATION_TAGS)[number], string>;
 
 export function PersonalizationFields({
   item,
@@ -20,6 +21,7 @@ export function PersonalizationFields({
   boilerplateOptions: BoilerplateOption[];
   selectedBoilerplateIds: string[];
 }) {
+  const t = useTranslations();
   const selected = new Set(selectedBoilerplateIds);
   const tags = new Set(item?.tags ?? []);
 
@@ -27,18 +29,18 @@ export function PersonalizationFields({
     <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <Label htmlFor="systemPrompt">System prompt</Label>
+          <Label htmlFor="systemPrompt">{t('adminItems.personalization.systemPrompt')}</Label>
           <AutogenerateButton field="systemPrompt" />
         </div>
         <Textarea
           id="systemPrompt"
           name="systemPrompt"
           defaultValue={item?.system_prompt ?? ''}
-          placeholder="Base generation instructions for this item's AI personalization."
+          placeholder={t('adminItems.personalization.systemPromptPlaceholder')}
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="skillFile">Skill file</Label>
+        <Label htmlFor="skillFile">{t('adminItems.personalization.skillFile')}</Label>
         <Input
           id="skillFile"
           name="skillFile"
@@ -46,32 +48,34 @@ export function PersonalizationFields({
           accept=".md,.txt,text/markdown,text/plain"
         />
         <p className="text-xs text-muted-foreground">
-          Optional .md or .txt document (max 1 MB) injected into AI generation instructions.
+          {t('adminItems.personalization.skillFileHelp')}
         </p>
         {item?.skill_id ? (
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">
-              Attached skill: <code>{item.skill_id.slice(0, 24)}…</code>
+              {t('adminItems.personalization.attachedSkill')}{' '}
+              <code>{item.skill_id.slice(0, 24)}…</code>
             </p>
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="removeSkill" /> Remove skill
+              <input type="checkbox" name="removeSkill" />{' '}
+              {t('adminItems.personalization.removeSkill')}
             </label>
           </div>
         ) : null}
       </div>
       <div className="space-y-2">
-        <Label>Tags</Label>
+        <Label>{t('adminItems.personalization.tags')}</Label>
         <div className="flex flex-wrap gap-4">
           {PERSONALIZATION_TAGS.map((tag) => (
             <label key={tag} className="flex items-center gap-2 text-sm">
               <input type="checkbox" name="tags" value={tag} defaultChecked={tags.has(tag)} />
-              {TAG_LABELS[tag]}
+              {t(TAG_LABEL_KEYS[tag])}
             </label>
           ))}
         </div>
       </div>
       <div className="space-y-2">
-        <Label>Boilerplates</Label>
+        <Label>{t('adminItems.personalization.boilerplates')}</Label>
         {boilerplateOptions.length ? (
           <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
             {boilerplateOptions.map((boilerplate) => (
@@ -91,19 +95,18 @@ export function PersonalizationFields({
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
-            No boilerplates yet. Add some in the{' '}
-            <a href="/admin/personalization/boilerplates" className="underline">
-              boilerplate library
-            </a>{' '}
-            first.
+            {t.rich('adminItems.personalization.noBoilerplates', {
+              link: (chunks) => (
+                <a href="/admin/personalization/boilerplates" className="underline">
+                  {chunks}
+                </a>
+              ),
+            })}
           </p>
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        At least one of System prompt, a skill file, or a selected boilerplate is required when
-        Customizable is checked.
-      </p>
+      <p className="text-xs text-muted-foreground">{t('adminItems.personalization.requirement')}</p>
     </div>
   );
 }

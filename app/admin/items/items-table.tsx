@@ -4,11 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { ImageOff, Trash2 } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { idleState } from '@/lib/action-state';
 import { isSvgPath } from '@/lib/catalog-media';
+import { DEFAULT_LOCALE, normalizeLocale } from '@/lib/i18n-config';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { resolvePublicStorageUrl } from '@/lib/storage';
 import { formatPrice } from '@/lib/utils';
 import { deleteCatalogItemsAction } from './actions';
@@ -92,6 +95,8 @@ function ItemPreview({ item }: { item: AdminItemRow }) {
 }
 
 export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDelete: boolean }) {
+  const t = useTranslations();
+  const locale = normalizeLocale(useLocale()) ?? DEFAULT_LOCALE;
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirming, setConfirming] = useState(false);
   const [state, action, pending] = useActionState(deleteCatalogItemsAction, idleState);
@@ -156,11 +161,12 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
           <p className="text-sm">
             {confirming ? (
               <span className="font-medium text-destructive">
-                Delete {selectedIds.length} {selectedIds.length === 1 ? 'item' : 'items'}? This
-                cannot be undone.
+                {t('adminItems.table.deleteConfirm', { count: selectedIds.length })}
               </span>
             ) : (
-              <span className="text-muted-foreground">{selectedIds.length} selected</span>
+              <span className="text-muted-foreground">
+                {t('adminItems.table.selectedCount', { count: selectedIds.length })}
+              </span>
             )}
           </p>
 
@@ -168,7 +174,7 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
             {confirming ? (
               <>
                 <Button type="submit" variant="destructive" size="sm" disabled={pending}>
-                  {pending ? 'Deleting...' : 'Confirm delete'}
+                  {pending ? t('adminItems.table.deleting') : t('adminItems.table.confirmDelete')}
                 </Button>
                 <Button
                   type="button"
@@ -177,7 +183,7 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                   disabled={pending}
                   onClick={() => setConfirming(false)}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
               </>
             ) : (
@@ -188,7 +194,7 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                 onClick={() => setConfirming(true)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Delete selected
+                {t('adminItems.table.deleteSelected')}
               </Button>
             )}
           </div>
@@ -206,18 +212,18 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                     type="checkbox"
                     checked={allSelected}
                     onChange={toggleAll}
-                    aria-label="Select all items"
+                    aria-label={t('adminItems.table.selectAll')}
                   />
                 </th>
               ) : null}
               <th className="w-16 px-4 py-3 font-medium">
-                <span className="sr-only">Preview</span>
+                <span className="sr-only">{t('common.preview')}</span>
               </th>
-              <th className="px-4 py-3 font-medium">Item</th>
-              <th className="px-4 py-3 font-medium">Category</th>
-              <th className="px-4 py-3 font-medium">Price</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium">Flags</th>
+              <th className="px-4 py-3 font-medium">{t('adminItems.table.columnItem')}</th>
+              <th className="px-4 py-3 font-medium">{t('adminItems.table.columnCategory')}</th>
+              <th className="px-4 py-3 font-medium">{t('common.price')}</th>
+              <th className="px-4 py-3 font-medium">{t('adminItems.table.columnStatus')}</th>
+              <th className="px-4 py-3 font-medium">{t('adminItems.table.columnFlags')}</th>
             </tr>
           </thead>
           <tbody>
@@ -229,7 +235,7 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                       type="checkbox"
                       checked={selected.has(item.id)}
                       onChange={() => toggle(item.id)}
-                      aria-label={`Select ${item.title}`}
+                      aria-label={t('adminItems.table.selectItem', { title: item.title })}
                     />
                   </td>
                 ) : null}
@@ -244,11 +250,14 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                 </td>
                 <td className="px-4 py-3">{item.category?.name ?? '-'}</td>
                 <td className="px-4 py-3">
-                  {formatPrice(item.displayPrice.amountCents, item.displayPrice.currency)}
+                  {formatPrice(item.displayPrice.amountCents, item.displayPrice.currency, locale)}
                 </td>
-                <td className="px-4 py-3 capitalize">{item.status}</td>
+                <td className="px-4 py-3">{tDynamic(t, `status.${item.status}`, item.status)}</td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {[item.is_popular && 'popular', item.is_customizable && 'custom']
+                  {[
+                    item.is_popular && t('adminItems.table.flagPopular'),
+                    item.is_customizable && t('adminItems.table.flagCustom'),
+                  ]
                     .filter(Boolean)
                     .join(', ') || '-'}
                 </td>

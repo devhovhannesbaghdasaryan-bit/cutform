@@ -1,10 +1,23 @@
-/** Maps raw AI-provider errors to a customer-friendly generation message. */
-export function friendlyGenerationError(error: unknown) {
+/**
+ * Classifies a raw AI-provider generation failure so the caller can show a
+ * localized message (personalize.errorBillingLimit / errorBusy / errorGeneration).
+ */
+export function generationErrorKind(error: unknown): 'billing_limit' | 'busy' | 'generic' {
   const message = error instanceof Error ? error.message.toLowerCase() : '';
   if (message.includes('billing hard limit') || message.includes('billing limit')) {
+    return 'billing_limit';
+  }
+  if (message.includes('rate limit') || message.includes('too many requests')) return 'busy';
+  return 'generic';
+}
+
+/** English-only variant of generationErrorKind for non-request contexts (logs, scripts). */
+export function friendlyGenerationError(error: unknown) {
+  const kind = generationErrorKind(error);
+  if (kind === 'billing_limit') {
     return 'Image generation is temporarily unavailable because the AI service billing limit was reached. Please try again later or contact support. Any generation credits were refunded.';
   }
-  if (message.includes('rate limit') || message.includes('too many requests')) {
+  if (kind === 'busy') {
     return 'The image service is busy right now. Please wait a moment and try again. Any generation credits were refunded.';
   }
   return 'We could not generate your previews. Please try again. Any generation credits were refunded.';

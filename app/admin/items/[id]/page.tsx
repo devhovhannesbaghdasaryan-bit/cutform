@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { ItemForm } from '@/app/admin/items/item-form';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
@@ -21,6 +22,7 @@ type CatalogMedia = Omit<CatalogItemMedia, 'poster_path'>;
 export default async function EditAdminItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase } = await requireAdmin();
+  const t = await getTranslations();
 
   const [
     { data: item, error },
@@ -99,13 +101,13 @@ export default async function EditAdminItemPage({ params }: { params: Promise<{ 
     <main className="container max-w-4xl space-y-6 py-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Edit item</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('adminItems.editPage.title')}</h1>
           <p className="text-muted-foreground">{item.title}</p>
         </div>
         {item.status === 'published' && (
           <Button asChild variant="outline">
             <a href={`/items/${item.slug}`} target="_blank" rel="noreferrer">
-              View storefront page
+              {t('adminItems.editPage.viewStorefront')}
             </a>
           </Button>
         )}

@@ -1,8 +1,26 @@
 import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
 import { requireAdmin } from '@/lib/admin';
+import { tDynamic } from '@/lib/i18n-dynamic';
+import { getRequestLocale } from '@/lib/i18n-server';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
+
+const PRODUCTION_STATUSES = [
+  'draft',
+  'pending_payment',
+  'paid',
+  'review_required',
+  'approved_for_production',
+  'in_production',
+  'ready_to_ship',
+  'shipped',
+  'cancelled',
+  'refunded',
+] as const;
+
+const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded', 'failed'] as const;
 
 export default async function AdminOrdersPage({
   searchParams,
@@ -11,6 +29,7 @@ export default async function AdminOrdersPage({
 }) {
   const params = await searchParams;
   const { supabase } = await requireAdmin();
+  const [t, locale] = await Promise.all([getTranslations(), getRequestLocale()]);
 
   let query = supabase
     .from('orders')
@@ -27,43 +46,39 @@ export default async function AdminOrdersPage({
   return (
     <main className="container space-y-6 py-10">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Orders</h1>
-        <p className="text-muted-foreground">
-          See order queue, payment state, and production status.
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('adminOrders.title')}</h1>
+        <p className="text-muted-foreground">{t('adminOrders.subtitle')}</p>
       </div>
 
       <form className="grid gap-3 rounded-lg border p-4 sm:grid-cols-[220px_220px_auto]">
         <select
           name="status"
           defaultValue={params.status ?? ''}
+          aria-label={t('adminOrders.statusForm.productionStatus')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All production statuses</option>
-          <option value="draft">Draft</option>
-          <option value="pending_payment">Pending payment</option>
-          <option value="paid">Paid</option>
-          <option value="review_required">Review required</option>
-          <option value="approved_for_production">Approved for production</option>
-          <option value="in_production">In production</option>
-          <option value="ready_to_ship">Ready to ship</option>
-          <option value="shipped">Shipped</option>
-          <option value="cancelled">Cancelled</option>
-          <option value="refunded">Refunded</option>
+          <option value="">{t('adminOrders.allProductionStatuses')}</option>
+          {PRODUCTION_STATUSES.map((value) => (
+            <option key={value} value={value}>
+              {t(`status.${value}`)}
+            </option>
+          ))}
         </select>
         <select
           name="payment"
           defaultValue={params.payment ?? ''}
+          aria-label={t('adminOrders.statusForm.paymentStatus')}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="">All payment statuses</option>
-          <option value="unpaid">Unpaid</option>
-          <option value="paid">Paid</option>
-          <option value="refunded">Refunded</option>
-          <option value="failed">Failed</option>
+          <option value="">{t('adminOrders.allPaymentStatuses')}</option>
+          {PAYMENT_STATUSES.map((value) => (
+            <option key={value} value={value}>
+              {t(`adminOrders.paymentStatus.${value}`)}
+            </option>
+          ))}
         </select>
         <button className="h-10 rounded-md border border-input px-4 text-sm" type="submit">
-          Filter
+          {t('adminOrders.filter')}
         </button>
       </form>
 
@@ -71,19 +86,19 @@ export default async function AdminOrdersPage({
         <p className="text-sm text-destructive">{error.message}</p>
       ) : !orders?.length ? (
         <div className="rounded-lg border border-dashed p-8 text-sm text-muted-foreground">
-          No orders found.
+          {t('adminOrders.noOrders')}
         </div>
       ) : (
         <div className="overflow-hidden rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left">
               <tr>
-                <th className="px-4 py-3 font-medium">Order</th>
-                <th className="px-4 py-3 font-medium">Buyer</th>
-                <th className="px-4 py-3 font-medium">Total</th>
-                <th className="px-4 py-3 font-medium">Payment</th>
-                <th className="px-4 py-3 font-medium">Production</th>
-                <th className="px-4 py-3 font-medium">Created</th>
+                <th className="px-4 py-3 font-medium">{t('adminOrders.columns.order')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminOrders.columns.buyer')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminOrders.columns.total')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminOrders.columns.payment')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminOrders.columns.production')}</th>
+                <th className="px-4 py-3 font-medium">{t('adminOrders.columns.created')}</th>
               </tr>
             </thead>
             <tbody>
@@ -98,13 +113,23 @@ export default async function AdminOrdersPage({
                     </Link>
                   </td>
                   <td className="px-4 py-3">
-                    <p>{order.contact_email ?? 'No email'}</p>
+                    <p>{order.contact_email ?? t('adminOrders.noEmail')}</p>
                     <p className="text-xs text-muted-foreground">{order.user_id.slice(0, 8)}</p>
                   </td>
-                  <td className="px-4 py-3">{formatPrice(order.subtotal_cents, order.currency)}</td>
-                  <td className="px-4 py-3">{order.payment_status}</td>
-                  <td className="px-4 py-3">{order.status}</td>
-                  <td className="px-4 py-3">{formatDate(order.created_at)}</td>
+                  <td className="px-4 py-3">
+                    {formatPrice(order.subtotal_cents, order.currency, locale)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {tDynamic(
+                      t,
+                      `adminOrders.paymentStatus.${order.payment_status}`,
+                      order.payment_status,
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {tDynamic(t, `status.${order.status}`, order.status)}
+                  </td>
+                  <td className="px-4 py-3">{formatDate(order.created_at, locale)}</td>
                 </tr>
               ))}
             </tbody>

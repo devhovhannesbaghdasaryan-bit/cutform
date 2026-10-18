@@ -1,4 +1,5 @@
 import { AlertTriangle, Check, Download, FileText } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import type { TechSheet } from '@/lib/production-pack/types';
 
 export interface ProductionPackHrefs {
@@ -18,11 +19,13 @@ export function productionPackHrefs(route: string, query: Record<string, string>
 
 export function ProductionPackLinks({
   hrefs,
-  packLabel = 'Production pack (.zip)',
+  packLabel,
 }: {
   hrefs: ProductionPackHrefs;
+  /** Defaults to the translated "Production pack (.zip)". */
   packLabel?: string;
 }) {
+  const t = useTranslations();
   return (
     <div className="flex flex-wrap items-center gap-2">
       <a
@@ -32,14 +35,14 @@ export function ProductionPackLinks({
         className="inline-flex h-9 items-center gap-2 rounded-md border px-3.5 text-sm font-medium hover:bg-muted"
       >
         <FileText className="size-4" aria-hidden="true" />
-        Tech sheet
+        {t('adminProductionPack.techSheet')}
       </a>
       <a
         href={hrefs.pack}
         className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
       >
         <Download className="size-4" aria-hidden="true" />
-        {packLabel}
+        {packLabel ?? t('adminProductionPack.packZip')}
       </a>
     </div>
   );
@@ -56,6 +59,7 @@ export function ProductionSummary({
   sheet: TechSheet;
   hrefs: ProductionPackHrefs;
 }) {
+  const t = useTranslations();
   const ready = sheet.status === 'ready';
   const productionFiles = sheet.files.filter((file) => !file.reference);
   const referenceFiles = sheet.files.filter((file) => file.reference);
@@ -67,7 +71,7 @@ export function ProductionSummary({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-medium">Technical documentation</p>
+            <p className="text-sm font-medium">{t('adminProductionPack.title')}</p>
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                 ready ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'
@@ -78,7 +82,7 @@ export function ProductionSummary({
               ) : (
                 <AlertTriangle className="size-3.5" aria-hidden="true" />
               )}
-              {ready ? 'Ready for production' : 'Review required'}
+              {ready ? t('adminProductionPack.ready') : t('adminProductionPack.reviewRequired')}
             </span>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -86,9 +90,9 @@ export function ProductionSummary({
             {sheet.product.styleName ? ` · ${sheet.product.styleName}` : ''}
             {sheet.specification.materials.length
               ? ` · ${sheet.specification.materials.slice(0, 2).join(', ')}`
-              : ' · material not recorded'}
+              : ` · ${t('adminProductionPack.materialNotRecorded')}`}
             {sheet.specification.artworkWidthMm
-              ? ` · artwork ${sheet.specification.artworkWidthMm} mm`
+              ? ` · ${t('adminProductionPack.artwork', { width: sheet.specification.artworkWidthMm })}`
               : ''}
           </p>
         </div>
@@ -97,7 +101,7 @@ export function ProductionSummary({
 
       <dl className="mt-3 grid gap-3 text-xs sm:grid-cols-2">
         <div>
-          <dt className="text-muted-foreground">Production inputs in the pack</dt>
+          <dt className="text-muted-foreground">{t('adminProductionPack.productionInputs')}</dt>
           <dd className="mt-1">
             {productionFiles.length ? (
               <ul className="space-y-0.5">
@@ -109,12 +113,14 @@ export function ProductionSummary({
                 ))}
               </ul>
             ) : (
-              <span className="font-medium text-destructive">None yet</span>
+              <span className="font-medium text-destructive">
+                {t('adminProductionPack.noneYet')}
+              </span>
             )}
           </dd>
         </div>
         <div>
-          <dt className="text-muted-foreground">Reference material</dt>
+          <dt className="text-muted-foreground">{t('adminProductionPack.referenceMaterial')}</dt>
           <dd className="mt-1 font-medium">
             {referenceFiles.length ? referenceFiles.map((file) => file.label).join(', ') : '—'}
           </dd>
@@ -131,15 +137,14 @@ export function ProductionSummary({
           ))}
           {sheet.warnings.length > 3 ? (
             <li className="pl-5 text-muted-foreground">
-              {sheet.warnings.length - 3} more in the tech sheet.
+              {t('adminProductionPack.moreWarnings', { count: sheet.warnings.length - 3 })}
             </li>
           ) : null}
         </ul>
       ) : null}
       {sheet.confirmations.length ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          {sheet.confirmations.length} point{sheet.confirmations.length === 1 ? '' : 's'} for the
-          operator to confirm before starting (listed in the sheet).
+          {t('adminProductionPack.confirmations', { count: sheet.confirmations.length })}
         </p>
       ) : null}
     </div>

@@ -70,6 +70,8 @@ export function PersonalizeItemForm({
   const [state, formAction, pending] = useActionState(generatePersonalizedItemAction, initialState);
   const remaining = MAX_PERSONALIZED_TEXT_LENGTH - text.length;
   const selectedCount = selected.length;
+  // One credit (and one design) per selected style, at least one.
+  const creditCount = Math.max(selectedCount, 1);
   const requiresBoilerplateSelection = boilerplates.length > 0;
   const canSubmit =
     (!requiresBoilerplateSelection || selectedCount > 0) && (!showPhoto || Boolean(fileName));
@@ -230,7 +232,7 @@ export function PersonalizeItemForm({
                 size="icon"
                 variant="secondary"
                 className="absolute right-2 top-2 h-8 w-8"
-                aria-label="Remove image"
+                aria-label={copy.removeImage}
                 onClick={(event) => {
                   event.preventDefault();
                   if (fileInputRef.current) fileInputRef.current.value = '';
@@ -286,18 +288,18 @@ export function PersonalizeItemForm({
             <div
               className="flex gap-1 border-b bg-muted/40 p-1"
               role="toolbar"
-              aria-label="Text formatting"
+              aria-label={copy.textFormatting}
             >
-              <EditorButton label="Bold" onClick={() => format('bold')}>
+              <EditorButton label={copy.bold} onClick={() => format('bold')}>
                 <Bold className="h-4 w-4" />
               </EditorButton>
-              <EditorButton label="Italic" onClick={() => format('italic')}>
+              <EditorButton label={copy.italic} onClick={() => format('italic')}>
                 <Italic className="h-4 w-4" />
               </EditorButton>
-              <EditorButton label="Align left" onClick={() => format('justifyLeft')}>
+              <EditorButton label={copy.alignLeft} onClick={() => format('justifyLeft')}>
                 <AlignLeft className="h-4 w-4" />
               </EditorButton>
-              <EditorButton label="Align center" onClick={() => format('justifyCenter')}>
+              <EditorButton label={copy.alignCenter} onClick={() => format('justifyCenter')}>
                 <AlignCenter className="h-4 w-4" />
               </EditorButton>
             </div>
@@ -337,7 +339,11 @@ export function PersonalizeItemForm({
       <div className="sticky bottom-3 rounded-xl border bg-background/95 p-3 shadow-lg backdrop-blur">
         <div className="mb-3 flex items-center justify-between gap-4 text-sm">
           <span className="text-muted-foreground">{copy.creditPerStyle}</span>
-          <strong>{copy.creditTotal.replace('{count}', String(Math.max(selectedCount, 1)))}</strong>
+          <strong>
+            {creditCount === 1
+              ? copy.creditTotalOne
+              : copy.creditTotal.replace('{count}', String(creditCount))}
+          </strong>
         </div>
         <Button type="submit" className="w-full" disabled={pending || !canSubmit}>
           {pending ? (
@@ -347,7 +353,9 @@ export function PersonalizeItemForm({
           )}
           {pending
             ? copy.generatingTitle
-            : copy.generate.replace('{count}', String(Math.max(selectedCount, 1)))}
+            : creditCount === 1
+              ? copy.generateOne
+              : copy.generate.replace('{count}', String(creditCount))}
         </Button>
       </div>
 

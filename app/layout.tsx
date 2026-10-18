@@ -1,23 +1,26 @@
 import type { Metadata } from 'next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { getTranslations } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { getLocaleForFormatting } from '@/lib/i18n';
 import { getRequestLocale } from '@/lib/i18n-server';
 import './globals.css';
 
-export const metadata: Metadata = {
-  title: 'Uniqraft - Personalized Products, Made Yours',
-  description:
-    'Customize meaningful products and create personalized designs made uniquely for you.',
-  icons: {
-    icon: [
-      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
-      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
-    ],
-    apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations();
+  return {
+    title: t('landing.siteTitle'),
+    description: t('landing.siteDescription'),
+    icons: {
+      icon: [
+        { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+        { url: '/icon.png', type: 'image/png', sizes: '512x512' },
+      ],
+      apple: [{ url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' }],
+    },
+  };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getRequestLocale();

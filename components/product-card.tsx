@@ -1,4 +1,5 @@
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import type { AppLocale } from '@/lib/i18n';
 import type { Tables } from '@/lib/supabase/types';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { SvgRender } from './svg-render';
@@ -11,18 +12,26 @@ export type ProductCardItem = Pick<
 // The legacy /products/[id] detail route (token-based price breakdown) was
 // removed in Phase 17 and there is no replacement detail page for rows in the
 // legacy `products` table, so the card is intentionally non-interactive.
-export function ProductCard({ product }: { product: ProductCardItem }) {
+export function ProductCard({
+  product,
+  locale,
+  previewLabel,
+}: {
+  product: ProductCardItem;
+  locale: AppLocale;
+  previewLabel: string;
+}) {
   return (
     <Card className="overflow-hidden">
       <CardContent className="flex aspect-square items-center justify-center bg-muted/40 p-6">
-        <SvgRender svg={product.svg_content} className="h-full w-full" />
+        <SvgRender svg={product.svg_content} label={previewLabel} className="h-full w-full" />
       </CardContent>
       <CardFooter className="flex items-start justify-between gap-2 p-4 pt-3">
         <div className="min-w-0">
           <p className="truncate font-medium">{product.title}</p>
-          <p className="text-xs text-muted-foreground">{formatDate(product.created_at)}</p>
+          <p className="text-xs text-muted-foreground">{formatDate(product.created_at, locale)}</p>
         </div>
-        <p className="font-semibold">{formatPrice(product.price_cents)}</p>
+        <p className="font-semibold">{formatPrice(product.price_cents, 'AMD', locale)}</p>
       </CardFooter>
     </Card>
   );

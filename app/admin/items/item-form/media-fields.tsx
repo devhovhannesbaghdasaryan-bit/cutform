@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { type DragEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
@@ -36,17 +37,16 @@ const MEDIA_ACCEPT = 'image/png,image/jpeg,image/webp,image/svg+xml,video/mp4,vi
 const MEDIA_MAX_BYTES = 50 * 1024 * 1024;
 
 export function ThumbnailFields({ item }: { item?: Pick<ItemFormValue, 'thumbnail_path'> }) {
+  const t = useTranslations();
   return (
     <div className="space-y-2">
-      <Label htmlFor="thumbnailPath">Thumbnail path</Label>
-      <p className="text-xs text-muted-foreground">
-        Recommended 4:3 image, at least 1200x900 px. Accepted: PNG, JPG, WEBP, SVG up to 50 MB.
-      </p>
+      <Label htmlFor="thumbnailPath">{t('adminItemMedia.thumbnail.label')}</Label>
+      <p className="text-xs text-muted-foreground">{t('adminItemMedia.thumbnail.hint')}</p>
       <Input
         id="thumbnailPath"
         name="thumbnailPath"
         defaultValue={item?.thumbnail_path ?? ''}
-        placeholder="Optional storage path or URL"
+        placeholder={t('adminItemMedia.thumbnail.placeholder')}
       />
       <Input
         id="thumbnailFile"
@@ -80,9 +80,10 @@ function getStorageClient() {
 
 function assertSuccess<T>(
   state: ActionState<T>,
+  unexpected: string,
 ): asserts state is Extract<ActionState<T>, { status: 'success' }> {
   if (state.status === 'error') throw new Error(state.error);
-  if (state.status !== 'success') throw new Error('Unexpected response.');
+  if (state.status !== 'success') throw new Error(unexpected);
 }
 
 function fileInfo(file: File) {
@@ -90,9 +91,9 @@ function fileInfo(file: File) {
 }
 
 /** Uploads files straight to Storage and returns what the attach/replace actions expect. */
-async function uploadToGallery(itemId: string, files: File[]) {
+async function uploadToGallery(itemId: string, files: File[], unexpected: string) {
   const prepared = await prepareCatalogMediaUploadsAction(itemId, files.map(fileInfo));
-  assertSuccess(prepared);
+  assertSuccess(prepared, unexpected);
   const tickets = prepared.data;
   const storage = (await getStorageClient()).storage.from('catalog-assets');
   await Promise.all(
@@ -224,6 +225,8 @@ function SavedMediaCard({
   total: number;
   onMove: (direction: -1 | 1) => void;
 }) {
+  const t = useTranslations();
+  const unexpected = t('adminItemMedia.toast.unexpectedResponse');
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState<'replacing' | 'removing' | null>(null);
   const [confirmingRemove, setConfirmingRemove] = useState(false);
@@ -234,25 +237,25 @@ function SavedMediaCard({
   const replacementUrl = useObjectUrl(pendingFile);
   const storedUrl = resolvePublicStorageUrl('catalog-assets', media.storage_path);
   const kind = pendingFile ? (getCatalogMediaKind(pendingFile.type) ?? 'image') : media.media_type;
-  const label = media.alt_text || `Gallery media ${position + 1}`;
+  const label = media.alt_text || t('adminItemMedia.mediaLabel', { position: position + 1 });
 
   async function replace(file: File) {
     if (replaceInputRef.current) replaceInputRef.current.value = '';
     const { accepted } = splitAcceptedFiles([file]);
     if (!accepted.length) {
-      toast.error(`${file.name}: use PNG, JPG, WEBP, SVG, MP4, or WEBM up to 50 MB.`);
+      toast.error(t('adminItemMedia.invalidFile', { name: file.name }));
       return;
     }
     setReplacement({ file, replacing: media.storage_path });
     setBusy('replacing');
     try {
-      const [upload] = await uploadToGallery(itemId, [file]);
+      const [upload] = await uploadToGallery(itemId, [file], unexpected);
       const state = await replaceCatalogMediaAction(itemId, media.id, upload);
-      assertSuccess(state);
-      toast.success(state.message ?? 'Gallery media replaced.');
+      assertSuccess(state, unexpected);
+      toast.success(state.message ?? t('adminItemMedia.toast.replaced'));
     } catch (error) {
       setReplacement(null);
-      toast.error(errorMessage(error, 'Failed to replace gallery media.'));
+      toast.error(errorMessage(error, t('adminItemMedia.toast.replaceFailed')));
     } finally {
       setBusy(null);
     }
@@ -263,12 +266,12 @@ function SavedMediaCard({
     setBusy('removing');
     try {
       const state = await removeCatalogMediaAction(itemId, media.id);
-      assertSuccess(state);
-      toast.success(state.message ?? 'Removed from the gallery.');
+      assertSuccess(state, unexpected);
+      toast.success(state.message ?? t('adminItemMedia.toast.removed'));
       // Stay busy: the card unmounts once the refreshed gallery arrives.
     } catch (error) {
       setBusy(null);
-      toast.error(errorMessage(error, 'Failed to remove gallery media.'));
+      toast.error(errorMessage(error, t('adminItemMedia.toast.removeFailed')));
     }
   }
 
@@ -287,17 +290,25 @@ function SavedMediaCard({
           <span className="rounded bg-background/90 px-1.5 py-0.5 shadow-sm">#{position + 1}</span>
           {kind === 'video' && (
             <span className="rounded bg-background/90 px-1.5 py-0.5 uppercase shadow-sm">
-              Video
+              {t('adminItemMedia.video')}
             </span>
           )}
         </div>
-        {busy && <BusyOverlay label={busy === 'replacing' ? 'Uploading…' : 'Removing…'} />}
+        {busy && (
+          <BusyOverlay
+            label={
+              busy === 'replacing' ? t('adminItemMedia.uploading') : t('adminItemMedia.removing')
+            }
+          />
+        )}
       </div>
 
       <div className="space-y-2 p-2">
         {confirmingRemove ? (
           <div className="flex items-center gap-1">
-            <span className="mr-auto text-sm font-medium text-destructive">Remove this file?</span>
+            <span className="mr-auto text-sm font-medium text-destructive">
+              {t('adminItemMedia.confirmRemove')}
+            </span>
             <Button
               type="button"
               variant="destructive"
@@ -305,7 +316,7 @@ function SavedMediaCard({
               className="h-8 px-2"
               onClick={remove}
             >
-              Remove
+              {t('adminItemMedia.remove')}
             </Button>
             <Button
               type="button"
@@ -314,7 +325,7 @@ function SavedMediaCard({
               className="h-8 px-2"
               onClick={() => setConfirmingRemove(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         ) : (
@@ -326,7 +337,7 @@ function SavedMediaCard({
               className="h-8 w-8"
               disabled={position === 0}
               onClick={() => onMove(-1)}
-              aria-label={`Move ${label} earlier`}
+              aria-label={t('adminItemMedia.moveEarlier', { label })}
             >
               <ArrowLeft className="h-4 w-4" />
             </Button>
@@ -337,7 +348,7 @@ function SavedMediaCard({
               className="h-8 w-8"
               disabled={position === total - 1}
               onClick={() => onMove(1)}
-              aria-label={`Move ${label} later`}
+              aria-label={t('adminItemMedia.moveLater', { label })}
             >
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -351,7 +362,7 @@ function SavedMediaCard({
                 onClick={() => replaceInputRef.current?.click()}
               >
                 <RefreshCw className="mr-1 h-4 w-4" />
-                Replace
+                {t('adminItemMedia.replace')}
               </Button>
               <Button
                 type="button"
@@ -362,7 +373,7 @@ function SavedMediaCard({
                 onClick={() => setConfirmingRemove(true)}
               >
                 <Trash2 className="mr-1 h-4 w-4" />
-                Remove
+                {t('adminItemMedia.remove')}
               </Button>
             </div>
           </div>
@@ -385,7 +396,7 @@ function SavedMediaCard({
 
         <div className="space-y-1">
           <Label htmlFor={`mediaAlt_${media.id}`} className="text-xs">
-            Alt text
+            {t('adminItemMedia.altText')}
           </Label>
           <Input
             id={`mediaAlt_${media.id}`}
@@ -401,7 +412,7 @@ function SavedMediaCard({
             value={media.id}
             defaultChecked={media.is_primary}
           />
-          Primary
+          {t('adminItemMedia.primary')}
         </label>
       </div>
     </li>
@@ -417,6 +428,7 @@ function NewMediaCard({
   uploading: boolean;
   onDiscard?: () => void;
 }) {
+  const t = useTranslations();
   const url = useObjectUrl(file);
   return (
     <li className="overflow-hidden rounded-md border border-dashed bg-background">
@@ -429,7 +441,7 @@ function NewMediaCard({
         />
         {!uploading && (
           <span className="pointer-events-none absolute left-2 top-2 rounded bg-primary px-1.5 py-0.5 text-[11px] font-medium text-primary-foreground shadow-sm">
-            New
+            {t('adminItemMedia.new')}
           </span>
         )}
         {onDiscard && (
@@ -439,12 +451,12 @@ function NewMediaCard({
             size="icon"
             className="absolute right-2 top-2 h-7 w-7"
             onClick={onDiscard}
-            aria-label={`Discard ${file.name}`}
+            aria-label={t('adminItemMedia.discard', { name: file.name })}
           >
             <X className="h-4 w-4" />
           </Button>
         )}
-        {uploading && <BusyOverlay label="Uploading…" />}
+        {uploading && <BusyOverlay label={t('adminItemMedia.uploading')} />}
       </div>
       <p className="truncate p-2 text-xs text-muted-foreground" title={file.name}>
         {file.name}
@@ -473,6 +485,8 @@ export function MediaSection({
   itemId?: string;
   media?: CatalogMediaFormValue[];
 }) {
+  const t = useTranslations();
+  const unexpected = t('adminItemMedia.toast.unexpectedResponse');
   const rootRef = useRef<HTMLElement>(null);
   const addInputRef = useRef<HTMLInputElement>(null);
   const nextFileKey = useRef(0);
@@ -519,12 +533,12 @@ export function MediaSection({
     setNewFiles(entries);
     setUploading(true);
     try {
-      const uploads = await uploadToGallery(id, files);
+      const uploads = await uploadToGallery(id, files, unexpected);
       const state = await attachCatalogMediaAction(id, uploads);
-      assertSuccess(state);
-      toast.success(state.message ?? 'Added to the gallery.');
+      assertSuccess(state, unexpected);
+      toast.success(state.message ?? t('adminItemMedia.toast.added'));
     } catch (error) {
-      toast.error(errorMessage(error, 'Failed to upload gallery media.'));
+      toast.error(errorMessage(error, t('adminItemMedia.toast.uploadFailed')));
     } finally {
       setNewFiles([]);
       setUploading(false);
@@ -569,16 +583,14 @@ export function MediaSection({
     <section ref={rootRef} className="space-y-4 rounded-lg border p-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="font-semibold">Product gallery</h2>
+          <h2 className="font-semibold">{t('adminItemMedia.title')}</h2>
           <p className="text-sm text-muted-foreground">
-            {itemId
-              ? 'Uploads, replacements and removals apply immediately. Order, alt text and the primary image are saved with the item.'
-              : 'Images and videos for the product slider, uploaded when the item is created.'}
+            {itemId ? t('adminItemMedia.descriptionSaved') : t('adminItemMedia.descriptionNew')}
           </p>
         </div>
         {itemId && (
           <p className="text-sm text-muted-foreground">
-            {ordered.length} {ordered.length === 1 ? 'file' : 'files'}
+            {t('adminItemMedia.fileCount', { count: ordered.length })}
           </p>
         )}
       </div>
@@ -600,7 +612,7 @@ export function MediaSection({
         ) : (
           !newFiles.length && (
             <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-              No gallery media yet. Add files below to create the product slider.
+              {t('adminItemMedia.empty')}
             </p>
           )
         ))}
@@ -634,10 +646,10 @@ export function MediaSection({
         )}
       >
         <ImagePlus className="h-6 w-6 text-muted-foreground" />
-        <span className="font-medium">{uploading ? 'Uploading…' : 'Add images or videos'}</span>
-        <span className="text-xs text-muted-foreground">
-          Click or drop files. PNG, JPG, WEBP, SVG, MP4, WEBM up to 50 MB each.
+        <span className="font-medium">
+          {uploading ? t('adminItemMedia.uploading') : t('adminItemMedia.addMedia')}
         </span>
+        <span className="text-xs text-muted-foreground">{t('adminItemMedia.dropHint')}</span>
       </button>
       <input
         ref={addInputRef}
@@ -660,14 +672,10 @@ export function MediaSection({
 
       {rejectedFiles.length > 0 && (
         <p role="alert" className="text-sm text-destructive">
-          Skipped {rejectedFiles.join(', ')}: use PNG, JPG, WEBP, SVG, MP4, or WEBM up to 50 MB.
+          {t('adminItemMedia.skipped', { names: rejectedFiles.join(', ') })}
         </p>
       )}
-      {order && (
-        <p className="text-sm text-muted-foreground">
-          New order is applied when you save the item.
-        </p>
-      )}
+      {order && <p className="text-sm text-muted-foreground">{t('adminItemMedia.orderPending')}</p>}
     </section>
   );
 }

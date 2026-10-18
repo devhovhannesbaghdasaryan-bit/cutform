@@ -1,8 +1,12 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { Button } from '@/components/ui/button';
 import { requireAdmin } from '@/lib/admin';
 import { getAdminUserDetail } from '@/lib/admin-users';
+import type { AppLocale } from '@/lib/i18n';
+import { tDynamic } from '@/lib/i18n-dynamic';
+import { getRequestLocale } from '@/lib/i18n-server';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { CreditAdjustmentForm, UserProfileForm } from './user-forms';
 
@@ -11,6 +15,7 @@ export const dynamic = 'force-dynamic';
 export default async function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase } = await requireAdmin();
+  const [t, locale] = await Promise.all([getTranslations(), getRequestLocale()]);
 
   const detail = await getAdminUserDetail(supabase, id);
 
@@ -23,19 +28,19 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {profile.display_name ?? 'User detail'}
+            {profile.display_name ?? t('adminUsers.detail.fallbackTitle')}
           </h1>
           <p className="font-mono text-sm text-muted-foreground">{profile.user_id}</p>
         </div>
         <Button asChild variant="outline">
-          <Link href="/admin/users">Back to users</Link>
+          <Link href="/admin/users">{t('adminUsers.detail.back')}</Link>
         </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <section className="space-y-6">
           <div className="rounded-lg border p-5">
-            <h2 className="font-semibold">Profile</h2>
+            <h2 className="font-semibold">{t('adminUsers.detail.profile')}</h2>
             <UserProfileForm
               userId={profile.user_id}
               role={profile.role}
@@ -46,24 +51,30 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           </div>
 
           <AdminTable
-            title="Recent orders"
-            empty="No orders found."
+            title={t('adminUsers.detail.recentOrders')}
+            empty={t('adminUsers.detail.noOrders')}
+            locale={locale}
             rows={orders.map((order) => ({
               id: order.id,
               href: `/admin/orders/${order.id}`,
-              primary: `${order.id.slice(0, 8)} - ${formatPrice(order.subtotal_cents)}`,
-              secondary: `${order.status} / ${order.payment_status}`,
+              primary: `${order.id.slice(0, 8)} - ${formatPrice(order.subtotal_cents, undefined, locale)}`,
+              secondary: `${tDynamic(t, `status.${order.status}`, order.status)} / ${tDynamic(
+                t,
+                `adminOrders.paymentStatus.${order.payment_status}`,
+                order.payment_status,
+              )}`,
               createdAt: order.created_at,
             }))}
           />
 
           <AdminTable
-            title="Generated items"
-            empty="No generated items found."
+            title={t('adminUsers.detail.generatedItems')}
+            empty={t('adminUsers.detail.noGeneratedItems')}
+            locale={locale}
             rows={generatedItems.map((item) => ({
               id: item.id,
               primary: item.title ?? item.id.slice(0, 8),
-              secondary: `${item.product_type} / ${item.review_status}`,
+              secondary: `${item.product_type} / ${tDynamic(t, `status.${item.review_status}`, item.review_status)}`,
               createdAt: item.created_at,
             }))}
           />
@@ -71,11 +82,13 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
         <aside className="space-y-6">
           <div className="rounded-lg border p-5">
-            <p className="text-sm text-muted-foreground">Balance</p>
-            <p className="text-3xl font-bold">{balance?.balance ?? 0} credits</p>
+            <p className="text-sm text-muted-foreground">{t('adminUsers.detail.balance')}</p>
+            <p className="text-3xl font-bold">
+              {t('adminUsers.credits', { count: balance?.balance ?? 0 })}
+            </p>
             {balance?.updated_at && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Updated {formatDate(balance.updated_at)}
+                {t('adminUsers.detail.updated', { date: formatDate(balance.updated_at, locale) })}
               </p>
             )}
           </div>
@@ -83,24 +96,30 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           <CreditAdjustmentForm userId={profile.user_id} />
 
           <AdminTable
-            title="Transactions"
-            empty="No transactions found."
+            title={t('adminUsers.detail.transactions')}
+            empty={t('adminUsers.detail.noTransactions')}
+            locale={locale}
             rows={transactions.map((transaction) => ({
               id: transaction.id,
               href: `/admin/transactions/${transaction.id}`,
-              primary: `${transaction.type} - ${transaction.status}`,
-              secondary: `${formatPrice(transaction.amount_cents, transaction.currency)} ${transaction.provider ?? ''}`,
+              primary: `${tDynamic(t, `adminTransactions.types.${transaction.type}`, transaction.type)} - ${tDynamic(
+                t,
+                `adminTransactions.statuses.${transaction.status}`,
+                transaction.status,
+              )}`,
+              secondary: `${formatPrice(transaction.amount_cents, transaction.currency, locale)} ${transaction.provider ?? ''}`,
               createdAt: transaction.created_at,
             }))}
           />
 
           <AdminTable
-            title="Audit history"
-            empty="No audit history found."
+            title={t('adminUsers.detail.auditHistory')}
+            empty={t('adminUsers.detail.noAuditHistory')}
+            locale={locale}
             rows={auditRows.map((row) => ({
               id: row.id,
               primary: row.action,
-              secondary: row.reason ?? 'No reason',
+              secondary: row.reason ?? t('adminUsers.detail.noReason'),
               createdAt: row.created_at,
             }))}
           />
@@ -113,10 +132,12 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 function AdminTable({
   title,
   empty,
+  locale,
   rows,
 }: {
   title: string;
   empty: string;
+  locale: AppLocale;
   rows: Array<{
     id: string;
     href?: string;
@@ -153,7 +174,7 @@ function AdminTable({
                   )}
                 </div>
                 <p className="shrink-0 text-xs text-muted-foreground">
-                  {formatDate(row.createdAt)}
+                  {formatDate(row.createdAt, locale)}
                 </p>
               </div>
             );

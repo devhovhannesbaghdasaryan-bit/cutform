@@ -15,7 +15,7 @@ import { generateOpenAiImage } from '@/lib/openai-image';
 import {
   composeManufacturingPrompt,
   composePersonalizationPrompt,
-  friendlyGenerationError,
+  generationErrorKind,
 } from '@/lib/personalization-ai';
 import { COMFORTABLE_COLORS } from '@/lib/personalization-constants';
 import {
@@ -206,7 +206,7 @@ export async function generatePersonalizedItemAction(
     openAiClient = getOpenAiClient();
   } catch (error) {
     console.error('[personalized-item] OpenAI client unavailable', error);
-    return errorState('Image generation is not configured on this server. Please contact support.');
+    return errorState(t('errorNotConfigured'));
   }
 
   let debited = false;
@@ -218,7 +218,10 @@ export async function generatePersonalizedItemAction(
     if (availableCredits < creditCost) {
       return {
         code: 'insufficient_credits',
-        message: `You need ${creditCost} credits to generate these previews, but you have ${availableCredits}.`,
+        message: t('insufficientCredits', {
+          required: creditCost,
+          available: availableCredits,
+        }),
         requiredCredits: creditCost,
         availableCredits,
       };
@@ -234,7 +237,7 @@ export async function generatePersonalizedItemAction(
     if (error instanceof Error && error.message.toLowerCase().includes('insufficient credit')) {
       return {
         code: 'insufficient_credits',
-        message: 'You do not have enough credits to generate these previews.',
+        message: t('insufficientCreditsGeneric'),
         requiredCredits: creditCost,
       };
     }
@@ -424,12 +427,16 @@ export async function generatePersonalizedItemAction(
         console.error('[personalized-item] credit refund failed', refundError);
       }
     }
+    const errorKind = generationErrorKind(error);
     return errorState(
-      error instanceof Error ? friendlyGenerationError(error) : t('errorGeneration'),
+      errorKind === 'billing_limit'
+        ? t('errorBillingLimit')
+        : errorKind === 'busy'
+          ? t('errorBusy')
+          : t('errorGeneration'),
     );
   }
 
-  if (!generatedId)
-    return errorState('We could not save the generated previews. Please try again.');
+  if (!generatedId) return errorState(t('errorSave'));
   redirect(`/generated/${generatedId}`);
 }

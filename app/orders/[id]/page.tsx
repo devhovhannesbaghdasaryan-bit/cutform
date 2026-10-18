@@ -7,6 +7,7 @@ import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { tDynamic } from '@/lib/i18n-dynamic';
 import { getTranslations } from 'next-intl/server';
+import { getRequestLocale } from '@/lib/i18n-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   if (!detail) notFound();
 
-  const t = await getTranslations();
+  const [t, locale] = await Promise.all([getTranslations(), getRequestLocale()]);
   const { order, items, itemsError } = detail;
 
   return (
@@ -31,7 +32,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm text-muted-foreground">
-              {t('order.created', { date: formatDate(order.created_at) })}
+              {t('order.created', { date: formatDate(order.created_at, locale) })}
             </p>
             <h1 className="text-3xl font-bold tracking-tight">
               {t('order.title')} {order.id.slice(0, 8)}
@@ -97,11 +98,11 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     </div>
                     <div className="text-right">
                       <p className="font-medium">
-                        {formatPrice(item.total_price_cents, item.currency)}
+                        {formatPrice(item.total_price_cents, item.currency, locale)}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {t('generated.priceEach', {
-                          price: formatPrice(item.unit_price_cents, item.currency),
+                          price: formatPrice(item.unit_price_cents, item.currency, locale),
                         })}
                       </p>
                     </div>
@@ -116,15 +117,21 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <dl className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">{t('cart.subtotal')}</dt>
-                <dd className="font-medium">{formatPrice(order.subtotal_cents, order.currency)}</dd>
+                <dd className="font-medium">
+                  {formatPrice(order.subtotal_cents, order.currency, locale)}
+                </dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">{t('cart.shipping')}</dt>
-                <dd className="font-medium">{formatPrice(order.shipping_cents, order.currency)}</dd>
+                <dd className="font-medium">
+                  {formatPrice(order.shipping_cents, order.currency, locale)}
+                </dd>
               </div>
               <div className="flex justify-between gap-4 border-t pt-3 text-base">
                 <dt className="font-medium">{t('cart.total')}</dt>
-                <dd className="font-bold">{formatPrice(order.total_cents, order.currency)}</dd>
+                <dd className="font-bold">
+                  {formatPrice(order.total_cents, order.currency, locale)}
+                </dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">{t('order.contact')}</dt>
