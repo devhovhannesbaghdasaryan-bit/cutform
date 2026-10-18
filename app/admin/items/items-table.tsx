@@ -6,6 +6,7 @@ import { useActionState, useEffect, useRef, useState } from 'react';
 import { ImageOff, Trash2 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { StatusBadge } from '@/components/admin/status-badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { idleState } from '@/lib/action-state';
@@ -252,7 +253,12 @@ export function ItemsTable({ items, canDelete }: { items: AdminItemRow[]; canDel
                 <td className="px-4 py-3">
                   {formatPrice(item.displayPrice.amountCents, item.displayPrice.currency, locale)}
                 </td>
-                <td className="px-4 py-3">{tDynamic(t, `status.${item.status}`, item.status)}</td>
+                <td className="px-4 py-3">
+                  <StatusBadge
+                    status={item.status}
+                    label={tDynamic(t, `status.${item.status}`, item.status)}
+                  />
+                </td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">
                   {[
                     item.is_popular && t('adminItems.table.flagPopular'),

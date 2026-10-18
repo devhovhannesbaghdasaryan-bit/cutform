@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import { StatusBadge } from '@/components/admin/status-badge';
 import { requireAdmin } from '@/lib/admin';
 import { listGeneratedItemsForAdminReview } from '@/lib/generated-items';
 import { tDynamic } from '@/lib/i18n-dynamic';
@@ -111,7 +112,10 @@ export default async function AdminGeneratedPage({
                     {tDynamic(t, `generated.productType.${item.product_type}`, item.product_type)}
                   </td>
                   <td className="px-4 py-3">
-                    {tDynamic(t, `status.${item.review_status}`, item.review_status)}
+                    <StatusBadge
+                      status={item.review_status}
+                      label={tDynamic(t, `status.${item.review_status}`, item.review_status)}
+                    />
                   </td>
                   <td className="px-4 py-3">
                     {t('adminGenerated.credits', { count: item.credit_cost })}

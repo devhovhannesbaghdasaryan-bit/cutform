@@ -4,6 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans:
+    var(--font-manrope), "Noto Sans Armenian", "Segoe UI", system-ui, sans-serif;
+  --font-display:
+    var(--font-sora), var(--font-manrope), "Noto Sans Armenian", "Segoe UI", system-ui,
+    sans-serif;
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -23,76 +28,88 @@
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --color-cyber-yellow: hsl(var(--cyber-yellow));
-  --color-cyber-cyan: hsl(var(--cyber-cyan));
-  --color-cyber-magenta: hsl(var(--cyber-magenta));
+  --color-gold: hsl(var(--gold));
+  --color-gold-foreground: hsl(var(--gold-foreground));
+  --color-gold-soft: hsl(var(--gold-soft));
+  --color-slate: hsl(var(--slate));
   --color-success: hsl(var(--success));
   --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-soft: hsl(var(--success-soft));
   --color-warning: hsl(var(--warning));
   --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-danger-soft: hsl(var(--danger-soft));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
 @layer base {
   :root {
     color-scheme: light;
-    --background: 54 45% 97%;
-    --foreground: 228 31% 10%;
-    --card: 54 30% 99%;
-    --card-foreground: 228 31% 10%;
-    --popover: 54 30% 99%;
-    --popover-foreground: 228 31% 10%;
-    --primary: 57 100% 47%;
-    --primary-foreground: 228 31% 8%;
-    --secondary: 187 58% 91%;
-    --secondary-foreground: 192 88% 20%;
-    --muted: 52 18% 91%;
-    --muted-foreground: 226 12% 39%;
-    --accent: 325 75% 92%;
-    --accent-foreground: 326 83% 28%;
-    --destructive: 350 78% 48%;
+    /* "Workshop" palette: warm paper ground, ink text, the logo's teal for
+       actions and the logo's gold for the photo-personalization path. */
+    --background: 44 41% 95%;
+    --foreground: 218 17% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 218 17% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 218 17% 9%;
+    --primary: 186 87% 29%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 185 49% 90%;
+    --secondary-foreground: 186 87% 25%;
+    --muted: 41 37% 90%;
+    --muted-foreground: 221 11% 40%;
+    --accent: 41 30% 88%;
+    --accent-foreground: 218 17% 9%;
+    --destructive: 356 59% 47%;
     --destructive-foreground: 0 0% 100%;
-    --border: 225 17% 82%;
-    --input: 225 17% 76%;
-    --ring: 187 100% 34%;
-    --cyber-yellow: 57 100% 47%;
-    --cyber-cyan: 187 100% 38%;
-    --cyber-magenta: 326 100% 48%;
-    --success: 155 68% 35%;
+    --danger-soft: 355 77% 93%;
+    --border: 41 26% 86%;
+    --input: 41 21% 80%;
+    --ring: 186 87% 29%;
+    --gold: 46 92% 53%;
+    --gold-foreground: 218 17% 9%;
+    --gold-soft: 47 92% 90%;
+    --slate: 217 12% 13%;
+    --success: 150 60% 30%;
     --success-foreground: 0 0% 100%;
-    --warning: 43 96% 88%;
-    --warning-foreground: 30 85% 22%;
-    --radius: 0.375rem;
+    --success-soft: 142 46% 91%;
+    --warning: 46 87% 88%;
+    --warning-foreground: 38 100% 24%;
+    --radius: 0.625rem;
   }
 
   .dark {
     color-scheme: dark;
-    --background: 228 32% 7%;
-    --foreground: 54 44% 94%;
-    --card: 228 27% 10%;
-    --card-foreground: 54 44% 94%;
-    --popover: 228 28% 9%;
-    --popover-foreground: 54 44% 94%;
-    --primary: 57 100% 51%;
-    --primary-foreground: 228 36% 7%;
-    --secondary: 190 58% 17%;
-    --secondary-foreground: 185 100% 82%;
-    --muted: 228 22% 15%;
-    --muted-foreground: 220 14% 68%;
-    --accent: 326 60% 18%;
-    --accent-foreground: 326 100% 83%;
-    --destructive: 350 76% 54%;
+    --background: 214 19% 7%;
+    --foreground: 44 28% 92%;
+    --card: 216 18% 11%;
+    --card-foreground: 44 28% 92%;
+    --popover: 216 18% 11%;
+    --popover-foreground: 44 28% 92%;
+    --primary: 185 62% 53%;
+    --primary-foreground: 214 19% 7%;
+    --secondary: 189 57% 15%;
+    --secondary-foreground: 185 62% 70%;
+    --muted: 217 17% 15%;
+    --muted-foreground: 219 12% 68%;
+    --accent: 217 17% 17%;
+    --accent-foreground: 44 28% 92%;
+    --destructive: 356 62% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 215 24% 22%;
-    --input: 215 24% 27%;
-    --ring: 185 100% 50%;
-    --cyber-yellow: 57 100% 51%;
-    --cyber-cyan: 185 100% 50%;
-    --cyber-magenta: 326 100% 58%;
-    --success: 155 72% 44%;
-    --success-foreground: 228 36% 7%;
+    --danger-soft: 356 40% 18%;
+    --border: 219 14% 19%;
+    --input: 219 14% 24%;
+    --ring: 185 62% 53%;
+    --gold: 46 92% 53%;
+    --gold-foreground: 218 17% 9%;
+    --gold-soft: 45 70% 13%;
+    --slate: 217 12% 13%;
+    --success: 150 55% 48%;
+    --success-foreground: 214 19% 7%;
+    --success-soft: 150 40% 15%;
     --warning: 42 70% 18%;
     --warning-foreground: 51 100% 81%;
   }
@@ -101,18 +118,22 @@
     border-color: hsl(var(--border));
   }
   body {
-    font-family: "Segoe UI", "Noto Sans Armenian", Arial, sans-serif;
+    font-family: var(--font-sans);
     background-color: hsl(var(--background));
-    background-image:
-      radial-gradient(circle at 8% -8%, hsl(var(--cyber-cyan) / 0.07), transparent 28rem),
-      radial-gradient(circle at 92% 0%, hsl(var(--cyber-magenta) / 0.05), transparent 26rem);
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
 
   ::selection {
-    background: hsl(var(--cyber-magenta) / 0.28);
+    background: hsl(var(--gold) / 0.45);
     color: hsl(var(--foreground));
   }
 }
@@ -133,6 +154,9 @@
   padding-inline: 1rem;
   width: 100%;
   max-width: 100%;
+  @media (width >= 768px) {
+    padding-inline: 2rem;
+  }
   @media (width >= 1400px) {
     max-width: 1400px;
   }
@@ -142,7 +166,7 @@
   box-sizing: border-box;
   margin-inline: auto;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
   padding-inline: 1rem;
   @media (width >= 768px) {
     padding-inline: 2rem;
@@ -150,43 +174,39 @@
 }
 
 @utility storefront-section {
-  padding-block: 4rem;
+  padding-block: 3.5rem;
   @media (width >= 768px) {
-    padding-block: 5rem;
+    padding-block: 4rem;
   }
 }
 
 @utility storefront-heading {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
-  font-weight: 800;
-  letter-spacing: 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   @media (width >= 768px) {
-    font-size: 2.25rem;
-    line-height: 2.5rem;
+    font-size: 2.125rem;
   }
 }
 
+/* Product photography sits on dark slate so the wood glows. */
 @utility product-art-frame {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
   aspect-ratio: 4 / 3;
-  border-radius: var(--radius-lg);
-  border: 1px solid hsl(var(--border));
-  background:
-    linear-gradient(135deg, hsl(var(--primary) / 0.13), hsl(var(--cyber-cyan) / 0.14)),
-    hsl(var(--muted));
+  border-radius: var(--radius-xl);
+  background: hsl(var(--slate));
 }
 
 @utility cyber-grid-surface {
   background-color: hsl(var(--background));
   background-image:
-    linear-gradient(hsl(var(--cyber-cyan) / 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--cyber-cyan) / 0.045) 1px, transparent 1px),
-    linear-gradient(180deg, hsl(var(--primary) / 0.12), transparent 68%);
-  background-size: 32px 32px, 32px 32px, 100% 100%;
+    radial-gradient(closest-side at 90% 0%, hsl(var(--gold) / 0.22), transparent),
+    radial-gradient(closest-side at 0% 100%, hsl(var(--primary) / 0.12), transparent);
 }
 
 @utility warning-panel {

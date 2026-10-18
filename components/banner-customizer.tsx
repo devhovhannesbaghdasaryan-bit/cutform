@@ -58,7 +58,7 @@ export function BannerCustomizer({
           className="relative flex w-full items-center justify-center overflow-hidden rounded-md border bg-muted p-8"
           style={{ aspectRatio: ratio }}
         >
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),hsl(var(--cyber-cyan)/0.14))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),hsl(var(--gold)/0.14))]" />
           <div className="relative max-w-[80%] text-center text-3xl font-extrabold tracking-normal text-foreground">
             {text || copy.previewText}
           </div>
