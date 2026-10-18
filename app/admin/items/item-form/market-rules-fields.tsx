@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { MarketCountryFormValue, MarketRegionFormValue, MarketRuleFormValue } from './types';
@@ -11,6 +12,7 @@ export function MarketRulesSection({
   marketCountries: MarketCountryFormValue[];
   marketRules: MarketRuleFormValue[];
 }) {
+  const t = useTranslations();
   const regionRuleById = new Map(
     marketRules
       .filter((rule): rule is typeof rule & { region_id: string } => Boolean(rule.region_id))
@@ -25,11 +27,8 @@ export function MarketRulesSection({
   return (
     <section className="space-y-4 rounded-lg border p-4">
       <div>
-        <h2 className="font-semibold">Markets &amp; shipping</h2>
-        <p className="text-sm text-muted-foreground">
-          Items are globally visible by default. Country settings override their region. Shipping is
-          per unit in AMD; blank means unavailable and 0 means free.
-        </p>
+        <h2 className="font-semibold">{t('adminItems.markets.heading')}</h2>
+        <p className="text-sm text-muted-foreground">{t('adminItems.markets.help')}</p>
       </div>
       <div className="space-y-3">
         {marketRegions
@@ -44,13 +43,13 @@ export function MarketRulesSection({
                 <summary className="cursor-pointer px-4 py-3 font-medium">
                   {region.name}{' '}
                   <span className="text-sm font-normal text-muted-foreground">
-                    ({countries.length} countries)
+                    {t('adminItems.markets.countryCount', { count: countries.length })}
                   </span>
                 </summary>
                 <div className="space-y-4 border-t p-4">
                   <MarketRuleFields
                     prefix={`market_region_${region.id}`}
-                    label={`${region.name} default`}
+                    label={t('adminItems.markets.regionDefault', { region: region.name })}
                     rule={regionRule}
                   />
                   <div className="divide-y rounded-md border bg-background">
@@ -84,6 +83,7 @@ function MarketRuleFields({
   rule?: MarketRuleFormValue;
   compact?: boolean;
 }) {
+  const t = useTranslations();
   const visibility =
     rule?.visibility_override === true ? 'show' : rule?.visibility_override === false ? 'hide' : '';
   return (
@@ -93,7 +93,7 @@ function MarketRuleFields({
       <div className="text-sm font-medium">{label}</div>
       <div className="space-y-1">
         <Label htmlFor={`${prefix}_visibility`} className="text-xs">
-          Visibility
+          {t('adminItems.markets.visibility')}
         </Label>
         <select
           id={`${prefix}_visibility`}
@@ -101,14 +101,14 @@ function MarketRuleFields({
           defaultValue={visibility}
           className="h-9 w-full rounded-md border bg-background px-2 text-sm"
         >
-          <option value="">Inherit</option>
-          <option value="show">Show</option>
-          <option value="hide">Hide</option>
+          <option value="">{t('adminItems.markets.inherit')}</option>
+          <option value="show">{t('adminItems.markets.show')}</option>
+          <option value="hide">{t('adminItems.markets.hide')}</option>
         </select>
       </div>
       <div className="space-y-1">
         <Label htmlFor={`${prefix}_shipping`} className="text-xs">
-          Shipping, AMD minor units
+          {t('adminItems.markets.shipping')}
         </Label>
         <Input
           id={`${prefix}_shipping`}
@@ -117,7 +117,7 @@ function MarketRuleFields({
           min="0"
           step="1"
           defaultValue={rule?.shipping_rate_cents ?? ''}
-          placeholder="Unavailable"
+          placeholder={t('adminItems.markets.unavailable')}
         />
       </div>
     </div>

@@ -9,6 +9,7 @@ import { listCatalogItemBoilerplates } from '@/lib/personalization-boilerplates'
 import { COMFORTABLE_COLORS } from '@/lib/personalization-constants';
 import { getCurrentUser, getServerSupabase } from '@/lib/supabase/server';
 import { getTranslations } from 'next-intl/server';
+import { tDynamic } from '@/lib/i18n-dynamic';
 import { resolvePublicStorageUrl } from '@/lib/storage';
 
 export const dynamic = 'force-dynamic';
@@ -65,9 +66,7 @@ export default async function PersonalizeItemPage({
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{item.title}</h1>
-              {item.description && (
-                <p className="mt-1 text-muted-foreground">{item.description}</p>
-              )}
+              {item.description && <p className="mt-1 text-muted-foreground">{item.description}</p>}
             </div>
           </section>
 
@@ -78,7 +77,9 @@ export default async function PersonalizeItemPage({
                 <p className="text-sm text-muted-foreground">{t('signInBody')}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Button asChild>
-                    <Link href={`/login?next=/personalize/${item.slug}`}>{tRoot('auth.login')}</Link>
+                    <Link href={`/login?next=/personalize/${item.slug}`}>
+                      {tRoot('auth.login')}
+                    </Link>
                   </Button>
                   <Button asChild variant="outline">
                     <Link href={`/register?next=/personalize/${item.slug}`}>
@@ -96,7 +97,10 @@ export default async function PersonalizeItemPage({
               <PersonalizeItemForm
                 catalogItemId={item.id}
                 boilerplates={boilerplates}
-                colors={[...COMFORTABLE_COLORS]}
+                colors={COMFORTABLE_COLORS.map((color) => ({
+                  ...color,
+                  label: tDynamic(tRoot, `generated.color.${color.value}`, color.label),
+                }))}
                 showColor={tags.has('personal_color')}
                 showText={tags.has('personal_text')}
                 showPhoto={tags.has('personal_photo')}
@@ -113,6 +117,14 @@ export default async function PersonalizeItemPage({
                   creditPerStyle: t('creditPerStyle'),
                   creditTotal: t.raw('creditTotal'),
                   generate: t.raw('generate'),
+                  generateOne: t('generateOne'),
+                  creditTotalOne: t('creditTotalOne'),
+                  removeImage: t('removeImage'),
+                  textFormatting: t('textFormatting'),
+                  bold: t('bold'),
+                  italic: t('italic'),
+                  alignLeft: t('alignLeft'),
+                  alignCenter: t('alignCenter'),
                   generatingTitle: t('generatingTitle'),
                   generatingBody: t('generatingBody'),
                   selectAtLeastOne: t('selectAtLeastOne'),

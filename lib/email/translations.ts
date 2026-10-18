@@ -65,3 +65,32 @@ export const RECEIPT_STRINGS: Record<ReceiptLocale, ReceiptStrings> = {
     footerNote: 'Դուք ստացել եք այս նամակը, քանի որ գնում եք կատարել Uniqraft-ում։',
   },
 };
+
+/** Credit pack display names (lib/credit-packs.ts keys) plus the no-pack fallback. */
+export interface ReceiptPackNames {
+  starter: string;
+  maker: string;
+  studio: string;
+  fallback: string;
+}
+
+export const RECEIPT_PACK_NAMES: Record<ReceiptLocale, ReceiptPackNames> = {
+  en: {
+    starter: 'Starter pack',
+    maker: 'Maker pack',
+    studio: 'Studio pack',
+    fallback: 'Credits',
+  },
+  ru: {
+    starter: 'Пакет «Старт»',
+    maker: 'Пакет «Мастер»',
+    studio: 'Пакет «Студия»',
+    fallback: 'Кредиты',
+  },
+  am: {
+    starter: '«Ստարտ» փաթեթ',
+    maker: '«Վարպետ» փաթեթ',
+    studio: '«Ստուդիա» փաթեթ',
+    fallback: 'Կրեդիտներ',
+  },
+};

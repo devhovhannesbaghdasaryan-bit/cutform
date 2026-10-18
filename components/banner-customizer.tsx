@@ -23,6 +23,9 @@ export type BannerCopy = {
   rights: string;
   generate: string;
   disclaimer: string;
+  defaultText: string;
+  /** Raw "{width}×{height} mm" template; interpolated client-side. */
+  dimensions: string;
 };
 
 export function BannerCustomizer({
@@ -36,7 +39,7 @@ export function BannerCustomizer({
 }) {
   const [sampleId, setSampleId] = useState(samples[0]?.id ?? '');
   const [sizeKey, setSizeKey] = useState(presets[0]?.key ?? '');
-  const [text, setText] = useState('Grand opening sale');
+  const [text, setText] = useState(copy.defaultText);
   const selectedSample = samples.find((sample) => sample.id === sampleId);
   const selectedPreset = presets.find((preset) => preset.key === sizeKey);
   const canCustomize =
@@ -55,7 +58,7 @@ export function BannerCustomizer({
           className="relative flex w-full items-center justify-center overflow-hidden rounded-md border bg-muted p-8"
           style={{ aspectRatio: ratio }}
         >
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),hsl(var(--cyber-cyan)/0.14))]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(var(--primary)/0.12),hsl(var(--gold)/0.14))]" />
           <div className="relative max-w-[80%] text-center text-3xl font-extrabold tracking-normal text-foreground">
             {text || copy.previewText}
           </div>
@@ -95,7 +98,10 @@ export function BannerCustomizer({
           >
             {presets.map((preset) => (
               <option key={preset.key} value={preset.key}>
-                {preset.name} - {preset.width_mm}x{preset.height_mm} mm
+                {preset.name} -{' '}
+                {copy.dimensions
+                  .replace('{width}', String(preset.width_mm))
+                  .replace('{height}', String(preset.height_mm))}
               </option>
             ))}
           </select>

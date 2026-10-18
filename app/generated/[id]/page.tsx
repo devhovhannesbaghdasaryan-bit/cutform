@@ -91,7 +91,13 @@ export default async function GeneratedItemPage({ params }: { params: Promise<{ 
     : null;
   const warnings = extractValidationWarnings(item.manufacturing_metadata);
   const bannerDetails =
-    item.product_type === 'banner' ? extractBannerDetails(item.generation_options) : null;
+    item.product_type === 'banner'
+      ? extractBannerDetails(item.generation_options, {
+          sizeFallback: t('generated.sizeReview'),
+          formatDimensions: (width, height) => t('common.dimensionsMm', { width, height }),
+          formatPlacement: (value) => tDynamic(t, `generated.placement.${value}`, value),
+        })
+      : null;
   const hasPreviewOptions = previewOptions.length > 0;
   const canOrder = item.review_status !== 'rejected';
   const salePriceCents = item.catalog_item?.price_cents ?? 0;
@@ -280,22 +286,29 @@ function asString(value: unknown) {
   return typeof value === 'string' && value.trim() ? value : null;
 }
 
-function extractBannerDetails(options: Record<string, unknown>) {
+function extractBannerDetails(
+  options: Record<string, unknown>,
+  labels: {
+    sizeFallback: string;
+    formatDimensions: (width: number, height: number) => string;
+    formatPlacement: (value: string) => string;
+  },
+) {
   const sizePreset = asRecord(options.sizePreset);
   const placement = asRecord(options.textPlacement);
   const dimensions =
     typeof sizePreset.width_mm === 'number' && typeof sizePreset.height_mm === 'number'
-      ? `${sizePreset.width_mm}x${sizePreset.height_mm} mm`
+      ? labels.formatDimensions(sizePreset.width_mm, sizePreset.height_mm)
       : null;
   const sizeLabel = [
-    asString(sizePreset.name) ?? asString(options.bannerSizeKey) ?? 'Size requires review',
+    asString(sizePreset.name) ?? asString(options.bannerSizeKey) ?? labels.sizeFallback,
     dimensions,
   ]
     .filter(Boolean)
     .join(' - ');
   const placementLabel = [
-    asString(placement.zone) ?? 'center',
-    asString(placement.alignment) ?? 'center',
+    labels.formatPlacement(asString(placement.zone) ?? 'center'),
+    labels.formatPlacement(asString(placement.alignment) ?? 'center'),
   ].join(', ');
 
   return {

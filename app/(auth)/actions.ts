@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { z } from 'zod';
 import { actionError, actionSuccess, zodErrorToState, type ActionState } from '@/lib/action-state';
 import { mergeSessionCartIntoUserCart } from '@/lib/cart';
@@ -30,25 +31,53 @@ const credentialsSchema = z.object({
   next: safeNextPath,
 });
 
-const registerSchema = z.object({
-  email: z.string().trim().min(1, 'Email and password are required.'),
-  password: z
-    .string()
-    .min(1, 'Email and password are required.')
-    .min(8, 'Password must be at least 8 characters.'),
-});
+type AuthTranslator = Awaited<ReturnType<typeof getTranslations<'auth'>>>;
 
-const emailSchema = z.object({
-  email: z.string().trim().min(1, 'Email is required.'),
-});
+function registerSchema(t: AuthTranslator) {
+  return z.object({
+    email: z.string().trim().min(1, t('errorEmailPasswordRequired')),
+    password: z.string().min(1, t('errorEmailPasswordRequired')).min(8, t('errorPasswordLength')),
+  });
+}
 
-const otpSchema = emailSchema.extend({
-  token: z
-    .string()
-    .transform((value) => value.replace(/\s+/g, ''))
-    // Supabase's email OTP length is a project setting (6–10 digits).
-    .refine((value) => /^\d{6,10}$/.test(value), 'Enter the code from the email.'),
-});
+function emailSchema(t: AuthTranslator) {
+  return z.object({
+    email: z.string().trim().min(1, t('errorEmailRequired')),
+  });
+}
+
+function otpSchema(t: AuthTranslator) {
+  return emailSchema(t).extend({
+    token: z
+      .string()
+      .transform((value) => value.replace(/\s+/g, ''))
+      // Supabase's email OTP length is a project setting (6–10 digits).
+      .refine((value) => /^\d{6,10}$/.test(value), t('errorCode')),
+  });
+}
+
+/**
+ * Localizes the common Supabase auth failures by their stable error code;
+ * anything unrecognized falls through to the provider's own message.
+ */
+function authErrorMessage(t: AuthTranslator, error: { code?: string; message: string }) {
+  switch (error.code) {
+    case 'invalid_credentials':
+      return t('errorInvalidCredentials');
+    case 'user_already_exists':
+    case 'email_exists':
+      return t('errorUserExists');
+    case 'weak_password':
+      return t('errorWeakPassword');
+    case 'over_email_send_rate_limit':
+    case 'over_request_rate_limit':
+      return t('errorRateLimit');
+    case 'otp_expired':
+      return t('errorCodeExpired');
+    default:
+      return error.message;
+  }
+}
 
 const socialSchema = z.object({
   provider: z.enum(['facebook', 'google']),
@@ -70,7 +99,8 @@ export async function registerAction(
   _prev: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const parsed = registerSchema.safeParse({
+  const t = await getTranslations('auth');
+  const parsed = registerSchema(t).safeParse({
     email: formData.get('email') ?? '',
     password: formData.get('password') ?? '',
   });
@@ -82,7 +112,7 @@ export async function registerAction(
     password: parsed.data.password,
     options: { emailRedirectTo: callbackUrl() },
   });
-  if (error) return actionError(error.message);
+  if (error) return actionError(authErrorMessage(t, error));
 
   redirect(`/auth/verify-email?email=${encodeURIComponent(parsed.data.email)}`);
 }
@@ -99,7 +129,7 @@ export async function loginAction(
 
   const supabase = await getServerSupabase();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return actionError(error.message);
+  if (error) return actionError(authErrorMessage(await getTranslations('auth'), error));
 
   if (!data.user?.email_confirmed_at) redirect('/auth/verify-email');
   await mergeAnonymousCart(data.user.id);
@@ -114,9 +144,7 @@ export async function socialLoginAction(formData: FormData) {
   });
 
   if (!parsed.success) {
-    redirect(
-      `/login?error=${encodeURIComponent('Unsupported login provider.')}&next=${encodeURIComponent(next)}`,
-    );
+    redirect(`/login?error=unsupported_provider&next=${encodeURIComponent(next)}`);
   }
 
   const supabase = await getServerSupabase();
@@ -128,7 +156,8 @@ export async function socialLoginAction(formData: FormData) {
   });
 
   if (error || !data.url) {
-    const message = error?.message ?? 'The login provider could not be started.';
+    // Coded errors are localized by the login page; provider messages pass through.
+    const message = error?.message ?? 'provider_unavailable';
     redirect(
       `/login?error=${encodeURIComponent(message)}&next=${encodeURIComponent(parsed.data.next)}`,
     );
@@ -148,7 +177,8 @@ export async function resendVerificationAction(
   _prev: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const parsed = emailSchema.safeParse({ email: formData.get('email') ?? '' });
+  const t = await getTranslations('auth');
+  const parsed = emailSchema(t).safeParse({ email: formData.get('email') ?? '' });
   if (!parsed.success) return zodErrorToState(parsed.error);
 
   const supabase = await getServerSupabase();
@@ -157,7 +187,7 @@ export async function resendVerificationAction(
     email: parsed.data.email,
     options: { emailRedirectTo: callbackUrl() },
   });
-  if (error) return actionError(error.message);
+  if (error) return actionError(authErrorMessage(t, error));
   return actionSuccess(null);
 }
 
@@ -165,7 +195,8 @@ export async function verifyOtpAction(
   _prev: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const parsed = otpSchema.safeParse({
+  const t = await getTranslations('auth');
+  const parsed = otpSchema(t).safeParse({
     email: formData.get('email') ?? '',
     token: formData.get('token') ?? '',
   });
@@ -177,7 +208,7 @@ export async function verifyOtpAction(
     token: parsed.data.token,
     type: 'signup',
   });
-  if (error) return actionError(error.message);
+  if (error) return actionError(authErrorMessage(t, error));
 
   if (data.user) await mergeAnonymousCart(data.user.id);
   redirect('/dashboard');

@@ -57,6 +57,9 @@ export type AdminOrderDetailRow = Pick<
   | 'payment_provider_route'
   | 'shipping_address'
   | 'contact_email'
+  | 'locale'
+  | 'destination_country_code'
+  | 'transaction_id'
   | 'created_at'
   | 'updated_at'
 >;
@@ -117,7 +120,7 @@ export async function getOrderDetailForAdmin(supabase: SupabaseClient, orderId: 
     supabase
       .from('orders')
       .select(
-        'id, user_id, status, payment_status, subtotal_cents, shipping_cents, total_cents, shipping_rate_context, currency, exchange_rate_context, payment_provider_route, shipping_address, contact_email, created_at, updated_at',
+        'id, user_id, status, payment_status, subtotal_cents, shipping_cents, total_cents, shipping_rate_context, currency, exchange_rate_context, payment_provider_route, shipping_address, contact_email, locale, destination_country_code, transaction_id, created_at, updated_at',
       )
       .eq('id', orderId)
       .maybeSingle<AdminOrderDetailRow>(),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RECEIPT_STRINGS } from '@/lib/email/translations';
+import { RECEIPT_PACK_NAMES, RECEIPT_STRINGS } from '@/lib/email/translations';
 
 const LOCALES = ['en', 'ru', 'am'] as const;
 
@@ -14,6 +14,16 @@ describe('RECEIPT_STRINGS', () => {
   it('has non-empty values everywhere', () => {
     for (const locale of LOCALES) {
       for (const [key, value] of Object.entries(RECEIPT_STRINGS[locale])) {
+        expect(value.trim(), `${locale}.${key}`).not.toBe('');
+      }
+    }
+  });
+
+  it('names every credit pack in every locale', () => {
+    const enKeys = Object.keys(RECEIPT_PACK_NAMES.en).sort();
+    for (const locale of LOCALES) {
+      expect(Object.keys(RECEIPT_PACK_NAMES[locale]).sort()).toEqual(enKeys);
+      for (const [key, value] of Object.entries(RECEIPT_PACK_NAMES[locale])) {
         expect(value.trim(), `${locale}.${key}`).not.toBe('');
       }
     }

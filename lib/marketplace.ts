@@ -128,6 +128,40 @@ export async function listCategories() {
   return getCachedCategories();
 }
 
+// One published item's thumbnail per category, so category tiles can show a
+// real product photo. Popular items win; categories without a photo are
+// simply absent from the map.
+const getCachedCategoryCovers = unstable_cache(
+  async () =>
+    retryTransient(async () => {
+      const supabase = getServiceSupabase();
+      const { data, error } = await supabase
+        .from('catalog_items')
+        .select('category_id, thumbnail_path, title')
+        .eq('status', 'published')
+        .not('thumbnail_path', 'is', null)
+        .order('is_popular', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(200)
+        .returns<{ category_id: string; thumbnail_path: string; title: string }[]>();
+      if (error) throw new Error(error.message);
+      const covers: Record<string, { path: string; title: string }> = {};
+      for (const row of data ?? []) {
+        if (!covers[row.category_id]) {
+          covers[row.category_id] = { path: row.thumbnail_path, title: row.title };
+        }
+      }
+      return covers;
+    }),
+  ['catalog-category-covers'],
+  { revalidate: 300, tags: ['catalog-items'] },
+);
+
+/** Map of category id → a published item's thumbnail, for category tiles. */
+export async function listCategoryCovers() {
+  return getCachedCategoryCovers();
+}
+
 const getCachedSubcategories = unstable_cache(
   async (categorySlug: string | undefined) =>
     retryTransient(async () => {
@@ -178,14 +212,32 @@ export const CATALOG_PAGE_SIZE = 24;
 // `!inner` join, which the previous version didn't use, so that filter was
 // silently a no-op and the whole (unfiltered, unpaginated) published catalog
 // was fetched and filtered in JS on every request instead.
+export type CatalogPersonalizationFilter = 'photo' | 'text' | 'none';
+export type CatalogSort = 'popular' | 'newest' | 'price_asc' | 'price_desc';
+
+export interface CatalogListOptions {
+  search?: string;
+  personalization?: CatalogPersonalizationFilter;
+  sort?: CatalogSort;
+}
+
 const getCachedPublishedCatalogItemsPage = unstable_cache(
-  async (categoryId: string | undefined, subcategoryId: string | undefined, offset: number) =>
+  async (
+    categoryId: string | undefined,
+    subcategoryId: string | undefined,
+    offset: number,
+    search: string | undefined,
+    personalization: CatalogPersonalizationFilter | undefined,
+    sort: CatalogSort,
+  ) =>
     retryTransient(async () => {
       const supabase = getServiceSupabase();
-      let query = supabase
-        .from('catalog_items')
-        .select(CATALOG_SELECT)
-        .eq('status', 'published')
+      let query = supabase.from('catalog_items').select(CATALOG_SELECT).eq('status', 'published');
+
+      if (sort === 'price_asc') query = query.order('price_cents', { ascending: true });
+      else if (sort === 'price_desc') query = query.order('price_cents', { ascending: false });
+      else if (sort === 'popular') query = query.order('is_popular', { ascending: false });
+      query = query
         .order('created_at', { ascending: false })
         // Fetch one extra row so the caller can tell whether another page
         // exists without a separate COUNT(*) query.
@@ -193,6 +245,15 @@ const getCachedPublishedCatalogItemsPage = unstable_cache(
 
       if (categoryId) query = query.eq('category_id', categoryId);
       if (subcategoryId) query = query.eq('subcategory_id', subcategoryId);
+      if (personalization === 'photo') query = query.contains('tags', ['personal_photo']);
+      else if (personalization === 'text') query = query.contains('tags', ['personal_text']);
+      else if (personalization === 'none') query = query.eq('is_customizable', false);
+      if (search) {
+        // Header search box: a plain title/description match is enough for a
+        // catalog this size; PostgREST escapes the pattern itself.
+        const pattern = `%${search.replace(/[%_]/g, '')}%`;
+        query = query.or(`title.ilike.${pattern},description.ilike.${pattern}`);
+      }
 
       const { data, error } = await query.returns<CatalogItem[]>();
       if (error) throw new Error(error.message);
@@ -212,11 +273,20 @@ export async function listPublishedCatalogItems(
   categoryId?: string,
   subcategoryId?: string,
   page = 1,
+  options: CatalogListOptions = {},
 ) {
   const safePage = Number.isInteger(page) && page > 0 ? page : 1;
   const offset = (safePage - 1) * CATALOG_PAGE_SIZE;
+  const normalizedSearch = options.search?.trim().slice(0, 80) || undefined;
 
-  const rows = await getCachedPublishedCatalogItemsPage(categoryId, subcategoryId, offset);
+  const rows = await getCachedPublishedCatalogItemsPage(
+    categoryId,
+    subcategoryId,
+    offset,
+    normalizedSearch,
+    options.personalization,
+    options.sort ?? 'popular',
+  );
   const hasMore = rows.length > CATALOG_PAGE_SIZE;
   const pageItems = hasMore ? rows.slice(0, CATALOG_PAGE_SIZE) : rows;
 

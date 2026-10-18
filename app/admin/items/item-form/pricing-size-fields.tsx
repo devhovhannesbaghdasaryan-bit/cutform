@@ -1,6 +1,8 @@
+import { useLocale, useTranslations } from 'next-intl';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { DEFAULT_LOCALE, normalizeLocale } from '@/lib/i18n-config';
 import { formatPrice } from '@/lib/utils';
 import { AutogenerateButton } from './ai-context';
 import type { ItemFormValue, StoredPriceFormValue } from './types';
@@ -16,6 +18,8 @@ export function PriceField({
   /** The price as currently stored, when it is not in AMD yet. */
   storedPrice?: StoredPriceFormValue | null;
 }) {
+  const t = useTranslations();
+  const locale = normalizeLocale(useLocale()) ?? DEFAULT_LOCALE;
   const fallbackAmd =
     item?.price_cents != null && (item.currency ?? 'AMD') === 'AMD'
       ? Math.round(item.price_cents / 100)
@@ -25,7 +29,7 @@ export function PriceField({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="priceAmd">Price, AMD</Label>
+      <Label htmlFor="priceAmd">{t('adminItems.pricing.priceAmd')}</Label>
       <Input
         id="priceAmd"
         name="priceAmd"
@@ -38,8 +42,9 @@ export function PriceField({
       />
       {needsConversion ? (
         <p className="text-xs text-muted-foreground">
-          Stored as {formatPrice(storedPrice.amountCents, storedPrice.currency)}. Prefilled at
-          today&apos;s rate; saving stores the price in AMD.
+          {t('adminItems.pricing.storedAs', {
+            price: formatPrice(storedPrice.amountCents, storedPrice.currency, locale),
+          })}
         </p>
       ) : null}
     </div>
@@ -51,10 +56,11 @@ export function ManufacturingNotesField({
 }: {
   item?: Pick<ItemFormValue, 'manufacturing_notes'>;
 }) {
+  const t = useTranslations();
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <Label htmlFor="manufacturingNotes">Manufacturing notes</Label>
+        <Label htmlFor="manufacturingNotes">{t('adminItems.pricing.manufacturingNotes')}</Label>
         <AutogenerateButton field="manufacturingNotes" />
       </div>
       <Textarea
@@ -71,10 +77,11 @@ export function SizesCharacteristicsFields({
 }: {
   item?: Pick<ItemFormValue, 'sizes' | 'characteristics'>;
 }) {
+  const t = useTranslations();
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <div className="space-y-2">
-        <Label htmlFor="sizesJson">Sizes JSON</Label>
+        <Label htmlFor="sizesJson">{t('adminItems.pricing.sizesJson')}</Label>
         <Textarea
           id="sizesJson"
           name="sizesJson"
@@ -84,14 +91,14 @@ export function SizesCharacteristicsFields({
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <Label htmlFor="characteristics">Admin-only characteristics</Label>
+          <Label htmlFor="characteristics">{t('adminItems.pricing.characteristics')}</Label>
           <AutogenerateButton field="characteristics" />
         </div>
         <Textarea
           id="characteristics"
           name="characteristics"
           defaultValue={item?.characteristics ?? ''}
-          placeholder="Materials, specifications, finish, production assumptions."
+          placeholder={t('adminItems.pricing.characteristicsPlaceholder')}
         />
       </div>
     </div>

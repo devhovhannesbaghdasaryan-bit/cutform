@@ -1,10 +1,26 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { updateOrderStatusAction } from '@/app/admin/orders/[id]/actions';
 import { errorOf, idleState } from '@/lib/action-state';
+
+const PRODUCTION_STATUSES = [
+  'draft',
+  'pending_payment',
+  'paid',
+  'review_required',
+  'approved_for_production',
+  'in_production',
+  'ready_to_ship',
+  'shipped',
+  'cancelled',
+  'refunded',
+] as const;
+
+const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded', 'failed'] as const;
 
 export function OrderStatusForm({
   orderId,
@@ -15,6 +31,7 @@ export function OrderStatusForm({
   status: string;
   paymentStatus: string;
 }) {
+  const t = useTranslations();
   const [state, action, pending] = useActionState(updateOrderStatusAction, idleState);
   const error = errorOf(state);
 
@@ -23,37 +40,33 @@ export function OrderStatusForm({
       <input type="hidden" name="orderId" value={orderId} />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="status">Production status</Label>
+          <Label htmlFor="status">{t('adminOrders.statusForm.productionStatus')}</Label>
           <select
             id="status"
             name="status"
             defaultValue={status}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
-            <option value="draft">Draft</option>
-            <option value="pending_payment">Pending payment</option>
-            <option value="paid">Paid</option>
-            <option value="review_required">Review required</option>
-            <option value="approved_for_production">Approved for production</option>
-            <option value="in_production">In production</option>
-            <option value="ready_to_ship">Ready to ship</option>
-            <option value="shipped">Shipped</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="refunded">Refunded</option>
+            {PRODUCTION_STATUSES.map((value) => (
+              <option key={value} value={value}>
+                {t(`status.${value}`)}
+              </option>
+            ))}
           </select>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="paymentStatus">Payment status</Label>
+          <Label htmlFor="paymentStatus">{t('adminOrders.statusForm.paymentStatus')}</Label>
           <select
             id="paymentStatus"
             name="paymentStatus"
             defaultValue={paymentStatus}
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
-            <option value="unpaid">Unpaid</option>
-            <option value="paid">Paid</option>
-            <option value="refunded">Refunded</option>
-            <option value="failed">Failed</option>
+            {PAYMENT_STATUSES.map((value) => (
+              <option key={value} value={value}>
+                {t(`adminOrders.paymentStatus.${value}`)}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -63,7 +76,7 @@ export function OrderStatusForm({
         </p>
       )}
       <Button type="submit" disabled={pending}>
-        {pending ? 'Updating...' : 'Update order'}
+        {pending ? t('adminOrders.statusForm.updating') : t('adminOrders.statusForm.submit')}
       </Button>
     </form>
   );

@@ -82,7 +82,9 @@ export default async function DashboardPage() {
       <>
         <SiteHeader email={user.email ?? ''} />
         <main className="container py-10">
-          <p className="text-destructive">Failed to load products: {error.message}</p>
+          <p className="text-destructive">
+            {t('dashboard.loadFailed', { message: error.message })}
+          </p>
         </main>
       </>
     );
@@ -146,7 +148,7 @@ export default async function DashboardPage() {
                             </Link>
                           </td>
                           <td className="px-4 py-3">
-                            {formatPrice(order.subtotal_cents, order.currency)}
+                            {formatPrice(order.subtotal_cents, order.currency, locale)}
                           </td>
                           <td className="px-4 py-3">
                             {tDynamic(t, `status.${order.payment_status}`, order.payment_status)}
@@ -192,10 +194,16 @@ export default async function DashboardPage() {
                       </div>
                       <div className="mt-4 space-y-1">
                         <p className="font-medium">{item.title ?? item.id.slice(0, 8)}</p>
-                        <p className="text-sm text-muted-foreground">{item.product_type}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {tDynamic(
+                            t,
+                            `generated.productType.${item.product_type}`,
+                            item.product_type.replaceAll('_', ' '),
+                          )}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           {tDynamic(t, `status.${item.review_status}`, item.review_status)} ·{' '}
-                          {item.credit_cost} {t('dashboard.credits').toLowerCase()} ·{' '}
+                          {t('credits.amount', { count: item.credit_cost })} ·{' '}
                           {formatLocalizedDate(locale, item.created_at)}
                         </p>
                       </div>
@@ -211,7 +219,12 @@ export default async function DashboardPage() {
                 </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((p) => (
-                    <ProductCard key={p.id} product={p} />
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      locale={locale}
+                      previewLabel={t('dashboard.productPreview')}
+                    />
                   ))}
                 </div>
               </section>

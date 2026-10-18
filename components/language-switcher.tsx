@@ -9,7 +9,13 @@ const LABELS: Record<AppLocale, string> = {
   am: 'AM',
 };
 
-export function LanguageSwitcher({ activeLocale = 'en' }: { activeLocale?: AppLocale }) {
+export function LanguageSwitcher({
+  activeLocale = 'en',
+  label,
+}: {
+  activeLocale?: AppLocale;
+  label: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,7 +37,7 @@ export function LanguageSwitcher({ activeLocale = 'en' }: { activeLocale?: AppLo
 
   return (
     <select
-      aria-label="Language"
+      aria-label={label}
       value={activeLocale}
       onChange={(event) => changeLocale(event.target.value as AppLocale)}
       className="h-8 rounded-md border bg-background px-2 text-xs font-medium text-muted-foreground hover:text-foreground"

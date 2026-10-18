@@ -20,17 +20,17 @@ export function toggleTheme() {
   window.localStorage.setItem(THEME_KEY, nextTheme);
 }
 
-export function ThemeToggle({ className }: { className?: string }) {
+export function ThemeToggle({ className, label }: { className?: string; label: string }) {
   return (
     <Button
       type="button"
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      aria-label="Toggle color theme"
-      title="Toggle color theme"
+      aria-label={label}
+      title={label}
       className={cn(
-        'relative shrink-0 text-cyber-cyan hover:bg-secondary hover:text-secondary-foreground',
+        'relative shrink-0 text-muted-foreground hover:bg-accent hover:text-foreground',
         className,
       )}
     >

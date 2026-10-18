@@ -3,11 +3,14 @@
 import Link from 'next/link';
 import {
   Coins,
+  Gift,
   LayoutDashboard,
   LayoutGrid,
+  Lamp,
   Menu,
   Moon,
   ShieldCheck,
+  Sparkles,
   Sun,
   UserCircle,
 } from 'lucide-react';
@@ -25,6 +28,9 @@ export interface MobileNavLabels {
   menu: string;
   theme: string;
   catalog: string;
+  nightLights: string;
+  gifts: string;
+  howItWorks: string;
   credits: string;
   dashboard: string;
   admin: string;
@@ -34,9 +40,8 @@ export interface MobileNavLabels {
 }
 
 /**
- * Sub-`sm` replacement for the header's hidden text links. Renders nothing on
- * desktop (`sm:hidden`); receives all state and strings as props so the
- * server-rendered header stays the only data owner.
+ * Sub-`lg` replacement for the header's hidden navigation. Receives all state
+ * and strings as props so the server-rendered header stays the only data owner.
  */
 export function MobileNavMenu({
   isAuthenticated,
@@ -50,20 +55,39 @@ export function MobileNavMenu({
   labels: MobileNavLabels;
 }) {
   return (
-    <div className="sm:hidden">
+    <div className="lg:hidden">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" aria-label={labels.menu}>
-            <Menu className="h-4 w-4" />
+            <Menu className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-[12rem]">
+        <DropdownMenuContent align="end" className="min-w-[14rem]">
           <DropdownMenuItem asChild>
             <Link href="/catalog" className="cursor-pointer">
               <LayoutGrid className="mr-2 h-4 w-4" />
               {labels.catalog}
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/catalog?category=night-lights" className="cursor-pointer">
+              <Lamp className="mr-2 h-4 w-4" />
+              {labels.nightLights}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/catalog?category=anniversary-gifts" className="cursor-pointer">
+              <Gift className="mr-2 h-4 w-4" />
+              {labels.gifts}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/#how" className="cursor-pointer">
+              <Sparkles className="mr-2 h-4 w-4" />
+              {labels.howItWorks}
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {isAuthenticated ? (
             <>
               <DropdownMenuItem asChild>

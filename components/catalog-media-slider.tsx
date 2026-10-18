@@ -69,7 +69,9 @@ export function CatalogMediaSlider({
   media,
   fallbackTitle,
   fallbackCategory,
+  showMediaLabel,
   compact = false,
+  priority = false,
   // Matches the catalog grid card width by default (up to 4 columns at
   // desktop width); the item-detail page passes a wider value since its
   // slider fills roughly half the page instead of one grid cell.
@@ -78,7 +80,11 @@ export function CatalogMediaSlider({
   media: CatalogItemMedia[];
   fallbackTitle: string;
   fallbackCategory?: string | null;
+  /** Localized "Show media {number}" template; the slider interpolates {number}. */
+  showMediaLabel: string;
   compact?: boolean;
+  /** Load the first slide eagerly (the product page's largest image). */
+  priority?: boolean;
   sizes?: string;
 }) {
   const [index, setIndex] = useState(0);
@@ -199,7 +205,7 @@ export function CatalogMediaSlider({
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: hover slideshow is a non-essential enhancement; every media is still reachable via the progress controls
     <div
-      className="group/media relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-md border border-black/10 bg-white/35 text-center shadow-inner"
+      className="group/media relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-slate text-center"
       onMouseEnter={() => setIsHoveringSelf(true)}
       onMouseLeave={() => setIsHoveringSelf(false)}
     >
@@ -227,6 +233,7 @@ export function CatalogMediaSlider({
             media={current}
             alt={current.alt_text ?? fallbackTitle}
             sizes={sizes}
+            eager={priority && index === 0}
             onLoad={() => markLoaded(current.id)}
           />
         </div>
@@ -263,13 +270,15 @@ export function CatalogMediaSlider({
         <div className="flex h-full w-full items-center justify-center p-4">
           <div className="space-y-2">
             {fallbackCategory ? (
-              <p className="text-xs font-medium uppercase text-black/55">{fallbackCategory}</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-white/55">
+                {fallbackCategory}
+              </p>
             ) : null}
             <p
               className={
                 compact
-                  ? 'text-lg font-semibold leading-tight text-black/80'
-                  : 'text-3xl font-bold text-black/80'
+                  ? 'text-lg font-semibold leading-tight text-white/85'
+                  : 'text-3xl font-bold text-white/85'
               }
             >
               {fallbackTitle}
@@ -325,7 +334,7 @@ export function CatalogMediaSlider({
                   event.preventDefault();
                   showSlide(itemIndex);
                 }}
-                aria-label={`Show media ${itemIndex + 1}`}
+                aria-label={showMediaLabel.replace('{number}', String(itemIndex + 1))}
               >
                 <span
                   className="block h-full rounded-full bg-background ease-linear"

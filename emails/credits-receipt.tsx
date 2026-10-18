@@ -26,7 +26,7 @@ export function CreditsReceiptEmail({
   strings: ReceiptStrings;
 }) {
   return (
-    <Html lang={model.locale}>
+    <Html lang={model.locale === 'am' ? 'hy' : model.locale}>
       <Tailwind config={{ presets: [pixelBasedPreset] }}>
         <Head />
         <Body className="bg-gray-100 font-sans">

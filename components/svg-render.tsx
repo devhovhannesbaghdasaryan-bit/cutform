@@ -11,7 +11,16 @@ import { cn } from '@/lib/utils';
  *      SVG, where strict XML parsing would fail.
  *   3. Appends the resulting <svg> element to a ref'd host node.
  */
-export function SvgRender({ svg, className }: { svg: string; className?: string }) {
+export function SvgRender({
+  svg,
+  label,
+  className,
+}: {
+  svg: string;
+  /** Localized accessible name for the rendered artwork. */
+  label: string;
+  className?: string;
+}) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -37,7 +46,7 @@ export function SvgRender({ svg, className }: { svg: string; className?: string 
     <div
       ref={ref}
       role="img"
-      aria-label="Generated SVG"
+      aria-label={label}
       className={cn('flex items-center justify-center [&>svg]:h-full [&>svg]:w-full', className)}
     />
   );

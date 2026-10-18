@@ -22,7 +22,7 @@ export default async function BannersPage() {
   const fallbackSamples: BannerSample[] = samples?.length
     ? samples
     : [{ id: 'mock-store-banner', title: t('banners.sampleFallback'), image_path: 'mock-banner' }];
-  const bannerCopy = Object.fromEntries(
+  const bannerTexts = Object.fromEntries(
     (
       [
         'sample',
@@ -39,9 +39,11 @@ export default async function BannersPage() {
         'rights',
         'generate',
         'disclaimer',
+        'defaultText',
       ] as const
     ).map((key) => [key, tBanner.raw(key)]),
-  ) as Parameters<typeof BannerCustomizer>[0]['copy'];
+  ) as Omit<Parameters<typeof BannerCustomizer>[0]['copy'], 'dimensions'>;
+  const bannerCopy = { ...bannerTexts, dimensions: t.raw('common.dimensionsMm') as string };
 
   return (
     <>

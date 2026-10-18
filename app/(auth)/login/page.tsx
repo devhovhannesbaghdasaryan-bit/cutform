@@ -9,6 +9,14 @@ export default async function LoginPage({
 }) {
   const { next, error } = await searchParams;
   const t = await getTranslations();
+  // Our own redirects pass short error codes; Supabase errors arrive as text.
+  const errorCodes: Record<string, string> = {
+    missing_code: t('auth.errorLinkInvalid'),
+    missing_token: t('auth.errorLinkInvalid'),
+    unsupported_provider: t('auth.errorProvider'),
+    provider_unavailable: t('auth.errorProviderStart'),
+  };
+  const oauthError = error ? (errorCodes[error] ?? error) : undefined;
   return (
     <main className="container flex min-h-screen items-center justify-center py-16">
       <div className="w-full max-w-sm space-y-6">
@@ -18,7 +26,7 @@ export default async function LoginPage({
         </div>
         <LoginForm
           next={next ?? '/dashboard'}
-          oauthError={error}
+          oauthError={oauthError}
           copy={{
             socialOptions: t('auth.socialOptions'),
             facebook: t('auth.continueFacebook'),

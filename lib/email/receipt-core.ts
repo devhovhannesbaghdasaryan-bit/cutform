@@ -1,5 +1,6 @@
 // Pure receipt model builders. No env, Next, or Supabase imports — unit-tested
 // outside the runtime (same convention as lib/payments/polar-core.ts).
+import { RECEIPT_PACK_NAMES, type ReceiptPackNames } from '@/lib/email/translations';
 import {
   DEFAULT_LOCALE,
   formatLocalizedCurrency,
@@ -77,10 +78,17 @@ export function buildCreditsReceiptModel(input: {
   currency: string;
   siteUrl: string;
 }): CreditsReceiptModel {
+  const packNames = RECEIPT_PACK_NAMES[input.locale];
+  const packKey = input.metadata.packKey;
+  const localizedPackName =
+    typeof packKey === 'string' && packKey !== 'fallback' && Object.hasOwn(packNames, packKey)
+      ? packNames[packKey as keyof ReceiptPackNames]
+      : null;
   const packName =
-    typeof input.metadata.packName === 'string' && input.metadata.packName.trim()
+    localizedPackName ??
+    (typeof input.metadata.packName === 'string' && input.metadata.packName.trim()
       ? input.metadata.packName
-      : 'Credits';
+      : packNames.fallback);
   const rawCredits = Number(input.metadata.creditAmount ?? 0);
   return {
     locale: input.locale,
